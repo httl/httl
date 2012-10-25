@@ -33,8 +33,6 @@ import httl.spi.runtime.WriterTemplate;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
 import httl.util.StringUtils;
-import httl.util.UnsafeByteArrayOutputStream;
-import httl.util.UnsafeStringWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -112,8 +110,6 @@ public abstract class AbstractParser implements Parser, Configurable {
 
     protected static final String BREAKIF = "breakif";
 
-    protected static final String BLOCK = "block";
-
     protected static final String MACRO = "macro";
 
     protected static final String END = "end";
@@ -131,8 +127,6 @@ public abstract class AbstractParser implements Parser, Configurable {
     protected String foreachName = FOREACH;
 
     protected String breakifName = BREAKIF;
-
-    protected String blockName = BLOCK;
 
     protected String macroName = MACRO;
 
@@ -173,7 +167,6 @@ public abstract class AbstractParser implements Parser, Configurable {
             breakifName = namespace + BREAKIF;
             setName = namespace + SET;
             varName = namespace + VAR;
-            blockName = namespace + BLOCK;
             macroName = namespace + MACRO;
         }
         String status = config.get(FOREACH_STATUS);
@@ -452,15 +445,6 @@ public abstract class AbstractParser implements Parser, Configurable {
             return "}\n"; // 插入结束指令
         } else if (foreachName.equals(name)) {
             return foreachStatus + ".increment();\n}\n" + foreachStatus + ".pop();\n"; // 插入结束指令
-        } else if (blockName.equals(name)) {
-            StringBuffer buf = new StringBuffer();
-            if (isOutput) {
-                buf.append(value + " = toString((" + UnsafeByteArrayOutputStream.class.getName() + ")$output);\n");
-            } else {
-                buf.append(value + " = $output.toString();\n");
-            }
-            buf.append("$output = $output_" + value + ";\n");
-            return buf.toString(); // 插入结束指令
         }
         return null;
     }
@@ -579,7 +563,7 @@ public abstract class AbstractParser implements Parser, Configurable {
             buf.append("\", ");
             buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
             buf.append(");\n");
-        } else if (varName.equals(name) || "define".equals(name)) {
+        } else if (varName.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The in parameters == null!", begin);
             }
@@ -611,24 +595,7 @@ public abstract class AbstractParser implements Parser, Configurable {
                 buf.append(var);
                 buf.append("\");\n");
             }
-        } else if (blockName.equals(name)) {
-            if (value == null || value.length() == 0) {
-                throw new ParseException("The block name == null!", begin);
-            }
-            if (isOutput) {
-                buf.append(OutputStream.class.getName() + " $output_" + value + " = $output;\n");
-                buf.append("$output = new " + UnsafeByteArrayOutputStream.class.getName() + "();\n");
-            } else {
-                buf.append(Writer.class.getName() + " $output_" + value + " = $output;\n");
-                buf.append("$output = new " + UnsafeStringWriter.class.getName() + "();\n");
-            }
-            Class<?> cls = types.get(value);
-            if (cls != null && ! cls.equals(String.class)) {
-                throw new ParseException("Duplicate block variable " + value + ", conflict types: " + cls.getName() + ", " + String.class.getName(), begin);
-            }
-            variables.add(value);
-            types.put(value, String.class);
-        } else {
+        }else {
             throw new ParseException("Unsupported directive " + name, begin);
         }
         return buf.toString();

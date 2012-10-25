@@ -89,8 +89,7 @@ public class AttributeParser extends AbstractParser {
                 }
                 if (! ifName.equals(name) && ! elseifName.equals(name) && ! elseName.equals(name)
                         && ! foreachName.equals(name) && ! breakifName.equals(name)
-                        && ! setName.equals(name) && ! varName.equals(name) 
-                        && ! blockName.equals(name)) {
+                        && ! setName.equals(name) && ! varName.equals(name)) {
                     continue;
                 }
                 statements.add(attribute);

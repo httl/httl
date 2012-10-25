@@ -138,7 +138,7 @@ public class CommentParser extends AbstractParser {
             } else {
                 if (ifName.equals(name) || elseifName.equals(name) 
                         || elseName.equals(name) || foreachName.equals(name)
-                        || blockName.equals(name) || macroName.equals(name)) {
+                        || macroName.equals(name)) {
                     nameStack.push(name);
                     valueStack.push(value);
                 }
