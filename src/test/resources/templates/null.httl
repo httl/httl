@@ -1,0 +1,2 @@
+<!--#var(User nonexistent)-->
+A: ${nonexistent.role}

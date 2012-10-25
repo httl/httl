@@ -1,0 +1,8 @@
+${"true".toBoolean}
+${"a".toChar}
+${"1".toByte}
+${"2".toShort}
+${"3".toInt}
+${"4".toLong}
+${"5".toFloat}
+${"6".toDouble}

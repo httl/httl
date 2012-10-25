@@ -1,0 +1,18 @@
+<!--#var(User user)-->
+${"name": "bb"}
+${["name": "bb"].class.name}
+${"name space": "bb"}
+${"name*operator": "bb"}
+${1:1}
+${(1:1).class.name}
+${(11:1).key.class.name}
+${(11:1).value.class.name}
+${user.name: "bb"}
+
+${["aa" : "bb", "cc" : "dd"]}
+${["aa" : "bb", "cc" : "dd"].class.name}
+${["aa", "bb", "cc"].class.name}
+
+<!--#set(tmap = ["aa" : "bb", "cc" : "dd"])-->
+${tmap["aa"]}
+${tmap.cc}

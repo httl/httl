@@ -1,0 +1,27 @@
+<!--#var(User user)-->
+<!--#if(user && user.role == 'admin')-->
+aaa.
+<!--#elseif(user)-->
+bbb.
+<!--#else-->
+ccc.
+<!--#end-->
+----
+<!--#if(user && user.role == 'xxx')-->
+xxx.
+<!--#elseif(user)-->
+yyy.
+<!--#else-->
+zzz.
+<!--#end-->
+====
+<!--#if(user && user.role == 'iii')-->
+iii.
+<!--#elseif(user && user == 'jjj')-->
+jjj.
+<!--#else-->
+kkk.
+<!--#end-->
+<!--#if(user.role == "#")-->
+...
+<!--#end-->

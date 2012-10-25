@@ -1,0 +1,24 @@
+${[1, 2, 3]}
+<!--#foreach(i in [1, 2, 3])-->
+${i}
+<!--#end-->
+${1..4}
+<!--#foreach(i in 1..4)-->
+${i}
+<!--#end-->
+${['a', 'b', 'c']}
+<!--#foreach(c in ['a', 'b', 'c'])-->
+${c}
+<!--#end-->
+${'a'..'d'}
+<!--#foreach(c in 'a'..'d')-->
+${c}
+<!--#end-->
+${["aa", "bb", "cc"]}
+<!--#foreach(s in ["aa", "bb", "cc"])-->
+${s}
+<!--#end-->
+${"Monday" .. "Friday"}
+<!--#foreach(s in "Monday" .. "Friday")-->
+${s}
+<!--#end-->

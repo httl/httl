@@ -1,0 +1,19 @@
+<!--#var(Book[] books)-->
+${1>2}
+${2>1}
+${1>=2}
+${2>=2}
+${1<=2}
+${1<=1}
+${1<2}
+${2<1}
+${2.1>1.0}
+${books[0].price}
+${books[0].price>1}
+${books[0].price==10000}
+${books[0].publication}
+${books[0].publication == "2007-08-09".toDate}
+${"2007-08-09".toDate == "2007-08-10".toDate}
+${"aa" == "aa"}
+${"aa" == "bb"}
+${books[0].title == books[1].title}

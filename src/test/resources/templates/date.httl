@@ -1,0 +1,10 @@
+<!--#var(Book[] books)-->
+${"2011-09-13 12:22:11".toDate.class.name}
+${books[0].publication}
+${books[0].publication.toString}
+${books[0].publication.format("yyyy-MM-dd")}
+${books[0].publication.format("yyyy-MM-dd HH:mm:ss")}
+${books[0].publication > "2011-09-13 12:22:11".toDate}
+${books[0].publication < "2011-09-13 12:22:11".toDate}
+${books[0].publication >= "2011-09-13 12:22:11".toDate}
+${books[0].publication <= "2011-09-13 12:22:11".toDate}

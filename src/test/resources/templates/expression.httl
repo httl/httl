@@ -1,0 +1,10 @@
+<!--#var(User user, Book[] books)-->
+${user.role == "admin" ? "A" : "B"}
+${user.role == "admin" ? 1 + 2 : 3 + 4}
+${user.role != "admin" ? 1 + 2 : 3 + 4}
+${user.isOwned(books[0])}
+${4 + 3 * (3 + 2) / (1 + 4)}
+${books[0].price}
+${books[1 + 2].price}
+${books[books[0].price % 10].price}
+${books[0].price * books[0].discount / 100}

@@ -1,0 +1,4 @@
+${new Date(0l)}
+${new Date(1324213l).time}
+${1 + new Date(1324213l).time * 2}
+${new Date(2011, 9, 12).year}
