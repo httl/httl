@@ -14,39 +14,33 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.formatters;
+package httl.test.performance;
 
-import httl.spi.Configurable;
-import httl.spi.Formatter;
-import httl.util.DateUtils;
+import httl.Engine;
+import httl.Template;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.Writer;
 import java.util.Map;
 
-
 /**
- * DateFormatter. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.Engine#setFormatter(Formatter)
+ * HttlCase
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DateFormatter implements Formatter<Date>, Configurable {
-    
-    private String dateFormat;
-    
-    public void configure(Map<String, String> config) {
-        String format = config.get(DATE_FORMAT);
-        if (format != null && format.trim().length() > 0) {
-            format = format.trim();
-            new SimpleDateFormat(format).format(new Date());
-            this.dateFormat = format;
+public class HttlCase implements Case {
+
+    public void count(String name, Map<String, Object> context, Writer writer, Writer ignore, int times, Counter counter) throws Exception {
+        counter.beginning();
+        Engine engine = Engine.getEngine();
+        counter.initialized();
+        Template template = engine.getTemplate("performance/" + name + ".httl");
+        counter.compiled();
+        template.render(context, writer);
+        counter.executed();
+        for (int i = times; i >= 0; i --) {
+            template.render(context, ignore);
         }
+        counter.finished();
     }
-    
-    public String format(Date value) {
-        return DateUtils.format(value, dateFormat);
-    }
-    
+
 }

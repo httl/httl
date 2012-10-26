@@ -14,39 +14,32 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.formatters;
+package com.googlecode.httl.test.cases;
 
-import httl.spi.Configurable;
-import httl.spi.Formatter;
-import httl.util.DateUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.Writer;
 import java.util.Map;
+
+import templates.Books;
 
 
 /**
- * DateFormatter. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.Engine#setFormatter(Formatter)
+ * JavaCase
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DateFormatter implements Formatter<Date>, Configurable {
+public class JavaCase implements Case {
     
-    private String dateFormat;
-    
-    public void configure(Map<String, String> config) {
-        String format = config.get(DATE_FORMAT);
-        if (format != null && format.trim().length() > 0) {
-            format = format.trim();
-            new SimpleDateFormat(format).format(new Date());
-            this.dateFormat = format;
+    public void count(String name, Map<String, Object> context, Writer writer, Writer ignore, int times, Counter counter) throws Exception {
+        counter.beginning();
+        counter.initialized();
+        Books template = new Books();
+        counter.compiled();
+        template.render(context, writer);
+        counter.executed();
+        for (int i = times; i >= 0; i --) {
+            template.render(context, ignore);
         }
-    }
-    
-    public String format(Date value) {
-        return DateUtils.format(value, dateFormat);
+        counter.finished();
     }
     
 }

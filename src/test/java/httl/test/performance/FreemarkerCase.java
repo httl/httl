@@ -14,39 +14,35 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.formatters;
+package httl.test.performance;
 
-import httl.spi.Configurable;
-import httl.spi.Formatter;
-import httl.util.DateUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.Writer;
 import java.util.Map;
 
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 
 /**
- * DateFormatter. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.Engine#setFormatter(Formatter)
+ * FreemarkerCase
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DateFormatter implements Formatter<Date>, Configurable {
-    
-    private String dateFormat;
-    
-    public void configure(Map<String, String> config) {
-        String format = config.get(DATE_FORMAT);
-        if (format != null && format.trim().length() > 0) {
-            format = format.trim();
-            new SimpleDateFormat(format).format(new Date());
-            this.dateFormat = format;
+public class FreemarkerCase implements Case {
+
+    public void count(String name, Map<String, Object> context, Writer writer, Writer ignore, int times, Counter counter) throws Exception {
+        counter.beginning();
+        Configuration configuration = new Configuration();
+        configuration.setTemplateLoader(new ClassTemplateLoader(FreemarkerCase.class, "/"));
+        counter.initialized();
+        Template template = configuration.getTemplate("performance/" + name + ".ftl");
+        counter.compiled();
+        template.process(context, writer);
+        counter.executed();
+        for (int i = times; i >= 0; i --) {
+            template.process(context, ignore);
         }
-    }
-    
-    public String format(Date value) {
-        return DateUtils.format(value, dateFormat);
+        counter.finished();
     }
     
 }

@@ -1,5 +1,5 @@
-<!--#block(xxx)-->
+<!--#macro(xxx)-->
 AAA
 <!--#end-->
 ============
-${xxx}
+${xxx()}

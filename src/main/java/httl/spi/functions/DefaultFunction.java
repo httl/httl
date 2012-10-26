@@ -202,26 +202,26 @@ public class DefaultFunction implements Configurable {
     
     public Date toDate(String value) {
         try {
-            return DateUtils.toDate(value, dateFormat);
+            return DateUtils.parse(value, dateFormat);
         } catch (Exception e) {
             try {
-                return DateUtils.toDate(value, "yyyy-MM-dd");
+                return DateUtils.parse(value, "yyyy-MM-dd");
             } catch (Exception e2) {
-                return DateUtils.toDate(value, "yyyy-MM-dd HH:mm:ss");
+                return DateUtils.parse(value, "yyyy-MM-dd HH:mm:ss");
             }
         }
     }
     
     public static Date toDate(String value, String format) {
-        return DateUtils.toDate(value, format);
+        return DateUtils.parse(value, format);
     }
     
     public String toString(Date value) {
-        return DateUtils.formatDate(value, dateFormat);
+        return DateUtils.format(value, dateFormat);
     }
     
     public static String format(Date value, String format) {
-        return DateUtils.formatDate(value, format);
+        return DateUtils.format(value, format);
     }
     
     public static String toString(boolean value) {

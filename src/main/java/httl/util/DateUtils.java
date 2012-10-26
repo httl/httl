@@ -16,6 +16,7 @@
  */
 package httl.util;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,7 +34,7 @@ public class DateUtils {
 
     private static final ThreadLocal<Map<String, SimpleDateFormat>> LOCAL = new ThreadLocal<Map<String, SimpleDateFormat>>();
 
-    public static SimpleDateFormat getSimpleDateFormat(String format) {
+    public static DateFormat getDateFormat(String format) {
         if (format == null || format.length() == 0) {
             format = DEFAULT_FORMAT;
         }
@@ -50,13 +51,17 @@ public class DateUtils {
         return formatter;
     }
     
-    public static String formatDate(Date value, String format) {
-        return getSimpleDateFormat(format).format(value);
+    public static String format(Date value) {
+    	return format(value, DEFAULT_FORMAT);
     }
     
-    public static Date toDate(String value, String format) {
+    public static String format(Date value, String format) {
+        return getDateFormat(format).format(value);
+    }
+    
+    public static Date parse(String value, String format) {
         try {
-            return getSimpleDateFormat(format).parse(value);
+            return getDateFormat(format).parse(value);
         } catch (ParseException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }

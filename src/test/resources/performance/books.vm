@@ -1,0 +1,38 @@
+<html>
+<body>
+${user.name}/${user.role}<br/>
+#if($user.role == "admin")<table>
+  <tr>
+    <th>NO.</th>
+    <th>Title</th>
+    <th>Author</th>
+    <th>Publisher</th>
+    <th>PublicationDate</th>
+    <th>Price</th>
+    <th>DiscountPercent</th>
+    <th>DiscountPrice</th>
+  </tr>
+  #foreach($book in $books)#if($book.price > 0)<tr>
+    <td>${velocityCount}</td>
+    <td>${book.title}</td>
+    <td>${book.author}</td>
+    <td>${book.publisher}</td>
+    <td>$date.format($book.publication)</td>
+    <td>${book.price}</td>
+    <td>${book.discount}%</td>
+    <td>#set($discountPrice = $book.price * $book.discount / 100)${discountPrice}</td>
+  </tr>#end#end
+
+</table>
+#elseif($user)<table>
+  <tr>
+    <td>No privilege.</td>
+  </tr>
+</table>
+#else<table>
+  <tr>
+    <td>No login.</td>
+  </tr>
+</table>#end
+</body>
+</html>

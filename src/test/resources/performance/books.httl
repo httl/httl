@@ -1,0 +1,37 @@
+<html><!--#var(User user, Book[] books)-->
+<body>
+${user.name}/${user.role}<br/>
+<!--#if(user.role == "admin")--><table>
+  <tr>
+    <th>NO.</th>
+    <th>Title</th>
+    <th>Author</th>
+    <th>Publisher</th>
+    <th>PublicationDate</th>
+    <th>Price</th>
+    <th>DiscountPercent</th>
+    <th>DiscountPrice</th>
+  </tr>
+  <!--#foreach(book in books)--><!--#if(book.price &gt; 0)--><tr >
+    <td>${foreach.count}</td>
+    <td>${book.title}</td>
+    <td>${book.author}</td>
+    <td>${book.publisher}</td>
+    <td>${book.publication}</td>
+    <td>${book.price}</td>
+    <td>${book.discount}%</td>
+    <td>${book.price * book.discount / 100}</td>
+  </tr><!--#end--><!--#end-->
+</table>
+<!--#elseif(user)--><table>
+  <tr>
+    <td>No privilege.</td>
+  </tr>
+</table>
+<!--#else--><table>
+  <tr>
+    <td>No login.</td>
+  </tr><!--#end-->
+</table>
+</body>
+</html>
