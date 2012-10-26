@@ -16,54 +16,45 @@
  */
 package httl.spi.translators.expression;
 
+
+import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Map;
 
 
 /**
- * Constant
+ * Node
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Constant extends Node {
+public abstract class Node implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    public static final Constant NULL = new Constant(null, null, "null");
-
-    public static final Constant EMPTY = new Constant(null, null, "");
-
-    public static final Constant TRUE = new Constant(true, boolean.class, "true");
-
-    public static final Constant FALSE = new Constant(false, boolean.class, "false");
+    private final int offset;
     
-    private final Object value;
+    private final Map<String, Class<?>> parameterTypes;
 
-    private final Class<?> type;
+    public Node(Map<String, Class<?>> parameterTypes, int offset) {
+        this.offset = offset;
+        this.parameterTypes = parameterTypes;
+    }
     
-    private final String literal;
-
-    public Constant(Object value, Class<?> type, String literal){
-        super(null, 0);
-        this.value = value;
-        this.type = type;
-        this.literal = literal;
+    public int getOffset() {
+        return offset;
     }
 
-    public Object getValue() {
-        return value;
+    public Map<String, Class<?>> getParameterTypes() {
+        return parameterTypes;
     }
 
-    public Class<?> getReturnType() throws ParseException {
-        return type;
+    public Class<?>[] getReturnTypes() throws ParseException {
+        Class<?> type = getReturnType();
+        return type == null ? new Class<?>[0] : new Class<?>[] { type };
     }
+    
+    public abstract Class<?> getReturnType() throws ParseException;
 
-    public String getCode() throws ParseException {
-        return literal;
-    }
-
-    @Override
-    public String toString() {
-        return literal;
-    }
+    public abstract String getCode() throws ParseException;
 
 }

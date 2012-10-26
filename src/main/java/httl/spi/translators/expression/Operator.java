@@ -27,7 +27,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class Operator extends AbstractExpression {
+public abstract class Operator extends Node {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,7 +40,7 @@ public abstract class Operator extends AbstractExpression {
     private final String[] packages;
 
     public Operator(Translator resolver, String source, int offset, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, String name, int priority){
-        super(resolver, source, offset, parameterTypes);
+        super(parameterTypes, offset);
         this.name = name;
         this.priority = priority;
         this.functions = functions;

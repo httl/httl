@@ -16,7 +16,6 @@
  */
 package httl.spi.translators.expression;
 
-import httl.Expression;
 import httl.Template;
 import httl.spi.Translator;
 import httl.util.ClassUtils;
@@ -40,18 +39,18 @@ public final class UnaryOperator extends Operator {
 
 	private static final long serialVersionUID = 1L;
 
-    private AbstractExpression parameter;
+    private Node parameter;
 
     public UnaryOperator(Translator resolver, String source, int offset, Map<String, Class<?>> parameterTypes, 
                          Collection<Class<?>> functions, String[] packages, String name, int priority) {
         super(resolver, source, offset, parameterTypes, functions, packages, name, priority);
     }
 
-    public Expression getParameter() {
+    public Node getParameter() {
         return parameter;
     }
 
-    public void setParameter(AbstractExpression parameter) {
+    public void setParameter(Node parameter) {
         this.parameter = parameter;
     }
 

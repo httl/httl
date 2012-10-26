@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Context. (API, ThreadLocal, ThreadSafe)
  * 
- * @see httl.spi.runtime.AbstractTemplate#render(Map, Writer)
+ * @see httl.spi.parsers.template.AbstractTemplate#render(Map, Writer)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

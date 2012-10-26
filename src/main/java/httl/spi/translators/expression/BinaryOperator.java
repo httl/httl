@@ -16,7 +16,6 @@
  */
 package httl.spi.translators.expression;
 
-import httl.Expression;
 import httl.spi.Translator;
 import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
@@ -45,28 +44,28 @@ public final class BinaryOperator extends Operator {
 
 	private static final long serialVersionUID = 1L;
 
-    private AbstractExpression leftParameter;
+    private Node leftParameter;
     
-    private AbstractExpression rightParameter;
+    private Node rightParameter;
     
     public BinaryOperator(Translator resolver, String source, int offset, 
                           Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, String name, int priority){
         super(resolver, source, offset, parameterTypes, functions, packages, name, priority);
     }
 
-    public Expression getLeftParameter() {
+    public Node getLeftParameter() {
         return leftParameter;
     }
 
-    public void setLeftParameter(AbstractExpression leftParameter) {
+    public void setLeftParameter(Node leftParameter) {
         this.leftParameter = leftParameter;
     }
 
-    public Expression getRightParameter() {
+    public Node getRightParameter() {
         return rightParameter;
     }
 
-    public void setRightParameter(AbstractExpression rightParameter) {
+    public void setRightParameter(Node rightParameter) {
         this.rightParameter = rightParameter;
     }
 

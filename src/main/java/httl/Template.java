@@ -37,7 +37,7 @@ public interface Template extends Resource {
      * 
      * @see httl.Context#getContext()
      * @see httl.Context#getParameters()
-     * @return Template render result
+     * @return result.
      */
     String render();
     
@@ -46,7 +46,7 @@ public interface Template extends Resource {
      * 
      * @see httl.Context#getContext()
      * @see httl.Context#getParameters()
-     * @param output - Template output stream
+     * @param output - output stream
      * @throws IOException Failed to output
      */
     void render(OutputStream output) throws IOException;
@@ -56,26 +56,26 @@ public interface Template extends Resource {
      * 
      * @see httl.Context#getContext()
      * @see httl.Context#getParameters()
-     * @param writer - Template writer
+     * @param writer - writer
      * @throws IOException Failed to writer
      */
     void render(Writer writer) throws IOException;
 
     /**
-     * Render the template to a string use getParameters() names.
+     * Render the template to a string use getParameterTypes() names.
      * 
      * @see #getParameterTypes()
-     * @param parameters - Template parameters
-     * @return Template render result
+     * @param parameters - parameters
+     * @return result.
      */
     String render(Object[] parameters);
     
     /**
-     * Render the template to output stream use getParameters() names.
+     * Render the template to output stream use getParameterTypes() names.
      * 
      * @see #getParameterTypes()
-     * @param parameters - Template parameters
-     * @param output - Template output stream
+     * @param parameters - parameters
+     * @param output - output stream
      * @throws IOException Failed to output
      */
     void render(Object[] parameters, OutputStream output) throws IOException;
@@ -84,8 +84,8 @@ public interface Template extends Resource {
      * Render the template to writer use getParameters() names.
      * 
      * @see #getParameterTypes()
-     * @param parameters - Template parameters
-     * @param writer - Template writer
+     * @param parameters - parameters
+     * @param writer - writer
      * @throws IOException Failed to writer
      */
     void render(Object[] parameters, Writer writer) throws IOException;
@@ -93,7 +93,7 @@ public interface Template extends Resource {
     /**
      * Render the template to a string.
      * 
-     * @param parameters - Template parameters
+     * @param parameters - parameters
      * @return Template render result
      */
     String render(Map<String, Object> parameters);
@@ -101,8 +101,8 @@ public interface Template extends Resource {
     /**
      * Render the template to output stream.
      * 
-     * @param parameters - Template parameters
-     * @param output - Template output stream
+     * @param parameters - parameters
+     * @param output - output stream
      * @throws IOException Failed to output
      */
     void render(Map<String, Object> parameters, OutputStream output) throws IOException;
@@ -110,30 +110,30 @@ public interface Template extends Resource {
     /**
      * Render the template to writer.
      * 
-     * @param parameters - Template parameters
-     * @param writer - Template writer
+     * @param parameters - parameters
+     * @param writer - writer
      * @throws IOException Failed to writer
      */
     void render(Map<String, Object> parameters, Writer writer) throws IOException;
 
     /**
-     * Get parameter types. (Ordered)
+     * Get the template parameter types. (Ordered)
      * 
      * @return parameter types.
      */
     Map<String, Class<?>> getParameterTypes();
 
     /**
-     * Get return types.
+     * Get the template return types.
      * 
-     * @return Template return types.
+     * @return return types.
      */
     Map<String, Class<?>> getReturnTypes();
 
     /**
      * Get the template code.
      * 
-     * @return Template code.
+     * @return code.
      */
     String getCode() throws ParseException;
 

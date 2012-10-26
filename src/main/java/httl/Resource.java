@@ -35,21 +35,21 @@ public interface Resource extends Serializable {
 	/**
 	 * Get the template name.
 	 * 
-	 * @return Name
+	 * @return name
 	 */
 	String getName();
 
 	/**
 	 * Get the the template encoding.
 	 * 
-	 * @return Encoding
+	 * @return encoding
 	 */
 	String getEncoding();
 
 	/**
-	 * Get the the template last modified.
+	 * Get the the template last modified time.
 	 * 
-	 * @return Last modified
+	 * @return last modified
 	 */
 	long getLastModified();
 
@@ -61,16 +61,27 @@ public interface Resource extends Serializable {
     long getLength();
 
 	/**
-	 * Get the template source code reader.
+	 * Get the template source reader.
 	 * 
-	 * @return Source code reader
+	 * NOTE: Don't forget close the reader.
+	 * 
+	 * <code>
+	 * Reader reader = resource.getSource();
+	 * try {
+	 *     // do something ...
+	 * } finally {
+	 *     readerc.close();
+	 * }
+	 * </code>
+	 * 
+	 * @return source reader
 	 */
 	Reader getSource() throws IOException;
 
     /**
      * Get the template engine.
      * 
-     * @return Template engine.
+     * @return template engine.
      */
     Engine getEngine();
 

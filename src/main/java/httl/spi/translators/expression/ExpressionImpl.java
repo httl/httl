@@ -16,16 +16,13 @@
  */
 package httl.spi.translators.expression;
 
+import httl.Context;
 import httl.Engine;
 import httl.Expression;
-import httl.spi.Compiler;
-import httl.spi.Translator;
 import httl.util.ClassUtils;
 
-import java.text.ParseException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 /**
  * ExpressionImpl. (SPI, Prototype, ThreadSafe)
@@ -40,10 +37,6 @@ public class ExpressionImpl implements Expression {
 
     private final Engine engine;
     
-    private final Compiler compiler;
-    
-    private final Translator resolver;
-    
     private final String source;
     
     private final int offset;
@@ -54,14 +47,12 @@ public class ExpressionImpl implements Expression {
 
     private final Class<?> returnType;
     
-    private volatile Expression evaluator;
-
     private final String[] importPackages;
-
-    public ExpressionImpl(Engine engine, Compiler compiler, Translator resolver, String source, Map<String, Class<?>> parameterTypes, int offset, String code, Class<?> returnType, String[] importPackages){
+    
+    private transient Evaluator evaluator;
+    
+    public ExpressionImpl(Engine engine, String source, Map<String, Class<?>> parameterTypes, int offset, String code, Class<?> returnType, String[] importPackages){
         this.engine = engine;
-        this.compiler = compiler;
-        this.resolver = resolver;
         this.source = source;
         this.offset = offset;
         this.code = code;
@@ -69,44 +60,28 @@ public class ExpressionImpl implements Expression {
         this.returnType = returnType;
         this.importPackages = importPackages;
     }
-    
-    public Translator getTranslator() {
-        return resolver;
-    }
-    
-    public String getSource() {
-        return source;
-    }
-    
-    public String getCode() throws ParseException {
-        return code;
-    }
 
-    public Map<String, Class<?>> getParameterTypes() {
-        return parameterTypes;
+    public Object evaluate() {
+        return evaluate(Context.getContext().getParameters());
     }
     
-    public Class<?> getReturnType() throws ParseException {
-        return returnType;
+    public Object evaluate(Object[] parameters) {
+        return evaluate(ClassUtils.toMap(getParameterTypes().keySet(), parameters));
     }
     
-    public int getOffset() {
-        return offset;
-    }
-    
-    public Object evaluate(Map<String, Object> parameters) throws ParseException {
-        if (evaluator == null) {
-            synchronized (this) {
-                if (evaluator == null) {
-                    evaluator = newEvaluator();
-                }
-            }
-        }
+    public Object evaluate(Map<String, Object> parameters) {
+    	if (evaluator == null) {
+    		synchronized (this) {
+    			if (evaluator == null) { // double check
+    				evaluator = newEvaluator(); // lazy compile
+    			}
+			}
+    	}
         return evaluator.evaluate(parameters);
     }
     
-    private Expression newEvaluator() throws ParseException {
-        StringBuilder imports = new StringBuilder();
+    private Evaluator newEvaluator() {
+    	StringBuilder imports = new StringBuilder();
         String[] packages = importPackages;
         if (packages != null && packages.length > 0) {
             for (String pkg : packages) {
@@ -115,24 +90,41 @@ public class ExpressionImpl implements Expression {
                 imports.append(".*;\n");
             }
         }
-        String className = (ExpressionImpl.class.getSimpleName() + "_" + sequence.incrementAndGet());
-        String sourceCode = "package " + ExpressionImpl.class.getPackage().getName() + ";\n" 
+    	String className = (Evaluator.class.getSimpleName() + "_" + sequence.incrementAndGet());
+        String sourceCode = "package " + Evaluator.class.getPackage().getName() + ";\n" 
                 + imports.toString()
-                + "public class " + className + " extends " + AbstractEvaluator.class.getName() + " {\n" 
-                + "public " + className + "(" + Engine.class.getName() + " engine) {\n" 
-                + "super(engine);\n" 
-                + "}\n"
-                + "public " + Object.class.getSimpleName() + " evaluate(" + Map.class.getName() + " parameters) throws " + ParseException.class.getName() + " {\n"
+                + "public class " + className + " implements " + Evaluator.class.getSimpleName() + " {\n" 
+                + "public " + Object.class.getSimpleName() + " evaluate(" + Map.class.getName() + " parameters) {\n"
                 + "return " + ClassUtils.class.getName() + ".boxed(" + getCode() + ");\n"
                 + "}\n"
                 + "}";
         try {
-            return (Expression) compiler.compile(sourceCode).getConstructor(Engine.class).newInstance(engine);
+            return (Evaluator) engine.getCompiler().compile(sourceCode).newInstance();
         } catch (Exception e) {
-            throw new ParseException("Failed to parse expression code: \n" + sourceCode + ", cause:" + ClassUtils.toString(e), getOffset());
+            throw new IllegalStateException("Failed to create expression instance. code: \n" + sourceCode + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
         }
     }
 
+    public String getSource() {
+        return source;
+    }
+    
+    public String getCode() {
+        return code;
+    }
+
+    public Map<String, Class<?>> getParameterTypes() {
+        return parameterTypes;
+    }
+    
+    public Class<?> getReturnType() {
+        return returnType;
+    }
+    
+    public int getOffset() {
+        return offset;
+    }
+    
     public Engine getEngine() {
         return engine;
     }

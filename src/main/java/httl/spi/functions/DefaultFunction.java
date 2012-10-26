@@ -20,7 +20,7 @@ import httl.Context;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Configurable;
-import httl.spi.runtime.Cycle;
+import httl.spi.parsers.template.Cycle;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
 import httl.util.IOUtils;

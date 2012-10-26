@@ -27,14 +27,14 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Variable extends AbstractExpression {
+public final class Variable extends Node {
 
 	private static final long serialVersionUID = 1L;
 
     private final String name;
     
     public Variable(Translator resolver, String source, int offset, Map<String, Class<?>> parameterTypes, String name){
-        super(resolver, source, offset, parameterTypes);
+        super(parameterTypes, offset);
         this.name = name;
     }
 

@@ -16,9 +16,8 @@
  */
 package httl.spi.translators;
 
-import httl.Expression;
 import httl.spi.Translator;
-import httl.spi.translators.expression.AbstractExpression;
+import httl.spi.translators.expression.Node;
 import httl.spi.translators.expression.BinaryOperator;
 import httl.spi.translators.expression.Bracket;
 import httl.spi.translators.expression.Constant;
@@ -98,7 +97,7 @@ public class DfaParser {
 
 	private final int offset;
 	
-	private final LinkedStack<AbstractExpression> parameterStack = new LinkedStack<AbstractExpression>();
+	private final LinkedStack<Node> parameterStack = new LinkedStack<Node>();
 
 	private final LinkedStack<Operator> operatorStack = new LinkedStack<Operator>();
 	
@@ -284,7 +283,7 @@ public class DfaParser {
         return tokens;
     }
     
-	public Expression parse(String source) throws ParseException {
+	public Node parse(String source) throws ParseException {
 	    List<Token> tokens = scan(source);
         boolean beforeOperator = true;
         for (int i = 0; i < tokens.size(); i ++) {
@@ -439,7 +438,7 @@ public class DfaParser {
                 throw new ParseException("Miss right parenthesis", offset);
             }
         }
-        Expression result = parameterStack.pop();
+        Node result = parameterStack.pop();
         if (! parameterStack.isEmpty())
             throw new ParseException("Operator miss parameter", offset);
         return result;

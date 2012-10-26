@@ -16,9 +16,7 @@
  */
 package httl;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -34,47 +32,72 @@ import java.util.Map;
 public interface Expression extends Serializable {
 
     /**
+     * Evaluate the expression with thread local context.
+     * 
+     * @see httl.Context#getContext()
+     * @see httl.Context#getParameters()
+     * @param parameters - parameters
+     * @return result.
+     */
+    Object evaluate();
+
+    /**
+     * Evaluate the expression use getParameterTypes() names.
+     * 
+     * @see #getParameterTypes()
+     * @param parameters - parameters
+     * @return result.
+     */
+    Object evaluate(Object[] parameters);
+
+    /**
      * Evaluate the expression.
      * 
      * @param parameters - parameters
      * @return result.
      */
-    Object evaluate(Map<String, Object> parameters) throws ParseException;
+    Object evaluate(Map<String, Object> parameters);
 
     /**
-     * Get parameter types. (Ordered)
+     * Get the expression parameter types. (Ordered)
      * 
      * @return parameter types.
      */
     Map<String, Class<?>> getParameterTypes();
 
     /**
-     * Get return type.
+     * Get the expression return type.
      * 
      * @return return type.
-     * @throws ParseException TODO
      */
-    Class<?> getReturnType() throws ParseException;
+    Class<?> getReturnType();
 
     /**
-     * Get source.
+     * Get the expression code.
+     * 
+     * @return code.
+     */
+    String getCode();
+
+    /**
+     * Get the expression source.
      * 
      * @return source.
      */
-    String getSource() throws IOException;
-    
-    /**
-     * Get the template code.
-     * 
-     * @return Template code.
-     */
-    String getCode() throws ParseException;
+    String getSource();
 
     /**
-     * Get the template engine.
+     * Get the expression offset.
      * 
-     * @return Template engine.
+     * @return offset.
+     */
+    int getOffset();
+
+    /**
+     * Get the expression engine.
+     * 
+     * @return engine.
      */
     Engine getEngine();
-    
+
 }

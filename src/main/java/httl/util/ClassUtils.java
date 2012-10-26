@@ -28,6 +28,7 @@ import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -599,6 +600,24 @@ public class ClassUtils {
             end = size - 1;
         }
         return new int[] {Math.min(begin, end), Math.max(begin, end) + 1};
+    }
+    
+    public static Map<String, Object> toMap(Collection<String> names, Object[] parameters) {
+    	return toMap(names.toArray(new String[0]), parameters);
+    }
+
+    public static Map<String, Object> toMap(String[] names, Object[] parameters) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        if (parameters == null || parameters.length == 0) {
+            return map;
+        }
+        if (names == null || names.length < parameters.length) {
+            throw new IllegalArgumentException("Mismatch parameters. names: " + Arrays.toString(names) + ", values: " + Arrays.toString(parameters));
+        }
+        for (int i = 0; i < parameters.length; i ++) {
+            map.put(names[i], parameters[i]);
+        }
+        return map;
     }
     
     private ClassUtils() {}

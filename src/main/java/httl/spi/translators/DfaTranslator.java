@@ -21,6 +21,7 @@ import httl.Expression;
 import httl.spi.Configurable;
 import httl.spi.Translator;
 import httl.spi.translators.expression.ExpressionImpl;
+import httl.spi.translators.expression.Node;
 import httl.util.StringUtils;
 
 import java.text.ParseException;
@@ -38,7 +39,7 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DfaTranslator implements Translator, Configurable {
-    
+
     private Engine engine;
 
     protected String[] importPackages;
@@ -57,8 +58,8 @@ public class DfaTranslator implements Translator, Configurable {
 	public Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
 	    source = StringUtils.unescapeHtml(source);
 	    Collection<Class<?>> functions = engine.getFunctions().keySet();
-	    Expression node = new DfaParser(this, parameterTypes, functions, importPackages, offset).parse(source);
-	    return new ExpressionImpl(engine, engine.getCompiler(), this, source, parameterTypes, offset, node.getCode(), node.getReturnType(), importPackages);
+	    Node node = new DfaParser(this, parameterTypes, functions, importPackages, offset).parse(source);
+        return new ExpressionImpl(engine, source, parameterTypes, offset, node.getCode(), node.getReturnType(), importPackages);
 	}
 
 }
