@@ -137,11 +137,4 @@ public interface Template extends Resource {
      */
     String getCode() throws ParseException;
 
-    /**
-     * Get the template engine.
-     * 
-     * @return Template engine.
-     */
-    Engine getEngine();
-
 }

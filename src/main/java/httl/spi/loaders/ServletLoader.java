@@ -66,7 +66,7 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
     }
 
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new ServletResource(this, name, encoding, path, servletContext != null ? servletContext : SERVLET_CONTEXT);
+		return new ServletResource(getEngine(), name, encoding, path, servletContext != null ? servletContext : SERVLET_CONTEXT);
 	}
 
 }

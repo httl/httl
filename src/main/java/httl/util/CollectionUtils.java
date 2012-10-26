@@ -14,33 +14,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.loaders;
+package httl.util;
 
-import httl.Resource;
-import httl.spi.Loader;
-import httl.util.UrlUtils;
+import java.util.Collection;
+import java.util.HashSet;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+public class CollectionUtils {
 
+	public static <T> Collection<T> merge(Collection<T> c1, Collection<T> c2) {
+		if (c1 == null || c1.size() == 0) {
+			return c2;
+		}
+		if (c2 == null || c2.size() == 0) {
+			return c1;
+		}
+		Collection<T> all = new HashSet<T>(c1.size() + c2.size());
+		all.addAll(c1);
+		all.addAll(c2);
+		return all;
+	}
 
-/**
- * FileLoader. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.Engine#setLoader(Loader)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
- */
-public class FileLoader extends AbstractLoader {
-
-    public List<String> doList(String directory, String[] suffixes) throws IOException {
-        File file = new File(directory);
-        return UrlUtils.listFile(file, suffixes);
-    }
-    
-    protected Resource doLoad(String name, String encoding, String path) throws IOException {
-        return new FileResource(getEngine(), name, encoding, path);
-    }
-    
 }

@@ -16,7 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
+import httl.Engine;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -36,8 +36,8 @@ public class StringResource extends AbstractResource {
     
     private final String source;
     
-    public StringResource(Loader loader, String name, String encoding, String source) {
-        super(loader, name, encoding);
+    public StringResource(Engine engine, String name, String encoding, String source) {
+        super(engine, name, encoding);
         this.source = source;
     }
     

@@ -21,12 +21,12 @@ import httl.Engine;
 import httl.Resource;
 import httl.Template;
 import httl.util.ClassUtils;
+import httl.util.WrappedMap;
 import httl.util.UnsafeByteArrayOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -58,8 +58,7 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
-    	if(parameters == null) 
-            parameters = new HashMap<String, Object>();
+        parameters = new WrappedMap<String, Object>(parameters);
         Context context = Context.getContext();
         Template preTemplate = context.getTemplate();
         Map<String, Object> preParameters = context.getParameters();

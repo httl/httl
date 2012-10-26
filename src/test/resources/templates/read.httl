@@ -1,1 +1,1 @@
-${read("foreach.httl")}
+$!{read("foreach.httl")}

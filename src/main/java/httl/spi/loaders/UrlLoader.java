@@ -39,7 +39,7 @@ public class UrlLoader extends AbstractLoader {
     }
     
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
-        return new UrlResource(this, name, encoding, path);
+        return new UrlResource(getEngine(), name, encoding, path);
     }
     
 }

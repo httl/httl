@@ -16,7 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
+import httl.Engine;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +37,8 @@ public class ClasspathResource extends InputStreamResource {
     
     private final String path;
 
-    public ClasspathResource(Loader loader, String name, String encoding, String path) {
-        super(loader, name, encoding);
+    public ClasspathResource(Engine engine, String name, String encoding, String path) {
+        super(engine, name, encoding);
         this.path = (path.startsWith("/") ? path.substring(1) : path);
     }
 

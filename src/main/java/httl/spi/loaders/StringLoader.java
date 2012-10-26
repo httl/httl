@@ -68,7 +68,7 @@ public class StringLoader extends AbstractLoader {
         if (source == null) {
             throw new FileNotFoundException("Not found template " + name);
         }
-        return new StringResource(this, name, encoding, source);
+        return new StringResource(getEngine(), name, encoding, source);
     }
     
 }

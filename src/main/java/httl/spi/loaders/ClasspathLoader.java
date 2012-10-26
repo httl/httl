@@ -38,7 +38,7 @@ public class ClasspathLoader extends AbstractLoader {
     }
     
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new ClasspathResource(this, name, encoding, path);
+		return new ClasspathResource(getEngine(), name, encoding, path);
 	}
 	
 }

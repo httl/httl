@@ -16,7 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
+import httl.Engine;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +37,8 @@ public class ZipResource extends InputStreamResource {
 
 	private final File file;
 
-	public ZipResource(Loader loader, String name, String encoding, File file) {
-		super(loader, name, encoding);
+	public ZipResource(Engine engine, String name, String encoding, File file) {
+		super(engine, name, encoding);
 		this.file = file;
 	}
 

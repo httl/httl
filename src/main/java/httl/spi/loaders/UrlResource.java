@@ -16,7 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
+import httl.Engine;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +43,8 @@ public class UrlResource extends InputStreamResource {
     
     private final File file;
     
-    public UrlResource(Loader loader, String name, String encoding, String path) throws IOException {
-        super(loader, name, encoding);
+    public UrlResource(Engine engine, String name, String encoding, String path) throws IOException {
+        super(engine, name, encoding);
         this.url = new URL(path);
         this.file = toFile(url);
     }

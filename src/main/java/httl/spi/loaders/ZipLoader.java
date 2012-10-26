@@ -53,7 +53,7 @@ public class ZipLoader extends AbstractLoader {
     }
 	
 	public Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new ZipResource(this, name, encoding, file);
+		return new ZipResource(getEngine(), name, encoding, file);
 	}
 
 }

@@ -16,8 +16,8 @@
  */
 package httl.spi.loaders;
 
+import httl.Engine;
 import httl.Resource;
-import httl.spi.Loader;
 
 /**
  * AbstractResource. (SPI, Prototype, ThreadSafe)
@@ -30,20 +30,20 @@ public abstract class AbstractResource implements Resource {
 
     private static final long serialVersionUID = 6834431114838915042L;
 
-    private final transient Loader loader;
+    private final transient Engine engine;
     
     private final String name;
     
     private final String encoding;
 
-    public AbstractResource(Loader loader, String name, String encoding) {
-        this.loader = loader;
+    public AbstractResource(Engine engine, String name, String encoding) {
+        this.engine = engine;
         this.name = name;
         this.encoding = encoding;
     }
 
-    public Loader getLoader() {
-        return loader;
+    public Engine getEngine() {
+        return engine;
     }
 
     public String getName() {

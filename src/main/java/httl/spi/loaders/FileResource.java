@@ -16,7 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
+import httl.Engine;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,8 +38,8 @@ public class FileResource extends AbstractResource {
     
     private final File file;
     
-    public FileResource(Loader loader, String name, String encoding, String path) {
-        super(loader, name, encoding);
+    public FileResource(Engine engine, String name, String encoding, String path) {
+        super(engine, name, encoding);
         this.file = new File(path);
     }
 

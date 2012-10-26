@@ -16,6 +16,7 @@
  */
 package httl.spi.loaders;
 
+import httl.Engine;
 import httl.Resource;
 import httl.spi.Configurable;
 import httl.spi.Loader;
@@ -35,13 +36,23 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class AbstractLoader implements Loader, Configurable {
-    
-    private String encoding;
+	
+	private Engine engine;
+
+	private String encoding;
     
     private String directory;
     
     private String[] suffixes;
-    
+
+	public Engine getEngine() {
+		return engine;
+	}
+
+    public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
+
     protected String getEncoding() {
         return encoding;
     }

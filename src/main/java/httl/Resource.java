@@ -23,6 +23,8 @@ import java.io.Serializable;
 /**
  * Resource. (API, Prototype, ThreadSafe)
  * 
+ * @see httl.Engine#getResource(String)
+ * @see httl.Engine#getResource(String, String)
  * @see httl.spi.Loader#load(String, String)
  * @see httl.spi.Parser#parse(Resource)
  * 
@@ -64,5 +66,12 @@ public interface Resource extends Serializable {
 	 * @return Source code reader
 	 */
 	Reader getSource() throws IOException;
+
+    /**
+     * Get the template engine.
+     * 
+     * @return Template engine.
+     */
+    Engine getEngine();
 
 }

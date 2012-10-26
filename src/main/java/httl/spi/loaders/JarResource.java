@@ -16,7 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
+import httl.Engine;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +37,8 @@ public class JarResource extends InputStreamResource {
 
 	private final File file;
 
-	public JarResource(Loader loader, String name, String encoding, File file) {
-		super(loader, name, encoding);
+	public JarResource(Engine engine, String name, String encoding, File file) {
+		super(engine, name, encoding);
 		this.file = file;
 	}
 

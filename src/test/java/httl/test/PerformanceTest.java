@@ -37,13 +37,11 @@ public class PerformanceTest {
         Case[] cases = new Case[] {new FreemarkerCase(), new VelocityCase(), new Smarty4jCase(), new HttlCase(), new JavaCase()};
         for (int i = 0; i < cases.length; i ++) {
             System.out.println("=============");
-            for (int j = i; j < cases.length + i; j ++) {
-                Case c = cases[j % cases.length];
-                Counter counter = new Counter();
-                StringWriter writer = new StringWriter();
-                c.count("books", new HashMap<String, Object>(context), writer, new IgnoredWriter(), times, counter);
-                System.out.println(c.getClass().getSimpleName().replace("Case", "") + ": initialize: " + counter.getInitialized() + "ms, compile: " + counter.getCompiled() + "ms, first: " + counter.getExecuted() + "ms/" + writer.getBuffer().length() + "b, total: " + counter.getFinished() + "ms/" + times + "t, tps: " + (counter.getFinished() == 0 ? 0 : (1000 * times / counter.getFinished())) + "t/s.");
-            }
+            Case c = cases[i];
+            Counter counter = new Counter();
+            StringWriter writer = new StringWriter();
+            c.count("books", new HashMap<String, Object>(context), writer, new IgnoredWriter(), times, counter);
+            System.out.println(c.getClass().getSimpleName().replace("Case", "") + ": initialize: " + counter.getInitialized() + "ms, compile: " + counter.getCompiled() + "ms, first: " + counter.getExecuted() + "ms/" + writer.getBuffer().length() + "b, total: " + counter.getFinished() + "ms/" + times + "t, tps: " + (counter.getFinished() == 0 ? 0 : (1000 * times / counter.getFinished())) + "t/s.");
         }
     }
     

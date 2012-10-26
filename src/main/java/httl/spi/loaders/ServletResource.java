@@ -16,8 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
-import httl.spi.loaders.InputStreamResource;
+import httl.Engine;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,8 +39,8 @@ public class ServletResource extends InputStreamResource {
     
     private final transient ServletContext servletContext;
 
-    public ServletResource(Loader loader, String name, String encoding, String path, ServletContext servletContext) {
-        super(loader, name, encoding);
+    public ServletResource(Engine engine, String name, String encoding, String path, ServletContext servletContext) {
+        super(engine, name, encoding);
         this.path = path;
         this.servletContext = servletContext;
     }

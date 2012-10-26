@@ -53,7 +53,7 @@ public class JarLoader extends AbstractLoader {
     }
 	
 	public Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new JarResource(this, name, encoding, file);
+		return new JarResource(getEngine(), name, encoding, file);
 	}
 
 }

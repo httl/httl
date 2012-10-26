@@ -16,7 +16,7 @@
  */
 package httl.spi.loaders;
 
-import httl.spi.Loader;
+import httl.Engine;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,8 +34,8 @@ public abstract class InputStreamResource extends AbstractResource {
 
     private static final long serialVersionUID = -5150738383353330217L;
 
-    public InputStreamResource(Loader loader, String name, String encoding){
-        super(loader, name, encoding);
+    public InputStreamResource(Engine engine, String name, String encoding){
+        super(engine, name, encoding);
     }
 
     public Reader getSource() throws IOException {
