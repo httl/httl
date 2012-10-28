@@ -33,64 +33,6 @@ import java.util.Map;
 public interface Template extends Resource {
 
     /**
-     * Render the template to a string with thread local context.
-     * 
-     * @see httl.Context#getContext()
-     * @see httl.Context#getParameters()
-     * @return result.
-     */
-    String render();
-    
-    /**
-     * Render the template to output stream with thread local context.
-     * 
-     * @see httl.Context#getContext()
-     * @see httl.Context#getParameters()
-     * @param output - output stream
-     * @throws IOException Failed to output
-     */
-    void render(OutputStream output) throws IOException;
-    
-    /**
-     * Render the template to writer with thread local context.
-     * 
-     * @see httl.Context#getContext()
-     * @see httl.Context#getParameters()
-     * @param writer - writer
-     * @throws IOException Failed to writer
-     */
-    void render(Writer writer) throws IOException;
-
-    /**
-     * Render the template to a string use getParameterTypes() names.
-     * 
-     * @see #getParameterTypes()
-     * @param parameters - parameters
-     * @return result.
-     */
-    String render(Object[] parameters);
-    
-    /**
-     * Render the template to output stream use getParameterTypes() names.
-     * 
-     * @see #getParameterTypes()
-     * @param parameters - parameters
-     * @param output - output stream
-     * @throws IOException Failed to output
-     */
-    void render(Object[] parameters, OutputStream output) throws IOException;
-    
-    /**
-     * Render the template to writer use getParameters() names.
-     * 
-     * @see #getParameterTypes()
-     * @param parameters - parameters
-     * @param writer - writer
-     * @throws IOException Failed to writer
-     */
-    void render(Object[] parameters, Writer writer) throws IOException;
-    
-    /**
      * Render the template to a string.
      * 
      * @param parameters - parameters
@@ -124,17 +66,18 @@ public interface Template extends Resource {
     Map<String, Class<?>> getParameterTypes();
 
     /**
-     * Get the template return types.
+     * Get the macro templates.
      * 
-     * @return return types.
+     * @return macro templates.
      */
-    Map<String, Class<?>> getReturnTypes();
+    Map<String, Template> getMacros();
 
     /**
      * Get the template code.
      * 
      * @return code.
      */
+ 
     String getCode() throws ParseException;
 
 }

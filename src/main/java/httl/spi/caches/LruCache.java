@@ -17,12 +17,9 @@
 package httl.spi.caches;
 
 import httl.spi.Cache;
-import httl.spi.Configurable;
-import httl.util.ConfigUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class LruCache extends MapCache implements Configurable {
+public class LruCache extends MapCache {
     
     private static final int DEFAULT_CAPACITY = 1000;
     
@@ -70,19 +67,12 @@ public class LruCache extends MapCache implements Configurable {
         this.capacity = capacity;
     }
 
-    public int getCapacity() {
+    public int getCacheCapacity() {
         return capacity.get();
     }
 
-    public void setCapacity(int capacity) {
+    public void setCacheCapacity(int capacity) {
         this.capacity.set(capacity);
-    }
-
-    public void configure(Map<String, String> config) {
-        String capacity = config.get(CACHE_CAPACITY);
-        if (capacity != null && ConfigUtils.isInteger(capacity.trim())) {
-            this.capacity.set(Integer.parseInt(capacity.trim()));
-        }
     }
 
 }

@@ -21,8 +21,6 @@ import httl.Resource;
 import java.io.IOException;
 import java.util.List;
 
-
-
 /**
  * Loader. (SPI, Singleton, ThreadSafe)
  * 

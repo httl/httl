@@ -16,13 +16,11 @@
  */
 package httl.spi.formatters;
 
-import httl.spi.Configurable;
 import httl.spi.Formatter;
 import httl.util.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 
 
 /**
@@ -32,20 +30,16 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DateFormatter implements Formatter<Date>, Configurable {
+public class DateFormatter implements Formatter<Date> {
     
     private String dateFormat;
     
-    public void configure(Map<String, String> config) {
-        String format = config.get(DATE_FORMAT);
-        if (format != null && format.trim().length() > 0) {
-            format = format.trim();
-            new SimpleDateFormat(format).format(new Date());
-            this.dateFormat = format;
-        }
-    }
-    
-    public String format(Date value) {
+    public void setDateFormat(String dateFormat) {
+    	new SimpleDateFormat(dateFormat).format(new Date());
+		this.dateFormat = dateFormat;
+	}
+
+	public String format(Date value) {
         return DateUtils.format(value, dateFormat);
     }
     

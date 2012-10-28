@@ -17,10 +17,11 @@
 package httl.spi.translators;
 
 import httl.spi.Translator;
-import httl.spi.translators.expression.Node;
+import httl.spi.sequences.StringSequence;
 import httl.spi.translators.expression.BinaryOperator;
 import httl.spi.translators.expression.Bracket;
 import httl.spi.translators.expression.Constant;
+import httl.spi.translators.expression.Node;
 import httl.spi.translators.expression.Operator;
 import httl.spi.translators.expression.Token;
 import httl.spi.translators.expression.UnaryOperator;
@@ -87,11 +88,13 @@ public class DfaParser {
 	
 	private static final Pattern BLANK_PATTERN = Pattern.compile("^(\\s+)");
 	
-	private final Translator resolver;
+	private final Translator translator;
 
 	private final Map<String, Class<?>> parameterTypes;
 
 	private final Collection<Class<?>> functions;
+
+    private final List<StringSequence> sequences;
 
     private final String[] packages;
 
@@ -103,10 +106,11 @@ public class DfaParser {
 	
 	private final Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
 
-    public DfaParser(Translator resolver, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, int offset) {
-        this.resolver = resolver;
+    public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, List<StringSequence> sequences, String[] packages, int offset) {
+        this.translator = translator;
         this.parameterTypes = parameterTypes;
         this.functions = functions;
+        this.sequences = sequences;
         this.packages = packages;
         this.offset = offset;
     }
@@ -126,13 +130,20 @@ public class DfaParser {
     
     private int getCharType(char ch) {
         switch (ch) {
-            case ' ': case '\t': case '\n': case '\r': case '\f':
+            case ' ': case '\t': case '\n': case '\r': case '\f': case '\b':
                 return 0;
             case '_' :
-            case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' : case 'o' : case 'p' : case 'q' : case 'r' : case 's' : case 't' : case 'u' : case 'v' : case 'w' : case 'x' : case 'y' : case 'z' :
-            case 'A' : case 'B' : case 'C' : case 'D' : case 'E' : case 'F' : case 'G' : case 'H' : case 'I' : case 'J' : case 'K' : case 'L' : case 'M' : case 'N' : case 'O' : case 'P' : case 'Q' : case 'R' : case 'S' : case 'T' : case 'U' : case 'V' : case 'W' : case 'X' : case 'Y' : case 'Z' :
+            case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : 
+            case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' : 
+            case 'o' : case 'p' : case 'q' : case 'r' : case 's' : case 't' : 
+            case 'u' : case 'v' : case 'w' : case 'x' : case 'y' : case 'z' :
+            case 'A' : case 'B' : case 'C' : case 'D' : case 'E' : case 'F' : case 'G' : 
+            case 'H' : case 'I' : case 'J' : case 'K' : case 'L' : case 'M' : case 'N' : 
+            case 'O' : case 'P' : case 'Q' : case 'R' : case 'S' : case 'T' : 
+            case 'U' : case 'V' : case 'W' : case 'X' : case 'Y' : case 'Z' :
                 return 1;
-            case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : case '8' : case '9' : 
+            case '0' : case '1' : case '2' : case '3' : case '4' : 
+            case '5' : case '6' : case '7' : case '8' : case '9' : 
                 return 2;
             case '.' : 
                 return 3;
@@ -312,7 +323,7 @@ public class DfaParser {
                         if (left != Bracket.ROUND) {
                             throw new ParseException("Miss left parenthesis", token.getOffset());
                         }
-                        UnaryOperator operator = new UnaryOperator(resolver, msg, getTokenOffset(token) + offset, parameterTypes, functions, packages, msg, getPriority(msg, true));
+                        UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, packages, msg, getPriority(msg, true));
                         operatorTokens.put(operator, token);
                         operatorStack.push(operator);
                         beforeOperator = true;
@@ -383,7 +394,7 @@ public class DfaParser {
                 if (! parameterTypes.containsKey(msg)) {
                     throw new ParseException("Undefined variable \"" + msg + "\".", getTokenOffset(token) + offset);
                 }
-                parameterStack.push(new Variable(resolver, msg, getTokenOffset(token) + offset, parameterTypes, msg));
+                parameterStack.push(new Variable(translator, msg, getTokenOffset(token) + offset, parameterTypes, msg));
                 beforeOperator = false;
             } else if ("(".equals(msg)) {
                 operatorStack.push(Bracket.ROUND);
@@ -399,14 +410,14 @@ public class DfaParser {
                     if (! msg.startsWith("new ") && ! StringUtils.isFunction(msg) && ! UNARY_OPERATORS.contains(msg)) {
                         throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
                     }
-                    UnaryOperator operator = new UnaryOperator(resolver, msg, getTokenOffset(token) + offset, parameterTypes, functions, packages, msg, getPriority(msg, true));
+                    UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, packages, msg, getPriority(msg, true));
                     operatorTokens.put(operator, token);
                     operatorStack.push(operator);
                 } else {
                     if (! StringUtils.isFunction(msg) && ! BINARY_OPERATORS.contains(msg)) {
                         throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
                     }
-                    BinaryOperator operator = new BinaryOperator(resolver, msg, getTokenOffset(token) + offset, parameterTypes, functions, packages, msg, getPriority(msg, false));
+                    BinaryOperator operator = new BinaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sequences, packages, msg, getPriority(msg, false));
                     operatorTokens.put(operator, token);
                     while (! operatorStack.isEmpty() && ! (operatorStack.peek() instanceof Bracket)
                             && operatorStack.peek().getPriority() >= operator.getPriority()) {

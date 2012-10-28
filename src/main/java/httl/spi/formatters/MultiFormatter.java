@@ -16,7 +16,6 @@
  */
 package httl.spi.formatters;
 
-import httl.spi.Configurable;
 import httl.spi.Formatter;
 import httl.util.ClassUtils;
 import httl.util.StringUtils;
@@ -32,23 +31,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class MultiFormatter implements Formatter<Object>, Configurable {
+public class MultiFormatter implements Formatter<Object> {
     
     private final Map<Class<?>, Formatter<?>> templateFormatters = new ConcurrentHashMap<Class<?>, Formatter<?>>();
     
-    public void configure(Map<String, String> config) {
-        String value = config.get(FORMATTERS);
-        if (value != null && value.trim().length() > 0) {
-            String[] values = value.trim().split("[\\s\\,]+");
-            Formatter<?>[] formatters = new Formatter<?>[values.length];
-            for (int i = 0; i < values.length; i ++) {
-                formatters[i] = (Formatter<?>) ClassUtils.newInstance(values[i]);
-                if (formatters[i] instanceof Configurable) {
-                    ((Configurable)formatters[i]).configure(config);
-                }
-            }
-            add(formatters);
-        }
+    public void setFormatters(Formatter<?>[] formatters) {
+        add(formatters);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })

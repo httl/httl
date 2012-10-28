@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * StringLoader. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.Engine#setLoader(Loader)
- * @see httl.Engine#addTemplate(String, String)
+ * @see httl.Engine#addResource(String, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

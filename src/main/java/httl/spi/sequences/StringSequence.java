@@ -220,4 +220,9 @@ public class StringSequence implements List<String>, Serializable {
 		return sequence.toArray(a);
 	}
 
+	@Override
+	public String toString() {
+		return sequence.toString();
+	}
+
 }

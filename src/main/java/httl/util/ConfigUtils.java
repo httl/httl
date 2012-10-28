@@ -22,8 +22,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -49,7 +47,7 @@ public final class ConfigUtils {
 	            && INTEGER_PATTERN.matcher(value).matches();
 	}
     
-	public static Map<String, String> loadProperties(String path) {
+	public static Properties loadProperties(String path) {
 	    return loadProperties(path, false);
 	}
 
@@ -59,13 +57,16 @@ public final class ConfigUtils {
 	 * @param path - File path
 	 * @return Properties map
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Map<String, String> loadProperties(String path, boolean ignore) {
+    public static Properties loadProperties(String path, boolean ignore) {
+    	Properties properties = new Properties();
+		return loadProperties(properties, path, ignore);
+	}
+    
+    public static Properties loadProperties(Properties properties, String path, boolean ignore) {
 		if (path == null || path.length() == 0) {
 			throw new IllegalArgumentException("path == null");
 		}
 		try {
-			Properties properties = new Properties();
 			InputStream in = null;
 			try {
     			if (path.startsWith("/") || path.startsWith("./") || path.startsWith("../") 
@@ -78,7 +79,7 @@ public final class ConfigUtils {
     			    throw new FileNotFoundException("Not found file " + path);
     			}
     			properties.load(in);
-    			return (Map) properties;
+    			return properties;
 			} finally {
 			    if (in != null) {
 			        in.close();
@@ -86,7 +87,7 @@ public final class ConfigUtils {
 			}
 		} catch (IOException e) {
 		    if (ignore) {
-		        return new HashMap<String, String>(0);
+		        return properties;
 		    } else {
 		        throw new IllegalStateException(e.getMessage(), e);
 		    }

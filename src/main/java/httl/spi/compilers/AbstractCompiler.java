@@ -17,14 +17,12 @@
 package httl.spi.compilers;
 
 import httl.spi.Compiler;
-import httl.spi.Configurable;
 import httl.util.ClassUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +32,7 @@ import java.util.regex.Pattern;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class AbstractCompiler implements Compiler, Configurable {
+public abstract class AbstractCompiler implements Compiler {
     
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([_a-zA-Z][_a-zA-Z0-9\\.]*);");
     
@@ -42,8 +40,7 @@ public abstract class AbstractCompiler implements Compiler, Configurable {
     
     private File compileDirectory;
     
-    public void configure(Map<String, String> config) {
-        String directory = config.get(COMPILE_DIRECTORY);
+    public void setCompileDirectory(String directory) {
         if (directory != null && directory.trim().length() > 0) {
             File file = new File(directory);
             if (file.exists() && file.isDirectory()) {
@@ -101,7 +98,7 @@ public abstract class AbstractCompiler implements Compiler, Configurable {
             } catch (ParseException t) {
                 throw t;
             } catch (Throwable t) {
-                throw new ParseException("Failed to compile class, cause: " + t.getMessage() + ", class: " + className + ", code: \n" + code + "\n, stack: " + ClassUtils.toString(t), 0);
+                throw new ParseException("Failed to compile class, cause: " + t.getMessage() + ", class: " + className + ", code: \n================================\n" + code + "\n================================\n, stack: " + ClassUtils.toString(t), 0);
             }
         }
     }

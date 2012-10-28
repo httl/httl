@@ -18,17 +18,16 @@ package httl.spi.parsers.template;
 
 import httl.Context;
 import httl.Engine;
-import httl.Resource;
-import httl.Template;
+import httl.spi.Filter;
+import httl.spi.Formatter;
 import httl.util.ClassUtils;
-import httl.util.WrappedMap;
 import httl.util.UnsafeByteArrayOutputStream;
+import httl.util.WrappedMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
-
 
 /**
  * OutputStream template. (SPI, Prototype, ThreadSafe)
@@ -38,13 +37,14 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class OutputStreamTemplate extends AbstractTemplate {
-    
+
     private static final long serialVersionUID = 7127901461769617745L;
 
-    public OutputStreamTemplate(Engine engine, Resource resource){
-        super(engine, resource);
+    public OutputStreamTemplate(Engine engine, Filter filter, 
+    		Formatter<?> formatter, Map<Class<?>, Object> functions){
+        super(engine, filter, formatter, functions);
     }
-    
+
     public String render(Map<String, Object> parameters) {
         UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
         try {
@@ -54,15 +54,12 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         }
         return toString(output);
     }
-    
+
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
         parameters = new WrappedMap<String, Object>(parameters);
-        Context context = Context.getContext();
-        Template preTemplate = context.getTemplate();
-        Map<String, Object> preParameters = context.getParameters();
-        context.setTemplate(this).setParameters(parameters);
+        Context.pushContext(this, parameters);
         try {
             doRender(parameters, output);
         } catch (RuntimeException e) {
@@ -72,14 +69,14 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         } catch (Exception e) {
             throw new IllegalStateException(ClassUtils.toString(e), e);
         } finally {
-            context.setTemplate(preTemplate).setParameters(preParameters);
+        	Context.popContext();
         }
     }
-    
+
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
         writer.write(render(parameters));
     }
-    
+
     protected abstract void doRender(Map<String, Object> parameters, OutputStream output) throws Exception;
-    
+
 }

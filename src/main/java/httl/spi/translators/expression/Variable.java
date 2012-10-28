@@ -33,7 +33,7 @@ public final class Variable extends Node {
 
     private final String name;
     
-    public Variable(Translator resolver, String source, int offset, Map<String, Class<?>> parameterTypes, String name){
+    public Variable(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, String name){
         super(parameterTypes, offset);
         this.name = name;
     }

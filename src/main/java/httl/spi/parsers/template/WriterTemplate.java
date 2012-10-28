@@ -18,18 +18,17 @@ package httl.spi.parsers.template;
 
 import httl.Context;
 import httl.Engine;
-import httl.Resource;
-import httl.Template;
+import httl.spi.Filter;
+import httl.spi.Formatter;
 import httl.util.ClassUtils;
-import httl.util.WrappedMap;
 import httl.util.UnsafeStringWriter;
+import httl.util.WrappedMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
-
 
 /**
  * Writer template. (SPI, Prototype, ThreadSafe)
@@ -41,11 +40,12 @@ import java.util.Map;
 public abstract class WriterTemplate extends AbstractTemplate {
     
     private static final long serialVersionUID = 7127901461769617745L;
-    
-    public WriterTemplate(Engine engine, Resource resource){
-        super(engine, resource);
+
+    public WriterTemplate(Engine engine, Filter filter, 
+    		Formatter<?> formatter, Map<Class<?>, Object> functions){
+        super(engine, filter, formatter, functions);
     }
-    
+
     public String render(Map<String, Object> parameters) {
         UnsafeStringWriter output = new UnsafeStringWriter();
         try {
@@ -55,19 +55,16 @@ public abstract class WriterTemplate extends AbstractTemplate {
         }
         return output.toString();
     }
-    
+
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
         render(parameters, new OutputStreamWriter(output));
     }
-    
+
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
     	if (writer == null) 
          	throw new IllegalArgumentException("writer == null");
     	parameters = new WrappedMap<String, Object>(parameters);
-        Context context = Context.getContext();
-        Template preTemplate = context.getTemplate();
-        Map<String, Object> preParameters = context.getParameters();
-        context.setTemplate(this).setParameters(parameters);
+        Context.pushContext(this, parameters);
         try {
             doRender(parameters, writer);
         } catch (RuntimeException e) {
@@ -77,10 +74,10 @@ public abstract class WriterTemplate extends AbstractTemplate {
         } catch (Exception e) {
             throw new IllegalStateException(ClassUtils.toString(e), e);
         } finally {
-            context.setTemplate(preTemplate).setParameters(preParameters);
+        	Context.popContext();
         }
     }
-    
+
     protected abstract void doRender(Map<String, Object> parameters, Writer output) throws Exception;
-    
+
 }

@@ -18,25 +18,19 @@ package httl.spi.parsers.template;
 
 import httl.Context;
 import httl.Engine;
-import httl.Resource;
 import httl.Template;
-import httl.spi.Constants;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.formatters.MultiFormatter;
-import httl.util.ClassUtils;
-import httl.util.IOUtils;
 import httl.util.StringUtils;
 import httl.util.UnsafeByteArrayOutputStream;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -49,7 +43,15 @@ import java.util.Date;
 public abstract class AbstractTemplate implements Template, Serializable {
     
     private static final long serialVersionUID = 8780375327644594903L;
-    
+
+    private static final String NULL_VALUE          = "null.value";
+
+    private static final String TRUE_VALUE          = "true.value";
+
+    private static final String FALSE_VALUE         = "false.value";
+
+    private static final String OUTPUT_ENCODING     = "output.encoding";
+
     private transient final Engine engine;
     
     private transient final Filter filter;
@@ -82,30 +84,15 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     private transient final String falseValue;
 
-    private final String name;
-    
-    private final String encoding;
+	private final Map<String, Template> macros;
 
-	private final long lastModified;
-
-    private final long length;
-    
-	private final String source;
-	
 	@SuppressWarnings("unchecked")
-    public AbstractTemplate(Engine engine, Resource resource) {
+    public AbstractTemplate(Engine engine, Filter filter, 
+    		Formatter<?> formatter, Map<Class<?>, Object> functions) {
 		this.engine = engine;
-		this.name = resource.getName();
-		this.encoding = resource.getEncoding();
-		this.lastModified = resource.getLastModified();
-		this.length = resource.getLength();
-		try {
-            this.source = IOUtils.readToString(resource.getSource());
-        } catch (IOException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
-		this.filter = engine.getFilter();
-		this.formatter = (Formatter<Object>) engine.getFormatter();
+		this.filter = filter;
+		this.formatter = (Formatter<Object>) formatter;
+		this.macros = initMacros(engine, filter, formatter, functions);
 		if (formatter instanceof MultiFormatter) {
 		    MultiFormatter multi = (MultiFormatter) formatter;
     		this.numberFormatter = multi.get(Number.class);
@@ -130,9 +117,29 @@ public abstract class AbstractTemplate implements Template, Serializable {
             this.doubleFormatter = null;
             this.dateFormatter = null;
 		}
-		this.nullValue = getConfiguration(engine, Constants.NULL_VALUE, "");
-		this.trueValue = getConfiguration(engine, Constants.TRUE_VALUE, "true");
-		this.falseValue = getConfiguration(engine, Constants.FALSE_VALUE, "false");
+		this.nullValue = engine.getConfig(NULL_VALUE, "");
+		this.trueValue = engine.getConfig(TRUE_VALUE, "true");
+		this.falseValue = engine.getConfig(FALSE_VALUE, "false");
+	}
+	
+	private Map<String, Template> initMacros(Engine engine, Filter filter, 
+			Formatter<?> formatter, Map<Class<?>, Object> functions) {
+		Map<String, Template> macros = new HashMap<String, Template>();
+		Map<String, Class<?>> macroTypes = getMacroTypes();
+		if (macroTypes == null || macroTypes.size() == 0) {
+			return Collections.unmodifiableMap(macros);
+		}
+		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
+			try {
+				Template macro = (Template) entry.getValue()
+						.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class)
+						.newInstance(engine, filter, formatter, functions);
+				macros.put(entry.getKey(), macro);
+			} catch (Exception e) {
+				throw new IllegalStateException(e.getMessage(), e);
+			}
+		}
+		return Collections.unmodifiableMap(macros);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -144,61 +151,15 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	    return formatter;
 	}
 	
-	private static String getConfiguration(Engine engine, String key, String defaultValue) {
-	    String value = engine.getConfiguration().get(key);
-	    if (value == null || value.length() == 0) {
-	        return defaultValue;
-	    }
-	    return value;
-	}
-	
 	public Engine getEngine() {
 		return engine;
 	}
-	
-	public String getName() {
-		return name;
+
+	public Map<String, Template> getMacros() {
+		return macros;
 	}
-
-    public String getEncoding() {
-        return encoding;
-    }
-
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    public long getLength() {
-        return length;
-    }
-
-    public Reader getSource() throws IOException {
-        return new StringReader(source);
-    }
-
-    public String render() {
-        return render(Context.getContext().getParameters());
-    }
-
-    public void render(Writer writer) throws IOException {
-        render(Context.getContext().getParameters(), writer);
-    }
-    
-    public void render(OutputStream output) throws IOException {
-        render(Context.getContext().getParameters(), output);
-    }
-    
-    public String render(Object[] parameters) {
-        return render(ClassUtils.toMap(getParameterTypes().keySet(), parameters));
-    }
-
-    public void render(Object[] parameters, Writer writer) throws IOException {
-        render(ClassUtils.toMap(getParameterTypes().keySet(), parameters), writer);
-    }
-    
-    public void render(Object[] parameters, OutputStream output) throws IOException {
-        render(ClassUtils.toMap(getParameterTypes().keySet(), parameters), output);
-    }
+	
+	protected abstract Map<String, Class<?>> getMacroTypes();
 
     @Override
     public int hashCode() {
@@ -222,14 +183,14 @@ public abstract class AbstractTemplate implements Template, Serializable {
         } else if (!name.equals(otherName)) return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
-        return render();
+        return render(Context.getContext().getParameters());
     }
 
     protected String toString(UnsafeByteArrayOutputStream output) {
-        String encoding = engine.getConfiguration().get(Constants.OUTPUT_ENCODING);
+        String encoding = engine.getConfig(OUTPUT_ENCODING);
         if (encoding != null && encoding.length() > 0) {
             try {
                 return new String(output.toByteArray(), encoding);

@@ -18,7 +18,6 @@ package httl.web;
 
 import httl.Engine;
 import httl.Template;
-import httl.spi.Constants;
 import httl.spi.loaders.ServletLoader;
 
 import java.io.IOException;
@@ -30,7 +29,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * HttlServlet. (Integration, Singleton, ThreadSafe)
  * 
@@ -40,8 +38,10 @@ public class HttlServlet extends HttpServlet {
     
     private static final long serialVersionUID = 1L;
 
-    public static final String CONFIGURATION = "configuration";
-    
+    private static final String CONFIGURATION = "configuration";
+
+    private static final String OUTPUT_STREAM = "output.stream";
+
     private transient Engine engine;
     
     private boolean isOutputStream;
@@ -65,7 +65,7 @@ public class HttlServlet extends HttpServlet {
         } else {
             this.engine = Engine.getEngine();
         }
-        isOutputStream = "true".equalsIgnoreCase(engine.getConfiguration().get(Constants.OUTPUT_STREAM));
+        isOutputStream = "true".equalsIgnoreCase(engine.getConfig(OUTPUT_STREAM));
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -16,12 +16,10 @@
  */
 package httl.spi.loggers;
 
-import httl.spi.Constants;
 import httl.spi.Logger;
 
 import java.io.Serializable;
 import java.util.logging.Level;
-
 
 /**
  * JdkLogger
@@ -32,7 +30,7 @@ public class JdkLogger implements Logger, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTL);
+	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NAME);
 
 	public void debug(String msg) {
 		logger.log(Level.FINE, msg);

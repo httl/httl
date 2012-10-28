@@ -16,11 +16,9 @@
  */
 package httl.spi.loggers;
 
-import httl.spi.Constants;
 import httl.spi.Logger;
 
 import java.io.Serializable;
-
 
 /**
  * SimpleLogger.
@@ -31,7 +29,7 @@ public class SimpleLogger implements Logger, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String prefix = "[" + Constants.HTTL + "] ";
+	private static final String prefix = "[" + NAME + "] ";
 
 	private String getMessage(String msg) {
 		if (prefix == null)

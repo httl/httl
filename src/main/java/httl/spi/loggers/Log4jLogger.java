@@ -16,14 +16,12 @@
  */
 package httl.spi.loggers;
 
-import httl.spi.Constants;
 import httl.spi.Logger;
 
 import java.io.Serializable;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-
 
 /**
  * Log4jLogger
@@ -34,7 +32,7 @@ public class Log4jLogger implements Logger, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final org.apache.log4j.Logger logger = LogManager.getLogger(Constants.HTTL);
+	private static final org.apache.log4j.Logger logger = LogManager.getLogger(NAME);
 
 	public void debug(String msg) {
 		logger.debug(msg);

@@ -17,9 +17,9 @@
 package httl.spi.parsers;
 
 import httl.Engine;
+import httl.Resource;
 import httl.spi.Parser;
 import httl.spi.Translator;
-import httl.util.ClassUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -38,18 +38,16 @@ import java.util.Set;
  */
 public class MultiParser extends AbstractParser {
     
-    private Engine engine;
-    
-    private Map<String, String> config;
-    
     private final List<AbstractParser> parsers = new ArrayList<AbstractParser>();
-    
+
+    public void setParsers(AbstractParser[] parsers) {
+        add(parsers);
+    }
+
     public void add(AbstractParser... parsers) {
         if (parsers != null && parsers.length > 0) {
             for (AbstractParser parser : parsers) {
-                if (parser != null) {
-                    parser.setEngine(engine);
-                    parser.configure(config);
+                if (parser != null && ! this.parsers.contains(parser)) {
                     this.parsers.add(parser);
                 }
             }
@@ -79,29 +77,11 @@ public class MultiParser extends AbstractParser {
         }
     }
 
-    @Override
-    public void configure(Map<String, String> config) {
-        super.configure(config);
-        this.config = config;
-        String value = config.get(PARSERS);
-        if (value != null && value.length() > 0) {
-            String[] values = value.split("\\,");
-            for (String v : values) {
-                if (v.length() > 0) {
-                    AbstractParser parser = (AbstractParser) ClassUtils.newInstance(v);
-                    parser.setEngine(engine);
-                    parser.configure(config);
-                    parsers.add(parser);
-                }
-            }
-        }
-    }
-
-    protected String doParse(String name, String source, Translator resolver, 
+    protected String doParse(Resource resource, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
-                             Set<String> variables, Map<String, Class<?>> types) throws IOException, ParseException {
+                             Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
         for (AbstractParser parser : parsers) {
-            source = parser.doParse(name, source, resolver, parameters, parameterTypes, variables, types);
+            source = parser.doParse(resource, source, translator, parameters, parameterTypes, variables, types, macros);
         }
         return source;
     }

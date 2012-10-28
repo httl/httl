@@ -32,25 +32,6 @@ import java.util.Map;
 public interface Expression extends Serializable {
 
     /**
-     * Evaluate the expression with thread local context.
-     * 
-     * @see httl.Context#getContext()
-     * @see httl.Context#getParameters()
-     * @param parameters - parameters
-     * @return result.
-     */
-    Object evaluate();
-
-    /**
-     * Evaluate the expression use getParameterTypes() names.
-     * 
-     * @see #getParameterTypes()
-     * @param parameters - parameters
-     * @return result.
-     */
-    Object evaluate(Object[] parameters);
-
-    /**
      * Evaluate the expression.
      * 
      * @param parameters - parameters

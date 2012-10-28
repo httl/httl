@@ -23,7 +23,6 @@ import httl.util.UrlUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipFile;
 
 
@@ -38,8 +37,8 @@ public class ZipLoader extends AbstractLoader {
 	
 	private File file;
 	
-	public void configure(Map<String, String> config) {
-	    super.configure(config);
+	public void setTemplateDirectory(String directory) {
+	    super.setTemplateDirectory(directory);
 	    file = new File(getDirectory());
 	}
 	

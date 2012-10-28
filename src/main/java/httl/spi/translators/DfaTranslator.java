@@ -18,19 +18,23 @@ package httl.spi.translators;
 
 import httl.Engine;
 import httl.Expression;
-import httl.spi.Configurable;
+import httl.spi.Compiler;
 import httl.spi.Translator;
+import httl.spi.sequences.StringSequence;
 import httl.spi.translators.expression.ExpressionImpl;
 import httl.spi.translators.expression.Node;
 import httl.util.StringUtils;
 
 import java.text.ParseException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- * DfaResolver. (SPI, Singleton, ThreadSafe)
+ * DfaTranslator. (SPI, Singleton, ThreadSafe)
  * 
  * Deterministic Finite state Automata (DFA)
  * 
@@ -38,28 +42,57 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DfaTranslator implements Translator, Configurable {
+public class DfaTranslator implements Translator {
 
     private Engine engine;
 
+    private Compiler compiler;
+    
     protected String[] importPackages;
+
+    private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
+
+    private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
     public void setEngine(Engine engine) {
         this.engine = engine;
     }
-    
-    public void configure(Map<String, String> config) {
-        String packages = config.get(IMPORT_PACKAGES);
-        if (packages != null && packages.trim().length() > 0) {
-            importPackages = packages.trim().split("\\s*\\,\\s*");
+
+    public void setCompiler(Compiler compiler) {
+        this.compiler = compiler;
+    }
+
+    public void setImportPackages(String[] importPackages) {
+    	this.importPackages = importPackages;
+    }
+
+    public void setFunctions(Object[] functions) {
+    	for (Object function : functions) {
+    		this.functions.put(function.getClass(), function);
+    	}
+    }
+
+    public void setSequences(String[] sequences) {
+    	for (String s : sequences) {
+            s = s.trim();
+            if (s.length() > 0) {
+                String[] ts = s.split("\\s+");
+                List<String> sequence = new ArrayList<String>();
+                for (String t : ts) {
+                    t = t.trim();
+                    if (t.length() > 0) {
+                        sequence.add(t);
+                    }
+                }
+                this.sequences.add(new StringSequence(sequence));
+            }
         }
     }
-    
+
 	public Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
 	    source = StringUtils.unescapeHtml(source);
-	    Collection<Class<?>> functions = engine.getFunctions().keySet();
-	    Node node = new DfaParser(this, parameterTypes, functions, importPackages, offset).parse(source);
-        return new ExpressionImpl(engine, source, parameterTypes, offset, node.getCode(), node.getReturnType(), importPackages);
+	    Node node = new DfaParser(this, parameterTypes, functions.keySet(), sequences, importPackages, offset).parse(source);
+        return new ExpressionImpl(source, parameterTypes, offset, node.getCode(), node.getReturnType(), engine, compiler, importPackages, functions);
 	}
 
 }

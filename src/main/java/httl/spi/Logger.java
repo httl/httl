@@ -23,6 +23,8 @@ package httl.spi;
  */
 public interface Logger {
 
+    public static final String NAME = "httl";
+
 	/**
 	 * debug.
 	 * 

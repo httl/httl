@@ -41,6 +41,16 @@ public class StringResource extends AbstractResource {
         this.source = source;
     }
     
+    public StringResource(Engine engine, String name, String encoding, long lastModified, String source) {
+        super(engine, name, encoding, lastModified);
+        this.source = source;
+    }
+
+    @Override
+    public long getLength() {
+    	return source.length();
+    }
+    
     public Reader getSource() throws IOException {
         return new StringReader(source);
     }

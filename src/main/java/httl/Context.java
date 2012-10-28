@@ -16,24 +16,20 @@
  */
 package httl;
 
-import java.io.Writer;
 import java.util.Map;
 
 /**
  * Context. (API, ThreadLocal, ThreadSafe)
  * 
- * @see httl.spi.parsers.template.AbstractTemplate#render(Map, Writer)
+ * @see httl.spi.parsers.template.WriterTemplate#render(Map, java.io.Writer)
+ * @see httl.spi.parsers.template.OutputStreamTemplate#render(Map, java.io.OutputStream)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Context {
-    
-    private static ThreadLocal<Context> LOCAL = new ThreadLocal<Context>() {
-        @Override
-        protected Context initialValue() {
-            return new Context();
-        }
-    };
+public final class Context {
+
+	// The thread local holder.
+    private static ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
     /**
      * Get current thread local context.
@@ -41,22 +37,68 @@ public class Context {
      * @return current thread local context.
      */
     public static Context getContext() {
-        return LOCAL.get();
+    	Context context = LOCAL.get();
+    	if (context == null) {
+    		context = new Context(null, null, null);
+    		LOCAL.set(context);
+    	}
+    	return context;
     }
-    
+
+    /**
+     * Push context in thread local.
+     * 
+     * @param parent
+     * @param template
+     * @param parameters
+     */
+    public static void pushContext(Template template, Map<String, Object> parameters) {
+    	LOCAL.set(new Context(LOCAL.get(), template, parameters));
+    }
+
+    /**
+     * Pop context in thread local.
+     */
+    public static void popContext() {
+    	Context context = LOCAL.get();
+    	if (context != null) {
+	    	Context parent = context.getParent();
+	    	if (parent != null) {
+	    		LOCAL.set(parent);
+	    	} else {
+	    		LOCAL.remove();
+	    	}
+    	}
+    }
+
     /**
      * Remove current thread local context.
      */
     public static void removeContext() {
         LOCAL.remove();
     }
-    
-    private Template template;
-    
-    private Map<String, Object> parameters;
-    
-    private Context() {}
-    
+
+    private final Context parent;
+
+	private final Template template;
+
+    private final Map<String, Object> parameters;
+
+    private Context(Context parent, Template template, Map<String, Object> parameters) {
+    	this.parent = parent;
+        this.template = template;
+        this.parameters = parameters;
+    }
+
+    /**
+     * Get parent context.
+     * 
+     * @return parent context.
+     */
+    public Context getParent() {
+		return parent;
+	}
+
     /**
      * Get current template.
      * 
@@ -68,18 +110,6 @@ public class Context {
     }
     
     /**
-     * Set current template.
-     * 
-     * @see #getContext()
-     * @param template - current template.
-     * @return current context.
-     */
-    public Context setTemplate(Template template) {
-        this.template = template;
-        return this;
-    }
-    
-    /**
      * Get current parameters.
      * 
      * @see #getContext()
@@ -88,17 +118,5 @@ public class Context {
     public Map<String, Object> getParameters() {
         return parameters;
     }
-    
-    /**
-     * Set current parameters.
-     * 
-     * @see #getContext()
-     * @param parameters - current parameters.
-     * @return current context.
-     */
-    public Context setParameters(Map<String, Object> parameters) {
-        this.parameters = parameters;
-        return this;
-    }
-    
+
 }

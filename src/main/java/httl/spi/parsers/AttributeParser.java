@@ -16,9 +16,11 @@
  */
 package httl.spi.parsers;
 
+import httl.Resource;
 import httl.Template;
 import httl.spi.Parser;
 import httl.spi.Translator;
+import httl.spi.loaders.StringResource;
 import httl.util.LinkedStack;
 import httl.util.StringUtils;
 
@@ -47,21 +49,21 @@ import net.htmlparser.jericho.Source;
  */
 public class AttributeParser extends AbstractParser {
 
-    protected String doParse(String name, String reader, Translator resolver, 
+    protected String doParse(Resource resource, String reader, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
-                             Set<String> variables, Map<String, Class<?>> types) throws IOException, ParseException {
+                             Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
         Source source = new Source(reader);
         OutputDocument document = new OutputDocument(source);
-        parseAttribute(name, source, source, document, resolver, parameters, parameterTypes, variables, types);
+        parseAttribute(resource, source, source, document, translator, parameters, parameterTypes, variables, types, macros);
         return document.toString();
     }
 
     // 替换子元素中的指令属性
-    private void parseAttribute(String template, Source source, 
+    private void parseAttribute(Resource resource, Source source, 
                                  Segment segment, OutputDocument document, 
-                                 Translator resolver, 
+                                 Translator translator, 
                                  List<String> parameters, List<Class<?>> parameterTypes, 
-                                 Set<String> variables, Map<String, Class<?>> types) throws ParseException {
+                                 Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
         List<Element> elements = segment.getChildElements();
         if (elements == null) {
             return;
@@ -119,12 +121,12 @@ public class AttributeParser extends AbstractParser {
                 if (! StringUtils.isNamed(var)) {
                     throw new ParseException("Invalid macro name " + var, macro.getBegin());
                 }
-                String key = getMacroPath(template, var);
+                String key = getMacroPath(resource.getName(), var);
                 String es = element.toString();
                 es = es.substring(0, macro.getBegin() - 1 - element.getBegin()) 
                     + (param == null || param.length() == 0 ? "" : " in=\"" + param + "\"")
                     + es.substring(macro.getEnd() - element.getBegin()); // 去掉macro属性
-                engine.addTemplate(key, es);
+                macros.put(var, parseClass(new StringResource(engine, key, resource.getEncoding(), resource.getLastModified(), es)));
                 Class<?> cls = types.get(var);
                 if (cls != null && ! cls.equals(Template.class)) {
                     throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macro.getBegin());
@@ -134,7 +136,7 @@ public class AttributeParser extends AbstractParser {
                 StringBuffer buf = new StringBuffer();
                 buf.append(LEFT);
                 buf.append(element.length());
-                buf.append(var + " = getEngine().getTemplate(\"" + key + "\");\n");
+                buf.append(var + " = getMacros().get(\"" + var + "\");\n");
                 buf.append(RIGHT);
                 document.insert(element.getBegin(), buf.toString()); // 插入块指令
                 document.remove(element); // 移除宏
@@ -159,7 +161,7 @@ public class AttributeParser extends AbstractParser {
                 } else {
                     offset ++;
                 }
-                String code = getStatementCode(name, value, attribute.getBegin(), offset, resolver, variables, types, parameters, parameterTypes, false);
+                String code = getStatementCode(name, value, attribute.getBegin(), offset, translator, variables, types, parameters, parameterTypes, false);
                 buf.append(code);
                 buf.append(RIGHT);
                 document.insert(element.getBegin(), buf.toString()); // 插入块指令
@@ -173,7 +175,7 @@ public class AttributeParser extends AbstractParser {
                 String end = ends.pop();
                 document.insert(element.getEnd(), LEFT + end + RIGHT); // 插入结束指令
             }
-            parseAttribute(template, source, element, document, resolver, parameters, parameterTypes, variables, types); // 递归处理子标签
+            parseAttribute(resource, source, element, document, translator, parameters, parameterTypes, variables, types, macros); // 递归处理子标签
         }
     }
     

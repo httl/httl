@@ -17,15 +17,12 @@
 package httl.spi.loaders;
 
 import httl.Resource;
-import httl.spi.Configurable;
 import httl.spi.Loader;
-import httl.util.ClassUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -36,23 +33,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class MultiLoader implements Loader, Configurable {
+public class MultiLoader implements Loader {
 
     private final List<Loader> templateLoaders = new CopyOnWriteArrayList<Loader>();
     
-	public void configure(Map<String, String> config) {
-	    String value = config.get(LOADERS);
-        if (value != null && value.trim().length() > 0) {
-            String[] values = value.trim().split("[\\s\\,]+");
-            Loader[] loaders = new Loader[values.length];
-            for (int i = 0; i < values.length; i ++) {
-                loaders[i] = (Loader) ClassUtils.newInstance(values[i]);
-                if (loaders[i] instanceof Configurable) {
-                    ((Configurable)loaders[i]).configure(config);
-                }
-            }
-            add(loaders);
-        }
+	public void setLoaders(Loader[] loaders) {
+		add(loaders);
 	}
 
     public void add(Loader... loaders) {

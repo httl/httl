@@ -48,9 +48,13 @@ public final class BinaryOperator extends Operator {
     
     private Node rightParameter;
     
-    public BinaryOperator(Translator resolver, String source, int offset, 
-                          Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, String name, int priority){
-        super(resolver, source, offset, parameterTypes, functions, packages, name, priority);
+    private List<StringSequence> sequences;
+    
+    public BinaryOperator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, 
+                          Collection<Class<?>> functions, List<StringSequence> sequences,
+                          String[] packages, String name, int priority){
+        super(translator, source, offset, parameterTypes, functions, packages, name, priority);
+        this.sequences = sequences;
     }
 
     public Node getLeftParameter() {
@@ -67,6 +71,15 @@ public final class BinaryOperator extends Operator {
 
     public void setRightParameter(Node rightParameter) {
         this.rightParameter = rightParameter;
+    }
+
+    private List<String> getSequence(String begin, String end) {
+        for (StringSequence sequence : sequences) {
+            if (sequence.containSequence(begin, end)) {
+                return sequence.getSequence(begin, end);
+            }
+        }
+        throw new IllegalStateException("No such sequence from \"" + begin + "\" to \"" + end + "\".");
     }
 
     public Class<?> getReturnType() throws ParseException {
@@ -235,7 +248,7 @@ public final class BinaryOperator extends Operator {
                         if (Modifier.isStatic(method.getModifiers())) {
                         	return function.getName() + "." + method.getName() + "(" + allCode + ")";
                         }
-                        return "((" + function.getName() + ")getEngine().getFunction(" + function.getName() + ".class))." + method.getName() + "(" + allCode + ")";
+                        return "_" + function.getName().replace('.', '_') + "." + method.getName() + "(" + allCode + ")";
                     } catch (NoSuchMethodException e) {
                     }
                 }
@@ -287,8 +300,20 @@ public final class BinaryOperator extends Operator {
                 return "new " + IntegerSequence.class.getName() + "(" + leftCode + ", " + rightCode + ")";
             } else if (leftType == char.class || leftType == Character.class) {
                 return "new " + CharacterSequence.class.getName() + "(" + leftCode + ", " + rightCode + ")";
-            } else if (leftType == String.class) {
-                return "getEngine().getSequence(" + leftCode + ", " + rightCode + ")";
+            } else if (leftType == String.class 
+            			&& leftCode.length() >= 2 && leftCode.startsWith("\"") && leftCode.endsWith("\"")
+            			&& rightCode.length() >= 2 && rightCode.startsWith("\"") && rightCode.endsWith("\"")) {
+        		StringBuilder buf = new StringBuilder();
+            	for (String s : getSequence(leftCode.substring(1, leftCode.length() - 1), 
+            			rightCode.substring(1, rightCode.length() - 1))) {
+            		if (buf.length() > 0) {
+            			buf.append(",");
+            		}
+            		buf.append("\"");
+            		buf.append(s);
+            		buf.append("\"");
+            	}
+                return "new String[] {" + buf.toString() + "}";
             } else {
                 throw new ParseException("The operator \"..\" unsupported parameter type " + leftType, getOffset());
             }

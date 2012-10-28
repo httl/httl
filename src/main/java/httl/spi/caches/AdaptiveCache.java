@@ -17,9 +17,6 @@
 package httl.spi.caches;
 
 import httl.spi.Cache;
-import httl.spi.Configurable;
-
-import java.util.Map;
 
 
 /**
@@ -29,19 +26,15 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class AdaptiveCache implements Cache, Configurable {
+public class AdaptiveCache implements Cache {
     
     private Cache cache;
-    
-    public void configure(Map<String, String> config) {
-        String capacity = config.get(CACHE_CAPACITY);
-        if (capacity != null && capacity.trim().length() > 0 && Integer.parseInt(capacity.trim()) > 0) {
-            cache = new LruCache(Integer.parseInt(capacity.trim()));
+
+    public void setCacheCapacity(int capacity) {
+    	if (capacity > 0) {
+            cache = new LruCache(capacity);
         } else {
             cache = new StrongCache();
-        }
-        if (cache instanceof Configurable) {
-            ((Configurable)cache).configure(config);
         }
     }
 

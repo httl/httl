@@ -17,11 +17,9 @@
 package httl.spi.compilers;
 
 import httl.spi.Compiler;
-import httl.spi.Configurable;
 import httl.util.ClassUtils;
 
 import java.text.ParseException;
-import java.util.Map;
 
 
 /**
@@ -31,19 +29,17 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class AdaptiveCompiler implements Compiler, Configurable {
+public class AdaptiveCompiler implements Compiler {
     
     private Compiler compiler;
 
-    public void configure(Map<String, String> config) {
-        String version = config.get(JAVA_VERSION);
+    public void setJavaVersion(String version) {
         if (version == null || ClassUtils.isBeforeJava6(version.trim())) {
             compiler = new JavassistCompiler();
         } else {
-            compiler = new JdkCompiler();
-        }
-        if (compiler instanceof Configurable) {
-            ((Configurable)compiler).configure(config);
+        	JdkCompiler jdkCompiler = new JdkCompiler();
+        	jdkCompiler.setJavaVersion(version);
+        	compiler = jdkCompiler;
         }
     }
 

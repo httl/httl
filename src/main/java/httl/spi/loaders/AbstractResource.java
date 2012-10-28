@@ -36,10 +36,17 @@ public abstract class AbstractResource implements Resource {
     
     private final String encoding;
 
+    private final long lastModified;
+    
     public AbstractResource(Engine engine, String name, String encoding) {
+    	this(engine, name, encoding, -1);
+    }
+
+    public AbstractResource(Engine engine, String name, String encoding, long lastModified) {
         this.engine = engine;
         this.name = name;
         this.encoding = encoding;
+        this.lastModified = lastModified;
     }
 
     public Engine getEngine() {
@@ -55,7 +62,7 @@ public abstract class AbstractResource implements Resource {
     }
 
     public long getLastModified() {
-        return -1;
+        return lastModified;
     }
 
     public long getLength() {

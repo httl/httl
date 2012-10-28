@@ -39,7 +39,7 @@ public abstract class Operator extends Node {
     
     private final String[] packages;
 
-    public Operator(Translator resolver, String source, int offset, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, String name, int priority){
+    public Operator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, String name, int priority){
         super(parameterTypes, offset);
         this.name = name;
         this.priority = priority;

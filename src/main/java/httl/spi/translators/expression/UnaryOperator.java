@@ -41,9 +41,9 @@ public final class UnaryOperator extends Operator {
 
     private Node parameter;
 
-    public UnaryOperator(Translator resolver, String source, int offset, Map<String, Class<?>> parameterTypes, 
+    public UnaryOperator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, 
                          Collection<Class<?>> functions, String[] packages, String name, int priority) {
-        super(resolver, source, offset, parameterTypes, functions, packages, name, priority);
+        super(translator, source, offset, parameterTypes, functions, packages, name, priority);
     }
 
     public Node getParameter() {
@@ -105,7 +105,7 @@ public final class UnaryOperator extends Operator {
             String name = getName().substring(1);
             Class<?> t = getParameterTypes().get(name);
             if (t != null && Template.class.isAssignableFrom(t)) {
-                return name + ".render(new Object[] {" + parameter.getCode()+ "})";
+                return name + ".render(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object[] {" + parameter.getCode()+ "}))";
             } else {
                 Class<?>[] types = parameter.getReturnTypes();
                 Collection<Class<?>> functions = getFunctions();
@@ -119,7 +119,7 @@ public final class UnaryOperator extends Operator {
                             if (Modifier.isStatic(method.getModifiers())) {
                             	return function.getName() + "." + method.getName() + "(" + parameter.getCode() + ")";
                             }
-                            return "((" + function.getName() + ")getEngine().getFunction(" + function.getName() + ".class))." + method.getName() + "(" + parameter.getCode() + ")";
+                            return "_" + function.getName().replace('.', '_') + "." + method.getName() + "(" + parameter.getCode() + ")";
                         } catch (NoSuchMethodException e) {
                         }
                     }

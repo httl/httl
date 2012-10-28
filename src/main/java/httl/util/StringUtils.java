@@ -17,6 +17,7 @@
 package httl.util;
 
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -339,6 +340,30 @@ public class StringUtils {
         } catch (Throwable t) {
         }
         return location;
+    }
+    
+    public static String splitCamelName(String name, String split) {
+    	StringBuilder buf = new StringBuilder();
+    	for (int i = 0; i < name.length(); i ++) {
+    		char c = name.charAt(i);
+    		if (c >= 'A' && c <= 'Z') {
+    			if (buf.length() > 0) {
+    				buf.append(split);
+    			}
+    			buf.append(Character.toLowerCase(c));
+    		} else {
+    			buf.append(c);
+    		}
+    	}
+    	return buf.toString();
+    }
+    
+    public static byte[] toBytes(String src, String encoding) {
+    	try {
+			return src.getBytes(encoding);
+		} catch (UnsupportedEncodingException e) {
+			return src.getBytes();
+		}
     }
     
 }

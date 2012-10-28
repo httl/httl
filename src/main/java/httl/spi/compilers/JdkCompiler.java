@@ -17,7 +17,6 @@
 package httl.spi.compilers;
 
 import httl.spi.Compiler;
-import httl.spi.Configurable;
 import httl.util.ClassUtils;
 
 import java.io.ByteArrayInputStream;
@@ -61,7 +60,7 @@ import javax.tools.ToolProvider;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class JdkCompiler extends AbstractCompiler implements Configurable {
+public class JdkCompiler extends AbstractCompiler {
 
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
@@ -100,9 +99,7 @@ public class JdkCompiler extends AbstractCompiler implements Configurable {
         javaFileManager = new JavaFileManagerImpl(manager, classLoader);
     }
     
-    public void configure(Map<String, String> config) {
-        super.configure(config);
-        String version = config.get(JAVA_VERSION);
+    public void setJavaVersion(String version) {
         if (version != null && version.trim().length() > 0) {
             options = new ArrayList<String>();
             options.add("-target");

@@ -14,22 +14,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi;
+package httl.spi.filters;
 
-import java.util.Map;
+import httl.spi.Filter;
 
 /**
- * Configurable. (SPI, Singleton, ThreadSafe)
+ * MultiFilter. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.Engine#setFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Configurable extends Constants {
+public class MultiValueFilter extends MultiFilter {
     
-    /**
-     * Configure.
-     * 
-     * @param config - The initialize configuration
-     */
-    void configure(Map<String, String> config);
-    
+    public void setValueFilters(Filter[] filters) {
+    	add(filters);
+    }
+
 }

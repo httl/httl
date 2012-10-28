@@ -17,9 +17,9 @@
 package httl.spi.functions;
 
 import httl.Context;
+import httl.Engine;
 import httl.Resource;
 import httl.Template;
-import httl.spi.Configurable;
 import httl.spi.parsers.template.Cycle;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
@@ -30,15 +30,12 @@ import httl.util.UrlUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-
 
 /**
  * DefaultFunction. (SPI, Singleton, ThreadSafe)
@@ -48,35 +45,34 @@ import java.util.UUID;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DefaultFunction implements Configurable {
+public class DefaultFunction {
     
     private static final Random RANDOM = new Random();
-    
-    private String dateFormat;
 
-    private String numberFormat;
+    private Engine engine;
 
-    protected String[] importPackages;
+	private String dateFormat;
 
-    public void configure(Map<String, String> config) {
-        String format = config.get(DATE_FORMAT);
-        if (format != null && format.trim().length() > 0) {
-            format = format.trim();
-            new SimpleDateFormat(format).format(new Date());
-            this.dateFormat = format;
-        }
-        format = config.get(NUMBER_FORMAT);
-        if (format != null && format.trim().length() > 0) {
-            format = format.trim();
-            new DecimalFormat(format).format(0);
-            this.numberFormat = format;
-        }
-        String packages = config.get(IMPORT_PACKAGES);
-        if (packages != null && packages.trim().length() > 0) {
-            importPackages = packages.trim().split("\\s*\\,\\s*");
-        }
-    }
-    
+	private String numberFormat;
+
+    private String[] importPackages;
+
+    public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
+
+    public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	public void setNumberFormat(String numberFormat) {
+		this.numberFormat = numberFormat;
+	}
+
+	public void setImportPackages(String[] importPackages) {
+		this.importPackages = importPackages;
+	}
+
     public static Date now() {
         return new Date();
     }
@@ -89,66 +85,64 @@ public class DefaultFunction implements Configurable {
         return UUID.randomUUID();
     }
 
-    public static String include(String name) throws IOException, ParseException {
+    public String include(String name) throws IOException, ParseException {
         return include(name, null);
     }
     
-    public static String include(String name, String encoding) throws IOException, ParseException {
-        return parse(name, encoding).render();
+    public String include(String name, String encoding) throws IOException, ParseException {
+        return parse(name, encoding).render(Context.getContext().getParameters());
     }
     
-    public static String read(String name) throws IOException, ParseException {
+    public String read(String name) throws IOException, ParseException {
         return read(name, null);
     }
     
-    public static String read(String name, String encoding) throws IOException {
+    public String read(String name, String encoding) throws IOException {
         return IOUtils.readToString(load(name, encoding).getSource());
     }
     
-    public static Template parse(String name) throws IOException, ParseException {
+    public Template parse(String name) throws IOException, ParseException {
         return parse(name, null);
     }
     
-    public static Template parse(String name, String encoding) throws IOException, ParseException {
+    public Template parse(String name, String encoding) throws IOException, ParseException {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("include template name == null");
         }
         Template template = Context.getContext().getTemplate();
-        if (template == null) {
-            throw new IllegalArgumentException("include context template == null");
+        if (template != null) {
+        	if (encoding == null || encoding.length() == 0) {
+                encoding = template.getEncoding();
+            }
+            name = UrlUtils.relativeUrl(name, template.getName());
         }
-        if (encoding == null || encoding.length() == 0) {
-            encoding = template.getEncoding();
-        }
-        name = UrlUtils.relativeUrl(name, template.getName());
-        return template.getEngine().getTemplate(name, encoding);
+        return engine.getTemplate(name, encoding);
     }
     
-    public static Resource load(String name) throws IOException, ParseException {
+    public Resource load(String name) throws IOException, ParseException {
         return load(name, null);
     }
     
-    public static Resource load(String name, String encoding) throws IOException {
+    public Resource load(String name, String encoding) throws IOException {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("display template name == null");
         }
         Template template = Context.getContext().getTemplate();
-        if (template == null) {
-            throw new IllegalArgumentException("display context template == null");
+        if (template != null) {
+	        if (encoding == null || encoding.length() == 0) {
+	            encoding = template.getEncoding();
+	        }
+	        name = UrlUtils.relativeUrl(name, template.getName());
         }
-        if (encoding == null || encoding.length() == 0) {
-            encoding = template.getEncoding();
-        }
-        name = UrlUtils.relativeUrl(name, template.getName());
-        return template.getEngine().getResource(name, encoding);
+        return engine.getResource(name, encoding);
     }
     
-    public static Object evaluate(String expr) throws ParseException {
+    public Object evaluate(String expr) throws ParseException {
         Template template = Context.getContext().getTemplate();
         if (template == null) {
             throw new IllegalArgumentException("display context template == null");
         }
-        return template.getEngine().getExpression(expr, template.getParameterTypes(), 0).evaluate(Context.getContext().getParameters());
+        return engine.getExpression(expr, template.getParameterTypes(), 0).evaluate(Context.getContext().getParameters());
     }
     
     public static String escapeString(String value) {

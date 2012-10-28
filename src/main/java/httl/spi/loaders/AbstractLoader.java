@@ -18,14 +18,12 @@ package httl.spi.loaders;
 
 import httl.Engine;
 import httl.Resource;
-import httl.spi.Configurable;
 import httl.spi.Loader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -35,7 +33,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class AbstractLoader implements Loader, Configurable {
+public abstract class AbstractLoader implements Loader {
 	
 	private Engine engine;
 
@@ -65,26 +63,27 @@ public abstract class AbstractLoader implements Loader, Configurable {
         return suffixes;
     }
     
-    public void configure(Map<String, String> config) {
-        String encoding = config.get(INPUT_ENCODING);
-        if (encoding != null && encoding.trim().length() > 0) {
+    public void setInputEncoding(String encoding) {
+    	if (encoding != null && encoding.trim().length() > 0) {
             encoding = encoding.trim();
             Charset.forName(encoding);
             this.encoding = encoding;
         }
-        String directory = config.get(TEMPLATE_DIRECTORY);
-        if (directory != null && directory.trim().length() > 0) {
+    }
+
+    public void setTemplateDirectory(String directory) {
+    	if (directory != null && directory.trim().length() > 0) {
             if (directory.endsWith("/") || directory.endsWith("\\")) {
                 directory = directory.substring(0, directory.length() - 1);
             }
             this.directory = directory.trim();
         }
-        String suffix = config.get(TEMPLATE_SUFFIX);
-        if (suffix != null && suffix.trim().length() > 0) {
-            this.suffixes = suffix.trim().split("\\s*\\,\\*");
-        }
     }
-    
+
+    public void setTemplateSuffix(String[] suffix) {
+    	this.suffixes = suffix;
+    }
+
     public List<String> list() throws IOException {
         String directory = getDirectory();
         if (directory == null || directory.length() == 0) {

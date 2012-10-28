@@ -21,8 +21,8 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Compiler;
-import httl.spi.Configurable;
 import httl.spi.Filter;
+import httl.spi.Formatter;
 import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.spi.parsers.template.AbstractTemplate;
@@ -32,26 +32,29 @@ import httl.spi.parsers.template.OutputStreamTemplate;
 import httl.spi.parsers.template.WriterTemplate;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
+import httl.util.StringCache;
 import httl.util.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
-import java.lang.reflect.Constructor;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 /**
  * AbstractParser. (SPI, Singleton, ThreadSafe)
@@ -60,7 +63,7 @@ import java.util.regex.Pattern;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class AbstractParser implements Parser, Configurable {
+public abstract class AbstractParser implements Parser {
     
     protected static final char SPECIAL = '\27';
 
@@ -138,28 +141,77 @@ public abstract class AbstractParser implements Parser, Configurable {
     
     protected Engine engine;
     
+    protected Compiler compiler;
+    
+	protected Translator translator;
+
+	protected Filter textFilter;
+
+	protected Filter valueFilter;
+
+    protected Formatter<?> formatter;
+
     protected String[] importPackages;
 
     protected Set<String> importPackageSet;
+
+    private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
     protected static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
     
     protected static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
     
-    protected boolean isOutput = false;
+    protected boolean isOutputStream = false;
+
+    protected boolean sourceInClass = false;
+
+	protected boolean textInClass = false;
+	
+	protected String outputEncoding;
     
-    public void setEngine(Engine engine) {
+    public void setOutputEncoding(String outputEncoding) {
+		this.outputEncoding = outputEncoding;
+	}
+
+	public void setEngine(Engine engine) {
         this.engine = engine;
     }
 
-    public void configure(Map<String, String> config) {
-        String output = config.get(OUTPUT_STREAM);
-        if (output != null && output.trim().length() > 0) {
-            isOutput = "true".equalsIgnoreCase(output);
-        }
-        String namespace = config.get(ATTRIBUTE_NAMESPACE);
-        if (namespace != null && namespace.trim().length() > 0) {
-            namespace = namespace.trim() + ":";
+    public void setCompiler(Compiler compiler) {
+		this.compiler = compiler;
+	}
+
+    public void setTranslator(Translator translator) {
+		this.translator = translator;
+	}
+
+    public void setTextFilter(Filter filter) {
+		this.textFilter = filter;
+	}
+
+	public void setValueFilter(Filter filter) {
+		this.valueFilter = filter;
+	}
+
+	public void setFormatter(Formatter<?> formatter) {
+		this.formatter = formatter;
+	}
+	
+	public void setOutputStream(boolean outputStream) {
+		this.isOutputStream = outputStream;
+	}
+
+    public void setSourceInClass(boolean sourceInClass) {
+		this.sourceInClass = sourceInClass;
+	}
+
+	public void setTextInClass(boolean textInClass) {
+		this.textInClass = textInClass;
+	}
+
+	public void setAttributeNamespace(String namespace) {
+		if (namespace != null && namespace.length() > 0) {
+            namespace = namespace + ":";
             ifName = namespace + IF;
             elseifName = namespace + ELSEIF;
             elseName = namespace + ELSE;
@@ -169,115 +221,205 @@ public abstract class AbstractParser implements Parser, Configurable {
             varName = namespace + VAR;
             macroName = namespace + MACRO;
         }
-        String status = config.get(FOREACH_STATUS);
-        if (status != null && status.trim().length() > 0 
-                && StringUtils.isNamed(status.trim())) {
-            foreachStatus = status.trim();
-        }
-        version = config.get(JAVA_VERSION);
-        if (version != null) {
-            version = version.trim();
-        }
-        String packages = config.get(IMPORT_PACKAGES);
-        if (packages != null && packages.trim().length() > 0) {
+	}
+
+	public void setForeachStatus(String foreachStatus) {
+		this.foreachStatus = foreachStatus;
+	}
+
+	public void setJavaVersion(String version) {
+		this.version = version;
+	}
+
+	public void setImportPackages(String packages) {
+		if (packages != null && packages.trim().length() > 0) {
             importPackages = packages.trim().split("\\s*\\,\\s*");
             importPackageSet = new HashSet<String>(Arrays.asList(importPackages));
         }
+	}
+
+    public void setFunctions(Object[] functions) {
+    	for (Object function : functions) {
+    		this.functions.put(function.getClass(), function);
+    	}
     }
-    
-    protected abstract String doParse(String name, String source, Translator resolver, 
+
+    protected abstract String doParse(Resource resoure, String source, Translator translator, 
                                       List<String> parameters, List<Class<?>> parameterTypes, 
-                                      Set<String> variables, Map<String, Class<?>> types) throws IOException, ParseException;
+                                      Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException;
 
     public Template parse(Resource resource) throws IOException, ParseException {
+    	Class<?> clazz = parseClass(resource);
         try {
-            String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified()).replaceAll("_");
-            Class<?> clazz;
-            try {
-                clazz = Class.forName(name, true, Thread.currentThread().getContextClassLoader());
-            } catch (ClassNotFoundException e) {
-                Translator resolver = engine.getTranslator();
-                Filter filter = engine.getTextFilter();
-                Set<String> variables = new HashSet<String>();
-                Map<String, Class<?>> types = new HashMap<String, Class<?>>();
-                types.put(foreachStatus, ForeachStatus.class);
-                List<String> parameters = new ArrayList<String>();
-                List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
-                StringBuilder fields = new StringBuilder();
-                String src = IOUtils.readToString(resource.getSource());
-                src = filterCData(src);
-                src = filterComment(src);
-                src = filterEscape(src);
-                src = doParse(resource.getName(), src, resolver, parameters, parameterTypes, variables, types);
-                String code = filterStatement(src, filter, resolver, fields, types, new AtomicInteger());
-                StringBuilder declare = new StringBuilder();
-                for (String var : variables) {
-                    Class<?> type = types.get(var);
-                    String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
-                    String typeName;
-                    if (pkgName != null && ("java.lang".equals(pkgName) 
-                            || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
-                        typeName = type.getSimpleName();
-                    } else {
-                        typeName = type.getCanonicalName();
-                    }
-                    declare.append(typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
+			return (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class)
+					.newInstance(engine, valueFilter, formatter, functions);
+		} catch (Exception e) {
+			throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
+		}
+    }
+    
+    protected Class<?> parseClass(Resource resource) throws IOException, ParseException {
+        String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified()).replaceAll("_");
+        try {
+            return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
+        } catch (ClassNotFoundException e) {
+        	Set<String> variables = new HashSet<String>();
+            Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+            types.put(foreachStatus, ForeachStatus.class);
+            List<String> parameters = new ArrayList<String>();
+            List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
+            Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
+            StringBuilder textFields = new StringBuilder();
+            StringBuilder textInits = new StringBuilder();
+            String source = IOUtils.readToString(resource.getSource());
+            String src = source;
+            src = filterCData(src);
+            src = filterComment(src);
+            src = filterEscape(src);
+            src = doParse(resource, src, translator, parameters, parameterTypes, variables, types, macros);
+            String code = filterStatement(src, textFilter, translator, textFields, textInits, types, new AtomicInteger());
+            int i = name.lastIndexOf('.');
+            String packageName = i < 0 ? "" : name.substring(0, i);
+            String className = i < 0 ? name : name.substring(i + 1);
+            StringBuilder imports = new StringBuilder();
+            String[] packages = importPackages;
+            if (packages != null && packages.length > 0) {
+                for (String pkg : packages) {
+                    imports.append("import ");
+                    imports.append(pkg);
+                    imports.append(".*;\n");
                 }
-                int i = name.lastIndexOf('.');
-                String packageName = i < 0 ? "" : name.substring(0, i);
-                String className = i < 0 ? name : name.substring(i + 1);
-                StringBuilder imports = new StringBuilder();
-                String[] packages = importPackages;
-                if (packages != null && packages.length > 0) {
-                    for (String pkg : packages) {
-                        imports.append("import ");
-                        imports.append(pkg);
-                        imports.append(".*;\n");
-                    }
-                }
-                List<String> returns = new ArrayList<String>();
-                List<Class<?>> returnTypes = new ArrayList<Class<?>>();
-                String methodCode = declare.toString() + code;
-                String sorceCode = "package " + packageName + ";\n" 
-                        + imports.toString()
-                        + "public class " + className + " extends " + (isOutput ? OutputStreamTemplate.class.getName() : WriterTemplate.class.getName()) + " {\n" 
-                         + fields
-                        + "public " + className + "(" + Engine.class.getName() + " engine, " 
-                        + Resource.class.getName() + " resource) {\n" 
-                        + "super(engine, resource);\n" 
-                        + "}\n"
-                        + "protected void doRender(" + Map.class.getName() + " $parameters, " 
-                        + (isOutput ? OutputStream.class.getName() : Writer.class.getName())
-                        + " $output) throws " + Exception.class.getName() + " {\n" 
-                        + ForeachStatus.class.getName() + " " + foreachStatus + " = new " + ForeachStatus.class.getName() + "();\n"
-                        + methodCode 
-                        + "}\n"
-                        + "public " + String.class.getSimpleName() + " getCode() {\n"
-                        + "return \"" + StringUtils.escapeString(methodCode) + "\";"
-                        + "}\n"
-                        + "public " + Map.class.getName() + " getParameterTypes() {\n"
-                        + toTypeCode(parameters, parameterTypes)
-                        + "}\n"
-                        + "public " + Map.class.getName() + " getReturnTypes() {\n"
-                        + toTypeCode(returns, returnTypes)
-                        + "}\n"
-                        + "}";
-                Compiler compiler = engine.getCompiler();
-                clazz = compiler.compile(sorceCode);
             }
-            Constructor<?> constructor = clazz.getConstructor(new Class<?>[] { Engine.class, Resource.class});
-            return (Template) constructor.newInstance(new Object[] { engine, resource });
-        } catch (IOException e) {
-            throw e;
-        } catch (ParseException e) {
-            throw e;
-        } catch (Throwable e) {
+            StringBuilder declare = new StringBuilder();
+            for (String var : variables) {
+                Class<?> type = types.get(var);
+                String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
+                String typeName;
+                if (pkgName != null && ("java.lang".equals(pkgName) 
+                        || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
+                    typeName = type.getSimpleName();
+                } else {
+                    typeName = type.getCanonicalName();
+                }
+                declare.append(typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
+            }
+            StringBuilder funtionFileds = new StringBuilder();
+            StringBuilder functionInits = new StringBuilder();
+            for (Map.Entry<Class<?>, Object> function : functions.entrySet()) {
+            	Class<?> functionType = function.getKey();
+            	String pkgName = functionType.getPackage() == null ? null : functionType.getPackage().getName();
+                String typeName;
+                if (pkgName != null && ("java.lang".equals(pkgName) 
+                        || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
+                    typeName = functionType.getSimpleName();
+                } else {
+                    typeName = functionType.getCanonicalName();
+                }
+                funtionFileds.append("private final ");
+            	funtionFileds.append(typeName);
+            	funtionFileds.append(" _");
+            	funtionFileds.append(functionType.getName().replace('.','_'));
+            	funtionFileds.append(";\n");
+            	
+            	functionInits.append("	this._");
+            	functionInits.append(functionType.getName().replace('.','_'));
+            	functionInits.append(" = (");
+            	functionInits.append(typeName);
+            	functionInits.append(") functions.get(");
+            	functionInits.append(typeName);
+            	functionInits.append(".class);\n");
+            }
+            
+            // TODO 将ForeachStatus中的Stack改成直接生成局部变量，使用JVM的线程栈
+            String methodCode = ForeachStatus.class.getName() + " " + foreachStatus + " = new " + ForeachStatus.class.getName() + "();\n"
+                    + declare + code;
+            
+            if (sourceInClass) {
+        		textFields.append("private static final String $SRC = \"" + StringUtils.escapeString(source) + "\";\n");
+        		textFields.append("private static final String $CODE = \"" + StringUtils.escapeString(methodCode) + "\";\n");
+        	} else {
+        		String sourceCodeId = StringCache.put(source);
+        		String methodCodeId = StringCache.put(source);
+        		textFields.append("private static final String $SRC = " + StringCache.class.getName() +  ".get(\"" + sourceCodeId + "\");\n");
+        		textFields.append("private static final String $CODE = " + StringCache.class.getName() +  ".get(\"" + methodCodeId + "\");\n");
+        	}
+            
+            String sorceCode = "package " + packageName + ";\n" 
+                    + "\n"
+                    + imports.toString()
+                    + "\n"
+                    + "public final class " + className + " extends " + (isOutputStream ? OutputStreamTemplate.class.getName() : WriterTemplate.class.getName()) + " {\n" 
+                    + "\n"
+                    + textFields
+                    + "\n"
+                    + funtionFileds
+                    + "\n"
+                    + "public " + className + "("
+                    + Engine.class.getName() + " engine, " 
+                    + Filter.class.getName() + " filter, "
+                    + Formatter.class.getName() + " formatter, "
+                    + Map.class.getName() + " functions) {\n" 
+                    + "	super(engine, filter, formatter, functions);\n"
+                    + functionInits
+                    + textInits
+                    + "}\n"
+                    + "\n"
+                    + "protected void doRender(" + Map.class.getName() + " $parameters, " 
+                    + (isOutputStream ? OutputStream.class.getName() : Writer.class.getName())
+                    + " $output) throws " + Exception.class.getName() + " {\n" 
+                    + methodCode
+                    + "}\n"
+                    + "\n"
+    				+ "public " + String.class.getSimpleName() + " getName() {\n"
+    				+ "	return \"" + resource.getName() + "\";\n"
+    				+ "}\n"
+                    + "\n"
+    			    + "public " + String.class.getSimpleName() + " getEncoding() {\n"
+    			    + "	return \"" + resource.getEncoding() + "\";\n"
+    			    + "}\n"
+                    + "\n"
+    			    + "public long getLastModified() {\n"
+    			    + "	return " + resource.getLastModified() + "L;\n"
+    			    + "}\n"
+                    + "\n"
+    			    + "public long getLength() {\n"
+    			    + "	return " + resource.getLength() + "L;\n"
+    			    + "}\n"
+                    + "\n"
+    			    + "public " + Reader.class.getName() + " getSource() throws " + IOException.class.getName() + " {\n"
+    			    + "	return new " + StringReader.class.getName() + "($SRC);\n"
+    			    + "}\n"
+                    + "\n"
+                    + "public " + String.class.getSimpleName() + " getCode() {\n"
+                    + "	return $CODE;\n"
+                    + "}\n"
+                    + "\n"
+                    + "public " + Map.class.getName() + " getParameterTypes() {\n"
+                    + toTypeCode(parameters, parameterTypes)
+                    + "}\n"
+                    + "\n"
+                    + "public " + Map.class.getName() + " getMacroTypes() {\n"
+                    + toTypeCode(macros)
+                    + "}\n"
+                    + "\n"
+                    + "}\n";
+            return compiler.compile(sorceCode);
+        } catch (Exception e) {
             throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
         }
     }
+
+    protected String toTypeCode(Map<String, Class<?>> types) {
+    	StringBuilder buf = new StringBuilder("	" + Map.class.getName() + " types = " + "new " + HashMap.class.getName() + "();\n");
+    	for (Map.Entry<String, Class<?>> entry : types.entrySet()) {
+    		buf.append("	types.put(\"" + entry.getKey() + "\", " + entry.getValue().getName() + ".class);");
+    	}
+    	buf.append("	return " + Collections.class.getName() + ".unmodifiableMap(types);\n");
+    	return buf.toString();
+    }
     
     protected String toTypeCode(List<String> names, List<Class<?>> types) {
-        StringBuilder buf = new StringBuilder("return new " + OrderedTypeMap.class.getName() + "(");
+        StringBuilder buf = new StringBuilder("	return new " + OrderedTypeMap.class.getName() + "(");
         if (names == null || names.size() == 0) {
             buf.append("new String[0]");
         } else {
@@ -359,7 +501,7 @@ public abstract class AbstractParser implements Parser, Configurable {
         return buf.toString();
     }
     
-    protected String filterStatement(String message, Filter filter, Translator resolver, StringBuilder fields, Map<String, Class<?>> types, AtomicInteger seq) throws ParseException {
+    protected String filterStatement(String message, Filter filter, Translator translator, StringBuilder textFields, StringBuilder textInits, Map<String, Class<?>> types, AtomicInteger seq) throws ParseException {
         int offset = 0;
         message = RIGHT + message + LEFT;
         StringBuffer buf = new StringBuffer();
@@ -378,7 +520,7 @@ public abstract class AbstractParser implements Parser, Configurable {
                 }
                 matcher.appendReplacement(buf, "" + next);
             } else {
-                matcher.appendReplacement(buf, Matcher.quoteReplacement("$output.write(" + filterExpression(text, filter, resolver, fields, types, offset, seq) + ");\n" + next));
+                matcher.appendReplacement(buf, Matcher.quoteReplacement("$output.write(" + filterExpression(text, filter, translator, textFields, textInits, types, offset, seq) + ");\n" + next));
             }
             if (text != null) {
                 offset += text.length();
@@ -389,7 +531,7 @@ public abstract class AbstractParser implements Parser, Configurable {
         return buf.toString().replace("$output.write();\n", "");
     }
     
-    protected String filterExpression(String message, Filter filter, Translator resolver, StringBuilder fields, Map<String, Class<?>> types, int offset, AtomicInteger seq) throws ParseException {
+    protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, StringBuilder textInits, Map<String, Class<?>> types, int offset, AtomicInteger seq) throws ParseException {
         if (message == null || message.length() == 0) {
             return "";
         }
@@ -398,16 +540,16 @@ public abstract class AbstractParser implements Parser, Configurable {
         int last = 0;
         while (matcher.find()) {
             int off = matcher.start(2) + offset;
-            String expression = resolver.translate(matcher.group(2), types, off).getCode();
+            String expression = translator.translate(matcher.group(2), types, off).getCode();
             expression = "format(" + expression + ")";
             if (! "$!".equals(matcher.group(1))) {
                 expression = "filter(" + expression + ")";
             }
-            if (isOutput) {
+            if (isOutputStream) {
                 expression = "serialize(" + expression + ")";
             }
             String txt = message.substring(last, matcher.start());
-            appendText(buf, txt, filter, fields, seq);
+            appendText(buf, txt, filter, textFields, textInits, seq);
             buf.append(");\n$output.write(" + expression + ");\n$output.write(");
             last = matcher.end();
         }
@@ -419,21 +561,31 @@ public abstract class AbstractParser implements Parser, Configurable {
         } else {
             txt = null;
         }
-        appendText(buf, txt, filter, fields, seq);
+        appendText(buf, txt, filter, textFields, textInits, seq);
         return buf.toString();
     }
     
-    private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder fields, AtomicInteger seq) {
+    private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder textFields, StringBuilder textInits, AtomicInteger seq) {
         if (txt != null && txt.length() > 0) {
             txt = txt.replace(POUND_SPECIAL, POUND);
             txt = txt.replace(DOLLAR_SPECIAL, DOLLAR);
             txt = filter.filter(txt);
             if (txt != null && txt.length() > 0) {
                 String var = "$TXT" + seq.incrementAndGet();
-                if (isOutput) {
-                    fields.append("protected static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(txt.getBytes()) + "};\n");
+                if (isOutputStream) {
+                	if (textInClass) {
+                		textFields.append("private static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(StringUtils.toBytes(txt, outputEncoding)) + "};\n");
+                	} else {
+                		String txtId = StringCache.put(txt);
+                		textFields.append("private static final byte[] " + var + " = " + StringUtils.class.getName() + ".toBytes(" + StringCache.class.getName() +  ".get(\"" + txtId + "\"), \"" + outputEncoding + "\");\n");
+                	}
                 } else {
-                    fields.append("protected static final String " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
+                	if (textInClass) {
+                		textFields.append("private static final String " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
+                	} else {
+                		String txtId = StringCache.put(txt);
+                		textFields.append("private static final String " + var + " = " + StringCache.class.getName() +  ".get(\"" + txtId + "\");\n");
+                	}
                 }
                 buf.append(var);
             }
@@ -449,7 +601,7 @@ public abstract class AbstractParser implements Parser, Configurable {
         return null;
     }
     
-    protected String getStatementCode(String name, String value, int begin, int offset, Translator resolver,
+    protected String getStatementCode(String name, String value, int begin, int offset, Translator translator,
                                     Set<String> variables, Map<String, Class<?>> types, 
                                     List<String> parameters, List<Class<?>> parameterTypes, boolean comment) throws ParseException {
         name = name == null ? null : name.trim();
@@ -460,7 +612,7 @@ public abstract class AbstractParser implements Parser, Configurable {
                 throw new ParseException("The if expression == null!", begin);
             }
             buf.append("if (");
-            buf.append(getConditionCode(resolver.translate(value, types, offset)));
+            buf.append(getConditionCode(translator.translate(value, types, offset)));
             buf.append(") {\n");
         } else if (elseifName.equals(name)) {
             if (value == null || value.length() == 0) {
@@ -470,7 +622,7 @@ public abstract class AbstractParser implements Parser, Configurable {
                 buf.append("} ");
             }
             buf.append("else if (");
-            buf.append(getConditionCode(resolver.translate(value, types, offset)));
+            buf.append(getConditionCode(translator.translate(value, types, offset)));
             buf.append(") {\n");
         } else if (elseName.equals(name)) {
             if (value != null && value.length() > 0) {
@@ -490,7 +642,7 @@ public abstract class AbstractParser implements Parser, Configurable {
             }
             int start = matcher.start(1);
             int end = matcher.end(1);
-            Expression expression = resolver.translate(value.substring(end).trim(), types, offset + end);
+            Expression expression = translator.translate(value.substring(end).trim(), types, offset + end);
             Class<?> returnType = expression.getReturnType();
             String code = expression.getCode();
             if (Map.class.isAssignableFrom(returnType)) {
@@ -527,7 +679,7 @@ public abstract class AbstractParser implements Parser, Configurable {
                 throw new ParseException("The breakif expression == null!", begin);
             }
             buf.append("if (");
-            buf.append(getConditionCode(resolver.translate(value, types, offset)));
+            buf.append(getConditionCode(translator.translate(value, types, offset)));
             buf.append(") break;");
         } else if (setName.equals(name)) {
             Matcher matcher = ASSIGN_PATTERN.matcher(value);
@@ -537,7 +689,7 @@ public abstract class AbstractParser implements Parser, Configurable {
             int start = matcher.start(1);
             int end = matcher.end(1);
             String expr = value.substring(end).trim();
-            Expression expression = resolver.translate(expr, types, offset + end);
+            Expression expression = translator.translate(expr, types, offset + end);
             String[] tokens = value.substring(0, start).trim().split("\\s+");
             String type;
             String var;

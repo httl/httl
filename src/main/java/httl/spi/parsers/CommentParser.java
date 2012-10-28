@@ -16,9 +16,11 @@
  */
 package httl.spi.parsers;
 
+import httl.Resource;
 import httl.Template;
 import httl.spi.Parser;
 import httl.spi.Translator;
+import httl.spi.loaders.StringResource;
 import httl.util.LinkedStack;
 
 import java.io.IOException;
@@ -49,15 +51,15 @@ public class CommentParser extends AbstractParser {
         return "<!--#" + name + "(" + value + ")-->";
     }
     
-    protected String doParse(String name, String source, Translator resolver, 
+    protected String doParse(Resource resource, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
-                             Set<String> variables, Map<String, Class<?>> types) throws IOException, ParseException {
-        return parseComment(name, source, resolver, parameters, parameterTypes, variables, types);
+                             Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
+        return parseComment(resource, source, translator, parameters, parameterTypes, variables, types, macros);
     }
     
-    public String parseComment(String template, String source, Translator resolver, List<String> parameters,
+    public String parseComment(Resource resource, String source, Translator translator, List<String> parameters,
                                 List<Class<?>> parameterTypes, Set<String> variables, 
-                                Map<String, Class<?>> types) throws ParseException {
+                                Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
         LinkedStack<String> nameStack = new LinkedStack<String>();
         LinkedStack<String> valueStack = new LinkedStack<String>();
         StringBuffer macro = null;
@@ -105,12 +107,12 @@ public class CommentParser extends AbstractParser {
                             param = null;
                         }
                         matcher.appendReplacement(macro, "");
-                        String key = getMacroPath(template, var);
+                        String key = getMacroPath(resource.getName(), var);
                         String es = macro.toString();
                         if (param != null && param.length() > 0) {
                             es = getDiretive(varName, param) + es;
                         }
-                        engine.addTemplate(key, es);
+                        macros.put(var, parseClass(new StringResource(engine, key, resource.getEncoding(), resource.getLastModified(), es)));
                         Class<?> cls = types.get(var);
                         if (cls != null && ! cls.equals(Template.class)) {
                             throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macroParameterStart);
@@ -119,7 +121,7 @@ public class CommentParser extends AbstractParser {
                         types.put(var, Template.class);
                         buf.append(LEFT);
                         buf.append(matcher.end() - macroStart);
-                        buf.append(var + " = getEngine().getTemplate(\"" + key + "\");\n");
+                        buf.append(var + " = getMacros().get(\"" + var + "\");\n");
                         buf.append(RIGHT);
                         macro = null;
                         macroStart = 0;
@@ -156,7 +158,7 @@ public class CommentParser extends AbstractParser {
                     } else {
                         buf.append(LEFT);
                         buf.append(matcher.group().length());
-                        String code = getStatementCode(name, value, matcher.start(1), offset, resolver, variables, types, parameters, parameterTypes, true);
+                        String code = getStatementCode(name, value, matcher.start(1), offset, translator, variables, types, parameters, parameterTypes, true);
                         buf.append(code);
                         buf.append(RIGHT);
                     }

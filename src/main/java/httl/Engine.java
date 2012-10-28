@@ -16,87 +16,45 @@
  */
 package httl;
 
-import httl.spi.Cache;
-import httl.spi.Compiler;
-import httl.spi.Configurable;
-import httl.spi.Filter;
-import httl.spi.Formatter;
-import httl.spi.Loader;
-import httl.spi.Logger;
-import httl.spi.Parser;
-import httl.spi.Translator;
-import httl.spi.loaders.StringLoader;
-import httl.spi.loggers.LoggerUtils;
-import httl.spi.sequences.StringSequence;
 import httl.util.ClassUtils;
 import httl.util.ConfigUtils;
 import httl.util.StringUtils;
-import httl.util.UrlUtils;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
 
 /**
  * Engine. (API, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Engine implements Configurable {
-    
-    /**
-     * Default config path.
-     */
-    public static final String DEFAULT_PATH = "httl.properties";
-    
-    private static final Map<String, String> DEFAULT_CONFIGURATION = ConfigUtils.loadProperties("httl-default.properties");
+public abstract class Engine {
+ 
+	private static final String DEFAULT_PATH = "httl.properties";
 
+	private static final String ENGINE_KEY= "engine";
+
+	private static final String PLUS = "+";
+
+	private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
+    
     private static final ConcurrentMap<String, ReentrantLock> ENGINE_LOCKS = new ConcurrentHashMap<String, ReentrantLock>();
 
 	private static final ConcurrentMap<String, Engine> ENGINES = new ConcurrentHashMap<String, Engine>();
 
-    private final ConcurrentMap<String, ReentrantLock> locks = new ConcurrentHashMap<String, ReentrantLock>();
-
-    private final StringLoader literal = new StringLoader();
-
-    private volatile Map<String, String> configuration;
+    private final Properties config = new Properties();
     
-    private volatile Logger logger = LoggerUtils.getDefaultLogger();
-
-    private volatile Cache cache;
-    
-    private volatile Loader loader;
-
-    private volatile Parser parser;
-
-    private volatile Translator translator;
-
-    private volatile Compiler compiler;
-
-    private volatile Filter textFilter;
-    
-    private volatile Formatter<?> formatter;
-    
-    private volatile Filter filter;
-
-    private volatile boolean reloadable;
-
-    private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
-
-    private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
+    private final ConcurrentMap<String, Object> instances = new ConcurrentHashMap<String, Object>();
     
     /**
      * Get template engine singleton.
@@ -114,9 +72,9 @@ public class Engine implements Configurable {
      * @return template engine.
      */
     public static Engine getEngine(String configPath) {
-        return getEngine(configPath, (Map<String, String>)null);
+        return getEngine(configPath, null);
     }
-    
+
 	/**
      * Get template engine singleton.
      * 
@@ -126,28 +84,6 @@ public class Engine implements Configurable {
 	public static Engine getEngine(Properties configProperties) {
 		return getEngine(DEFAULT_PATH, configProperties);
 	}
-	
-	/**
-     * Get template engine singleton.
-     * 
-     * @param configProperties config properties.
-     * @return template engine.
-     */
-    public static Engine getEngine(Map<String, String> configProperties) {
-        return getEngine(DEFAULT_PATH, configProperties);
-    }
-	
-	/**
-     * Get template engine singleton.
-     * 
-     * @param configPath config path.
-     * @param configProperties config map.
-     * @return template engine.
-     */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-    public static Engine getEngine(String configPath, Properties configProperties) {
-	    return getEngine(configPath, (Map) configProperties);
-	}
 
 	/**
      * Get template engine singleton.
@@ -156,7 +92,7 @@ public class Engine implements Configurable {
      * @param configProperties config map.
      * @return template engine.
      */
-	public static Engine getEngine(String configPath, Map<String, String> configProperties) {
+    public static Engine getEngine(String configPath, Properties configProperties) {
 		if (configPath == null || configPath.length() == 0) {
 			throw new IllegalArgumentException("httl config path == null");
 		}
@@ -172,7 +108,15 @@ public class Engine implements Configurable {
             try {
                 engine = ENGINES.get(configPath);
                 if (engine == null) { // double check
-                    engine = configProperties == null ? new Engine(configPath) : new Engine(configProperties);
+                	Properties config = mergeConfig(configPath, configProperties);
+                	String engineClassName = config.getProperty(ENGINE_KEY);
+                	Class<?> engineClass = ClassUtils.forName(engineClassName);
+            		try {
+						engine = (Engine) engineClass.newInstance();
+						engine.config(config);
+					} catch (Exception e) {
+						throw new IllegalStateException(e.getMessage(), e);
+					}
                     ENGINES.put(configPath, engine);
                 }
             } finally {
@@ -182,189 +126,175 @@ public class Engine implements Configurable {
         assert(engine != null);
         return engine;
 	}
-	
-	/**
-	 * Create template engine.
-	 */
-	public Engine() {
-	    this(DEFAULT_PATH);
-	}
 
-	/**
-	 * Create template engine.
-	 * 
-	 * @param configuration path
-	 */
-	public Engine(String configuration) {
-        this(ConfigUtils.loadProperties(configuration, DEFAULT_PATH.equals(configuration)));
-    }
-	
-	/**
-     * Create template engine.
-     * 
-     * @param configuration
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Engine(Properties configuration) {
-        this((Map) configuration);
-    }
-
-	/**
-	 * Create template engine.
-	 * 
-	 * @param configuration
-	 */
-    public Engine(Map<String, String> configuration) {
-        Map<String, String> copy = new HashMap<String, String>(DEFAULT_CONFIGURATION);
-        if (configuration != null) {
-            copy.putAll(configuration);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static Properties mergeConfig(String configPath, Properties configProperties) {
+		Properties defaultConfig = ConfigUtils.loadProperties("httl-default.properties", false);
+		Properties config = ConfigUtils.loadProperties(configPath, configProperties != null || DEFAULT_PATH.equals(configPath));
+        if (configProperties != null) {
+        	config.putAll(configProperties);
         }
-	    configure(copy);
-	}
-
-	/**
-	 * Get configuration.
-	 * 
-	 * @return configuration.
-	 */
-	public Map<String, String> getConfiguration() {
-		return configuration;
-	}
-	
-    public synchronized void configure(Map<String, String> config) {
-        if (config == null || config.size() == 0) {
-            return;
-        }
-        config = new HashMap<String, String>(config); // safe copy mutable argument
-        for (Map.Entry<String, String> entry : new HashMap<String, String>(config).entrySet()) {
+        for (Map.Entry<String, String> entry : new HashMap<String, String>((Map) config).entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             if (key.endsWith(PLUS)) {
                 if (value != null && value.length() > 0) {
                     String k = key.substring(0, key.length() - PLUS.length());
-                    String v = config.get(k);
+                    String v = config.getProperty(k);
                     if (v != null && v.length() > 0) {
                         v += "," + value;
                     } else {
                         v = value;
                     }
-                    config.put(k, v);
+                    config.setProperty(k, v);
                 }
                 config.remove(key);
             }
             if (value != null && value.startsWith(PLUS)) {
                 value = value.substring(PLUS.length());
-                String v = DEFAULT_CONFIGURATION.get(key);
+                String v = defaultConfig.getProperty(key);
                 if (v != null && v.length() > 0) {
                     v += "," + value;
                 } else {
                     v = value;
                 }
-                config.put(key, v);
+                config.setProperty(key, v);
             }
         }
-        this.configuration = Collections.unmodifiableMap(config);
-        String cache = config.get(CACHE);
-        if (cache != null && cache.trim().length() > 0) {
-            if (NULL.equals(cache.trim())) {
-                setCache(null);
-            } else {
-                setCache((Cache) ClassUtils.newInstance(cache.trim()));
-            }
-        }
-        String loader = config.get(LOADER);
-        if (loader != null && loader.trim().length() > 0) {
-            setLoader((Loader) ClassUtils.newInstance(loader.trim()));
-        }
-        String parser = config.get(PARSER);
-        if (parser != null && parser.trim().length() > 0) {
-            setParser((Parser) ClassUtils.newInstance(parser.trim()));
-        }
-        String resolver = config.get(TRANSLATOR);
-        if (resolver != null && resolver.trim().length() > 0) {
-            setTranslator((Translator) ClassUtils.newInstance(resolver.trim()));
-        }
-        String compiler = config.get(COMPILER);
-        if (compiler != null && compiler.trim().length() > 0) {
-            setCompiler((Compiler) ClassUtils.newInstance(compiler.trim()));
-        }
-        String rep = config.get(TEXT_FILTER);
-        if (rep != null && rep.trim().length() > 0) {
-            setTextFilter((Filter) ClassUtils.newInstance(rep));
-        }
-        String fmt = config.get(FORMATTER);
-        if (fmt != null && fmt.trim().length() > 0) {
-            setFormatter((Formatter<?>) ClassUtils.newInstance(fmt));
-        }
-        String flt = config.get(FILTERS);
-        if (flt != null && flt.trim().length() > 0) {
-            setFilter((Filter) ClassUtils.newInstance(flt));
-        }
-        String fun = config.get(FUNCTIONS);
-        if (fun != null && fun.trim().length() > 0) {
-            String[] funs = fun.trim().split("[\\s\\,]+");
-            Object[] functions = new Object[funs.length];
-            for (int i = 0; i < funs.length; i ++) {
-                functions[i] = ClassUtils.newInstance(funs[i]);
-            }
-            setFunctions(functions);
-        }
-        String seq = config.get(SEQUENCES);
-        if (seq != null && seq.trim().length() > 0) {
-            String[] ss = seq.trim().split(",");
-            for (String s : ss) {
-                s = s.trim();
-                if (s.length() > 0) {
-                    String[] ts = s.split("\\s+");
-                    List<String> sequence = new ArrayList<String>();
-                    for (String t : ts) {
-                        t = t.trim();
-                        if (t.length() > 0) {
-                            sequence.add(t);
-                        }
-                    }
-                    addSequence(sequence);
-                }
-            }
-        }
-        if (cache == null ) {
-            throw new IllegalStateException("cache == null");
-        }
-        if (loader == null) {
-            throw new IllegalStateException("loader == null");
-        }
-        if (parser == null) {
-            throw new IllegalStateException("parser == null");
-        }
-        if (resolver == null) {
-            throw new IllegalStateException("resolver == null");
-        }
-        if (compiler == null) {
-            throw new IllegalStateException("compiler == null");
-        }
-        reloadable = "true".equalsIgnoreCase(config.get(RELOADABLE));
-        boolean precompiled = "true".equalsIgnoreCase(config.get(PRECOMPILED));
-        if (precompiled) {
-            try {
-                List<String> list = getLoader().list();
-                for (String name : list) {
-                    try {
-                        getTemplate(name);
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-    }
-    
+        defaultConfig.putAll(config);
+        return defaultConfig;
+	}
+
+	protected Engine() {
+	}
+
+	/**
+	 * Get config.
+	 * 
+	 * @return config.
+	 */
+	public Properties getConfig() {
+		return config;
+	}
+
+	/**
+	 * Get config value.
+	 * 
+	 * @param key config key.
+	 * @return config value.
+	 */
+	public String getConfig(String key) {
+		String value = config.getProperty(key);
+		return value == null ? null : value.trim();
+	}
+
+	/**
+	 * Get config value.
+	 * 
+	 * @param key config key.
+	 * @param defaultValue default value.
+	 * @return config value
+	 */
+	public String getConfig(String key, String defaultValue) {
+		String value = getConfig(key);
+		if (value == null || value.length() == 0) {
+			return defaultValue;
+		}
+		return value;
+	}
+
+	/**
+	 * Get config values.
+	 * 
+	 * @param key config key.
+	 * @param defaultValue default value.
+	 * @return config value
+	 */
+	public String[] getConfig(String key, String[] defaultValue) {
+		String value = getConfig(key);
+		if (value == null || value.length() == 0) {
+			return defaultValue;
+		}
+		return COMMA_SPLIT_PATTERN.split(value);
+	}
+
+	/**
+	 * Get config extension value.
+	 * 
+	 * @param key config key.
+	 * @param type extension type.
+	 * @return config extension.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getConfig(String key, Class<T> type) {
+		String value = getConfig(key);
+		if (value == null || value.length() == 0 || "null".equals(value)) {
+			return null;
+		}
+		if (type.isArray()) {
+			Class<?> componentType = type.getComponentType();
+			String[] values = COMMA_SPLIT_PATTERN.split(value);
+			Object results = Array.newInstance(componentType, values.length);
+			for (int i = 0; i < values.length; i ++) {
+				Array.set(results, i, cache(values[i], componentType));
+			}
+			return (T) results;
+		} else {
+			return cache(getConfig(key), type);
+		}
+	}
+
+	/**
+	 * Get config extension value.
+	 * 
+	 * @param key config key.
+	 * @param type extension type.
+	 * @param defaultValue default value.
+	 * @return config extension.
+	 */
+	public <T> T getConfig(String key, Class<T> type, T defaultValue) {
+		T value = getConfig(key, type);
+		if (value == null) {
+			return defaultValue;
+		}
+		return value;
+	}
+
+	/**
+	 * Get config int value.
+	 * 
+	 * @param key config key.
+	 * @param defaultValue default value.
+	 * @return config value
+	 */
+	public int getConfig(String key, int defaultValue) {
+		String value = getConfig(key);
+		if (value == null || value.length() == 0) {
+			return defaultValue;
+		}
+		return Integer.parseInt(value);
+	}
+
+	/**
+	 * Get config boolean value.
+	 * 
+	 * @param key config key.
+	 * @param defaultValue default value.
+	 * @return config value
+	 */
+	public boolean getConfig(String key, boolean defaultValue) {
+		String value = getConfig(key);
+		if (value == null || value.length() == 0) {
+			return defaultValue;
+		}
+		return Boolean.parseBoolean(value);
+	}
+
     /**
      * Get expression.
      * 
      * @param source
-     * @return
+     * @return expression.
      * @throws ParseException
      */
     public Expression getExpression(String source) throws ParseException {
@@ -376,7 +306,7 @@ public class Engine implements Configurable {
      * 
      * @param source
      * @param parameterTypes
-     * @return
+     * @return expression.
      * @throws ParseException
      */
     public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
@@ -388,18 +318,16 @@ public class Engine implements Configurable {
      * 
      * @param source
      * @param parameterTypes
-     * @return
+     * @return template resource.
      * @throws ParseException
      */
-    public Expression getExpression(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
-        return getTranslator().translate(source, parameterTypes, offset);
-    }
-    
+    public abstract Expression getExpression(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException;
+
     /**
-     * Get resource.
+     * Get template resource.
      * 
      * @param name
-     * @return
+     * @return template resource.
      * @throws IOException
      * @throws ParseException
      */
@@ -408,17 +336,15 @@ public class Engine implements Configurable {
     }
 
     /**
-     * Get resource.
+     * Get template resource.
      * 
      * @param name
      * @param encoding
-     * @return
+     * @return template resource.
      * @throws IOException
      * @throws ParseException
      */
-    public Resource getResource(String name, String encoding) throws IOException {
-        return getLoader().load(name, encoding);
-    }
+    public abstract Resource getResource(String name, String encoding) throws IOException;
 
 	/**
 	 * Get template.
@@ -431,7 +357,7 @@ public class Engine implements Configurable {
 	public Template getTemplate(String name) throws IOException, ParseException {
 		return getTemplate(name, null);
 	}
-	
+
 	/**
 	 * Get template.
 	 * 
@@ -441,427 +367,38 @@ public class Engine implements Configurable {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-    public Template getTemplate(String name, String encoding) throws IOException, ParseException {
-		if (name == null || name.trim().length() == 0) {
-			throw new IllegalArgumentException("template name == null");
+    public abstract Template getTemplate(String name, String encoding) throws IOException, ParseException;
+
+	private void config(Properties properties) {
+		config.putAll(properties);
+        init(this);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> T cache(String value, Class<T> type) {
+		if (value == null || value.length() == 0 || "null".equals(value)) {
+			return null;
 		}
-		name = UrlUtils.cleanUrl(name.trim());
-		int i = name.indexOf('#');
-        if (i > 0) {
-            getTemplate(name.substring(0, i), encoding);
-        }
-		Cache cache = this.cache; // safe copy reference
-		if (cache == null) {
-		    return parseTemplate(name, encoding);
+		Class<?> cls = ClassUtils.forName(value);
+		if (! type.isAssignableFrom(cls)) {
+			throw new IllegalStateException("The class + " + value + " unimplemented interface " + cls.getName() + ".");
 		}
-		ReentrantLock lock = locks.get(name);
-        if (lock == null) {
-            locks.putIfAbsent(name, new ReentrantLock());
-            lock= locks.get(name);
-        }
-        assert(lock != null);
-        Resource resource;
-        if (reloadable) {
-            resource = getLoader().load(name, encoding);
-        } else {
-            resource = null;
-        }
-		Template template = (Template) cache.get(name);
-		if (template == null || (resource != null 
-		        && resource.getLastModified() > template.getLastModified())) {
-    		lock.lock();
-    		try {
-    			template = (Template) cache.get(name);
-    			// double check
-    			if (template == null || (resource != null 
-    			        && resource.getLastModified() > template.getLastModified())) {
-    				template = parseTemplate(name, encoding);
-    				cache.put(name, template);
-    			}
-    		} finally {
-    		    lock.unlock();
-    		}
+		try {
+			Object instance = instances.get(value);
+			if (instance == null) {
+				Object newInstance = cls.newInstance();
+				instances.putIfAbsent(value, newInstance);
+				instance = instances.get(value);
+				if (instance == newInstance) {
+					init(instance);
+				}
+			}
+			return (T) instance;
+		} catch (Exception e) {
+			throw new IllegalStateException(e.getMessage(), e);
 		}
-		assert(template != null);
-		return template;
 	}
 
-    /**
-     * Parse the template. (No cache)
-     * 
-     * @param name - Template name
-     * @return Template instance.
-     * @throws IOException
-     * @throws ParseException
-     */
-    public Template parseTemplate(String name) throws IOException, ParseException {
-        return parseTemplate(name, null);
-    }
-    
-    /**
-     * Parse the template. (No cache)
-     * 
-     * @param name - Template name
-     * @param encoding - Template encoding
-     * @return Template instance.
-     * @throws IOException
-     * @throws ParseException
-     */
-    public Template parseTemplate(String name, String encoding) throws IOException, ParseException {
-        if (name == null || name.trim().length() == 0) {
-            throw new IllegalArgumentException("template name == null");
-        }
-        name = UrlUtils.cleanUrl(name.trim());
-        Resource resource;
-        if (literal.has(name)) {
-            resource = literal.load(name, encoding);
-        } else {
-            resource = getLoader().load(name, encoding);
-        }
-        try {
-            return getParser().parse(resource);
-        } catch (ParseException e) {
-            int offset = e.getErrorOffset();
-            if (offset < 0) {
-                offset = 0;
-            }
-            String location = null;
-            if (offset > 0) {
-                try {
-                    Reader reader = resource.getSource();
-                    try {
-                        location = StringUtils.getLocationMessage(reader, offset);
-                    } finally {
-                        reader.close();
-                    }
-                } catch (Throwable t) {
-                }
-            }
-            throw new ParseException("Failed to parse template " + name + ", cause: " + e.getMessage()  + ". occur to offset: " + offset + 
-                                     (location == null || location.length() == 0 ? "" : ", " + location) 
-                                     + ", stack: " + ClassUtils.toString(e), offset);
-        }
-    }
-    
-	/**
-	 * Add literal template.
-	 * 
-	 * @param name - template name
-	 * @param template
-	 */
-	public void addTemplate(String name, String template) {
-	    literal.add(name, template);
-	}
-	
-	/**
-	 * Remove literal template.
-	 * 
-	 * @param name - template name
-	 */
-	public void removeTemplate(String name) {
-        literal.remove(name);
-    }
-	
-    /**
-     * Get logger.
-     * 
-     * @return logger.
-     */
-    public Logger getLogger() {
-        return logger;
-    }
-
-    /**
-     * Set logger.
-     * 
-     * @param logger - logger.
-     */
-    public void setLogger(Logger logger) {
-        if (loader == null) {
-            throw new IllegalArgumentException("logger == null");
-        }
-        init(logger);
-        this.logger = logger;
-    }
-    
-	/**
-	 * Get template cache.
-	 * 
-	 * @return template cache.
-	 */
-    public Cache getCache() {
-        return cache;
-    }
-
-    /**
-     * Set template cache.
-     * 
-     * @param cache template cache.
-     */
-    public void setCache(Cache cache) {
-        if (cache != null) {
-            init(cache);
-        }
-        this.cache = cache;
-	}
-    
-	/**
-	 * Get template loader.
-	 * 
-	 * @return template loader.
-	 */
-	public Loader getLoader() {
-		return loader;
-	}
-
-	/**
-	 * Set template loader.
-	 * 
-	 * @param loader template loader.
-	 */
-	public void setLoader(Loader loader) {
-	    if (loader == null) {
-	        throw new IllegalArgumentException("loader == null");
-	    }
-	    init(loader);
-	    this.loader = loader;
-	}
-
-	/**
-	 * Get template parser.
-	 * 
-	 * @return template parser.
-	 */
-	public Parser getParser() {
-		return parser;
-	}
-
-	/**
-	 * Set template parser.
-	 * 
-	 * @param parser template parser.
-	 */
-	public void setParser(Parser parser) {
-	    if (parser == null) {
-            throw new IllegalArgumentException("parser == null");
-        }
-	    init(parser);
-		this.parser = parser;
-	}
-
-	/**
-	 * Get expression resolver.
-	 * 
-	 * @return expression resolver.
-	 */
-	public Translator getTranslator() {
-		return translator;
-	}
-
-	/**
-	 * Set expression translator.
-	 * 
-	 * @param translator expression translator.
-	 */
-	public void setTranslator(Translator translator) {
-	    if (translator == null) {
-            throw new IllegalArgumentException("resolver == null");
-        }
-	    init(translator);
-		this.translator = translator;
-	}
-
-	/**
-	 * Get template compiler.
-	 * 
-	 * @return template compiler.
-	 */
-	public Compiler getCompiler() {
-		return compiler;
-	}
-
-	/**
-	 * Set template compiler.
-	 * 
-	 * @param compiler template compiler.
-	 */
-	public void setCompiler(Compiler compiler) {
-	    if (compiler == null) {
-            throw new IllegalArgumentException("compiler == null");
-        }
-	    init(compiler);
-		this.compiler = compiler;
-	}
-
-	/**
-	 * Get template formatter.
-	 * 
-	 * @return template formatter.
-	 */
-    public Formatter<?> getFormatter() {
-        return formatter;
-    }
-    
-    /**
-     * Set template formatter.
-     * 
-     * @param formatter template formatter.
-     */
-    public void setFormatter(Formatter<?> formatter) {
-        if (formatter == null) {
-            throw new IllegalArgumentException("formatter == null");
-        }
-        init(formatter);
-        this.formatter = formatter;
-    }
-    
-    /**
-     * Get template text filter.
-     * 
-     * @return template text filter.
-     */
-    public Filter getTextFilter() {
-        return textFilter;
-    }
-
-    /**
-     * Set template text filter.
-     * 
-     * @param filter template text filter.
-     */
-    public void setTextFilter(Filter filter) {
-        if (filter == null) {
-            throw new IllegalArgumentException("text filter == null");
-        }
-        init(filter);
-        this.textFilter = filter;
-    }
-    
-    /**
-     * Get template filter.
-     * 
-     * @return template filter.
-     */
-    public Filter getFilter() {
-        return filter;
-    }
-
-    /**
-     * Set template filter.
-     * 
-     * @param filter template filters.
-     */
-    public void setFilter(Filter filter) {
-        if (filter == null) {
-            throw new IllegalArgumentException("filter == null");
-        }
-        init(filter);
-        this.filter = filter;
-    }
-
-    /**
-     * Get template functions.
-     * 
-     * @return template functions.
-     */
-    public Map<Class<?>, Object> getFunctions() {
-        return Collections.unmodifiableMap(functions);
-    }
-    
-    /**
-     * Get function by type.
-     * 
-     * @param <T> - function type
-     * @param type - function type
-     * @return function
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T getFunction(Class<T> type) {
-        return (T) functions.get(type);
-    }
-
-    /**
-     * Set template functions.
-     * 
-     * @param functions template functions.
-     */
-    public void setFunctions(Object... functions) {
-        this.functions.clear();
-        addFunctions(functions);
-    }
-    
-    /**
-     * Add template functions.
-     * 
-     * @param functions
-     */
-    public void addFunctions(Object... functions) {
-        if (functions != null && functions.length > 0) {
-            for (Object function : functions) {
-                if (function != null) {
-                    Class<?> type = function.getClass();
-                    init(function);
-                    if (! this.functions.containsKey(type)) {
-                        this.functions.put(type, function);
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Remove template functions.
-     * 
-     * @param functions
-     */
-    public void removeFunctions(Object... functions) {
-        if (functions != null && functions.length > 0) {
-            for (Object function : functions) {
-                if (function != null) {
-                    Class<?> type = function.getClass();
-                    this.functions.remove(type);
-                }
-            }
-        }
-    }
-    
-    /**
-     * Get sequence.
-     * 
-     * @param begin - sequence begin
-     * @param end - sequence end
-     * @return sequence
-     */
-    public List<String> getSequence(String begin, String end) {
-        for (StringSequence sequence : sequences) {
-            if (sequence.containSequence(begin, end)) {
-                return sequence.getSequence(begin, end);
-            }
-        }
-        throw new IllegalStateException("No such sequence from \"" + begin + "\" to \"" + end + "\".");
-    }
-    
-    /**
-     * Add sequence.
-     * 
-     * @param sequence
-     */
-    public void addSequence(List<String> sequence) {
-        if (sequence == null || sequence.size() == 0) {
-            throw new IllegalArgumentException("sequence == null");
-        }
-        sequences.add(new StringSequence(sequence));
-    }
-    
-    /**
-     * Add sequence.
-     * 
-     * @param sequence
-     */
-    public void addSequence(String[] sequence) {
-        addSequence(Arrays.asList(sequence));
-    }
-    
     private void init(Object object) {
         Method[] methods = object.getClass().getMethods();
         for (Method method : methods) {
@@ -869,39 +406,64 @@ public class Engine implements Configurable {
                 String name = method.getName();
                 if (name.length() > 3 && name.startsWith("set")
                         && Modifier.isPublic(method.getModifiers())
+                        && ! Modifier.isStatic(method.getModifiers())
                         && method.getParameterTypes().length == 1) {
-                    Class<?> parameterType = method.getParameterTypes()[0];
-                    if (parameterType == Engine.class) {
-                        method.invoke(object, new Object[] {this});
-                    } else if (parameterType == Logger.class) {
-                        method.invoke(object, new Object[] {getLogger()});
-                    } else if (parameterType == Loader.class) {
-                        method.invoke(object, new Object[] {getLoader()});
-                    } else if (parameterType == Cache.class) {
-                        method.invoke(object, new Object[] {getCache()});
-                    } else if (parameterType == Parser.class) {
-                        method.invoke(object, new Object[] {getParser()});
-                    } else if (parameterType == Translator.class) {
-                        method.invoke(object, new Object[] {getTranslator()});
-                    } else if (parameterType == Compiler.class) {
-                        method.invoke(object, new Object[] {getCompiler()});
-                    } else if (parameterType == Formatter.class) {
-                        method.invoke(object, new Object[] {getFormatter()});
-                    } else if (parameterType == Filter.class) {
-                        if ("setTextFilter".equals(name)) {
-                            method.invoke(object, new Object[] {getTextFilter()});
-                        } else {
-                            method.invoke(object, new Object[] {getFilter()});
-                        }
+                	Class<?> parameterType = method.getParameterTypes()[0];
+                	if ("setEngine".equals(name) && Engine.class.isAssignableFrom(parameterType)) {
+                		method.invoke(object, new Object[] { this });
+                		continue;
+                	}
+                	if ("setConfig".equals(name) && Properties.class.isAssignableFrom(parameterType)) {
+                		method.invoke(object, new Object[] { config });
+                		continue;
+                	}
+                	String key = StringUtils.splitCamelName(name.substring(3), ".");
+                	String value = getConfig(key);
+                    if (value != null && value.length() > 0) {
+                    	Object obj;
+                    	if (parameterType.isArray()) {
+                    		Class<?> componentType = parameterType.getComponentType();
+                    		String[] values = COMMA_SPLIT_PATTERN.split(value);
+                    		obj = Array.newInstance(componentType, values.length);
+                    		for (int i = 0; i < values.length; i ++) {
+                    			Array.set(obj, i, parseValue(values[i], componentType));
+                    		}
+                    	} else {
+                    		obj = parseValue(value, parameterType);
+                    	}
+                    	method.invoke(object, new Object[] { obj });
                     }
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                throw new IllegalStateException(e.getMessage(), e);
             }
         }
-        if (object instanceof Configurable) {
-            ((Configurable) object).configure(getConfiguration());
+    }
+
+    private Object parseValue(String value, Class<?> parameterType) {
+    	if (parameterType == String.class) {
+    		return value;
+        } else if (parameterType == char.class) {
+        	return value.charAt(0);
+        } else if (parameterType == int.class) {
+    		return Integer.valueOf(value);
+        } else if (parameterType == long.class) {
+    		return Long.valueOf(value);
+        } else if (parameterType == float.class) {
+    		return Float.valueOf(value);
+        } else if (parameterType == double.class) {
+    		return Double.valueOf(value);
+        } else if (parameterType == short.class) {
+    		return Short.valueOf(value);
+        } else if (parameterType == byte.class) {
+    		return Byte.valueOf(value);
+        } else if (parameterType == boolean.class) {
+            return Boolean.valueOf(value);
+        } else if (parameterType == Class.class) {
+            return ClassUtils.forName(value);
+        } else {
+        	return cache(value, parameterType);
         }
     }
-    
+
 }
