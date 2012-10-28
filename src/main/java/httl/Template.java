@@ -32,61 +32,52 @@ import java.util.Map;
  */
 public interface Template extends Resource {
 
-	/**
-	 * Render the template to a string.
-	 * 
-	 * @param parameters
-	 *            - parameters
-	 * @return Template render result
-	 */
-	String render(Map<String, Object> parameters);
+    /**
+     * Render the template to a string.
+     * 
+     * @param parameters - parameters
+     * @return Template render result
+     */
+    String render(Map<String, Object> parameters);
 
-	/**
-	 * Render the template to output stream.
-	 * 
-	 * @param parameters
-	 *            - parameters
-	 * @param output
-	 *            - output stream
-	 * @throws IOException
-	 *             Failed to output
-	 */
-	void render(Map<String, Object> parameters, OutputStream output)
-			throws IOException;
+    /**
+     * Render the template to output stream.
+     * 
+     * @param parameters - parameters
+     * @param output - output stream
+     * @throws IOException Failed to output
+     */
+    void render(Map<String, Object> parameters, OutputStream output) throws IOException;
 
-	/**
-	 * Render the template to writer.
-	 * 
-	 * @param parameters
-	 *            - parameters
-	 * @param writer
-	 *            - writer
-	 * @throws IOException
-	 *             Failed to writer
-	 */
-	void render(Map<String, Object> parameters, Writer writer)
-			throws IOException;
+    /**
+     * Render the template to writer.
+     * 
+     * @param parameters - parameters
+     * @param writer - writer
+     * @throws IOException Failed to writer
+     */
+    void render(Map<String, Object> parameters, Writer writer) throws IOException;
 
-	/**
-	 * Get the template parameter types. (Ordered)
-	 * 
-	 * @return parameter types.
-	 */
-	Map<String, Class<?>> getParameterTypes();
+    /**
+     * Get the template parameter types. (Ordered)
+     * 
+     * @return parameter types.
+     */
+    Map<String, Class<?>> getParameterTypes();
 
-	/**
-	 * Get the macro templates.
-	 * 
-	 * @return macro templates.
-	 */
-	Map<String, Template> getMacros();
+    /**
+     * Get the macro templates.
+     * 
+     * @return macro templates.
+     */
+    Map<String, Template> getMacros();
 
-	/**
-	 * Get the template code.
-	 * 
-	 * @return code.
-	 */
-
-	String getCode() throws ParseException;
+    /**
+     * Get the template code.
+     * 
+     * @return code.
+     */
+ 
+    String getCode() throws ParseException;
 
 }

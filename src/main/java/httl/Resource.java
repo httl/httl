@@ -53,12 +53,12 @@ public interface Resource extends Serializable {
 	 */
 	long getLastModified();
 
-	/**
-	 * Get the the template length.
-	 * 
-	 * @return length
-	 */
-	long getLength();
+    /**
+     * Get the the template length.
+     * 
+     * @return length
+     */
+    long getLength();
 
 	/**
 	 * Get the template source reader.
@@ -78,11 +78,11 @@ public interface Resource extends Serializable {
 	 */
 	Reader getSource() throws IOException;
 
-	/**
-	 * Get the template engine.
-	 * 
-	 * @return template engine.
-	 */
-	Engine getEngine();
+    /**
+     * Get the template engine.
+     * 
+     * @return template engine.
+     */
+    Engine getEngine();
 
 }

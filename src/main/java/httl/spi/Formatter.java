@@ -24,14 +24,13 @@ package httl.spi;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Formatter<T> {
-
-	/**
-	 * Format the value to a string.
-	 * 
-	 * @param value
-	 *            - variable value.
-	 * @return string value
-	 */
-	String format(T value);
-
+    
+    /**
+     * Format the value to a string.
+     * 
+     * @param value - variable value.
+     * @return string value
+     */
+    String format(T value);
+    
 }
