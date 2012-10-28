@@ -25,92 +25,92 @@ public interface Logger {
 
     public static final String NAME = "httl";
 
-	/**
-	 * debug.
-	 * 
-	 * @param msg
-	 */
-	public void debug(String msg);
+    /**
+     * debug.
+     * 
+     * @param msg
+     */
+    public void debug(String msg);
 
-	/**
-	 * debug.
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public void debug(String msg, Throwable e);
+    /**
+     * debug.
+     * 
+     * @param msg
+     * @param e
+     */
+    public void debug(String msg, Throwable e);
 
-	/**
-	 * info.
-	 * 
-	 * @param msg
-	 */
-	public void info(String msg);
+    /**
+     * info.
+     * 
+     * @param msg
+     */
+    public void info(String msg);
 
-	/**
-	 * info.
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public void info(String msg, Throwable e);
+    /**
+     * info.
+     * 
+     * @param msg
+     * @param e
+     */
+    public void info(String msg, Throwable e);
 
-	/**
-	 * warn.
-	 * 
-	 * @param msg
-	 */
-	public void warn(String msg);
+    /**
+     * warn.
+     * 
+     * @param msg
+     */
+    public void warn(String msg);
 
-	/**
-	 * warn.
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public void warn(String msg, Throwable e);
+    /**
+     * warn.
+     * 
+     * @param msg
+     * @param e
+     */
+    public void warn(String msg, Throwable e);
 
-	/**
-	 * error.
-	 * 
-	 * @param msg
-	 */
-	public void error(String msg);
+    /**
+     * error.
+     * 
+     * @param msg
+     */
+    public void error(String msg);
 
-	/**
-	 * error.
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public void error(String msg, Throwable e);
+    /**
+     * error.
+     * 
+     * @param msg
+     * @param e
+     */
+    public void error(String msg, Throwable e);
 
-	/**
-	 * isDebugEnabled.
-	 * 
-	 * @return debug enabled
-	 */
-	public boolean isDebugEnabled();
+    /**
+     * isDebugEnabled.
+     * 
+     * @return debug enabled
+     */
+    public boolean isDebugEnabled();
 
-	/**
-	 * isInfoEnabled.
-	 * 
-	 * @return info enabled
-	 */
-	public boolean isInfoEnabled();
+    /**
+     * isInfoEnabled.
+     * 
+     * @return info enabled
+     */
+    public boolean isInfoEnabled();
 
-	/**
-	 * isWarnEnabled.
-	 * 
-	 * @return warn enabled
-	 */
-	public boolean isWarnEnabled();
+    /**
+     * isWarnEnabled.
+     * 
+     * @return warn enabled
+     */
+    public boolean isWarnEnabled();
 
-	/**
-	 * isErrorEnabled.
-	 * 
-	 * @return error nabled
-	 */
-	public boolean isErrorEnabled();
+    /**
+     * isErrorEnabled.
+     * 
+     * @return error nabled
+     */
+    public boolean isErrorEnabled();
 
 }

@@ -32,26 +32,26 @@ import java.io.Serializable;
  */
 public interface Resource extends Serializable {
 
-	/**
-	 * Get the template name.
-	 * 
-	 * @return name
-	 */
-	String getName();
+    /**
+     * Get the template name.
+     * 
+     * @return name
+     */
+    String getName();
 
-	/**
-	 * Get the the template encoding.
-	 * 
-	 * @return encoding
-	 */
-	String getEncoding();
+    /**
+     * Get the the template encoding.
+     * 
+     * @return encoding
+     */
+    String getEncoding();
 
-	/**
-	 * Get the the template last modified time.
-	 * 
-	 * @return last modified
-	 */
-	long getLastModified();
+    /**
+     * Get the the template last modified time.
+     * 
+     * @return last modified
+     */
+    long getLastModified();
 
     /**
      * Get the the template length.
@@ -60,23 +60,23 @@ public interface Resource extends Serializable {
      */
     long getLength();
 
-	/**
-	 * Get the template source reader.
-	 * 
-	 * NOTE: Don't forget close the reader.
-	 * 
-	 * <code>
-	 * Reader reader = resource.getSource();
-	 * try {
-	 *     // do something ...
-	 * } finally {
-	 *     readerc.close();
-	 * }
-	 * </code>
-	 * 
-	 * @return source reader
-	 */
-	Reader getSource() throws IOException;
+    /**
+     * Get the template source reader.
+     * 
+     * NOTE: Don't forget close the reader.
+     * 
+     * <code>
+     * Reader reader = resource.getSource();
+     * try {
+     *     // do something ...
+     * } finally {
+     *     readerc.close();
+     * }
+     * </code>
+     * 
+     * @return source reader
+     */
+    Reader getSource() throws IOException;
 
     /**
      * Get the template engine.

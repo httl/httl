@@ -31,13 +31,13 @@ import java.text.ParseException;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Parser {
-    
-	/**
-	 * Parse the template.
-	 * 
-	 * @param source - Template source.
-	 * @return Java source code
-	 */
+
+    /**
+     * Parse the template.
+     * 
+     * @param source - Template source.
+     * @return Java source code
+     */
     Template parse(Resource source) throws IOException, ParseException;
-	
+
 }

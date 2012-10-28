@@ -24,7 +24,7 @@ package httl.spi;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Formatter<T> {
-    
+
     /**
      * Format the value to a string.
      * 
@@ -32,5 +32,5 @@ public interface Formatter<T> {
      * @return string value
      */
     String format(T value);
-    
+
 }

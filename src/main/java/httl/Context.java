@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public final class Context {
 
-	// The thread local holder.
+    // The thread local holder.
     private static ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
     /**
@@ -37,12 +37,12 @@ public final class Context {
      * @return current thread local context.
      */
     public static Context getContext() {
-    	Context context = LOCAL.get();
-    	if (context == null) {
-    		context = new Context(null, null, null);
-    		LOCAL.set(context);
-    	}
-    	return context;
+        Context context = LOCAL.get();
+        if (context == null) {
+            context = new Context(null, null, null);
+            LOCAL.set(context);
+        }
+        return context;
     }
 
     /**
@@ -53,22 +53,22 @@ public final class Context {
      * @param parameters
      */
     public static void pushContext(Template template, Map<String, Object> parameters) {
-    	LOCAL.set(new Context(LOCAL.get(), template, parameters));
+        LOCAL.set(new Context(LOCAL.get(), template, parameters));
     }
 
     /**
      * Pop context in thread local.
      */
     public static void popContext() {
-    	Context context = LOCAL.get();
-    	if (context != null) {
-	    	Context parent = context.getParent();
-	    	if (parent != null) {
-	    		LOCAL.set(parent);
-	    	} else {
-	    		LOCAL.remove();
-	    	}
-    	}
+        Context context = LOCAL.get();
+        if (context != null) {
+            Context parent = context.getParent();
+            if (parent != null) {
+                LOCAL.set(parent);
+            } else {
+                LOCAL.remove();
+            }
+        }
     }
 
     /**
@@ -80,12 +80,12 @@ public final class Context {
 
     private final Context parent;
 
-	private final Template template;
+    private final Template template;
 
     private final Map<String, Object> parameters;
 
     private Context(Context parent, Template template, Map<String, Object> parameters) {
-    	this.parent = parent;
+        this.parent = parent;
         this.template = template;
         this.parameters = parameters;
     }
@@ -96,8 +96,8 @@ public final class Context {
      * @return parent context.
      */
     public Context getParent() {
-		return parent;
-	}
+        return parent;
+    }
 
     /**
      * Get current template.
@@ -108,7 +108,7 @@ public final class Context {
     public Template getTemplate() {
         return template;
     }
-    
+
     /**
      * Get current parameters.
      * 

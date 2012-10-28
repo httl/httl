@@ -24,7 +24,7 @@ package httl.spi;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Filter {
-    
+
     /**
      * Filter the variable value.
      * 
@@ -32,5 +32,5 @@ public interface Filter {
      * @return Filtered variable value
      */
     String filter(String value);
-    
+
 }

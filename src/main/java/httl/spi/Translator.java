@@ -30,15 +30,15 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Translator {
-    
-	/**
-	 * Translate the template expression to java expression.
-	 * 
-	 * @param source - Template expression source
-	 * @param parameterTypes Expression parameter types
-	 * @param offset - Template expression offset
-	 * @return Java expression
-	 */
-	Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException;
-	
+
+    /**
+     * Translate the template expression to java expression.
+     * 
+     * @param source - Template expression source
+     * @param parameterTypes Expression parameter types
+     * @param offset - Template expression offset
+     * @return Java expression
+     */
+    Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException;
+
 }
