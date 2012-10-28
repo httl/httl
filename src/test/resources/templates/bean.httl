@@ -1,0 +1,5 @@
+<!--#var(User user, Book[] books)-->
+${user.name}
+${user.role}
+${user.isLogin}
+${books[0].title}
