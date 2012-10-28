@@ -32,7 +32,7 @@ public class PerformanceTest {
             books[i] = new Book(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), new Date(), random.nextInt(100) + 10, random.nextInt(60) + 30);
         }
         Map<String, Object> context = new HashMap<String, Object>();
-        context.put("user", new User("liangfei", "admin"));
+        context.put("user", new User("liangfei", "admin", "Y"));
         context.put("books", books);
         Case[] cases = new Case[] {new FreemarkerCase(), new VelocityCase(), new Smarty4jCase(), new HttlCase(), new JavaCase()};
         for (int i = 0; i < cases.length; i ++) {

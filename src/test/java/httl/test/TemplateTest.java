@@ -46,7 +46,7 @@ public class TemplateTest extends TestCase {
     @Test
     public void testTemplate() throws Exception {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        User user = new User("liangfei", "admin");
+        User user = new User("liangfei", "admin", "Y");
         Book[] books = new Book[10];
         books[0] = new Book("Practical API Design", "Jaroslav Tulach", "Apress", format.parse("2008-07-29"), 75, 85);
         books[1] = new Book("Effective Java", "Joshua Bloch", "Addison-Wesley Professional", format.parse("2008-05-28"), 55, 70);

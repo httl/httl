@@ -30,13 +30,16 @@ public class User implements Serializable {
     private String name;
 
     private String role;
+    
+    private String isLogin;
 
 	public User() {
 	}
-
-	public User(String name, String role) {
+	
+	public User(String name, String role, String isLogin) {
 		this.name = name;
 		this.role = role;
+		this.isLogin = isLogin;
 	}
 
 	public String getName() {
@@ -58,5 +61,13 @@ public class User implements Serializable {
     public boolean isOwned(Book book) {
         return true;
     }
+
+	public String getIsLogin() {
+		return isLogin;
+	}
+
+	public void setIsLogin(String isLogin) {
+		this.isLogin = isLogin;
+	}
 
 }

@@ -376,7 +376,7 @@ public final class BinaryOperator extends Operator {
             Method method = ClassUtils.searchMethod(leftType, name, rightTypes);
             return leftCode + "." + method.getName() + "(" + rightCode + ")";
         } catch (NoSuchMethodException e) {
-            if (rightTypes != null && rightTypes.length > 0 || name.startsWith("get") || name.startsWith("is")) {
+            if (rightTypes != null && rightTypes.length > 0) {
                 throw new ParseException("No such method " + name + "("
                         + Arrays.toString(rightTypes) + ") in class "
                         + leftType.getName(), getOffset());
@@ -443,7 +443,7 @@ public final class BinaryOperator extends Operator {
             Method method = ClassUtils.searchMethod(leftType, name, rightTypes);
             return method.getReturnType();
         } catch (NoSuchMethodException e) {
-            if (rightTypes != null && rightTypes.length > 0 || name.startsWith("get") || name.startsWith("is")) {
+            if (rightTypes != null && rightTypes.length > 0) {
                 throw new ParseException("No such method " + name + "("
                         + Arrays.toString(rightTypes) + ") in class "
                         + leftType.getName(), getOffset());
