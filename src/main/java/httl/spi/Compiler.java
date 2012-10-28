@@ -26,13 +26,14 @@ import java.text.ParseException;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Compiler {
-    
+
 	/**
 	 * Compile java source code.
 	 * 
-	 * @param code Java source code
+	 * @param code
+	 *            - Java source code
 	 * @return Compiled class
 	 */
 	Class<?> compile(String code) throws ParseException;
-	
+
 }

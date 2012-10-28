@@ -22,7 +22,6 @@ import httl.Template;
 import java.io.IOException;
 import java.text.ParseException;
 
-
 /**
  * Template Parser. (SPI, Singleton, ThreadSafe)
  * 
@@ -31,13 +30,14 @@ import java.text.ParseException;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Parser {
-    
+
 	/**
 	 * Parse the template.
 	 * 
-	 * @param source - Template source.
+	 * @param source
+	 *            - Template source.
 	 * @return Java source code
 	 */
-    Template parse(Resource source) throws IOException, ParseException;
-	
+	Template parse(Resource source) throws IOException, ParseException;
+
 }

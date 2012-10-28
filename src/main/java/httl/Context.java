@@ -22,101 +22,104 @@ import java.util.Map;
  * Context. (API, ThreadLocal, ThreadSafe)
  * 
  * @see httl.spi.parsers.template.WriterTemplate#render(Map, java.io.Writer)
- * @see httl.spi.parsers.template.OutputStreamTemplate#render(Map, java.io.OutputStream)
+ * @see httl.spi.parsers.template.OutputStreamTemplate#render(Map,
+ *      java.io.OutputStream)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public final class Context {
 
 	// The thread local holder.
-    private static ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
+	private static ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
-    /**
-     * Get current thread local context.
-     * 
-     * @return current thread local context.
-     */
-    public static Context getContext() {
-    	Context context = LOCAL.get();
-    	if (context == null) {
-    		context = new Context(null, null, null);
-    		LOCAL.set(context);
-    	}
-    	return context;
-    }
+	/**
+	 * Get current thread local context.
+	 * 
+	 * @return current thread local context.
+	 */
+	public static Context getContext() {
+		Context context = LOCAL.get();
+		if (context == null) {
+			context = new Context(null, null, null);
+			LOCAL.set(context);
+		}
+		return context;
+	}
 
-    /**
-     * Push context in thread local.
-     * 
-     * @param parent
-     * @param template
-     * @param parameters
-     */
-    public static void pushContext(Template template, Map<String, Object> parameters) {
-    	LOCAL.set(new Context(LOCAL.get(), template, parameters));
-    }
+	/**
+	 * Push context in thread local.
+	 * 
+	 * @param parent
+	 * @param template
+	 * @param parameters
+	 */
+	public static void pushContext(Template template,
+			Map<String, Object> parameters) {
+		LOCAL.set(new Context(LOCAL.get(), template, parameters));
+	}
 
-    /**
-     * Pop context in thread local.
-     */
-    public static void popContext() {
-    	Context context = LOCAL.get();
-    	if (context != null) {
-	    	Context parent = context.getParent();
-	    	if (parent != null) {
-	    		LOCAL.set(parent);
-	    	} else {
-	    		LOCAL.remove();
-	    	}
-    	}
-    }
+	/**
+	 * Pop context in thread local.
+	 */
+	public static void popContext() {
+		Context context = LOCAL.get();
+		if (context != null) {
+			Context parent = context.getParent();
+			if (parent != null) {
+				LOCAL.set(parent);
+			} else {
+				LOCAL.remove();
+			}
+		}
+	}
 
-    /**
-     * Remove current thread local context.
-     */
-    public static void removeContext() {
-        LOCAL.remove();
-    }
+	/**
+	 * Remove current thread local context.
+	 */
+	public static void removeContext() {
+		LOCAL.remove();
+	}
 
-    private final Context parent;
+	private final Context parent;
 
 	private final Template template;
 
-    private final Map<String, Object> parameters;
+	private final Map<String, Object> parameters;
 
-    private Context(Context parent, Template template, Map<String, Object> parameters) {
-    	this.parent = parent;
-        this.template = template;
-        this.parameters = parameters;
-    }
+	private Context(Context parent, Template template,
+			Map<String, Object> parameters) {
+		this.parent = parent;
+		this.template = template;
+		this.parameters = parameters;
+	}
 
-    /**
-     * Get parent context.
-     * 
-     * @return parent context.
-     */
-    public Context getParent() {
+	/**
+	 * Get parent context.
+	 * 
+	 * @return parent context.
+	 */
+	public Context getParent() {
 		return parent;
 	}
 
-    /**
-     * Get current template.
-     * 
-     * @see #getContext()
-     * @return current template.
-     */
-    public Template getTemplate() {
-        return template;
-    }
-    
-    /**
-     * Get current parameters.
-     * 
-     * @see #getContext()
-     * @return current parameters.
-     */
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
+	/**
+	 * Get current template.
+	 * 
+	 * @see #getContext()
+	 * @return current template.
+	 */
+	public Template getTemplate() {
+		return template;
+	}
+
+	/**
+	 * Get current parameters.
+	 * 
+	 * @see #getContext()
+	 * @return current parameters.
+	 */
+	public Map<String, Object> getParameters() {
+		return parameters;
+	}
 
 }

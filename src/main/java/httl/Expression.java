@@ -31,54 +31,55 @@ import java.util.Map;
  */
 public interface Expression extends Serializable {
 
-    /**
-     * Evaluate the expression.
-     * 
-     * @param parameters - parameters
-     * @return result.
-     */
-    Object evaluate(Map<String, Object> parameters);
+	/**
+	 * Evaluate the expression.
+	 * 
+	 * @param parameters
+	 *            - parameters
+	 * @return result.
+	 */
+	Object evaluate(Map<String, Object> parameters);
 
-    /**
-     * Get the expression parameter types. (Ordered)
-     * 
-     * @return parameter types.
-     */
-    Map<String, Class<?>> getParameterTypes();
+	/**
+	 * Get the expression parameter types. (Ordered)
+	 * 
+	 * @return parameter types.
+	 */
+	Map<String, Class<?>> getParameterTypes();
 
-    /**
-     * Get the expression return type.
-     * 
-     * @return return type.
-     */
-    Class<?> getReturnType();
+	/**
+	 * Get the expression return type.
+	 * 
+	 * @return return type.
+	 */
+	Class<?> getReturnType();
 
-    /**
-     * Get the expression code.
-     * 
-     * @return code.
-     */
-    String getCode();
+	/**
+	 * Get the expression code.
+	 * 
+	 * @return code.
+	 */
+	String getCode();
 
-    /**
-     * Get the expression source.
-     * 
-     * @return source.
-     */
-    String getSource();
+	/**
+	 * Get the expression source.
+	 * 
+	 * @return source.
+	 */
+	String getSource();
 
-    /**
-     * Get the expression offset.
-     * 
-     * @return offset.
-     */
-    int getOffset();
+	/**
+	 * Get the expression offset.
+	 * 
+	 * @return offset.
+	 */
+	int getOffset();
 
-    /**
-     * Get the expression engine.
-     * 
-     * @return engine.
-     */
-    Engine getEngine();
+	/**
+	 * Get the expression engine.
+	 * 
+	 * @return engine.
+	 */
+	Engine getEngine();
 
 }
