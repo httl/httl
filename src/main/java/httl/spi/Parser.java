@@ -22,7 +22,6 @@ import httl.Template;
 import java.io.IOException;
 import java.text.ParseException;
 
-
 /**
  * Template Parser. (SPI, Singleton, ThreadSafe)
  * 

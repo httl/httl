@@ -21,7 +21,6 @@ import httl.Expression;
 import java.text.ParseException;
 import java.util.Map;
 
-
 /**
  * Expression Translator. (SPI, Singleton, ThreadSafe)
  * 
