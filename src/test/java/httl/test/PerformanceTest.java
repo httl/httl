@@ -25,7 +25,7 @@ public class PerformanceTest {
     @Test
     public void testPerformance() throws Exception {
         int size = 100;
-        int times = 1000;
+        int times = 10000;
         Random random = new Random();
         Book[] books = new Book[size];
         for (int i = 0; i < size; i ++) {
