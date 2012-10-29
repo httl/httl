@@ -17,6 +17,7 @@
 package httl;
 
 import httl.util.ClassUtils;
+import httl.util.ConcurrentHashSet;
 import httl.util.ConfigUtils;
 import httl.util.StringUtils;
 
@@ -28,6 +29,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -114,6 +116,7 @@ public abstract class Engine {
                     try {
                         engine = (Engine) engineClass.newInstance();
                         engine.config(config);
+                        engine.init();
                     } catch (Exception e) {
                         throw new IllegalStateException(e.getMessage(), e);
                     }
@@ -371,7 +374,7 @@ public abstract class Engine {
 
     private void config(Properties properties) {
         config.putAll(properties);
-        init(this);
+        inject(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -390,7 +393,7 @@ public abstract class Engine {
                 instances.putIfAbsent(value, newInstance);
                 instance = instances.get(value);
                 if (instance == newInstance) {
-                    init(instance);
+                    inject(instance);
                 }
             }
             return (T) instance;
@@ -398,46 +401,72 @@ public abstract class Engine {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
+    
+    private final Set<Object> inits = new ConcurrentHashSet<Object>();
+    
+    private void init() {
+    	try {
+    		for (Object object : inits) {
+    			try {
+	    			Method method = object.getClass().getMethod("init", new Class<?>[0]);
+	    			if (Modifier.isPublic(method.getModifiers())) {
+	    				method.invoke(object, new Object[0]);
+	    			}
+    			} catch (NoSuchMethodException e) {
+    			}
+			}
+    		inits.clear();
+		} catch (Exception e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		}
+    }
 
-    private void init(Object object) {
-        Method[] methods = object.getClass().getMethods();
-        for (Method method : methods) {
-            try {
-                String name = method.getName();
-                if (name.length() > 3 && name.startsWith("set")
-                        && Modifier.isPublic(method.getModifiers())
-                        && ! Modifier.isStatic(method.getModifiers())
-                        && method.getParameterTypes().length == 1) {
-                    Class<?> parameterType = method.getParameterTypes()[0];
-                    if ("setEngine".equals(name) && Engine.class.isAssignableFrom(parameterType)) {
-                        method.invoke(object, new Object[] { this });
-                        continue;
-                    }
-                    if ("setConfig".equals(name) && Properties.class.isAssignableFrom(parameterType)) {
-                        method.invoke(object, new Object[] { config });
-                        continue;
-                    }
-                    String key = StringUtils.splitCamelName(name.substring(3), ".");
-                    String value = getConfig(key);
-                    if (value != null && value.length() > 0) {
-                        Object obj;
-                        if (parameterType.isArray()) {
-                            Class<?> componentType = parameterType.getComponentType();
-                            String[] values = COMMA_SPLIT_PATTERN.split(value);
-                            obj = Array.newInstance(componentType, values.length);
-                            for (int i = 0; i < values.length; i ++) {
-                                Array.set(obj, i, parseValue(values[i], componentType));
-                            }
-                        } else {
-                            obj = parseValue(value, parameterType);
-                        }
-                        method.invoke(object, new Object[] { obj });
-                    }
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException(e.getMessage(), e);
-            }
-        }
+    private void inject(Object object) {
+		try {
+			inits.add(object);
+			Method[] methods = object.getClass().getMethods();
+			for (Method method : methods) {
+				String name = method.getName();
+				if (name.length() > 3 && name.startsWith("set")
+						&& Modifier.isPublic(method.getModifiers())
+						&& !Modifier.isStatic(method.getModifiers())
+						&& method.getParameterTypes().length == 1) {
+					Class<?> parameterType = method.getParameterTypes()[0];
+					if ("setEngine".equals(name)
+							&& Engine.class.isAssignableFrom(parameterType)) {
+						method.invoke(object, new Object[] { this });
+						continue;
+					}
+					if ("setConfig".equals(name)
+							&& Properties.class.isAssignableFrom(parameterType)) {
+						method.invoke(object, new Object[] { config });
+						continue;
+					}
+					String key = StringUtils.splitCamelName(name.substring(3),
+							".");
+					String value = getConfig(key);
+					if (value != null && value.length() > 0) {
+						Object obj;
+						if (parameterType.isArray()) {
+							Class<?> componentType = parameterType
+									.getComponentType();
+							String[] values = COMMA_SPLIT_PATTERN.split(value);
+							obj = Array.newInstance(componentType,
+									values.length);
+							for (int i = 0; i < values.length; i++) {
+								Array.set(obj, i,
+										parseValue(values[i], componentType));
+							}
+						} else {
+							obj = parseValue(value, parameterType);
+						}
+						method.invoke(object, new Object[] { obj });
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		}
     }
 
     private Object parseValue(String value, Class<?> parameterType) {

@@ -88,7 +88,12 @@ public class TemplateTest extends TestCase {
             }
             Template template = engine.getTemplate("/templates/" + file.getName());
             String expected = IOUtils.readToString(new FileReader(result));
-            String actual = template.render(context);
+            String actual;
+            try {
+            	actual = template.render(context);
+            } catch (Exception e) {
+            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
+            }
             super.assertEquals("The template " +  file.getName() + " error.", expected, actual);
         }
     }

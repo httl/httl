@@ -84,15 +84,19 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     private transient final String falseValue;
 
+	private final Map<String, Template> importMacros;
+
 	private final Map<String, Template> macros;
 
 	@SuppressWarnings("unchecked")
     public AbstractTemplate(Engine engine, Filter filter, 
-    		Formatter<?> formatter, Map<Class<?>, Object> functions) {
+    		Formatter<?> formatter, Map<Class<?>, Object> functions,
+    		Map<String, Template> importMacros) {
 		this.engine = engine;
 		this.filter = filter;
 		this.formatter = (Formatter<Object>) formatter;
-		this.macros = initMacros(engine, filter, formatter, functions);
+		this.importMacros = importMacros;
+		this.macros = initMacros(engine, filter, formatter, functions, importMacros);
 		if (formatter instanceof MultiFormatter) {
 		    MultiFormatter multi = (MultiFormatter) formatter;
     		this.numberFormatter = multi.get(Number.class);
@@ -121,9 +125,14 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.trueValue = engine.getConfig(TRUE_VALUE, "true");
 		this.falseValue = engine.getConfig(FALSE_VALUE, "false");
 	}
-	
+
+	protected Map<String, Template> getImportMacros() {
+		return importMacros;
+	}
+
 	private Map<String, Template> initMacros(Engine engine, Filter filter, 
-			Formatter<?> formatter, Map<Class<?>, Object> functions) {
+			Formatter<?> formatter, Map<Class<?>, Object> functions,
+			Map<String, Template> importMacros) {
 		Map<String, Template> macros = new HashMap<String, Template>();
 		Map<String, Class<?>> macroTypes = getMacroTypes();
 		if (macroTypes == null || macroTypes.size() == 0) {
@@ -132,8 +141,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
 			try {
 				Template macro = (Template) entry.getValue()
-						.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class)
-						.newInstance(engine, filter, formatter, functions);
+						.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, filter, formatter, functions, importMacros);
 				macros.put(entry.getKey(), macro);
 			} catch (Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);

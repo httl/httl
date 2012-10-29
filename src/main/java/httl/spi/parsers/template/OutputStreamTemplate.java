@@ -18,6 +18,7 @@ package httl.spi.parsers.template;
 
 import httl.Context;
 import httl.Engine;
+import httl.Template;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.util.ClassUtils;
@@ -41,8 +42,9 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     private static final long serialVersionUID = 7127901461769617745L;
 
     public OutputStreamTemplate(Engine engine, Filter filter, 
-    		Formatter<?> formatter, Map<Class<?>, Object> functions){
-        super(engine, filter, formatter, functions);
+    		Formatter<?> formatter, Map<Class<?>, Object> functions,
+    		Map<String, Template> importMacros){
+        super(engine, filter, formatter, functions, importMacros);
     }
 
     public String render(Map<String, Object> parameters) {
@@ -59,6 +61,7 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
         parameters = new WrappedMap<String, Object>(parameters);
+        parameters.putAll(getImportMacros());
         Context.pushContext(this, parameters);
         try {
             doRender(parameters, output);

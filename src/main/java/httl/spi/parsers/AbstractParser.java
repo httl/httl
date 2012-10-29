@@ -151,7 +151,11 @@ public abstract class AbstractParser implements Parser {
 
     protected Formatter<?> formatter;
 
-    protected String[] importPackages;
+    protected String[] importMacros;
+    
+    protected final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
+
+	protected String[] importPackages;
 
     protected Set<String> importPackageSet;
 
@@ -168,7 +172,11 @@ public abstract class AbstractParser implements Parser {
 	protected boolean textInClass = false;
 	
 	protected String outputEncoding;
-    
+
+    public void setImportMacros(String[] importMacros) {
+		this.importMacros = importMacros;
+	}
+
     public void setOutputEncoding(String outputEncoding) {
 		this.outputEncoding = outputEncoding;
 	}
@@ -244,6 +252,19 @@ public abstract class AbstractParser implements Parser {
     	}
     }
 
+    public void init() {
+    	if (importMacros != null && importMacros.length > 0) {
+        	for (String importMacro : importMacros) {
+        		try {
+	        		Template importMacroTemplate = engine.getTemplate(importMacro);
+	        		importMacroTemplates.putAll(importMacroTemplate.getMacros());
+        		} catch (Exception e) {
+        			throw new IllegalStateException(e.getMessage(), e);
+        		}
+        	}
+        }
+    }
+
     protected abstract String doParse(Resource resoure, String source, Translator translator, 
                                       List<String> parameters, List<Class<?>> parameterTypes, 
                                       Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException;
@@ -251,8 +272,8 @@ public abstract class AbstractParser implements Parser {
     public Template parse(Resource resource) throws IOException, ParseException {
     	Class<?> clazz = parseClass(resource);
         try {
-			return (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class)
-					.newInstance(engine, valueFilter, formatter, functions);
+			return (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
+					.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
 		} catch (Exception e) {
 			throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
 		}
@@ -264,8 +285,14 @@ public abstract class AbstractParser implements Parser {
             return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
         	Set<String> variables = new HashSet<String>();
-            Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+        	Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+        	StringBuilder statusInit = new StringBuilder();
             types.put(foreachStatus, ForeachStatus.class);
+            for (String macro : importMacroTemplates.keySet()) {
+            	types.put(macro, Template.class);
+            	statusInit.append(Template.class.getName() + " " + macro + " = getImportMacros().get(\"" + macro + "\");");
+            }
+            statusInit.append(ForeachStatus.class.getName() + " " + foreachStatus + " = new " + ForeachStatus.class.getName() + "();\n");
             List<String> parameters = new ArrayList<String>();
             List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
             Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
@@ -331,16 +358,15 @@ public abstract class AbstractParser implements Parser {
             }
             
             // TODO 将ForeachStatus中的Stack改成直接生成局部变量，使用JVM的线程栈
-            String methodCode = ForeachStatus.class.getName() + " " + foreachStatus + " = new " + ForeachStatus.class.getName() + "();\n"
-                    + declare + code;
+            String methodCode = statusInit.toString() + declare + code;
             
             if (sourceInClass) {
         		textFields.append("private static final String $SRC = \"" + StringUtils.escapeString(source) + "\";\n");
         		textFields.append("private static final String $CODE = \"" + StringUtils.escapeString(methodCode) + "\";\n");
         	} else {
         		String sourceCodeId = StringCache.put(source);
-        		String methodCodeId = StringCache.put(source);
         		textFields.append("private static final String $SRC = " + StringCache.class.getName() +  ".get(\"" + sourceCodeId + "\");\n");
+        		String methodCodeId = StringCache.put(methodCode);
         		textFields.append("private static final String $CODE = " + StringCache.class.getName() +  ".get(\"" + methodCodeId + "\");\n");
         	}
             
@@ -358,8 +384,9 @@ public abstract class AbstractParser implements Parser {
                     + Engine.class.getName() + " engine, " 
                     + Filter.class.getName() + " filter, "
                     + Formatter.class.getName() + " formatter, "
-                    + Map.class.getName() + " functions) {\n" 
-                    + "	super(engine, filter, formatter, functions);\n"
+                    + Map.class.getName() + " functions, " 
+                    + Map.class.getName() + " importMacros) {\n" 
+                    + "	super(engine, filter, formatter, functions, importMacros);\n"
                     + functionInits
                     + textInits
                     + "}\n"

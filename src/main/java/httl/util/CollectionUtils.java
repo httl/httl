@@ -18,6 +18,7 @@ package httl.util;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 
 public class CollectionUtils {
 
@@ -32,6 +33,17 @@ public class CollectionUtils {
 		all.addAll(c1);
 		all.addAll(c2);
 		return all;
+	}
+	
+	public static <K, V> void putIfAbsent(Map<K, V> from, Map<K, ? super V> to) {
+		if (from == null || to == null) {
+			return;
+		}
+		for (Map.Entry<K, V> entry : from.entrySet()) {
+			if (! to.containsKey(entry.getKey())) {
+				to.put(entry.getKey(), entry.getValue());
+			}
+		}
 	}
 
 }
