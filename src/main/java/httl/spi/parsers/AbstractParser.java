@@ -246,8 +246,8 @@ public abstract class AbstractParser implements Parser {
         }
 	}
 
-    public void setFunctions(Object[] functions) {
-    	for (Object function : functions) {
+    public void setImportMethods(Object[] importMethods) {
+    	for (Object function : importMethods) {
     		this.functions.put(function.getClass(), function);
     	}
     }

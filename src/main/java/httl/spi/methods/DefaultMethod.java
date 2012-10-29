@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.functions;
+package httl.spi.methods;
 
 import httl.Context;
 import httl.Engine;
@@ -38,14 +38,11 @@ import java.util.Random;
 import java.util.UUID;
 
 /**
- * DefaultFunction. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.Engine#addFunctions(Object...)
- * @see httl.Engine#setFunctions(Object...)
+ * DefaultMethod. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DefaultFunction {
+public class DefaultMethod {
 
     private static final Random RANDOM = new Random();
 
