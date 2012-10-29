@@ -23,6 +23,7 @@ import httl.Template;
 import httl.spi.Compiler;
 import httl.spi.Filter;
 import httl.spi.Formatter;
+import httl.spi.Logger;
 import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.spi.parsers.template.AbstractTemplate;
@@ -176,8 +177,14 @@ public abstract class AbstractParser implements Parser {
 	protected boolean textInClass = false;
 	
 	protected String outputEncoding;
+	
+	protected Logger logger;
 
-    public void setImportMacros(String[] importMacros) {
+    public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
+	public void setImportMacros(String[] importMacros) {
 		this.importMacros = importMacros;
 	}
 
@@ -434,6 +441,9 @@ public abstract class AbstractParser implements Parser {
                     + "}\n"
                     + "\n"
                     + "}\n";
+            if (logger.isDebugEnabled()) {
+            	logger.debug("\n================================\n" + resource.getName() + "\n================================\n" + sorceCode + "\n================================\n");
+            }
             return compiler.compile(sorceCode);
         } catch (Exception e) {
             throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);

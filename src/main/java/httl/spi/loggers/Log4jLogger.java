@@ -34,6 +34,14 @@ public class Log4jLogger implements Logger, Serializable {
 
 	private static final org.apache.log4j.Logger logger = LogManager.getLogger(NAME);
 
+	public void trace(String msg) {
+		logger.trace(msg);
+	}
+
+	public void trace(String msg, Throwable e) {
+		logger.trace(msg, e);
+	}
+
 	public void debug(String msg) {
 		logger.debug(msg);
 	}
@@ -66,6 +74,10 @@ public class Log4jLogger implements Logger, Serializable {
 		logger.error(msg, e);
 	}
 
+	public boolean isTraceEnabled() {
+		return logger.isTraceEnabled();
+	}
+
 	public boolean isDebugEnabled() {
 		return logger.isDebugEnabled();
 	}
@@ -75,15 +87,15 @@ public class Log4jLogger implements Logger, Serializable {
 	}
 
 	public boolean isWarnEnabled() {
-		return logger.getLevel().toInt() >= Level.WARN_INT;
+		return logger.getLevel() == null || logger.getLevel().toInt() >= Level.WARN_INT;
 	}
 
 	public boolean isErrorEnabled() {
-		return logger.getLevel().toInt() >= Level.ERROR_INT;
+		return logger.getLevel() == null || logger.getLevel().toInt() >= Level.ERROR_INT;
 	}
 
 	public boolean isFatalEnabled() {
-		return logger.getLevel().toInt() >= Level.FATAL_INT;
+		return logger.getLevel() == null || logger.getLevel().toInt() >= Level.FATAL_INT;
 	}
 
 }

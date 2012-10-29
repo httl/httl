@@ -32,6 +32,14 @@ public class JdkLogger implements Logger, Serializable {
 
 	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NAME);
 
+	public void trace(String msg) {
+		logger.log(Level.FINER, msg);
+	}
+
+	public void trace(String msg, Throwable e) {
+		logger.log(Level.FINER, msg, e);
+	}
+
 	public void debug(String msg) {
 		logger.log(Level.FINE, msg);
 	}
@@ -62,6 +70,10 @@ public class JdkLogger implements Logger, Serializable {
 
 	public void error(String msg, Throwable e) {
 		logger.log(Level.SEVERE, msg, e);
+	}
+
+	public boolean isTraceEnabled() {
+		return logger.isLoggable(Level.FINER);
 	}
 
 	public boolean isDebugEnabled() {

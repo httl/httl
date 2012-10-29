@@ -37,6 +37,16 @@ public class SimpleLogger implements Logger, Serializable {
 		return prefix + msg;
 	}
 
+	public void trace(String msg) {
+		System.out.println(getMessage(msg));
+	}
+
+	public void trace(String msg, Throwable e) {
+		System.out.println(getMessage(msg));
+		if (e != null)
+			e.printStackTrace();
+	}
+
 	public void debug(String msg) {
 		System.out.println(getMessage(msg));
 	}
@@ -75,6 +85,10 @@ public class SimpleLogger implements Logger, Serializable {
 		System.err.println(getMessage(msg));
 		if (e != null)
 			e.printStackTrace();
+	}
+
+	public boolean isTraceEnabled() {
+		return true;
 	}
 
 	public boolean isDebugEnabled() {

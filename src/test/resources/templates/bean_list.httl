@@ -1,0 +1,7 @@
+<!--#var(List<Map<String, Object>> mapbooklist)-->
+${mapbooklist[0].title}
+${mapbooklist[0]["title"]}
+${mapbooklist.get(0).get("title")}
+${mapbooklist[0].price + 1}
+${mapbooklist[0]["price"] + 1}
+${mapbooklist.get(0).get("price") + 1}

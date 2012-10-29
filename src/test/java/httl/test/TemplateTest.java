@@ -28,8 +28,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -61,16 +63,20 @@ public class TemplateTest extends TestCase {
         books[8] = new Book("Agile Software Development, Principles, Patterns, and Practices", " Robert C. Martin", "Prentice Hall", format.parse("2002-10-25"), 80, 75);
         books[9] = new Book("Design by Contract, by Example", "Richard Mitchell", "Addison-Wesley Publishing Company", format.parse("2001-10-22"), 50, 85);
         Map<String, Book> bookmap = new TreeMap<String, Book>();
-        Map<String, Map<String, Object>> bookbeanmap = new TreeMap<String, Map<String, Object>>();
+        Map<String, Map<String, Object>> mapbookmap = new TreeMap<String, Map<String, Object>>();
+        List<Map<String, Object>> mapbooklist = new ArrayList<Map<String, Object>>();
         for (Book book : books) {
             bookmap.put(book.getTitle().replaceAll("\\s+", ""), book);
-        	bookbeanmap.put(book.getTitle().replaceAll("\\s+", ""), ClassUtils.getBeanProperties(book));
+            Map<String, Object> genericBook = ClassUtils.getBeanProperties(book);
+            mapbookmap.put(book.getTitle().replaceAll("\\s+", ""), genericBook);
+            mapbooklist.add(genericBook);
         }
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("user", user);
         context.put("booklist", Arrays.asList(books));
         context.put("bookmap", bookmap);
-        context.put("bookbeanmap", bookbeanmap);
+        context.put("mapbookmap", mapbookmap);
+        context.put("mapbooklist", mapbooklist);
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
         Engine engine = Engine.getEngine();
