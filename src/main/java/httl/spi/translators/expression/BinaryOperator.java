@@ -89,7 +89,8 @@ public final class BinaryOperator extends Operator {
                 || "&&".equals(getName())|| "||".equals(getName())) {
             return boolean.class;
         }
-        Class<?> leftType = leftParameter.getReturnType();
+        Map<String, Class<?>> types = getParameterTypes();
+    	Class<?> leftType = leftParameter.getReturnType();
         if (StringUtils.isFunction(getName())) {
             String name =  getName().substring(1);
             if ("to".equals(name) 
@@ -101,6 +102,39 @@ public final class BinaryOperator extends Operator {
                 }
             } else if ("class".equals(name)) {
                 return Class.class;
+            }
+            if (Map.Entry.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& ("key".equals(name) || "value".equals(name))) {
+            	String var = ((Variable)leftParameter).getName();
+            	Class<?> keyType = types.get(var + ":0"); // Map<K,V>第一个泛型
+            	Class<?> valueType = types.get(var + ":1"); // Map<K,V>第二个泛型
+                if ("key".equals(name) && keyType != null) {
+            		return keyType;
+            	} else if ("value".equals(name) && valueType != null) {
+            		return valueType;
+            	}
+            }
+            Class<?> rightType = rightParameter.getReturnType();
+            if (Map.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& "get".equals(name)
+            		&& String.class.equals(rightType)) {
+                String var = ((Variable)leftParameter).getName();
+                Class<?> type = types.get(var + ":1"); // Map<K,V>第二个泛型 
+                if (type != null) {
+                    return type;
+                }
+            }
+            if (List.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& "get".equals(name)
+            		&& int.class.equals(rightType)) {
+            	String var = ((Variable)leftParameter).getName();
+                Class<?> type = types.get(var + ":0"); // List<T>第一个泛型
+                if (type != null) {
+                    return type;
+                }
             }
             Class<?>[] rightTypes = rightParameter.getReturnTypes();
             Collection<Class<?>> functions = getFunctions();
@@ -142,7 +176,6 @@ public final class BinaryOperator extends Operator {
                 throw new ParseException("The operator \"..\" unsupported parameter type " + leftType, getOffset());
             }
         } else if ("[".equals(getName())) {
-            Map<String, Class<?>> types = getParameterTypes();
             if (Map.class.isAssignableFrom(leftType)) {
                 if (leftParameter instanceof Variable) {
                     String var = ((Variable)leftParameter).getName();
@@ -209,6 +242,7 @@ public final class BinaryOperator extends Operator {
                 && ((Operator) leftParameter).getPriority() < getPriority()) {
             leftCode = "(" + leftCode + ")";
         }
+        Map<String, Class<?>> types = getParameterTypes();
         String rightCode = rightParameter.getCode();
         if (StringUtils.isFunction(getName())) {
             String name =  getName().substring(1);
@@ -223,6 +257,39 @@ public final class BinaryOperator extends Operator {
                     return leftType.getCanonicalName() + ".class";
                 } else {
                     return leftCode + ".getClass()";
+                }
+            }
+            if (Map.Entry.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& ("key".equals(name) || "value".equals(name))) {
+            	String var = ((Variable)leftParameter).getName();
+            	Class<?> keyType = types.get(var + ":0"); // Map<K,V>第一个泛型
+            	Class<?> valueType = types.get(var + ":1"); // Map<K,V>第二个泛型
+                if ("key".equals(name) && keyType != null) {
+            		return "((" + keyType.getName() + ")" + leftCode + ".getKey(" + rightCode + "))";
+            	} else if ("value".equals(name) && valueType != null) {
+            		return "((" + valueType.getName() + ")" + leftCode + ".getValue(" + rightCode + "))";
+            	}
+            }
+            Class<?> rightType = rightParameter.getReturnType();
+            if (Map.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& "get".equals(name)
+            		&& String.class.equals(rightType)) {
+                String var = ((Variable)leftParameter).getName();
+                Class<?> type = types.get(var + ":1"); // Map<K,V>第二个泛型 
+                if (type != null) {
+                    return "((" + type.getName() + ")" + leftCode + ".get(" + rightCode + "))";
+                }
+            }
+            if (List.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& "get".equals(name)
+            		&& int.class.equals(rightType)) {
+            	String var = ((Variable)leftParameter).getName();
+                Class<?> type = types.get(var + ":0"); // List<T>第一个泛型
+                if (type != null) {
+                	return "((" + type.getName() + ")" + leftCode + ".get(" + rightCode + "))";
                 }
             }
             Class<?>[] rightTypes = rightParameter.getReturnTypes();
@@ -256,7 +323,6 @@ public final class BinaryOperator extends Operator {
             Class<?> type = getReturnType();
             return "(" + leftCode + " == null ? (" + type.getCanonicalName() + ")" + ClassUtils.getInitCode(type) + " : " + getMethodName(leftType, name, rightTypes, leftCode, rightCode) + ")";
         } else if (getName().equals("[")) {
-            Map<String, Class<?>> types = getParameterTypes();
             if (Map.class.isAssignableFrom(leftType)) {
                 if (leftParameter instanceof Variable) {
                     String var = ((Variable)leftParameter).getName();

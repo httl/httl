@@ -29,7 +29,9 @@ import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
@@ -52,7 +54,9 @@ public class DefaultMethod {
 
     private String numberFormat;
 
-    private String[] importPackages;
+    private String outputEncoding;
+
+	private String[] importPackages;
 
     public void setEngine(Engine engine) {
         this.engine = engine;
@@ -65,6 +69,10 @@ public class DefaultMethod {
     public void setNumberFormat(String numberFormat) {
         this.numberFormat = numberFormat;
     }
+
+    public void setOutputEncoding(String outputEncoding) {
+		this.outputEncoding = outputEncoding;
+	}
 
     public void setImportPackages(String[] importPackages) {
         this.importPackages = importPackages;
@@ -158,6 +166,18 @@ public class DefaultMethod {
 
     public static String escapeHtml(String value) {
         return StringUtils.escapeHtml(value);
+    }
+
+    public String escapeUrl(String value) {
+    	return escapeUrl(value, outputEncoding);
+    }
+
+    public static String escapeUrl(String value, String encoding) {
+        try {
+			return URLEncoder.encode(value, encoding);
+		} catch (UnsupportedEncodingException e) {
+			return value;
+		}
     }
 
     public static boolean toBoolean(String value) {

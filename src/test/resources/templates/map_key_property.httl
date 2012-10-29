@@ -7,5 +7,6 @@ ${bookmap["entrySet"]}
 ${bookmap.entrySet.size}
 ${bookmap["xxx"]}
 ${bookmap.xxx}
-${bookmap["EffectiveJava"].title}
 ${bookmap.EffectiveJava.title}
+${bookmap["EffectiveJava"].title}
+${bookmap.get("EffectiveJava").title}

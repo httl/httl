@@ -62,7 +62,8 @@ public class ClassUtils {
         try {
             return _forName(className);
         } catch (ClassNotFoundException e) {
-            if (packages != null && packages.length > 0) {
+        	// import class
+    		if (packages != null && packages.length > 0) {
                 for (String pkg : packages) {
                     try {
                         return _forName(pkg + "." + className);
@@ -70,7 +71,15 @@ public class ClassUtils {
                     }
                 }
             }
-            throw new IllegalStateException(e.getMessage(), e);
+    		// inner class
+    		int i = className.lastIndexOf('.');
+        	if (i > 0 && i < className.length() - 1) {
+        		try {
+                    return _forName(className.substring(0, i) + "$" + className.substring(i + 1));
+                } catch (ClassNotFoundException e2) {
+                }
+        	}
+        	throw new IllegalStateException(e.getMessage(), e);
         }
     }
     

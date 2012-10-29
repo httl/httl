@@ -672,9 +672,6 @@ public abstract class AbstractParser implements Parser {
             Expression expression = translator.translate(value.substring(end).trim(), types, offset + end);
             Class<?> returnType = expression.getReturnType();
             String code = expression.getCode();
-            if (Map.class.isAssignableFrom(returnType)) {
-                code = "(" + code + ").entrySet()";
-            }
             String[] tokens = value.substring(0, start).trim().split("\\s+");
             String type;
             String var;
@@ -683,7 +680,7 @@ public abstract class AbstractParser implements Parser {
                 if (returnType.isArray()) {
                     type = returnType.getComponentType().getName();
                 } else if (Map.class.isAssignableFrom(returnType)) {
-                    type = Map.class.getName() + "$Entry";
+                    type = Map.class.getName() + ".Entry";
                 } else if (Collection.class.isAssignableFrom(returnType)
                         && StringUtils.isNamed(code.trim()) 
                         && types.get(code.trim() + ":0") != null) {
@@ -700,6 +697,17 @@ public abstract class AbstractParser implements Parser {
             }
             Class<?> clazz = ClassUtils.forName(importPackages, type);
             types.put(var, clazz);
+            if (Map.class.isAssignableFrom(returnType)) {
+            	Class<?> keyType = types.get(code.trim() + ":0");
+            	if (keyType != null) {
+            		types.put(var + ":0", keyType);
+            	}
+            	Class<?> valueType = types.get(code.trim() + ":1");
+            	if (valueType != null) {
+            		types.put(var + ":1", valueType);
+            	}
+                code = "(" + code + ").entrySet()";
+            }
             buf.append(getForeachCode(type, clazz, var, code));
         } else if (breakifName.equals(name)) {
             if (value == null || value.length() == 0) {

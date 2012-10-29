@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import junit.framework.TestCase;
 
@@ -58,7 +59,7 @@ public class TemplateTest extends TestCase {
         books[7] = new Book("Design Patterns", "Erich Gamma", "Addison-Wesley Professional", format.parse("1994-11-10"), 60, 80);
         books[8] = new Book("Agile Software Development, Principles, Patterns, and Practices", " Robert C. Martin", "Prentice Hall", format.parse("2002-10-25"), 80, 75);
         books[9] = new Book("Design by Contract, by Example", "Richard Mitchell", "Addison-Wesley Publishing Company", format.parse("2001-10-22"), 50, 85);
-        Map<String, Book> bookmap = new HashMap<String, Book>();
+        Map<String, Book> bookmap = new TreeMap<String, Book>();
         for (Book book : books) {
             bookmap.put(book.getTitle().replaceAll("\\s+", ""), book);
         }
@@ -74,7 +75,7 @@ public class TemplateTest extends TestCase {
         File[] files = directory.listFiles();
         for (int i = 0, n = files.length; i < n; i ++) {
             File file = files[i];
-            /*if (! "block.httl".equals(file.getName())) {
+            /*if (! "bean.httl".equals(file.getName())) {
                 continue;
             }*/
             System.out.println(file.getName());
