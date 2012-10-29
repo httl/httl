@@ -191,9 +191,6 @@ public class DefaultEngine extends Engine {
      * @param logger - logger.
      */
     public void setLogger(Logger logger) {
-        if (loader == null) {
-            throw new IllegalArgumentException("logger == null");
-        }
         this.logger = logger;
     }
     
@@ -212,9 +209,6 @@ public class DefaultEngine extends Engine {
 	 * @param loader template loader.
 	 */
 	public void setLoader(Loader loader) {
-	    if (loader == null) {
-	        throw new IllegalArgumentException("loader == null");
-	    }
 	    this.loader = loader;
 	}
 
@@ -224,9 +218,6 @@ public class DefaultEngine extends Engine {
 	 * @param parser template parser.
 	 */
 	public void setParser(Parser parser) {
-	    if (parser == null) {
-            throw new IllegalArgumentException("parser == null");
-        }
 		this.parser = parser;
 	}
 
@@ -236,9 +227,6 @@ public class DefaultEngine extends Engine {
 	 * @param translator expression translator.
 	 */
 	public void setTranslator(Translator translator) {
-	    if (translator == null) {
-            throw new IllegalArgumentException("translator == null");
-        }
 		this.translator = translator;
 	}
 
