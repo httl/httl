@@ -272,6 +272,8 @@ public class ClassUtils {
             return ((Iterable<?>)object).iterator();
         } else if (object instanceof Map<?, ?>) {
             return ((Map<?, ?>)object).entrySet().iterator();
+        } else if (object instanceof Object[]) {
+            return new ObjectArrayIterator<Object>((Object[]) object);
         } else if (object.getClass().isArray()) {
             return new ArrayIterator<Object>(object);
         } else {
