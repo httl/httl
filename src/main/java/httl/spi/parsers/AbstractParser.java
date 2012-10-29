@@ -683,7 +683,7 @@ public abstract class AbstractParser implements Parser {
                 if (returnType.isArray()) {
                     type = returnType.getComponentType().getName();
                 } else if (Map.class.isAssignableFrom(returnType)) {
-                    type = Map.class.getName() + ".Entry";
+                    type = Map.class.getName() + "$Entry";
                 } else if (Collection.class.isAssignableFrom(returnType)
                         && StringUtils.isNamed(code.trim()) 
                         && types.get(code.trim() + ":0") != null) {
