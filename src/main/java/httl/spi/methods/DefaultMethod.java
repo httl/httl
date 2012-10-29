@@ -174,14 +174,77 @@ public class DefaultMethod {
 
     public static String escapeUrl(String value, String encoding) {
         try {
-			return URLEncoder.encode(value, encoding);
+			return value == null ? null : URLEncoder.encode(value, encoding);
 		} catch (UnsupportedEncodingException e) {
 			return value;
 		}
     }
 
+    public static boolean toBoolean(Object value) {
+    	if (value instanceof Boolean) {
+    		return (Boolean) value;
+    	}
+        return value == null ? false : toBoolean(String.valueOf(value));
+    }
+
+    public static char toChar(Object value) {
+    	if (value instanceof Character) {
+    		return (Character) value;
+    	}
+        return value == null ? '\0' : toChar(String.valueOf(value));
+    }
+
+    public static byte toByte(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).byteValue();
+    	}
+        return value == null ? 0 : toByte(String.valueOf(value));
+    }
+
+    public static short toShort(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).shortValue();
+    	}
+        return value == null ? 0 : toShort(String.valueOf(value));
+    }
+
+    public static int toInt(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).intValue();
+    	}
+        return value == null ? 0 : toInt(String.valueOf(value));
+    }
+
+    public static long toLong(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).longValue();
+    	}
+        return value == null ? 0 : toLong(String.valueOf(value));
+    }
+
+    public static float toFloat(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).floatValue();
+    	}
+        return value == null ? 0 : toFloat(String.valueOf(value));
+    }
+
+    public static double toDouble(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).doubleValue();
+    	}
+        return value == null ? 0 : toDouble(String.valueOf(value));
+    }
+
+    public static Class<?> toClass(Object value) {
+    	if (value instanceof Class) {
+    		return (Class<?>) value;
+    	}
+        return value == null ? null : toClass(String.valueOf(value));
+    }
+
     public static boolean toBoolean(String value) {
-        return Boolean.parseBoolean(value);
+        return value == null || value.length() == 0 ? false : Boolean.parseBoolean(value);
     }
 
     public static char toChar(String value) {
@@ -189,31 +252,31 @@ public class DefaultMethod {
     }
 
     public static byte toByte(String value) {
-        return Byte.parseByte(value);
+        return value == null || value.length() == 0 ? 0 : Byte.parseByte(value);
     }
 
     public static short toShort(String value) {
-        return Short.parseShort(value);
+        return value == null || value.length() == 0 ? 0 : Short.parseShort(value);
     }
 
     public static int toInt(String value) {
-        return Integer.parseInt(value);
+        return value == null || value.length() == 0 ? 0 : Integer.parseInt(value);
     }
 
     public static long toLong(String value) {
-        return Long.parseLong(value);
+        return value == null || value.length() == 0 ? 0 : Long.parseLong(value);
     }
 
     public static float toFloat(String value) {
-        return Float.parseFloat(value);
+        return value == null || value.length() == 0 ? 0 : Float.parseFloat(value);
     }
 
     public static double toDouble(String value) {
-        return Double.parseDouble(value);
+        return value == null || value.length() == 0 ? 0 : Double.parseDouble(value);
     }
 
     public static Class<?> toClass(String value) {
-        return ClassUtils.forName(value);
+        return value == null || value.length() == 0 ? null : ClassUtils.forName(value);
     }
 
     public Object[] toArray(Collection<?> value, String type) {
@@ -223,7 +286,7 @@ public class DefaultMethod {
 
     public Date toDate(String value) {
         try {
-            return DateUtils.parse(value, dateFormat);
+            return value == null || value.length() == 0 ? null : DateUtils.parse(value, dateFormat);
         } catch (Exception e) {
             try {
                 return DateUtils.parse(value, "yyyy-MM-dd");
@@ -234,15 +297,15 @@ public class DefaultMethod {
     }
 
     public static Date toDate(String value, String format) {
-        return DateUtils.parse(value, format);
+        return value == null || value.length() == 0 ? null : DateUtils.parse(value, format);
     }
 
     public String toString(Date value) {
-        return DateUtils.format(value, dateFormat);
+        return value == null ? null : DateUtils.format(value, dateFormat);
     }
 
     public static String format(Date value, String format) {
-        return DateUtils.format(value, format);
+        return value == null ? null : DateUtils.format(value, format);
     }
 
     public static String toString(boolean value) {
@@ -306,7 +369,7 @@ public class DefaultMethod {
     }
 
     public static String format(Number value, String format) {
-        return NumberUtils.formatNumber(value, format);
+        return value == null ? null : NumberUtils.formatNumber(value, format);
     }
 
     public static Cycle toCycle(Collection<?> values) {

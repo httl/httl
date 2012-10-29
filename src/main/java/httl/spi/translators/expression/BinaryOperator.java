@@ -17,6 +17,7 @@
 package httl.spi.translators.expression;
 
 import httl.spi.Translator;
+import httl.spi.methods.DefaultMethod;
 import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
 import httl.spi.sequences.StringSequence;
@@ -80,159 +81,6 @@ public final class BinaryOperator extends Operator {
             }
         }
         throw new IllegalStateException("No such sequence from \"" + begin + "\" to \"" + end + "\".");
-    }
-
-    public Class<?> getReturnType() throws ParseException {
-        if (">".equals(getName()) || ">=".equals(getName()) 
-                || "<".equals(getName())|| "<=".equals(getName())
-                || "==".equals(getName())|| "!=".equals(getName())
-                || "&&".equals(getName())|| "||".equals(getName())) {
-            return boolean.class;
-        }
-        Map<String, Class<?>> types = getParameterTypes();
-    	Class<?> leftType = leftParameter.getReturnType();
-        if (StringUtils.isFunction(getName())) {
-            String name =  getName().substring(1);
-            if ("to".equals(name) 
-                    && rightParameter instanceof Constant
-                    && rightParameter.getReturnType() == String.class) {
-                String rightCode = rightParameter.getCode();
-                if(rightCode.length() > 2 && rightCode.startsWith("\"") && rightCode.endsWith("\"")) {
-                    return ClassUtils.forName(getPackages(), rightCode.substring(1, rightCode.length() - 1));
-                }
-            } else if ("class".equals(name)) {
-                return Class.class;
-            }
-            if (Map.Entry.class.isAssignableFrom(leftType)
-            		&& leftParameter instanceof Variable
-            		&& ("key".equals(name) || "value".equals(name))) {
-            	String var = ((Variable)leftParameter).getName();
-            	Class<?> keyType = types.get(var + ":0"); // Map<K,V>第一个泛型
-            	Class<?> valueType = types.get(var + ":1"); // Map<K,V>第二个泛型
-                if ("key".equals(name) && keyType != null) {
-            		return keyType;
-            	} else if ("value".equals(name) && valueType != null) {
-            		return valueType;
-            	}
-            }
-            Class<?> rightType = rightParameter.getReturnType();
-            if (Map.class.isAssignableFrom(leftType)
-            		&& leftParameter instanceof Variable
-            		&& "get".equals(name)
-            		&& String.class.equals(rightType)) {
-                String var = ((Variable)leftParameter).getName();
-                Class<?> type = types.get(var + ":1"); // Map<K,V>第二个泛型 
-                if (type != null) {
-                    return type;
-                }
-            }
-            if (List.class.isAssignableFrom(leftType)
-            		&& leftParameter instanceof Variable
-            		&& "get".equals(name)
-            		&& int.class.equals(rightType)) {
-            	String var = ((Variable)leftParameter).getName();
-                Class<?> type = types.get(var + ":0"); // List<T>第一个泛型
-                if (type != null) {
-                    return type;
-                }
-            }
-            Class<?>[] rightTypes = rightParameter.getReturnTypes();
-            Collection<Class<?>> functions = getFunctions();
-            if (functions != null && functions.size() > 0) {
-                Class<?>[] allTypes;
-                if (rightTypes == null || rightTypes.length == 0) {
-                    if (leftType == null) {
-                        allTypes = new Class<?>[0];
-                    } else {
-                        allTypes = new Class<?>[] {leftType};
-                    }
-                } else {
-                    allTypes = new Class<?>[rightTypes.length + 1];
-                    allTypes[0] = leftType;
-                    System.arraycopy(rightTypes, 0, allTypes, 1, rightTypes.length);
-                }
-                for (Class<?> function : functions) {
-                    try {
-                        Method method = ClassUtils.searchMethod(function, name, allTypes);
-                        if (Object.class.equals(method.getDeclaringClass())) {
-                            break;
-                        }
-                        return method.getReturnType();
-                    } catch (NoSuchMethodException e) {
-                    }
-                }
-            }
-            return getReturnType(leftType, getName().substring(1), rightTypes);
-        } else if (getName().equals("..")) {
-            if (leftType == int.class || leftType == Integer.class 
-                    || leftType == short.class  || leftType == Short.class
-                    || leftType == long.class || leftType == Long.class ) {
-                return IntegerSequence.class;
-            } else if (leftType == char.class || leftType == Character.class) {
-                return CharacterSequence.class;
-            } else if (leftType == String.class) {
-                return StringSequence.class;
-            } else {
-                throw new ParseException("The operator \"..\" unsupported parameter type " + leftType, getOffset());
-            }
-        } else if ("[".equals(getName())) {
-            if (Map.class.isAssignableFrom(leftType)) {
-                if (leftParameter instanceof Variable) {
-                    String var = ((Variable)leftParameter).getName();
-                    Class<?> t = types.get(var + ":1"); // Map<K,V>第二个泛型 
-                    if (t != null) {
-                        return t;
-                    }
-                }
-                return Object.class;
-            }
-            Class<?> rightType = rightParameter.getReturnType();
-            if (List.class.isAssignableFrom(leftType)) {
-                if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
-                    return List.class;
-                } else if (int.class.equals(rightType)) {
-                    if (leftParameter instanceof Variable) {
-                        String var = ((Variable)leftParameter).getName();
-                        Class<?> t = types.get(var + ":0"); // List<T>第一个泛型
-                        if (t != null) {
-                            return t;
-                        }
-                    }
-                    return Object.class;
-                } else {
-                    throw new ParseException("The \"[]\" index type: " + rightType.getName() + " must be int!", getOffset());
-                }
-            } else if (leftType.isArray()) {
-                if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
-                    return leftType;
-                } else if (int.class.equals(rightType)) {
-                    return leftType.getComponentType();
-                } else {
-                    throw new ParseException("The \"[]\" index type: " + rightType.getName() + " must be int!", getOffset());
-                }
-            }
-            throw new ParseException("Unsuptorted \"[]\" for non-array type: " + leftType.getName(), getOffset());
-        } else if ("?".equals(getName())) {
-            return rightParameter.getReturnType();
-        } else if (":".equals(getName()) 
-                && ! (leftParameter instanceof BinaryOperator 
-                        && "?".equals(((BinaryOperator)leftParameter).getName()))) {
-            return Map.Entry.class;
-        } else {
-            return leftType;
-        }
-    }
-    
-    public Class<?>[] getReturnTypes() throws ParseException {
-        if (getName().equals(",")) {
-            Class<?>[] leftTypes = leftParameter.getReturnTypes();
-            Class<?>[] rightTypes = rightParameter.getReturnTypes();
-            Class<?>[] types = new Class<?>[leftTypes.length + rightTypes.length];
-            System.arraycopy(leftTypes, 0, types, 0, leftTypes.length);
-            System.arraycopy(rightTypes, 0, types, leftTypes.length, rightTypes.length);
-            return types;
-        }
-        return super.getReturnTypes();
     }
 
     public String getCode() throws ParseException {
@@ -425,6 +273,45 @@ public final class BinaryOperator extends Operator {
                     return "! " + leftCode + ".before(" + rightCode + ")";
                 }
             }
+            if ("+".equals(getName())) {
+            	Class<?> rightType = rightParameter.getReturnType();
+            	Class<?> type;
+            	if (rightType.isPrimitive() && rightType != boolean.class) {
+            		type = rightType;
+            	} else if (leftType.isPrimitive() && leftType != boolean.class) {
+            		type = leftType;
+            	} else {
+            		type = String.class;
+            	}
+            	if (type != String.class) {
+	            	String typeName = type.getCanonicalName();
+	        		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
+	            	if (! (leftType.isPrimitive() && leftType != boolean.class)) {
+	            		leftCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + leftCode + ")";
+	            	}
+	            	if (! (rightType.isPrimitive() && leftType != boolean.class)) {
+	            		rightCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + rightCode + ")";
+	            	}
+            	}
+            } else if ("－".equals(getName()) || "＊".equals(getName()) || "／".equals(getName()) || "%".equals(getName())) {
+            	Class<?> rightType = rightParameter.getReturnType();
+            	Class<?> type;
+            	if (rightType.isPrimitive() && rightType != boolean.class) {
+            		type = rightType;
+            	} else if (leftType.isPrimitive() && leftType != boolean.class) {
+            		type = leftType;
+            	} else {
+            		type = int.class;
+            	}
+            	String typeName = type.getCanonicalName();
+        		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
+            	if (! (leftType.isPrimitive() && leftType != boolean.class)) {
+            		leftCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + leftCode + ")";
+            	}
+            	if (! (rightType.isPrimitive() && leftType != boolean.class)) {
+            		rightCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + rightCode + ")";
+            	}
+            }
             if (rightParameter instanceof Operator
                     && ((Operator) rightParameter).getPriority() < getPriority()) {
                 rightCode = "(" + rightCode + ")";
@@ -433,6 +320,177 @@ public final class BinaryOperator extends Operator {
         }
     }
     
+    public Class<?> getReturnType() throws ParseException {
+        if (">".equals(getName()) || ">=".equals(getName()) 
+                || "<".equals(getName())|| "<=".equals(getName())
+                || "==".equals(getName())|| "!=".equals(getName())
+                || "&&".equals(getName())|| "||".equals(getName())) {
+            return boolean.class;
+        }
+        Map<String, Class<?>> types = getParameterTypes();
+    	Class<?> leftType = leftParameter.getReturnType();
+        if (StringUtils.isFunction(getName())) {
+            String name =  getName().substring(1);
+            if ("to".equals(name) 
+                    && rightParameter instanceof Constant
+                    && rightParameter.getReturnType() == String.class) {
+                String rightCode = rightParameter.getCode();
+                if(rightCode.length() > 2 && rightCode.startsWith("\"") && rightCode.endsWith("\"")) {
+                    return ClassUtils.forName(getPackages(), rightCode.substring(1, rightCode.length() - 1));
+                }
+            } else if ("class".equals(name)) {
+                return Class.class;
+            }
+            if (Map.Entry.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& ("key".equals(name) || "value".equals(name))) {
+            	String var = ((Variable)leftParameter).getName();
+            	Class<?> keyType = types.get(var + ":0"); // Map<K,V>第一个泛型
+            	Class<?> valueType = types.get(var + ":1"); // Map<K,V>第二个泛型
+                if ("key".equals(name) && keyType != null) {
+            		return keyType;
+            	} else if ("value".equals(name) && valueType != null) {
+            		return valueType;
+            	}
+            }
+            Class<?> rightType = rightParameter.getReturnType();
+            if (Map.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& "get".equals(name)
+            		&& String.class.equals(rightType)) {
+                String var = ((Variable)leftParameter).getName();
+                Class<?> type = types.get(var + ":1"); // Map<K,V>第二个泛型 
+                if (type != null) {
+                    return type;
+                }
+            }
+            if (List.class.isAssignableFrom(leftType)
+            		&& leftParameter instanceof Variable
+            		&& "get".equals(name)
+            		&& int.class.equals(rightType)) {
+            	String var = ((Variable)leftParameter).getName();
+                Class<?> type = types.get(var + ":0"); // List<T>第一个泛型
+                if (type != null) {
+                    return type;
+                }
+            }
+            Class<?>[] rightTypes = rightParameter.getReturnTypes();
+            Collection<Class<?>> functions = getFunctions();
+            if (functions != null && functions.size() > 0) {
+                Class<?>[] allTypes;
+                if (rightTypes == null || rightTypes.length == 0) {
+                    if (leftType == null) {
+                        allTypes = new Class<?>[0];
+                    } else {
+                        allTypes = new Class<?>[] {leftType};
+                    }
+                } else {
+                    allTypes = new Class<?>[rightTypes.length + 1];
+                    allTypes[0] = leftType;
+                    System.arraycopy(rightTypes, 0, allTypes, 1, rightTypes.length);
+                }
+                for (Class<?> function : functions) {
+                    try {
+                        Method method = ClassUtils.searchMethod(function, name, allTypes);
+                        if (Object.class.equals(method.getDeclaringClass())) {
+                            break;
+                        }
+                        return method.getReturnType();
+                    } catch (NoSuchMethodException e) {
+                    }
+                }
+            }
+            return getReturnType(leftType, getName().substring(1), rightTypes);
+        } else if (getName().equals("..")) {
+            if (leftType == int.class || leftType == Integer.class 
+                    || leftType == short.class  || leftType == Short.class
+                    || leftType == long.class || leftType == Long.class ) {
+                return IntegerSequence.class;
+            } else if (leftType == char.class || leftType == Character.class) {
+                return CharacterSequence.class;
+            } else if (leftType == String.class) {
+                return StringSequence.class;
+            } else {
+                throw new ParseException("The operator \"..\" unsupported parameter type " + leftType, getOffset());
+            }
+        } else if ("[".equals(getName())) {
+            if (Map.class.isAssignableFrom(leftType)) {
+                if (leftParameter instanceof Variable) {
+                    String var = ((Variable)leftParameter).getName();
+                    Class<?> t = types.get(var + ":1"); // Map<K,V>第二个泛型 
+                    if (t != null) {
+                        return t;
+                    }
+                }
+                return Object.class;
+            }
+            Class<?> rightType = rightParameter.getReturnType();
+            if (List.class.isAssignableFrom(leftType)) {
+                if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
+                    return List.class;
+                } else if (int.class.equals(rightType)) {
+                    if (leftParameter instanceof Variable) {
+                        String var = ((Variable)leftParameter).getName();
+                        Class<?> t = types.get(var + ":0"); // List<T>第一个泛型
+                        if (t != null) {
+                            return t;
+                        }
+                    }
+                    return Object.class;
+                } else {
+                    throw new ParseException("The \"[]\" index type: " + rightType.getName() + " must be int!", getOffset());
+                }
+            } else if (leftType.isArray()) {
+                if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
+                    return leftType;
+                } else if (int.class.equals(rightType)) {
+                    return leftType.getComponentType();
+                } else {
+                    throw new ParseException("The \"[]\" index type: " + rightType.getName() + " must be int!", getOffset());
+                }
+            }
+            throw new ParseException("Unsuptorted \"[]\" for non-array type: " + leftType.getName(), getOffset());
+        } else if ("?".equals(getName())) {
+            return rightParameter.getReturnType();
+        } else if (":".equals(getName()) 
+                && ! (leftParameter instanceof BinaryOperator 
+                        && "?".equals(((BinaryOperator)leftParameter).getName()))) {
+            return Map.Entry.class;
+        } else if ("+".equals(getName())) {
+        	Class<?> rightType = rightParameter.getReturnType();
+        	if (rightType.isPrimitive() && rightType != boolean.class) {
+        		return rightType;
+        	} else if (leftType.isPrimitive() && leftType != boolean.class) {
+        		return leftType;
+        	} else {
+        		return String.class;
+        	}
+        } else if ("－".equals(getName()) || "＊".equals(getName()) || "／".equals(getName()) || "%".equals(getName())) {
+        	Class<?> rightType = rightParameter.getReturnType();
+        	if (rightType.isPrimitive() && rightType != boolean.class) {
+        		return rightType;
+        	} else if (leftType.isPrimitive() && leftType != boolean.class) {
+        		return leftType;
+        	} else {
+        		return int.class;
+        	}
+        } else {
+            return leftType;
+        }
+    }
+    
+    public Class<?>[] getReturnTypes() throws ParseException {
+        if (getName().equals(",")) {
+            Class<?>[] leftTypes = leftParameter.getReturnTypes();
+            Class<?>[] rightTypes = rightParameter.getReturnTypes();
+            Class<?>[] types = new Class<?>[leftTypes.length + rightTypes.length];
+            System.arraycopy(leftTypes, 0, types, 0, leftTypes.length);
+            System.arraycopy(rightTypes, 0, types, leftTypes.length, rightTypes.length);
+            return types;
+        }
+        return super.getReturnTypes();
+    }
+
     private String getMethodName(Class<?> leftType, String name, Class<?>[] rightTypes, String leftCode, String rightCode) throws ParseException {
         if (leftType == null) {
             throw new ParseException("No such method " + name + "("

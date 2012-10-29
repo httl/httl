@@ -629,6 +629,30 @@ public class ClassUtils {
         return map;
     }
     
+    public static Map<String, Object> getBeanProperties(Object bean) {
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	for (Method method : bean.getClass().getMethods()) {
+    		String name = method.getName();
+    		if ((name.length() > 3 && name.startsWith("get") 
+    				|| name.length() > 2 && name.startsWith("is"))
+    				&& Modifier.isPublic(method.getModifiers())
+    				&& method.getParameterTypes().length == 0
+    				&& method.getDeclaringClass() != Object.class) {
+    			int i = name.startsWith("get") ? 3 : 2;
+    			String key = name.substring(i, i + 1).toLowerCase() + name.substring(i + 1);
+    			try {
+					map.put(key, method.invoke(bean, new Object[0]));
+				} catch (Exception e) {
+				}
+    		}
+    	}
+    	return map;
+    }
+    
+    public static void add(Object left, Object right) {
+    	
+    }
+    
     private ClassUtils() {}
 
 }

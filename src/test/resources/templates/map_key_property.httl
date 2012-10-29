@@ -10,3 +10,6 @@ ${bookmap.xxx}
 ${bookmap.EffectiveJava.title}
 ${bookmap["EffectiveJava"].title}
 ${bookmap.get("EffectiveJava").title}
+${bookmap.EffectiveJava.price + 1}
+${bookmap["EffectiveJava"].price + 1}
+${bookmap.get("EffectiveJava").price + 1}

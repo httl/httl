@@ -1,0 +1,7 @@
+<!--#var(Map<String, Map> bookbeanmap)-->
+${bookbeanmap.EffectiveJava.title}
+${bookbeanmap["EffectiveJava"]["title"]}
+${bookbeanmap.get("EffectiveJava").get("title")}
+${bookbeanmap.EffectiveJava.price + 1}
+${bookbeanmap["EffectiveJava"].price + 1}
+${bookbeanmap.get("EffectiveJava").price + 1}
