@@ -14,25 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.util;
+package httl.util.iterators;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * ArrayIterator. (Tool, Prototype, ThreadUnsafe)
+ * CharArrayIterator. (Tool, Prototype, ThreadUnsafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ObjectArrayIterator<T> implements Iterator<T> {
+public class CharArrayIterator implements Iterator<Character> {
 
-    private final Object[] array;
+    private final char[] array;
 
     private final int    length;
 
     private volatile int index;
 
-    public ObjectArrayIterator(Object[] array){
+    public CharArrayIterator(char[] array){
         this.array = array;
         this.length = array.length;
     }
@@ -45,12 +45,11 @@ public class ObjectArrayIterator<T> implements Iterator<T> {
         return index < length;
     }
 
-    @SuppressWarnings("unchecked")
-    public T next() {
+    public Character next() {
         if (! hasNext()) {
             throw new NoSuchElementException();
         }
-        return (T) array[index ++];
+        return array[index ++];
     }
 
     public void remove() {

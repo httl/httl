@@ -14,28 +14,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.util;
+package httl.util.iterators;
 
-import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * ArrayIterator. (Tool, Prototype, ThreadUnsafe)
+ * FloatArrayIterator. (Tool, Prototype, ThreadUnsafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ArrayIterator<T> implements Iterator<T> {
+public class FloatArrayIterator implements Iterator<Float> {
 
-    private final Object array;
+    private final float[] array;
 
     private final int    length;
 
     private volatile int index;
 
-    public ArrayIterator(Object array){
+    public FloatArrayIterator(float[] array){
         this.array = array;
-        this.length = Array.getLength(array);
+        this.length = array.length;
     }
 
     public Object getArray() {
@@ -46,12 +45,11 @@ public class ArrayIterator<T> implements Iterator<T> {
         return index < length;
     }
 
-    @SuppressWarnings("unchecked")
-    public T next() {
+    public Float next() {
         if (! hasNext()) {
             throw new NoSuchElementException();
         }
-        return (T) Array.get(array, index ++);
+        return array[index ++];
     }
 
     public void remove() {

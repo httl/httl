@@ -17,6 +17,15 @@
 package httl.util;
 
 import httl.spi.sequences.IntegerSequence;
+import httl.util.iterators.BooleanArrayIterator;
+import httl.util.iterators.ByteArrayIterator;
+import httl.util.iterators.CharArrayIterator;
+import httl.util.iterators.DoubleArrayIterator;
+import httl.util.iterators.FloatArrayIterator;
+import httl.util.iterators.IntArrayIterator;
+import httl.util.iterators.LongArrayIterator;
+import httl.util.iterators.ObjectArrayIterator;
+import httl.util.iterators.ShortArrayIterator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -35,7 +44,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * ClassUtils. (Tool, Static, ThreadSafe)
@@ -274,8 +282,22 @@ public class ClassUtils {
             return ((Map<?, ?>)object).entrySet().iterator();
         } else if (object instanceof Object[]) {
             return new ObjectArrayIterator<Object>((Object[]) object);
-        } else if (object.getClass().isArray()) {
-            return new ArrayIterator<Object>(object);
+        } else if (object instanceof int[]) {
+            return new IntArrayIterator((int[]) object);
+        } else if (object instanceof long[]) {
+            return new LongArrayIterator((long[]) object);
+        } else if (object instanceof float[]) {
+            return new FloatArrayIterator((float[]) object);
+        } else if (object instanceof double[]) {
+            return new DoubleArrayIterator((double[]) object);
+        } else if (object instanceof short[]) {
+            return new ShortArrayIterator((short[]) object);
+        } else if (object instanceof byte[]) {
+            return new ByteArrayIterator((byte[]) object);
+        } else if (object instanceof char[]) {
+            return new CharArrayIterator((char[]) object);
+        } else if (object instanceof boolean[]) {
+            return new BooleanArrayIterator((boolean[]) object);
         } else {
             throw new UnsupportedOperationException("Unsupported foreach type " + object.getClass().getName());
         }
