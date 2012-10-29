@@ -95,7 +95,7 @@ public abstract class AbstractParser implements Parser {
 
     protected static final Pattern CDATA_PATTERN = Pattern.compile("<!\\[CDATA\\[##(.*?)\\]\\]>", Pattern.DOTALL);
     
-    protected static final Pattern VAR_PATTERN = Pattern.compile("([_0-9a-zA-Z>]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
+    protected static final Pattern VAR_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
 
     protected static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
     
@@ -800,6 +800,36 @@ public abstract class AbstractParser implements Parser {
         return buf.toString();
     }
     
+    private void parseGenericTypeString(String type, int offset, List<String> types, List<Integer> offsets) throws ParseException {
+    	StringBuilder buf = new StringBuilder();
+        int begin = 0;
+        for (int j = 0; j < type.length(); j ++) {
+        	char ch = type.charAt(j);
+        	if (ch == '<') {
+        		begin ++;
+        	} else if (ch == '>') {
+        		begin --;
+        		if (begin < 0) {
+        			 throw new ParseException("Illegal type: " + type, offset + j);
+        		}
+        	}
+        	if (ch == ',' && begin == 0) {
+        		String token = buf.toString();
+        		types.add(token.trim());
+        		offsets.add(offset + j - token.length());
+        		buf.setLength(0);
+        	} else {
+        		buf.append(ch);
+        	}
+        }
+        if (buf.length() > 0) {
+        	String token = buf.toString();
+        	types.add(token.trim());
+    		offsets.add(offset + type.length() - token.length());
+    		buf.setLength(0);
+        }
+    }
+    
     protected String parseGenericType(String type, String var, Map<String, Class<?>> types, int offset) throws ParseException {
         int i = type.indexOf('<');
         if (i < 0) {
@@ -812,33 +842,7 @@ public abstract class AbstractParser implements Parser {
         offset = offset + 1;
         List<String> genericTypes = new ArrayList<String>();
         List<Integer> genericOffsets = new ArrayList<Integer>();
-        StringBuilder buf = new StringBuilder();
-        int begin = 0;
-        for (int j = 0; j < parameterType.length(); j ++) {
-        	char ch = parameterType.charAt(j);
-        	if (ch == '<') {
-        		begin ++;
-        	} else if (ch == '>') {
-        		begin --;
-        		if (begin < 0) {
-        			 throw new ParseException("Illegal type: " + type, offset + j);
-        		}
-        	}
-        	if (ch == ',' && begin == 0) {
-        		String token = buf.toString();
-        		genericTypes.add(token.trim());
-        		genericOffsets.add(offset + j - token.length());
-        		buf.setLength(0);
-        	} else {
-        		buf.append(ch);
-        	}
-        }
-        if (buf.length() > 0) {
-        	String token = buf.toString();
-        	genericTypes.add(token.trim());
-    		genericOffsets.add(offset + parameterType.length() - token.length());
-    		buf.setLength(0);
-        }
+        parseGenericTypeString(parameterType, offset, genericTypes, genericOffsets);
         if (genericTypes != null && genericTypes.size() > 0) {
             for (int k = 0; k < genericTypes.size(); k ++) {
                 String genericVar = var + ":" + k;
