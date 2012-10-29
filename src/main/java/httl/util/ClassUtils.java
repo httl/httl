@@ -63,22 +63,29 @@ public class ClassUtils {
             return _forName(className);
         } catch (ClassNotFoundException e) {
         	// import class
-    		if (packages != null && packages.length > 0) {
-                for (String pkg : packages) {
-                    try {
-                        return _forName(pkg + "." + className);
-                    } catch (ClassNotFoundException e2) {
+    		if (! className.contains(".")) {
+    			if (packages != null && packages.length > 0) {
+                    for (String pkg : packages) {
+                        try {
+                            return _forName(pkg + "." + className);
+                        } catch (ClassNotFoundException e2) {
+                        }
                     }
                 }
-            }
-    		// inner class
-    		int i = className.lastIndexOf('.');
-        	if (i > 0 && i < className.length() - 1) {
-        		try {
-                    return _forName(className.substring(0, i) + "$" + className.substring(i + 1));
+    			try {
+                    return _forName("java.lang." + className);
                 } catch (ClassNotFoundException e2) {
                 }
-        	}
+    		} else {
+	    		// inner class
+	    		int i = className.lastIndexOf('.');
+	        	if (i > 0 && i < className.length() - 1) {
+	        		try {
+	                    return _forName(className.substring(0, i) + "$" + className.substring(i + 1));
+	                } catch (ClassNotFoundException e2) {
+	                }
+	        	}
+    		}
         	throw new IllegalStateException(e.getMessage(), e);
         }
     }
