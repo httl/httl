@@ -92,12 +92,6 @@ public class DefaultEngine extends Engine {
 			throw new IllegalArgumentException("template name == null");
 		}
 		name = UrlUtils.cleanUrl(name.trim());
-		String macro = null;
-		int i = name.indexOf('#');
-        if (i > 0) {
-        	macro = name.substring(i + 1);
-        	name = name.substring(0, i);
-        }
 		Cache cache = this.cache; // safe copy reference
 		if (cache == null) {
 		    return parseTemplate(name, encoding);
@@ -131,9 +125,6 @@ public class DefaultEngine extends Engine {
     		}
 		}
 		assert(template != null);
-		if (macro != null && macro.length() > 0) {
-			return template.getMacros().get(macro);
-		}
 		return template;
 	}
 

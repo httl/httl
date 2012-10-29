@@ -106,6 +106,12 @@ public class DefaultMethod {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("include template name == null");
         }
+        String macro = null;
+		int i = name.indexOf('#');
+        if (i > 0) {
+        	macro = name.substring(i + 1);
+        	name = name.substring(0, i);
+        }
         Template template = Context.getContext().getTemplate();
         if (template != null) {
             if (encoding == null || encoding.length() == 0) {
@@ -113,7 +119,11 @@ public class DefaultMethod {
             }
             name = UrlUtils.relativeUrl(name, template.getName());
         }
-        return engine.getTemplate(name, encoding);
+        template = engine.getTemplate(name, encoding);
+        if (macro != null && macro.length() > 0) {
+			return template.getMacros().get(macro);
+		}
+        return template;
     }
 
     public Resource load(String name) throws IOException, ParseException {
