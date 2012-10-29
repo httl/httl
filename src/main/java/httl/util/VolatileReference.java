@@ -16,24 +16,16 @@
  */
 package httl.util;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicLong;
+public class VolatileReference<T> {
 
-public class StringCache {
-	
-	private static final AtomicLong IDS = new AtomicLong();
-	
-	private static final ConcurrentMap<String, String> cache = new ConcurrentHashMap<String, String>();
+	private volatile T value;
 
-	public static String put(String source) {
-		String id = String.valueOf(IDS.incrementAndGet());
-		cache.putIfAbsent(id, source);
-		return id;
+	public T get() {
+		return value;
 	}
 
-	public static String get(String id) {
-		return cache.remove(id);
+	public void set(T value) {
+		this.value = value;
 	}
 
 }

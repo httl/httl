@@ -121,9 +121,9 @@ public abstract class AbstractTemplate implements Template, Serializable {
             this.doubleFormatter = null;
             this.dateFormatter = null;
 		}
-		this.nullValue = engine.getConfig(NULL_VALUE, "");
-		this.trueValue = engine.getConfig(TRUE_VALUE, "true");
-		this.falseValue = engine.getConfig(FALSE_VALUE, "false");
+		this.nullValue = engine.getProperty(NULL_VALUE, "");
+		this.trueValue = engine.getProperty(TRUE_VALUE, "true");
+		this.falseValue = engine.getProperty(FALSE_VALUE, "false");
 	}
 
 	protected Map<String, Template> getImportMacros() {
@@ -199,7 +199,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
     }
 
     protected String toString(UnsafeByteArrayOutputStream output) {
-        String encoding = engine.getConfig(OUTPUT_ENCODING);
+        String encoding = engine.getProperty(OUTPUT_ENCODING);
         if (encoding != null && encoding.length() > 0) {
             try {
                 return new String(output.toByteArray(), encoding);

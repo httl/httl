@@ -1,17 +1,18 @@
 /*
- * Copyright 1999-2012 Alibaba Group.
- *  
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *  
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package httl.spi.engines;
 
@@ -27,15 +28,13 @@ import httl.spi.Translator;
 import httl.util.ClassUtils;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
+import httl.util.VolatileReference;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class DefaultEngine extends Engine {
 
@@ -50,8 +49,6 @@ public class DefaultEngine extends Engine {
     private Translator translator;
 
     private boolean reloadable;
-
-    private final ConcurrentMap<String, ReentrantLock> locks = new ConcurrentHashMap<String, ReentrantLock>();
 
     /**
      * Get expression.
@@ -87,42 +84,41 @@ public class DefaultEngine extends Engine {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-    public Template getTemplate(String name, String encoding) throws IOException, ParseException {
+    @SuppressWarnings("unchecked")
+	public Template getTemplate(String name, String encoding) throws IOException, ParseException {
 		if (name == null || name.trim().length() == 0) {
 			throw new IllegalArgumentException("template name == null");
 		}
-		name = UrlUtils.cleanUrl(name.trim());
 		Cache cache = this.cache; // safe copy reference
 		if (cache == null) {
 		    return parseTemplate(name, encoding);
 		}
-		ReentrantLock lock = locks.get(name);
-        if (lock == null) {
-            locks.putIfAbsent(name, new ReentrantLock());
-            lock= locks.get(name);
-        }
-        assert(lock != null);
-        Resource resource;
+		long lastModified;
         if (reloadable) {
-            resource = loader.load(name, encoding);
+        	lastModified = loader.load(name, encoding).getLastModified();
         } else {
-            resource = null;
+        	lastModified = -1;
         }
-		Template template = (Template) cache.get(name);
-		if (template == null || (resource != null 
-		        && resource.getLastModified() > template.getLastModified())) {
-    		lock.lock();
-    		try {
-    			template = (Template) cache.get(name);
-    			// double check
-    			if (template == null || (resource != null 
-    			        && resource.getLastModified() > template.getLastModified())) {
-    				template = parseTemplate(name, encoding);
-    				cache.put(name, template);
-    			}
-    		} finally {
-    		    lock.unlock();
-    		}
+        VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(name);
+        if (reference == null) {
+        	synchronized (cache) { // cache lock
+        		reference = (VolatileReference<Template>) cache.get(name);
+                if (reference == null) { // double check
+                	reference = new VolatileReference<Template>(); // quickly
+                	cache.put(name, reference);
+                }
+			}
+        }
+        assert(reference != null);
+        Template template = (Template) reference.get();
+		if (template == null || template.getLastModified() < lastModified) {
+			synchronized (reference) { // reference lock
+				template = (Template) reference.get();
+				if (template == null || template.getLastModified() < lastModified) { // double check
+					template = parseTemplate(name, encoding); // slowly
+					reference.set(template);
+				}
+			}
 		}
 		assert(template != null);
 		return template;

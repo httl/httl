@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -41,7 +43,11 @@ public final class ConfigUtils {
 	private static final Pattern WINDOWS_FILE_PATTERN = Pattern.compile("^[A-Za-z]+:");
 	
 	private static final Pattern INTEGER_PATTERN = Pattern.compile("^\\d+$");
-	
+
+    private static final String PLUS = "+";
+
+    private static final String COMMA = ",";
+
 	public static boolean isInteger(String value) {
 	    return value != null && value.length() > 0 
 	            && INTEGER_PATTERN.matcher(value).matches();
@@ -110,7 +116,43 @@ public final class ConfigUtils {
         Document document = builder.parse(dataInputStream);
         return document;
     }
-    
+
+    public static Properties mergeProperties(Object... configs) {
+    	Properties result = new Properties();
+    	for (Object config : configs) {
+    		if (config != null) {
+    			Properties properties;
+    			if (config instanceof String) {
+    				properties = loadProperties((String) config);
+    			} else {
+    				properties = (Properties) config;
+    			}
+	    		Map<String, String> plusConfigs = new HashMap<String, String>();
+	    		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+	                String key = (String) entry.getKey();
+	                String value = (String) entry.getValue();
+	                if (key.endsWith(PLUS)) {
+	                	if (value != null && value.length() > 0) {
+	                		plusConfigs.put(key, value);
+	                    }
+	                } else {
+	                	result.setProperty(key, value);
+	                }
+	            }
+	    		for (Map.Entry<String, String> entry : plusConfigs.entrySet()) {
+	                String key = (String) entry.getKey();
+	                String value = (String) entry.getValue();
+	                String k = key.substring(0, key.length() - PLUS.length());
+	                String v = result.getProperty(k);
+	                if (v != null && v.length() > 0) {
+	                	result.setProperty(k, v + COMMA + value);
+	                }
+	    		}
+    		}
+    	}
+    	return result;
+    }
+
     private ConfigUtils() {}
     
 }

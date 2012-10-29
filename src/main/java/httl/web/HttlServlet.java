@@ -65,7 +65,7 @@ public class HttlServlet extends HttpServlet {
         } else {
             this.engine = Engine.getEngine();
         }
-        isOutputStream = "true".equalsIgnoreCase(engine.getConfig(OUTPUT_STREAM));
+        isOutputStream = "true".equalsIgnoreCase(engine.getProperty(OUTPUT_STREAM));
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)

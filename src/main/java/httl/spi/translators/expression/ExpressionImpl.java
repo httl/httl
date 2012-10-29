@@ -58,7 +58,7 @@ public class ExpressionImpl implements Expression {
 
     private final Map<Class<?>, Object> functions;
     
-    private transient Evaluator evaluator;
+    private volatile Evaluator evaluator;
     
     public ExpressionImpl(String source, Map<String, Class<?>> parameterTypes, int offset, String code, Class<?> returnType, Engine engine, Compiler compiler, String[] importPackages, Map<Class<?>, Object> functions){
         this.engine = engine;
