@@ -18,14 +18,17 @@ package httl.test;
 
 import httl.Engine;
 import httl.Template;
+import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.User;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,37 +82,37 @@ public class TemplateTest extends TestCase {
         context.put("mapbooklist", mapbooklist);
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
-        String[] configs = new String[] {"httl.properties", "httl-stream.properties"};
-        for (String config : configs) {
-        	System.out.println("========" + config + "========");
-	        Engine engine = Engine.getEngine(config);
-	        File directory = new File(this.getClass().getClassLoader().getResource("templates/").getFile());
-	        super.assertTrue(directory.isDirectory());
-	        File[] files = directory.listFiles();
-	        for (int i = 0, n = files.length; i < n; i ++) {
-	            File file = files[i];
-	            /*if (! "map_key_property.httl".equals(file.getName())) {
-	                continue;
-	            }*/
-	            System.out.println(file.getName());
-	            URL url = this.getClass().getClassLoader().getResource("results/" + file.getName());
-	            if (url == null) {
-	                throw new FileNotFoundException("Not found file: " + "results/" + file.getName());
-	            }
-	            File result = new File(url.getFile());
-	            if (! result.exists()) {
-	                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
-	            }
-	            Template template = engine.getTemplate("/templates/" + file.getName());
-	            String expected = IOUtils.readToString(new FileReader(result));
-	            String actual;
-	            try {
-	            	actual = template.render(context);
-	            } catch (Exception e) {
-	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
-	            }
-	            super.assertEquals("The template " +  file.getName() + " error.", expected, actual);
-	        }
+        Engine engine = Engine.getEngine();
+        File directory = new File(this.getClass().getClassLoader().getResource("templates/").getFile());
+        super.assertTrue(directory.isDirectory());
+        File[] files = directory.listFiles();
+        for (int i = 0, n = files.length; i < n; i ++) {
+            File file = files[i];
+            /*if (! "map_key_property.httl".equals(file.getName())) {
+                continue;
+            }*/
+            System.out.println(file.getName());
+            URL url = this.getClass().getClassLoader().getResource("results/" + file.getName());
+            if (url == null) {
+                throw new FileNotFoundException("Not found file: " + "results/" + file.getName());
+            }
+            File result = new File(url.getFile());
+            if (! result.exists()) {
+                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
+            }
+            Template template = engine.getTemplate("/templates/" + file.getName());
+            super.assertEquals(AdaptiveTemplate.class, template.getClass());
+            String expected = IOUtils.readToString(new FileReader(result));
+            ByteArrayOutputStream actualStream = new ByteArrayOutputStream();
+            StringWriter actualWriter = new StringWriter();;
+            try {
+            	template.render(context, actualWriter);
+            	template.render(context, actualStream);
+            } catch (Exception e) {
+            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
+            }
+            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
+            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
         }
     }
 
