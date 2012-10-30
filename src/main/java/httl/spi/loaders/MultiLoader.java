@@ -66,6 +66,9 @@ public class MultiLoader implements Loader {
     }
 
     public Resource load(String name, String encoding) throws IOException {
+    	if (templateLoaders.size() == 1) {
+    		return templateLoaders.get(0).load(name, encoding);
+    	}
         for (Loader loader : templateLoaders) {
             try {
                 return loader.load(name, encoding);
@@ -75,7 +78,10 @@ public class MultiLoader implements Loader {
         throw new FileNotFoundException("No such template file: " + name);
     }
 
-    public List<String> list() {
+    public List<String> list() throws IOException {
+    	if (templateLoaders.size() == 1) {
+    		return templateLoaders.get(0).list();
+    	}
         List<String> all = new ArrayList<String>();
         for (Loader loader : templateLoaders) {
             try {
