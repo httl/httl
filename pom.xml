@@ -8,6 +8,19 @@
 	<packaging>jar</packaging>
 	<name>HTTL</name>
 	<description>Hyper Text Template Language and Engine.</description>
+	<url>http://httl.github.com</url>
+	<inceptionYear>2012</inceptionYear>
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>httl-repository</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
+	<properties>
+		<updateReleaseInfo>true</updateReleaseInfo>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.javassist</groupId>
@@ -81,6 +94,10 @@
 		<connection>scm:git:https://github.com/httl/httl.git</connection>
 		<developerConnection>scm:git:git@github.com:httl/httl.git</developerConnection>
 	</scm>
+	<issueManagement>
+		<system>github</system>
+		<url>https://github.com/httl/httl/issues</url>
+	</issueManagement>
 	<developers>
 		<developer>
 			<name>Liang Fei</name>
