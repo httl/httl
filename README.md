@@ -2,8 +2,8 @@ Hyper-Text Template Language and Engine.
 
 Homepage:
 
-    <http://httl.github.com>
-    
+    [http://httl.github.com](http://httl.github.com)
+
 Checkout:
 
 ```bash
