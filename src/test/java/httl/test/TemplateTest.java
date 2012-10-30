@@ -79,33 +79,37 @@ public class TemplateTest extends TestCase {
         context.put("mapbooklist", mapbooklist);
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
-        Engine engine = Engine.getEngine();
-        File directory = new File(this.getClass().getClassLoader().getResource("templates/").getFile());
-        super.assertTrue(directory.isDirectory());
-        File[] files = directory.listFiles();
-        for (int i = 0, n = files.length; i < n; i ++) {
-            File file = files[i];
-            /*if (! "bean.httl".equals(file.getName())) {
-                continue;
-            }*/
-            System.out.println(file.getName());
-            URL url = this.getClass().getClassLoader().getResource("results/" + file.getName());
-            if (url == null) {
-                throw new FileNotFoundException("Not found file: " + "results/" + file.getName());
-            }
-            File result = new File(url.getFile());
-            if (! result.exists()) {
-                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
-            }
-            Template template = engine.getTemplate("/templates/" + file.getName());
-            String expected = IOUtils.readToString(new FileReader(result));
-            String actual;
-            try {
-            	actual = template.render(context);
-            } catch (Exception e) {
-            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
-            }
-            super.assertEquals("The template " +  file.getName() + " error.", expected, actual);
+        String[] configs = new String[] {"httl.properties", "httl-stream.properties"};
+        for (String config : configs) {
+        	System.out.println("========" + config + "========");
+	        Engine engine = Engine.getEngine(config);
+	        File directory = new File(this.getClass().getClassLoader().getResource("templates/").getFile());
+	        super.assertTrue(directory.isDirectory());
+	        File[] files = directory.listFiles();
+	        for (int i = 0, n = files.length; i < n; i ++) {
+	            File file = files[i];
+	            /*if (! "map_key_property.httl".equals(file.getName())) {
+	                continue;
+	            }*/
+	            System.out.println(file.getName());
+	            URL url = this.getClass().getClassLoader().getResource("results/" + file.getName());
+	            if (url == null) {
+	                throw new FileNotFoundException("Not found file: " + "results/" + file.getName());
+	            }
+	            File result = new File(url.getFile());
+	            if (! result.exists()) {
+	                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
+	            }
+	            Template template = engine.getTemplate("/templates/" + file.getName());
+	            String expected = IOUtils.readToString(new FileReader(result));
+	            String actual;
+	            try {
+	            	actual = template.render(context);
+	            } catch (Exception e) {
+	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
+	            }
+	            super.assertEquals("The template " +  file.getName() + " error.", expected, actual);
+	        }
         }
     }
 

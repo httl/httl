@@ -218,10 +218,10 @@ public abstract class AbstractTemplate implements Template, Serializable {
     }
 
     protected String format(Object value) {
+    	if (value == null)
+            return nullValue;
         if (formatter != null)
             return formatter.format(value);
-        if (value == null)
-            return nullValue;
         return StringUtils.toString(value);
     }
     
@@ -280,74 +280,74 @@ public abstract class AbstractTemplate implements Template, Serializable {
     }
     
     protected String format(Boolean value) {
+    	if (value == null)
+            return nullValue;
         if (booleanFormatter != null) 
             return booleanFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.booleanValue() ? trueValue : falseValue;
     }
     
     protected String format(Byte value) {
+    	if (value == null)
+            return nullValue;
         if (byteFormatter != null) 
             return byteFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
 
     protected String format(Character value) {
+    	if (value == null)
+            return nullValue;
         if (charFormatter != null) 
             return charFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
 
     protected String format(Short value) {
+    	if (value == null)
+            return nullValue;
         if (shortFormatter != null) 
             return shortFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
 
     protected String format(Integer value) {
+    	if (value == null)
+            return nullValue;
         if (intFormatter != null) 
             return intFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
     
     protected String format(Long value) {
+    	if (value == null)
+            return nullValue;
         if (longFormatter != null) 
             return longFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
     
     protected String format(Double value) {
+    	if (value == null)
+            return nullValue;
         if (doubleFormatter != null) 
             return doubleFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
     
     protected String format(Number value) {
+    	if (value == null)
+            return nullValue;
         if (numberFormatter != null) 
             return numberFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
     
     protected String format(Date value) {
+    	if (value == null)
+            return nullValue;
         if (dateFormatter != null) 
             return dateFormatter.format(value);
-        if (value == null)
-            return nullValue;
         return value.toString();
     }
     
