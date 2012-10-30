@@ -82,11 +82,15 @@ public class TemplateTest extends TestCase {
         context.put("mapbooklist", mapbooklist);
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
-        String[] configs = new String[] { "httl.properties", "httl-javassist.properties" };
+        String[] configs = new String[] { "httl.properties", "httl-javassist.properties", "httl-attribute.properties" };
         for (String config : configs) {
 	        System.out.println("========" + config + "========");
         	Engine engine = Engine.getEngine(config);
-	        File directory = new File(this.getClass().getClassLoader().getResource("templates/").getFile());
+        	String dir = engine.getProperty("template.directory");
+        	if (dir.length() > 0) {
+        		dir += "/";
+        	}
+	        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
 	        super.assertTrue(directory.isDirectory());
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
@@ -95,9 +99,9 @@ public class TemplateTest extends TestCase {
 	                continue;
 	            }*/
 	            System.out.println(file.getName());
-	            URL url = this.getClass().getClassLoader().getResource("results/" + file.getName());
+	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName());
 	            if (url == null) {
-	                throw new FileNotFoundException("Not found file: " + "results/" + file.getName());
+	                throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName());
 	            }
 	            File result = new File(url.getFile());
 	            if (! result.exists()) {

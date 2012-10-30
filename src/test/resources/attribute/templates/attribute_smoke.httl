@@ -1,0 +1,9 @@
+<html var="User user, Book[] books">
+  <body>
+    <table if="user.role == 'admin'">
+      <tr foreach="book in books">
+        <td>${book.title}</td>
+      </tr>
+    </table>
+  </body>
+</html>

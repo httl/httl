@@ -1,0 +1,14 @@
+<!--#var(User user, Book[] books)-->
+<html>
+  <body>
+    <!--#if(user.role == "admin")-->
+    <table>
+      <!--#foreach(book in books)-->
+      <tr>
+        <td>${book.title}</td>
+      </tr>
+      <!--#end-->
+    </table>
+    <!--#end-->
+  </body>
+</html>
