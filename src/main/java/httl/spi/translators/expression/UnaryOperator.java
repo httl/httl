@@ -73,10 +73,9 @@ public final class UnaryOperator extends Operator {
                     for (Class<?> function : functions) {
                         try {
                             Method method = ClassUtils.searchMethod(function, name, types);
-                            if (Object.class.equals(method.getDeclaringClass())) {
-                                break;
+                            if (! Object.class.equals(method.getDeclaringClass())) {
+                            	return method.getReturnType();
                             }
-                            return method.getReturnType();
                         } catch (NoSuchMethodException e) {
                         }
                     }

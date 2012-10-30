@@ -1,4 +1,5 @@
 <!--#var(User user, Book[] books, List<Book> booklist)-->
+${user.class.simpleName}
 ${user.name}
 ${user.role}
 ${user.isLogin}

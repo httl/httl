@@ -158,13 +158,12 @@ public final class BinaryOperator extends Operator {
                 for (Class<?> function : functions) {
                     try {
                         Method method = ClassUtils.searchMethod(function, name, allTypes);
-                        if (Object.class.equals(method.getDeclaringClass())) {
-                            break;
+                        if (! Object.class.equals(method.getDeclaringClass())) {
+                        	if (Modifier.isStatic(method.getModifiers())) {
+                            	return function.getName() + "." + method.getName() + "(" + allCode + ")";
+                            }
+                            return "_" + function.getName().replace('.', '_') + "." + method.getName() + "(" + allCode + ")";
                         }
-                        if (Modifier.isStatic(method.getModifiers())) {
-                        	return function.getName() + "." + method.getName() + "(" + allCode + ")";
-                        }
-                        return "_" + function.getName().replace('.', '_') + "." + method.getName() + "(" + allCode + ")";
                     } catch (NoSuchMethodException e) {
                     }
                 }
