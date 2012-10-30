@@ -82,7 +82,7 @@ public class DfaParser {
 		/*13.数点  */{ T, T, 3, T, T, T, T, T, T, T}, // 数字属性点号识别, 区分于小数点(如: 123.toString 或 11..15)
 	};
 	
-	private static final Set<String> BINARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "*", "/", "%", "==", "!=", ">", ">=", "<", "<=", "&&", "||", "&", "|", "^", ">>", "<<", ">>>", ",", "?", ":", "instanceof", "[", ".."}));
+	private static final Set<String> BINARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "*", "/", "%", "==", "!=", ">", ">=", "<", "<=", "gt", "ge", "lt", "le", "&&", "||", "&", "|", "^", ">>", "<<", ">>>", ",", "?", ":", "instanceof", "[", ".."}));
 	
 	private static final Set<String> UNARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "!", "~", "new", "["}));
 	
@@ -390,7 +390,9 @@ public class DfaParser {
             } else if ("true".equals(msg) || "false".equals(msg)) {
                 parameterStack.push(Boolean.parseBoolean(msg) ? Constant.TRUE : Constant.FALSE);
                 beforeOperator = false;
-            } else if (StringUtils.isNamed(msg)) {
+            } else if (StringUtils.isNamed(msg)
+            		&& ! "gt".equals(msg) && ! "ge".equals(msg) 
+            		&& ! "lt".equals(msg) && ! "le".equals(msg)) {
                 if (! parameterTypes.containsKey(msg)) {
                     throw new ParseException("Undefined variable \"" + msg + "\".", getTokenOffset(token) + offset);
                 }

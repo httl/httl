@@ -90,10 +90,11 @@ public final class BinaryOperator extends Operator {
                 && ((Operator) leftParameter).getPriority() < getPriority()) {
             leftCode = "(" + leftCode + ")";
         }
+        String name = getName();
         Map<String, Class<?>> types = getParameterTypes();
         String rightCode = rightParameter.getCode();
-        if (StringUtils.isFunction(getName())) {
-            String name =  getName().substring(1);
+        if (StringUtils.isFunction(name)) {
+            name =  name.substring(1);
             if ("to".equals(name) 
                     && rightParameter instanceof Constant
                     && rightParameter.getReturnType() == String.class
@@ -170,7 +171,7 @@ public final class BinaryOperator extends Operator {
             }
             Class<?> type = getReturnType();
             return "(" + leftCode + " == null ? (" + type.getCanonicalName() + ")" + ClassUtils.getInitCode(type) + " : " + getMethodName(leftType, name, rightTypes, leftCode, rightCode) + ")";
-        } else if (getName().equals("[")) {
+        } else if (name.equals("[")) {
             if (Map.class.isAssignableFrom(leftType)) {
                 if (leftParameter instanceof Variable) {
                     String var = ((Variable)leftParameter).getName();
@@ -207,7 +208,7 @@ public final class BinaryOperator extends Operator {
                 }
             }
             throw new ParseException("Unsuptorted \"[]\" for non-array type: " + leftType.getName(), getOffset());
-        } else if (getName().equals("..")) {
+        } else if (name.equals("..")) {
             if (leftType == int.class || leftType == Integer.class 
                     || leftType == short.class  || leftType == Short.class
                     || leftType == long.class || leftType == Long.class ) {
@@ -231,49 +232,58 @@ public final class BinaryOperator extends Operator {
             } else {
                 throw new ParseException("The operator \"..\" unsupported parameter type " + leftType, getOffset());
             }
-        } else if("==".equals(getName()) && ! "null".equals(leftCode) && ! "null".equals(rightCode)
+        } else if("==".equals(name) && ! "null".equals(leftCode) && ! "null".equals(rightCode)
                 && ! leftType.isPrimitive() && ! rightParameter.getReturnType().isPrimitive()) {
             return leftCode + ".equals(" + rightCode + ")";
-        } else if("!=".equals(getName()) && ! "null".equals(leftCode) && ! "null".equals(rightCode)
+        } else if("!=".equals(name) && ! "null".equals(leftCode) && ! "null".equals(rightCode)
                 && ! leftType.isPrimitive() && ! rightParameter.getReturnType().isPrimitive()) {
             return "(! " + leftCode + ".equals(" + rightCode + "))";
-        } else if("&&".equals(getName()) || "||".equals(getName())) {
+        } else if("&&".equals(name) || "||".equals(name)) {
             if (rightParameter instanceof Operator
                     && ((Operator) rightParameter).getPriority() < getPriority()) {
                 rightCode = "(" + rightCode + ")";
             }
             leftCode = StringUtils.getConditionCode(leftType, leftCode);
             rightCode = StringUtils.getConditionCode(rightParameter.getReturnType(), rightCode);
-            return leftCode + " " + getName() + " " + rightCode;
-        } else if (getName().equals("?")) {
+            return leftCode + " " + name + " " + rightCode;
+        } else if (name.equals("?")) {
             if (rightParameter instanceof Operator
                     && ((Operator) rightParameter).getPriority() < getPriority()) {
                 rightCode = "(" + rightCode + ")";
             }
             leftCode = StringUtils.getConditionCode(leftType, leftCode);
-            return leftCode + " " + getName() + " " + rightCode;
-        } else if("|".equals(getName()) 
+            return leftCode + " " + name + " " + rightCode;
+        } else if("|".equals(name) 
                 && ! leftType.isPrimitive()
                 && ! Number.class.isAssignableFrom(leftType)
                 && ! Boolean.class.isAssignableFrom(leftType)) {
             return "(" + ClassUtils.class.getName() + ".isNotEmpty(" + leftParameter.getCode() + ") ? (" + leftCode + ") : (" + rightCode + "))";
-        } else if (":".equals(getName()) 
+        } else if (":".equals(name) 
                 && ! (leftParameter instanceof BinaryOperator 
                         && "?".equals(((BinaryOperator)leftParameter).getName()))) {
             return "new " + MapEntry.class.getName() + "(" + leftCode + ", " + rightCode + ")";
         } else {
+        	if ("lt".equals(name)) {
+            	name = "<";
+            } else if ("le".equals(name)) {
+            	name = "<=";
+            } else if ("gt".equals(name)) {
+            	name = ">";
+            } else if ("ge".equals(name)) {
+            	name = ">=";
+            }
             if (leftType != null && Date.class.isAssignableFrom(leftType)) {
-                if ("<".equals(getName())) {
-                    return leftCode + ".before(" + rightCode + ")";
-                } else if ("<=".equals(getName())) {
-                    return "! " + leftCode + ".after(" + rightCode + ")";
-                } else if (">".equals(getName())) {
+                if (">".equals(name)) {
                     return leftCode + ".after(" + rightCode + ")";
-                } else if (">=".equals(getName())) {
+                } else if (">=".equals(name)) {
                     return "! " + leftCode + ".before(" + rightCode + ")";
+                } else if ("<".equals(name)) {
+                    return leftCode + ".before(" + rightCode + ")";
+                } else if ("<=".equals(name)) {
+                    return "! " + leftCode + ".after(" + rightCode + ")";
                 }
             }
-            if ("+".equals(getName())) {
+            if ("+".equals(name)) {
             	Class<?> rightType = rightParameter.getReturnType();
             	Class<?> type;
             	if (rightType.isPrimitive() && rightType != boolean.class) {
@@ -293,7 +303,7 @@ public final class BinaryOperator extends Operator {
 	            		rightCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + rightCode + ")";
 	            	}
             	}
-            } else if ("－".equals(getName()) || "＊".equals(getName()) || "／".equals(getName()) || "%".equals(getName())) {
+            } else if ("－".equals(name) || "＊".equals(name) || "／".equals(name) || "%".equals(name)) {
             	Class<?> rightType = rightParameter.getReturnType();
             	Class<?> type;
             	if (rightType.isPrimitive() && rightType != boolean.class) {
@@ -316,21 +326,24 @@ public final class BinaryOperator extends Operator {
                     && ((Operator) rightParameter).getPriority() < getPriority()) {
                 rightCode = "(" + rightCode + ")";
             }
-            return leftCode + " " + getName() + " " + rightCode;
+            return leftCode + " " + name + " " + rightCode;
         }
     }
     
     public Class<?> getReturnType() throws ParseException {
-        if (">".equals(getName()) || ">=".equals(getName()) 
-                || "<".equals(getName())|| "<=".equals(getName())
-                || "==".equals(getName())|| "!=".equals(getName())
-                || "&&".equals(getName())|| "||".equals(getName())) {
+    	String name = getName();
+        if (">".equals(name) || ">=".equals(name) 
+                || "<".equals(name)|| "<=".equals(name)
+                || "gt".equals(name) || "ge".equals(name)
+                || "lt".equals(name) || "le".equals(name)
+                || "==".equals(name)|| "!=".equals(name)
+                || "&&".equals(name)|| "||".equals(name)) {
             return boolean.class;
         }
         Map<String, Class<?>> types = getParameterTypes();
     	Class<?> leftType = leftParameter.getReturnType();
-        if (StringUtils.isFunction(getName())) {
-            String name =  getName().substring(1);
+        if (StringUtils.isFunction(name)) {
+            name =  name.substring(1);
             if ("to".equals(name) 
                     && rightParameter instanceof Constant
                     && rightParameter.getReturnType() == String.class) {
@@ -400,8 +413,8 @@ public final class BinaryOperator extends Operator {
                     }
                 }
             }
-            return getReturnType(leftType, getName().substring(1), rightTypes);
-        } else if (getName().equals("..")) {
+            return getReturnType(leftType, name, rightTypes);
+        } else if ("..".equals(name)) {
             if (leftType == int.class || leftType == Integer.class 
                     || leftType == short.class  || leftType == Short.class
                     || leftType == long.class || leftType == Long.class ) {
@@ -413,7 +426,7 @@ public final class BinaryOperator extends Operator {
             } else {
                 throw new ParseException("The operator \"..\" unsupported parameter type " + leftType, getOffset());
             }
-        } else if ("[".equals(getName())) {
+        } else if ("[".equals(name)) {
             if (Map.class.isAssignableFrom(leftType)) {
                 if (leftParameter instanceof Variable) {
                     String var = ((Variable)leftParameter).getName();
@@ -450,13 +463,13 @@ public final class BinaryOperator extends Operator {
                 }
             }
             throw new ParseException("Unsuptorted \"[]\" for non-array type: " + leftType.getName(), getOffset());
-        } else if ("?".equals(getName())) {
+        } else if ("?".equals(name)) {
             return rightParameter.getReturnType();
-        } else if (":".equals(getName()) 
+        } else if (":".equals(name) 
                 && ! (leftParameter instanceof BinaryOperator 
                         && "?".equals(((BinaryOperator)leftParameter).getName()))) {
             return Map.Entry.class;
-        } else if ("+".equals(getName())) {
+        } else if ("+".equals(name)) {
         	Class<?> rightType = rightParameter.getReturnType();
         	if (rightType.isPrimitive() && rightType != boolean.class) {
         		return rightType;
@@ -465,7 +478,7 @@ public final class BinaryOperator extends Operator {
         	} else {
         		return String.class;
         	}
-        } else if ("－".equals(getName()) || "＊".equals(getName()) || "／".equals(getName()) || "%".equals(getName())) {
+        } else if ("－".equals(name) || "＊".equals(name) || "／".equals(name) || "%".equals(name)) {
         	Class<?> rightType = rightParameter.getReturnType();
         	if (rightType.isPrimitive() && rightType != boolean.class) {
         		return rightType;

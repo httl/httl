@@ -39,13 +39,13 @@ public class Books {
         writer.write(user.getName());
         writer.write("/");
         writer.write(user.getRole());
-        writer.write("<br/>\r\n");
+        writer.write("<br/>\r\n\r\n");
         if (user.getRole().equals("admin")) {
-        writer.write("<table>\r\n  <tr>\r\n    <th>NO.</th>\r\n    <th>Title</th>\r\n    <th>Author</th>\r\n    <th>Publisher</th>\r\n    <th>PublicationDate</th>\r\n    <th>Price</th>\r\n    <th>DiscountPercent</th>\r\n    <th>DiscountPrice</th>\r\n  </tr>\r\n  ");
+        writer.write("<table>\r\n  <tr>\r\n    <th>NO.</th>\r\n    <th>Title</th>\r\n    <th>Author</th>\r\n    <th>Publisher</th>\r\n    <th>PublicationDate</th>\r\n    <th>Price</th>\r\n    <th>DiscountPercent</th>\r\n    <th>DiscountPrice</th>\r\n  </tr>\r\n  \r\n");
         int count = 1;
         for (Book book : books) {
         if (book.getPrice() > 0) {
-        writer.write("<tr>\r\n    <td>");
+        writer.write("  \r\n  <tr>\r\n    <td>");
         writer.write(String.valueOf(count ++));
         writer.write("</td>\r\n    <td>");
         writer.write(book.getTitle());
@@ -61,10 +61,10 @@ public class Books {
         writer.write(String.valueOf(book.getDiscount()));
         writer.write("%</td>\r\n    <td>");
         writer.write(String.valueOf(book.getPrice() * book.getDiscount() / 100));
-        writer.write("</td>\r\n  </tr>");
+        writer.write("</td>\r\n  </tr>\r\n  \r\n  \r\n");
         }
         }
-        writer.write("\r\n</table>\r\n");
+        writer.write("</table>\r\n\r\n");
         }
         writer.write("</body>\r\n</html>");
     }

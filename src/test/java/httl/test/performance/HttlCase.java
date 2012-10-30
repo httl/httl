@@ -31,7 +31,7 @@ public class HttlCase implements Case {
 
     public void count(String name, Map<String, Object> context, Writer writer, Writer ignore, int times, Counter counter) throws Exception {
         counter.beginning();
-        Engine engine = Engine.getEngine();
+        Engine engine = Engine.getEngine("httl-performance.properties");
         counter.initialized();
         Template template = engine.getTemplate("performance/" + name + ".httl");
         counter.compiled();
