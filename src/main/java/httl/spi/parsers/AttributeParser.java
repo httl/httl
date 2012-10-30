@@ -49,17 +49,17 @@ import net.htmlparser.jericho.Source;
  */
 public class AttributeParser extends AbstractParser {
 
-    protected String doParse(Resource resource, String reader, Translator translator, 
+    protected String doParse(Resource resource, boolean stream, String reader, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
                              Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
         Source source = new Source(reader);
         OutputDocument document = new OutputDocument(source);
-        parseAttribute(resource, source, source, document, translator, parameters, parameterTypes, variables, types, macros);
+        parseAttribute(resource, stream, source, source, document, translator, parameters, parameterTypes, variables, types, macros);
         return document.toString();
     }
 
     // 替换子元素中的指令属性
-    private void parseAttribute(Resource resource, Source source, 
+    private void parseAttribute(Resource resource, boolean stream, Source source, 
                                  Segment segment, OutputDocument document, 
                                  Translator translator, 
                                  List<String> parameters, List<Class<?>> parameterTypes, 
@@ -126,7 +126,7 @@ public class AttributeParser extends AbstractParser {
                 es = es.substring(0, macro.getBegin() - 1 - element.getBegin()) 
                     + (param == null || param.length() == 0 ? "" : " in=\"" + param + "\"")
                     + es.substring(macro.getEnd() - element.getBegin()); // 去掉macro属性
-                macros.put(var, parseClass(new StringResource(engine, key, resource.getEncoding(), resource.getLastModified(), es)));
+                macros.put(var, parseClass(new StringResource(engine, key, resource.getEncoding(), resource.getLastModified(), es), stream));
                 Class<?> cls = types.get(var);
                 if (cls != null && ! cls.equals(Template.class)) {
                     throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macro.getBegin());
@@ -175,7 +175,7 @@ public class AttributeParser extends AbstractParser {
                 String end = ends.pop();
                 document.insert(element.getEnd(), LEFT + end + RIGHT); // 插入结束指令
             }
-            parseAttribute(resource, source, element, document, translator, parameters, parameterTypes, variables, types, macros); // 递归处理子标签
+            parseAttribute(resource, stream, source, element, document, translator, parameters, parameterTypes, variables, types, macros); // 递归处理子标签
         }
     }
     

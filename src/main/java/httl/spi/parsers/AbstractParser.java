@@ -27,6 +27,7 @@ import httl.spi.Logger;
 import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.spi.parsers.template.AbstractTemplate;
+import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.spi.parsers.template.ForeachStatus;
 import httl.spi.parsers.template.OrderedTypeMap;
 import httl.spi.parsers.template.OutputStreamTemplate;
@@ -170,11 +171,13 @@ public abstract class AbstractParser implements Parser {
     
     protected static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
     
-    protected boolean isOutputStream = false;
+    protected boolean isOutputStream;
 
-    protected boolean sourceInClass = false;
+    protected boolean isOutputWriter;
 
-	protected boolean textInClass = false;
+    protected boolean sourceInClass;
+
+	protected boolean textInClass;
 	
 	protected String outputEncoding;
 	
@@ -218,6 +221,10 @@ public abstract class AbstractParser implements Parser {
 	
 	public void setOutputStream(boolean outputStream) {
 		this.isOutputStream = outputStream;
+	}
+	
+	public void setOutputWriter(boolean outputWriter) {
+		this.isOutputWriter = outputWriter;
 	}
 
     public void setSourceInClass(boolean sourceInClass) {
@@ -276,22 +283,38 @@ public abstract class AbstractParser implements Parser {
         }
     }
 
-    protected abstract String doParse(Resource resoure, String source, Translator translator, 
+    protected abstract String doParse(Resource resoure, boolean stream, String source, Translator translator, 
                                       List<String> parameters, List<Class<?>> parameterTypes, 
                                       Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException;
 
     public Template parse(Resource resource) throws IOException, ParseException {
-    	Class<?> clazz = parseClass(resource);
-        try {
-			return (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
-					.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
-		} catch (Exception e) {
+    	try {
+    		Template writerTemplate = null;
+	    	Template streamTemplate = null;
+	    	if (isOutputWriter || ! isOutputStream) {
+	    		Class<?> clazz = parseClass(resource, false);
+	        	writerTemplate = (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
+	    	}
+	    	if (isOutputStream) {
+	    		Class<?> clazz = parseClass(resource, true);
+	    		streamTemplate = (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
+	    	}
+	    	if (writerTemplate != null && streamTemplate != null) {
+	    		return new AdaptiveTemplate(writerTemplate, streamTemplate);
+	    	} else if (streamTemplate != null) {
+	    		return streamTemplate;
+	    	} else {
+	    		return writerTemplate;
+	    	}
+    	} catch (Exception e) {
 			throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
 		}
     }
     
-    protected Class<?> parseClass(Resource resource) throws IOException, ParseException {
-        String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified()).replaceAll("_");
+    protected Class<?> parseClass(Resource resource, boolean stream) throws IOException, ParseException {
+        String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified() + "_for_" + (stream ? "stream" : "writer")).replaceAll("_");
         try {
             return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
@@ -314,8 +337,8 @@ public abstract class AbstractParser implements Parser {
             src = filterCData(src);
             src = filterComment(src);
             src = filterEscape(src);
-            src = doParse(resource, src, translator, parameters, parameterTypes, variables, types, macros);
-            String code = filterStatement(src, textFilter, translator, textFields, textInits, types, new AtomicInteger());
+            src = doParse(resource, stream, src, translator, parameters, parameterTypes, variables, types, macros);
+            String code = filterStatement(src, textFilter, translator, textFields, textInits, types, new AtomicInteger(), stream);
             int i = name.lastIndexOf('.');
             String packageName = i < 0 ? "" : name.substring(0, i);
             String className = i < 0 ? name : name.substring(i + 1);
@@ -385,7 +408,7 @@ public abstract class AbstractParser implements Parser {
                     + "\n"
                     + imports.toString()
                     + "\n"
-                    + "public final class " + className + " extends " + (isOutputStream ? OutputStreamTemplate.class.getName() : WriterTemplate.class.getName()) + " {\n" 
+                    + "public final class " + className + " extends " + (stream ? OutputStreamTemplate.class.getName() : WriterTemplate.class.getName()) + " {\n" 
                     + "\n"
                     + textFields
                     + "\n"
@@ -403,7 +426,7 @@ public abstract class AbstractParser implements Parser {
                     + "}\n"
                     + "\n"
                     + "protected void doRender(" + Map.class.getName() + " $parameters, " 
-                    + (isOutputStream ? OutputStream.class.getName() : Writer.class.getName())
+                    + (stream ? OutputStream.class.getName() : Writer.class.getName())
                     + " $output) throws " + Exception.class.getName() + " {\n" 
                     + methodCode
                     + "}\n"
@@ -542,7 +565,7 @@ public abstract class AbstractParser implements Parser {
         return buf.toString();
     }
     
-    protected String filterStatement(String message, Filter filter, Translator translator, StringBuilder textFields, StringBuilder textInits, Map<String, Class<?>> types, AtomicInteger seq) throws ParseException {
+    protected String filterStatement(String message, Filter filter, Translator translator, StringBuilder textFields, StringBuilder textInits, Map<String, Class<?>> types, AtomicInteger seq, boolean stream) throws ParseException {
         int offset = 0;
         message = RIGHT + message + LEFT;
         StringBuffer buf = new StringBuffer();
@@ -561,7 +584,7 @@ public abstract class AbstractParser implements Parser {
                 }
                 matcher.appendReplacement(buf, "" + next);
             } else {
-                matcher.appendReplacement(buf, Matcher.quoteReplacement("$output.write(" + filterExpression(text, filter, translator, textFields, textInits, types, offset, seq) + ");\n" + next));
+                matcher.appendReplacement(buf, Matcher.quoteReplacement("$output.write(" + filterExpression(text, filter, translator, textFields, textInits, types, offset, seq, stream) + ");\n" + next));
             }
             if (text != null) {
                 offset += text.length();
@@ -572,7 +595,7 @@ public abstract class AbstractParser implements Parser {
         return buf.toString().replace("$output.write();\n", "");
     }
     
-    protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, StringBuilder textInits, Map<String, Class<?>> types, int offset, AtomicInteger seq) throws ParseException {
+    protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, StringBuilder textInits, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream) throws ParseException {
         if (message == null || message.length() == 0) {
             return "";
         }
@@ -586,11 +609,11 @@ public abstract class AbstractParser implements Parser {
             if (! "$!".equals(matcher.group(1))) {
                 expression = "filter(" + expression + ")";
             }
-            if (isOutputStream) {
+            if (stream) {
                 expression = "serialize(" + expression + ")";
             }
             String txt = message.substring(last, matcher.start());
-            appendText(buf, txt, filter, textFields, textInits, seq);
+            appendText(buf, txt, filter, textFields, textInits, seq, stream);
             buf.append(");\n$output.write(" + expression + ");\n$output.write(");
             last = matcher.end();
         }
@@ -602,18 +625,18 @@ public abstract class AbstractParser implements Parser {
         } else {
             txt = null;
         }
-        appendText(buf, txt, filter, textFields, textInits, seq);
+        appendText(buf, txt, filter, textFields, textInits, seq, stream);
         return buf.toString();
     }
     
-    private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder textFields, StringBuilder textInits, AtomicInteger seq) {
+    private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder textFields, StringBuilder textInits, AtomicInteger seq, boolean stream) {
         if (txt != null && txt.length() > 0) {
             txt = txt.replace(POUND_SPECIAL, POUND);
             txt = txt.replace(DOLLAR_SPECIAL, DOLLAR);
             txt = filter.filter(txt);
             if (txt != null && txt.length() > 0) {
                 String var = "$TXT" + seq.incrementAndGet();
-                if (isOutputStream) {
+                if (stream) {
                 	if (textInClass) {
                 		textFields.append("private static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(StringUtils.toBytes(txt, outputEncoding)) + "};\n");
                 	} else {

@@ -77,11 +77,11 @@ public class MultiParser extends AbstractParser {
         }
     }
 
-    protected String doParse(Resource resource, String source, Translator translator, 
+    protected String doParse(Resource resource, boolean stream, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
                              Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
         for (AbstractParser parser : parsers) {
-            source = parser.doParse(resource, source, translator, parameters, parameterTypes, variables, types, macros);
+            source = parser.doParse(resource, stream, source, translator, parameters, parameterTypes, variables, types, macros);
         }
         return source;
     }

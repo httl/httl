@@ -51,13 +51,13 @@ public class CommentParser extends AbstractParser {
         return "<!--#" + name + "(" + value + ")-->";
     }
     
-    protected String doParse(Resource resource, String source, Translator translator, 
+    protected String doParse(Resource resource, boolean stream, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
                              Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
-        return parseComment(resource, source, translator, parameters, parameterTypes, variables, types, macros);
+        return parseComment(resource, stream, source, translator, parameters, parameterTypes, variables, types, macros);
     }
     
-    public String parseComment(Resource resource, String source, Translator translator, List<String> parameters,
+    public String parseComment(Resource resource, boolean stream, String source, Translator translator, List<String> parameters,
                                 List<Class<?>> parameterTypes, Set<String> variables, 
                                 Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
         LinkedStack<String> nameStack = new LinkedStack<String>();
@@ -112,7 +112,7 @@ public class CommentParser extends AbstractParser {
                         if (param != null && param.length() > 0) {
                             es = getDiretive(varName, param) + es;
                         }
-                        macros.put(var, parseClass(new StringResource(engine, key, resource.getEncoding(), resource.getLastModified(), es)));
+                        macros.put(var, parseClass(new StringResource(engine, key, resource.getEncoding(), resource.getLastModified(), es), stream));
                         Class<?> cls = types.get(var);
                         if (cls != null && ! cls.equals(Template.class)) {
                             throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macroParameterStart);
