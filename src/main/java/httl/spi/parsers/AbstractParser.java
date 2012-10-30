@@ -476,7 +476,7 @@ public abstract class AbstractParser implements Parser {
     protected String toTypeCode(Map<String, Class<?>> types) {
     	StringBuilder buf = new StringBuilder("	" + Map.class.getName() + " types = " + "new " + HashMap.class.getName() + "();\n");
     	for (Map.Entry<String, Class<?>> entry : types.entrySet()) {
-    		buf.append("	types.put(\"" + entry.getKey() + "\", " + entry.getValue().getName() + ".class);");
+    		buf.append("	types.put(\"" + entry.getKey() + "\", " + entry.getValue().getName() + ".class);\n");
     	}
     	buf.append("	return " + Collections.class.getName() + ".unmodifiableMap(types);\n");
     	return buf.toString();

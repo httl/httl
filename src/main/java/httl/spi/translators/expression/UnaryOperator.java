@@ -104,7 +104,7 @@ public final class UnaryOperator extends Operator {
             String name = getName().substring(1);
             Class<?> t = getParameterTypes().get(name);
             if (t != null && Template.class.isAssignableFrom(t)) {
-                return name + ".render(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object[] {" + parameter.getCode()+ "}))";
+                return name + ".render(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " ))";
             } else {
                 Class<?>[] types = parameter.getReturnTypes();
                 Collection<Class<?>> functions = getFunctions();

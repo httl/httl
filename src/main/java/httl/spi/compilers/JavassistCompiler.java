@@ -52,13 +52,16 @@ public class JavassistCompiler extends AbstractCompiler {
     private static final Pattern METHODS_PATTERN = Pattern.compile("\n(private|public|protected)\\s+");
 
     private static final Pattern FIELD_PATTERN = Pattern.compile("[^\n]+=[^\n]+;");
+    
+    private ClassPool pool = ClassPool.getDefault();
+    {
+    	pool.appendClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
+    }
 
     @Override
     public Class<?> doCompile(String name, String source) throws Throwable {
         int i = name.lastIndexOf('.');
         String className = i < 0 ? name : name.substring(i + 1);
-        ClassPool pool = new ClassPool(true);
-        pool.appendClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
         Matcher matcher = IMPORT_PATTERN.matcher(source);
         List<String> importPackages = new ArrayList<String>();
         Map<String, String> fullNames = new HashMap<String, String>();
@@ -114,7 +117,7 @@ public class JavassistCompiler extends AbstractCompiler {
             if (method.length() > 0) {
                 if (method.startsWith(className)) {
                     cls.addConstructor(CtNewConstructor.make("public " + method, cls));
-                } else if (FIELD_PATTERN.matcher(method).matches()) {
+                } else if (method.indexOf('{') < 0 || FIELD_PATTERN.matcher(method).matches()) {
                     cls.addField(CtField.make("private " + method, cls));
                 } else {
                     cls.addMethod(CtNewMethod.make("public " + method, cls));

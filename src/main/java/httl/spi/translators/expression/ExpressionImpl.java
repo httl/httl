@@ -137,7 +137,7 @@ public class ExpressionImpl implements Expression {
         String className = (Evaluator.class.getSimpleName() + "_" + sequence.incrementAndGet());
         String sourceCode = "package " + Evaluator.class.getPackage().getName() + ";\n" 
                 + imports.toString()
-                + "public class " + className + " implements " + Evaluator.class.getSimpleName() + " {\n" 
+                + "public class " + className + " implements " + Evaluator.class.getName() + " {\n" 
                 + funtionFileds
                 + "public " + className + "(Map functions) {\n"
                 + functionInits
