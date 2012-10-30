@@ -14,7 +14,7 @@ ${user.name}/${user.role}<br/>
     <th>DiscountPrice</th>
   </tr>
   <!--#foreach(book in books)-->
-  <!--#if(book.price < 0)-->
+  <!--#if(book.price > 0)-->
   <tr>
     <td>${foreach.count}</td>
     <td>${book.title}</td>
