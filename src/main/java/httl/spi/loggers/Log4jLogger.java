@@ -32,46 +32,52 @@ public class Log4jLogger implements Logger, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final org.apache.log4j.Logger logger = LogManager.getLogger(NAME);
+	private final org.apache.log4j.Logger logger = LogManager.getLogger(NAME);
+
+	private String FQCN = Log4jLogger.class.getName();
+
+	public void setLogger(String name) {
+		this.FQCN = name;
+	}
 
 	public void trace(String msg) {
-		logger.trace(msg);
+		logger.log(FQCN, Level.TRACE, msg, null);
 	}
 
 	public void trace(String msg, Throwable e) {
-		logger.trace(msg, e);
+		logger.log(FQCN, Level.TRACE, msg, e);
 	}
 
 	public void debug(String msg) {
-		logger.debug(msg);
+		logger.log(FQCN, Level.DEBUG, msg, null);
 	}
 
 	public void debug(String msg, Throwable e) {
-		logger.debug(msg, e);
+		logger.log(FQCN, Level.DEBUG, msg, e);
 	}
 
 	public void info(String msg) {
-		logger.info(msg);
+		logger.log(FQCN, Level.INFO, msg, null);
 	}
 
 	public void info(String msg, Throwable e) {
-		logger.info(msg, e);
+		logger.log(FQCN, Level.INFO, msg, e);
 	}
 
 	public void warn(String msg) {
-		logger.warn(msg);
+		logger.log(FQCN, Level.WARN, msg, null);
 	}
 
 	public void warn(String msg, Throwable e) {
-		logger.warn(msg, e);
+		logger.log(FQCN, Level.WARN, msg, e);
 	}
 
 	public void error(String msg) {
-		logger.error(msg);
+		logger.log(FQCN, Level.ERROR, msg, null);
 	}
 
 	public void error(String msg, Throwable e) {
-		logger.error(msg, e);
+		logger.log(FQCN, Level.ERROR, msg, e);
 	}
 
 	public boolean isTraceEnabled() {
@@ -87,15 +93,11 @@ public class Log4jLogger implements Logger, Serializable {
 	}
 
 	public boolean isWarnEnabled() {
-		return logger.getLevel() == null || logger.getLevel().toInt() >= Level.WARN_INT;
+		return logger.isEnabledFor(Level.WARN);
 	}
-
+	
 	public boolean isErrorEnabled() {
-		return logger.getLevel() == null || logger.getLevel().toInt() >= Level.ERROR_INT;
-	}
-
-	public boolean isFatalEnabled() {
-		return logger.getLevel() == null || logger.getLevel().toInt() >= Level.FATAL_INT;
+	    return logger.isEnabledFor(Level.ERROR);
 	}
 
 }
