@@ -21,6 +21,9 @@ import java.util.Map;
 /**
  * Context. (API, ThreadLocal, ThreadSafe)
  * 
+ * @see httl.Template#render(Map)
+ * @see httl.Template#render(Map, java.io.Writer)
+ * @see httl.Template#render(Map, java.io.OutputStream)
  * @see httl.spi.parsers.template.WriterTemplate#render(Map, java.io.Writer)
  * @see httl.spi.parsers.template.OutputStreamTemplate#render(Map, java.io.OutputStream)
  * 
@@ -93,6 +96,7 @@ public final class Context {
     /**
      * Get parent context.
      * 
+     * @see #getContext()
      * @return parent context.
      */
     public Context getParent() {

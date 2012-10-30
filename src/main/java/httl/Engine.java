@@ -30,6 +30,11 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Engine. (API, Singleton, ThreadSafe)
  * 
+ * @see httl.Template#getEngine()
+ * @see httl.Resource#getEngine()
+ * @see httl.Expression#getEngine()
+ * @see httl.spi.engines.DefaultEngine
+ * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class Engine {
@@ -112,6 +117,7 @@ public abstract class Engine {
     /**
      * Get config value.
      * 
+     * @see #getEngine()
      * @param key config key.
      * @return config value.
      */
@@ -123,6 +129,7 @@ public abstract class Engine {
     /**
      * Get config value.
      * 
+     * @see #getEngine()
      * @param key config key.
      * @param defaultValue default value.
      * @return config value
@@ -135,6 +142,7 @@ public abstract class Engine {
     /**
      * Get expression.
      * 
+     * @see #getEngine()
      * @param source
      * @return expression.
      * @throws ParseException
@@ -146,6 +154,7 @@ public abstract class Engine {
     /**
      * Get expression.
      * 
+     * @see #getEngine()
      * @param source
      * @param parameterTypes
      * @return expression.
@@ -158,6 +167,7 @@ public abstract class Engine {
     /**
      * Get expression.
      * 
+     * @see #getEngine()
      * @param source
      * @param parameterTypes
      * @return template resource.
@@ -180,6 +190,7 @@ public abstract class Engine {
     /**
      * Get template resource.
      * 
+     * @see #getEngine()
      * @param name
      * @param encoding
      * @return template resource.
@@ -191,6 +202,7 @@ public abstract class Engine {
     /**
      * Get template.
      * 
+     * @see #getEngine()
      * @param name
      * @return template
      * @throws IOException
@@ -203,6 +215,7 @@ public abstract class Engine {
     /**
      * Get template.
      * 
+     * @see #getEngine()
      * @param name
      * @param encoding
      * @return template

@@ -27,6 +27,8 @@ import java.util.Map;
  * 
  * @see httl.Engine#getTemplate(String)
  * @see httl.Engine#getTemplate(String, String)
+ * @see httl.Context#getTemplate()
+ * @see httl.spi.Parser#parse(Resource)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -35,6 +37,7 @@ public interface Template extends Resource {
     /**
      * Render the template to a string.
      * 
+     * @see httl.Context#getParameters()
      * @param parameters - parameters
      * @return Template render result
      */
@@ -43,6 +46,7 @@ public interface Template extends Resource {
     /**
      * Render the template to output stream.
      * 
+     * @see httl.Context#getParameters()
      * @param parameters - parameters
      * @param output - output stream
      * @throws IOException Failed to output
@@ -52,6 +56,7 @@ public interface Template extends Resource {
     /**
      * Render the template to writer.
      * 
+     * @see httl.Context#getParameters()
      * @param parameters - parameters
      * @param writer - writer
      * @throws IOException Failed to writer
