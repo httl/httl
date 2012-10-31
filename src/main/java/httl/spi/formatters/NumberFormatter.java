@@ -17,10 +17,9 @@
 package httl.spi.formatters;
 
 import httl.spi.Formatter;
+import httl.util.NumberUtils;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
 
 /**
  * NumberFormatter. (SPI, Singleton, ThreadSafe)
@@ -39,10 +38,7 @@ public class NumberFormatter implements Formatter<Number> {
 	}
 
     public String format(Number value) {
-        if (numberFormat == null || numberFormat == null) {
-            return NumberFormat.getNumberInstance().format(value);
-        }
-        return new DecimalFormat(numberFormat).format(value);
+        return NumberUtils.format(value, numberFormat);
     }
 
 }

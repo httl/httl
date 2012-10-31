@@ -48,7 +48,7 @@ public class NumberUtils {
         return formatter;
     }
     
-    public static String formatNumber(Number value, String format) {
+    public static String format(Number value, String format) {
         return getDecimalFormat(format).format(value);
     }
     

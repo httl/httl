@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -50,6 +51,8 @@ public class DefaultMethod {
 
     private Engine engine;
 
+    private TimeZone timeZone;
+
     private String dateFormat;
 
     private String numberFormat;
@@ -60,6 +63,10 @@ public class DefaultMethod {
 
     public void setEngine(Engine engine) {
         this.engine = engine;
+    }
+
+    public void setTimeZone(String timeZone) {
+    	this.timeZone = TimeZone.getTimeZone(timeZone);
     }
 
     public void setDateFormat(String dateFormat) {
@@ -287,7 +294,7 @@ public class DefaultMethod {
 
     public Date toDate(String value) {
         try {
-            return value == null || value.length() == 0 ? null : DateUtils.parse(value, dateFormat);
+            return value == null || value.length() == 0 ? null : DateUtils.parse(value, dateFormat, timeZone);
         } catch (Exception e) {
             try {
                 return DateUtils.parse(value, "yyyy-MM-dd");
@@ -297,16 +304,24 @@ public class DefaultMethod {
         }
     }
 
-    public static Date toDate(String value, String format) {
-        return value == null || value.length() == 0 ? null : DateUtils.parse(value, format);
+    public Date toDate(String value, String format) {
+        return value == null || value.length() == 0 ? null : DateUtils.parse(value, format, timeZone);
+    }
+
+    public static Date toDate(String value, String format, String timeZone) {
+        return value == null || value.length() == 0 ? null : DateUtils.parse(value, format, timeZone == null ? null : TimeZone.getTimeZone(timeZone));
     }
 
     public String toString(Date value) {
-        return value == null ? null : DateUtils.format(value, dateFormat);
+        return value == null ? null : DateUtils.format(value, dateFormat, timeZone);
     }
 
-    public static String format(Date value, String format) {
-        return value == null ? null : DateUtils.format(value, format);
+    public String format(Date value, String format) {
+        return value == null ? null : DateUtils.format(value, format, timeZone);
+    }
+
+    public static String format(Date value, String format, String timeZone) {
+        return value == null ? null : DateUtils.format(value, format, timeZone == null ? null : TimeZone.getTimeZone(timeZone));
     }
 
     public static String toString(boolean value) {
@@ -370,7 +385,7 @@ public class DefaultMethod {
     }
 
     public static String format(Number value, String format) {
-        return value == null ? null : NumberUtils.formatNumber(value, format);
+        return value == null ? null : NumberUtils.format(value, format);
     }
 
     public static Cycle toCycle(Collection<?> values) {

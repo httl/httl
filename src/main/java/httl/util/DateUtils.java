@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * DateUtils. (Tool, Static, ThreadSafe)
@@ -29,12 +30,12 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DateUtils {
-    
+
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private static final ThreadLocal<Map<String, SimpleDateFormat>> LOCAL = new ThreadLocal<Map<String, SimpleDateFormat>>();
 
-    public static DateFormat getDateFormat(String format) {
+    public static DateFormat getDateFormat(String format, TimeZone timeZone) {
         if (format == null || format.length() == 0) {
             format = DEFAULT_FORMAT;
         }
@@ -43,25 +44,40 @@ public class DateUtils {
             formatters= new HashMap<String, SimpleDateFormat>();
             LOCAL.set(formatters);
         }
-        SimpleDateFormat formatter = formatters.get(format);
+        String key = format;
+        if (timeZone != null) {
+        	key += timeZone.getID();
+        }
+        SimpleDateFormat formatter = formatters.get(key);
         if (formatter == null) {
             formatter = new SimpleDateFormat(format);
-            formatters.put(format, formatter);
+            if (timeZone != null) {
+            	formatter.setTimeZone(timeZone);
+            }
+            formatters.put(key, formatter);
         }
         return formatter;
     }
-    
+
     public static String format(Date value) {
-    	return format(value, DEFAULT_FORMAT);
+    	return format(value, DEFAULT_FORMAT, null);
     }
-    
+
     public static String format(Date value, String format) {
-        return getDateFormat(format).format(value);
+        return format(value, format, null);
     }
-    
+
     public static Date parse(String value, String format) {
+        return parse(value, format, null);
+    }
+
+    public static String format(Date value, String format, TimeZone timeZone) {
+        return getDateFormat(format, timeZone).format(value);
+    }
+
+    public static Date parse(String value, String format, TimeZone timeZone) {
         try {
-            return getDateFormat(format).parse(value);
+            return getDateFormat(format, timeZone).parse(value);
         } catch (ParseException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }

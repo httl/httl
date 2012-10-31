@@ -21,7 +21,7 @@ import httl.util.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.TimeZone;
 
 /**
  * DateFormatter. (SPI, Singleton, ThreadSafe)
@@ -31,16 +31,22 @@ import java.util.Date;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DateFormatter implements Formatter<Date> {
-    
+
     private String dateFormat;
-    
+
+    private TimeZone timeZone;
+
     public void setDateFormat(String dateFormat) {
     	new SimpleDateFormat(dateFormat).format(new Date());
 		this.dateFormat = dateFormat;
 	}
 
-	public String format(Date value) {
-        return DateUtils.format(value, dateFormat);
+    public void setTimeZone(String timeZone) {
+    	this.timeZone = TimeZone.getTimeZone(timeZone);
     }
-    
+
+	public String format(Date value) {
+        return DateUtils.format(value, dateFormat, timeZone);
+    }
+
 }

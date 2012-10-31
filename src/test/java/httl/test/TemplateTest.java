@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import junit.framework.TestCase;
@@ -53,6 +54,7 @@ public class TemplateTest extends TestCase {
     @Test
     public void testTemplate() throws Exception {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        format.setTimeZone(TimeZone.getTimeZone("+0"));
         User user = new User("liangfei", "admin", "Y");
         Book[] books = new Book[10];
         books[0] = new Book("Practical API Design", "Jaroslav Tulach", "Apress", format.parse("2008-07-29"), 75, 85);

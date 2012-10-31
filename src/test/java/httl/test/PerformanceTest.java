@@ -36,12 +36,13 @@ public class PerformanceTest {
         context.put("books", books);
         Case[] cases = new Case[] {new FreemarkerCase(), new VelocityCase(), new Smarty4jCase(), new HttlCase(), new JavaCase()};
         for (int i = 0; i < cases.length; i ++) {
-            System.out.println("=============");
-            Case c = cases[i];
+        	Case c = cases[i];
+        	String name = c.getClass().getSimpleName().replace("Case", "");
+            System.out.println("========" + name.toLowerCase() + "========");
             Counter counter = new Counter();
             StringWriter writer = new StringWriter();
             c.count("books", new HashMap<String, Object>(context), writer, new IgnoredWriter(), times, counter);
-            System.out.println(c.getClass().getSimpleName().replace("Case", "") + ": " +
+            System.out.println(name + ": " +
             		"initialize: " + counter.getInitialized() + "ms, " +
             		"compile: " + counter.getCompiled() + "ms, " +
             		"first: " + counter.getExecuted() + "ms/" + writer.getBuffer().length() + "b, " +
