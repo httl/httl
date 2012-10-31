@@ -43,7 +43,7 @@ public abstract class Engine {
 
     private static final String HTTL_PROPERTIES = "httl.properties";
 
-    // The engine singleton cache
+    // The engine singletons cache
     private static final ConcurrentMap<String, VolatileReference<Engine>> ENGINES = new ConcurrentHashMap<String, VolatileReference<Engine>>();
 
     // The engine configuration properties
@@ -178,6 +178,7 @@ public abstract class Engine {
     /**
      * Get template resource.
      * 
+     * @see #getEngine()
      * @param name
      * @return template resource.
      * @throws IOException
