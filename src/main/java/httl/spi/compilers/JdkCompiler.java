@@ -76,6 +76,9 @@ public class JdkCompiler extends AbstractCompiler {
         options = new ArrayList<String>();
         options.add("-target");
         options.add("1.6");
+        if (compiler == null) {
+        	throw new IllegalStateException("Can not get system java compiler. Please add jdk tools.jar to your classpath.");
+        }
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         if (loader instanceof URLClassLoader 
