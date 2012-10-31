@@ -1,7 +1,7 @@
 <html>
 <body>
 ${user.name}/${user.role}<br/>
-<%if(user.role == "admin") {%>
+<%if(user.role == "admin"){%>
 <table>
   <tr>
     <th>NO.</th>
@@ -13,8 +13,8 @@ ${user.name}/${user.role}<br/>
     <th>DiscountPercent</th>
     <th>DiscountPrice</th>
   </tr>
-  <%for(book in books) { %>
-  <%if(book.price > 0) {%>
+  <%for(book in books){%>
+  <%if(book.price > 0){%>
   <tr>
     <td>${book_index + 1}</td>
     <td>${book.title}</td>
@@ -28,13 +28,13 @@ ${user.name}/${user.role}<br/>
   <%}%>
   <%}%>
 </table>
-<%}else if (user != null) {%>
+<%}else if(user != null){%>
 <table>
   <tr>
     <td>No privilege.</td>
   </tr>
 </table>
-<%} else {%>
+<%}else{%>
 <table>
   <tr>
     <td>No login.</td>
