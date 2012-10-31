@@ -20,7 +20,6 @@ import httl.Engine;
 import httl.Expression;
 import httl.Resource;
 import httl.Template;
-import httl.spi.Cache;
 import httl.spi.Loader;
 import httl.spi.Logger;
 import httl.spi.Parser;
@@ -35,12 +34,13 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 public class DefaultEngine extends Engine {
 
     private Logger logger;
     
-    private Cache cache;
+    private Map<Object, Object> cache;
     
     private Loader loader;
 
@@ -89,7 +89,7 @@ public class DefaultEngine extends Engine {
 		if (name == null || name.trim().length() == 0) {
 			throw new IllegalArgumentException("template name == null");
 		}
-		Cache cache = this.cache; // safe copy reference
+		Map<Object, Object> cache = this.cache; // safe copy reference
 		if (cache == null) {
 		    return parseTemplate(name, encoding);
 		}
@@ -101,13 +101,21 @@ public class DefaultEngine extends Engine {
         }
         VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(name);
         if (reference == null) {
-        	synchronized (cache) { // cache lock
-        		reference = (VolatileReference<Template>) cache.get(name);
-                if (reference == null) { // double check
-                	reference = new VolatileReference<Template>(); // quickly
-                	cache.put(name, reference);
-                }
-			}
+        	if (cache instanceof ConcurrentMap) {
+        		reference = new VolatileReference<Template>(); // quickly
+        		VolatileReference<Template> old = (VolatileReference<Template>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(name, reference);
+        		if (old != null) { // duplicate
+        			reference = old;
+        		}
+        	} else {
+	        	synchronized (cache) { // cache lock
+	        		reference = (VolatileReference<Template>) cache.get(name);
+	                if (reference == null) { // double check
+	                	reference = new VolatileReference<Template>(); // quickly
+	                	cache.put(name, reference);
+	                }
+				}
+        	}
         }
         assert(reference != null);
         Template template = (Template) reference.get();
@@ -199,7 +207,7 @@ public class DefaultEngine extends Engine {
      * 
      * @param cache template cache.
      */
-    public void setCache(Cache cache) {
+    public void setCache(Map<Object, Object> cache) {
         this.cache = cache;
 	}
     

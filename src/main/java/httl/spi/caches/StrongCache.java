@@ -16,10 +16,7 @@
  */
 package httl.spi.caches;
 
-import httl.spi.Cache;
-
 import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
  * StrongCache. (SPI, Singleton, ThreadSafe)
@@ -28,10 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class StrongCache extends MapCache {
+public class StrongCache<K, V> extends ConcurrentHashMap<K, V> {
 
-    public StrongCache(){
-        super(new ConcurrentHashMap<Object, Object>());
-    }
+	private static final long serialVersionUID = 5079086354053387280L;
 
 }
