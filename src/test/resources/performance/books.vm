@@ -20,7 +20,7 @@ ${user.name}/${user.role}<br/>
     <td>${book.title}</td>
     <td>${book.author}</td>
     <td>${book.publisher}</td>
-    <td>$date.format($book.publication)</td>
+    <td>$date.format($book.publication, "yyyy-MM-dd HH:mm:ss")</td>
     <td>${book.price}</td>
     <td>${book.discount}%</td>
     <td>#set($discountPrice = $book.price * $book.discount / 100)${discountPrice}</td>

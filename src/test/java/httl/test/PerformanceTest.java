@@ -2,6 +2,7 @@ package httl.test;
 
 import httl.test.model.Book;
 import httl.test.model.User;
+import httl.test.performance.BeetlCase;
 import httl.test.performance.Case;
 import httl.test.performance.Counter;
 import httl.test.performance.FreemarkerCase;
@@ -24,8 +25,8 @@ public class PerformanceTest {
 
     @Test
     public void testPerformance() throws Exception {
-        int size = 100;
-        int times = 10000;
+    	int count = getProperty("count", 10000);
+        int size = getProperty("size", 100);
         Random random = new Random();
         Book[] books = new Book[size];
         for (int i = 0; i < size; i ++) {
@@ -34,21 +35,28 @@ public class PerformanceTest {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("user", new User("liangfei", "admin", "Y"));
         context.put("books", books);
-        Case[] cases = new Case[] {new FreemarkerCase(), new VelocityCase(), new Smarty4jCase(), new HttlCase(), new JavaCase()};
+        Case[] cases = new Case[] { new BeetlCase(), new Smarty4jCase(), new FreemarkerCase(), new VelocityCase(), new HttlCase(), new JavaCase() };
         for (int i = 0; i < cases.length; i ++) {
         	Case c = cases[i];
         	String name = c.getClass().getSimpleName().replace("Case", "");
             System.out.println("========" + name.toLowerCase() + "========");
             Counter counter = new Counter();
             StringWriter writer = new StringWriter();
-            c.count("books", new HashMap<String, Object>(context), writer, new IgnoredWriter(), times, counter);
-            System.out.println(name + ": " +
-            		"initialize: " + counter.getInitialized() + "ms, " +
+            c.count("books", new HashMap<String, Object>(context), writer, new IgnoredWriter(), count, counter);
+            System.out.println("initialize: " + counter.getInitialized() + "ms, " +
             		"compile: " + counter.getCompiled() + "ms, " +
             		"first: " + counter.getExecuted() + "ms/" + writer.getBuffer().length() + "b, " +
-            		"total: " + counter.getFinished() + "ms/" + times + "t, " +
-            		"tps: " + (counter.getFinished() == 0 ? 0L : (1000L * times / counter.getFinished())) + "t/s.");
+            		"total: " + counter.getFinished() + "ms/" + count + ", " +
+            		"tps: " + (counter.getFinished() == 0 ? 0L : (1000L * count / counter.getFinished())) + "/s.");
         }
+    }
+    
+    private static int getProperty(String key, int defaultValue) {
+    	String value = System.getProperty(key);
+    	if (value != null && value.length() > 0 && value.matches("\\d+")) {
+    		return Integer.parseInt(value);
+    	}
+    	return defaultValue;
     }
     
     public static void main(String[] args) throws Exception {

@@ -22,8 +22,8 @@ import java.util.Date;
 
 public class DateTool {
 
-	public String format(Date date) {
-		return DateUtils.format(date);
+	public String format(Date date, String format) {
+		return DateUtils.format(date, format);
 	}
 
 }

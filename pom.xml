@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.15.0-GA</version>
+			<version>3.16.1-GA</version>
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>net.htmlparser.jericho</groupId>
 			<artifactId>jericho-html</artifactId>
-			<version>3.1</version>
+			<version>3.2</version>
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
@@ -73,6 +73,12 @@
 			<groupId>org.lilystudio.smarty4j</groupId>
 			<artifactId>smarty4j</artifactId>
 			<version>1.0.0-jdk5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bee.tl</groupId>
+			<artifactId>beetl</artifactId>
+			<version>1.2M1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -130,6 +136,24 @@
 				</executions>
 				<configuration>
 					<attach>true</attach>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<useSystemClassLoader>true</useSystemClassLoader>
+					<forkMode>once</forkMode>
+					<systemProperties>
+						<property>
+							<name>count</name>
+							<value>${count}</value>
+						</property>
+						<property>
+							<name>size</name>
+							<value>${size}</value>
+						</property>
+					</systemProperties>
 				</configuration>
 			</plugin>
 			<plugin>

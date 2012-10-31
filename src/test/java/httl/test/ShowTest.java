@@ -2,6 +2,7 @@ package httl.test;
 
 import httl.test.model.Book;
 import httl.test.model.User;
+import httl.test.performance.BeetlCase;
 import httl.test.performance.Case;
 import httl.test.performance.Counter;
 import httl.test.performance.FreemarkerCase;
@@ -34,7 +35,7 @@ public class ShowTest {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("user", new User("liangfei", "admin", "Y"));
         context.put("books", books);
-        Case[] cases = new Case[] {new HttlCase(), new FreemarkerCase(), new VelocityCase(), new Smarty4jCase(), new JavaCase()};
+        Case[] cases = new Case[] { new BeetlCase(), new Smarty4jCase(), new FreemarkerCase(), new VelocityCase(), new HttlCase(), new JavaCase() };
         for (int i = 0; i < cases.length; i ++) {
             System.out.println("=============");
             System.out.println(cases[i].getClass().getSimpleName().replace("Case", ""));
