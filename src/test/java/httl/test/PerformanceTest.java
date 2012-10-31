@@ -37,8 +37,8 @@ public class PerformanceTest {
         context.put("books", books);
         Case[] cases = new Case[] { new BeetlCase(), new Smarty4jCase(), new FreemarkerCase(), new VelocityCase(), new HttlCase(), new JavaCase() };
         System.out.println("=======test environment========");
-        System.out.println("os: " + System.getProperty("os.name")  + ", cpu: " + Runtime.getRuntime().availableProcessors() 
-        		+ ", jvm: " + System.getProperty("java.version") + ", mem: " + Runtime.getRuntime().totalMemory()
+        System.out.println("os: " + System.getProperty("os.name") + " " + System.getProperty("os.version")  + ", cpu: " + Runtime.getRuntime().availableProcessors() 
+        		+ ", jvm: " + System.getProperty("java.version") + ", memory: " + Runtime.getRuntime().totalMemory()
         		+ ", count: " + count + ", size: " + size);
         for (int i = 0; i < cases.length; i ++) {
         	Case c = cases[i];
