@@ -89,7 +89,7 @@ public abstract class AbstractParser implements Parser {
 
     protected static final Pattern IN_PATTERN = Pattern.compile("(\\s+in\\s+)");
 
-    protected static final Pattern ASSIGN_PATTERN = Pattern.compile("(\\s*=\\s*)");
+    protected static final Pattern ASSIGN_PATTERN = Pattern.compile("(\\s*:?=\\s*)");
 
     protected static final Pattern ESCAPE_PATTERN = Pattern.compile("(\\\\+)([#$])");
     
@@ -762,6 +762,7 @@ public abstract class AbstractParser implements Parser {
             }
             int start = matcher.start(1);
             int end = matcher.end(1);
+            String oper = matcher.group(1).trim();
             String expr = value.substring(end).trim();
             Expression expression = translator.translate(expr, types, offset + end);
             String[] tokens = value.substring(0, start).trim().split("\\s+");
@@ -784,11 +785,13 @@ public abstract class AbstractParser implements Parser {
             variables.add(var);
             types.put(var, clazz);
             buf.append(var + " = (" + type + ")(" + expression.getCode() + ");\n");
-            buf.append("$parameters.put(\"");
-            buf.append(var);
-            buf.append("\", ");
-            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
-            buf.append(");\n");
+            if (":=".equals(oper)) {
+	            buf.append("$parameters.put(\"");
+	            buf.append(var);
+	            buf.append("\", ");
+	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
+	            buf.append(");\n");
+            }
         } else if (varName.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The in parameters == null!", begin);
