@@ -29,6 +29,7 @@ public class BeetlCase implements Case {
         counter.beginning();
         GroupTemplate group = new GroupTemplate();
         group.enableOptimize();
+        group.enableNativeCall();
         counter.initialized();
         Template template = group.getReaderTemplate(new InputStreamReader(BeetlCase.class.getClassLoader().getResourceAsStream("performance/books.btl"))); 
         for (Map.Entry<String, Object> entry : context.entrySet()) {
