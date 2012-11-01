@@ -41,6 +41,11 @@ public class SimpleLogger implements Logger, Serializable {
 		System.out.println(getMessage(msg));
 	}
 
+	public void trace(Throwable e) {
+		if (e != null)
+			e.printStackTrace();
+	}
+
 	public void trace(String msg, Throwable e) {
 		System.out.println(getMessage(msg));
 		if (e != null)
@@ -49,6 +54,11 @@ public class SimpleLogger implements Logger, Serializable {
 
 	public void debug(String msg) {
 		System.out.println(getMessage(msg));
+	}
+
+	public void debug(Throwable e) {
+		if (e != null)
+			e.printStackTrace();
 	}
 
 	public void debug(String msg, Throwable e) {
@@ -61,6 +71,11 @@ public class SimpleLogger implements Logger, Serializable {
 		System.out.println(getMessage(msg));
 	}
 
+	public void info(Throwable e) {
+		if (e != null)
+			e.printStackTrace();
+	}
+
 	public void info(String msg, Throwable e) {
 		System.out.println(getMessage(msg));
 		if (e != null)
@@ -71,6 +86,11 @@ public class SimpleLogger implements Logger, Serializable {
 		System.err.println(getMessage(msg));
 	}
 
+	public void warn(Throwable e) {
+		if (e != null)
+			e.printStackTrace();
+	}
+
 	public void warn(String msg, Throwable e) {
 		System.err.println(getMessage(msg));
 		if (e != null)
@@ -79,6 +99,11 @@ public class SimpleLogger implements Logger, Serializable {
 
 	public void error(String msg) {
 		System.err.println(getMessage(msg));
+	}
+
+	public void error(Throwable e) {
+		if (e != null)
+			e.printStackTrace();
 	}
 
 	public void error(String msg, Throwable e) {

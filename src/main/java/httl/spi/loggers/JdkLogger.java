@@ -32,17 +32,25 @@ public class JdkLogger implements Logger, Serializable {
 
 	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NAME);
 
-	public void trace(String msg) {
-		logger.log(Level.FINER, msg);
-	}
+    public void trace(String msg) {
+        logger.log(Level.FINER, msg);
+    }
 
-	public void trace(String msg, Throwable e) {
-		logger.log(Level.FINER, msg, e);
-	}
+    public void trace(Throwable e) {
+        logger.log(Level.FINER, e.getMessage(), e);
+    }
+
+    public void trace(String msg, Throwable e) {
+        logger.log(Level.FINER, msg, e);
+    }
 
 	public void debug(String msg) {
 		logger.log(Level.FINE, msg);
 	}
+
+    public void debug(Throwable e) {
+        logger.log(Level.FINE, e.getMessage(), e);
+    }
 
 	public void debug(String msg, Throwable e) {
 		logger.log(Level.FINE, msg, e);
@@ -72,9 +80,21 @@ public class JdkLogger implements Logger, Serializable {
 		logger.log(Level.SEVERE, msg, e);
 	}
 
-	public boolean isTraceEnabled() {
-		return logger.isLoggable(Level.FINER);
-	}
+    public void error(Throwable e) {
+        logger.log(Level.SEVERE, e.getMessage(), e);
+    }
+
+    public void info(Throwable e) {
+        logger.log(Level.INFO, e.getMessage(), e);
+    }
+
+    public void warn(Throwable e) {
+        logger.log(Level.WARNING, e.getMessage(), e);
+    }
+
+    public boolean isTraceEnabled() {
+        return logger.isLoggable(Level.FINER);
+    }
 
 	public boolean isDebugEnabled() {
 		return logger.isLoggable(Level.FINE);
@@ -89,10 +109,6 @@ public class JdkLogger implements Logger, Serializable {
 	}
 
 	public boolean isErrorEnabled() {
-		return logger.isLoggable(Level.SEVERE);
-	}
-
-	public boolean isFatalEnabled() {
 		return logger.isLoggable(Level.SEVERE);
 	}
 

@@ -26,11 +26,44 @@ public class MultiLogger implements Logger {
 		this.loggers = loggers;
 	}
 
+	public void init() {
+		if (loggers == null) {
+			try {
+				setLoggers(new Logger[] { new Slf4jLogger() });
+            } catch (Throwable e1) {
+                try {
+                	setLoggers(new Logger[] { new JclLogger() });
+                } catch (Throwable e2) {
+                    try {
+                    	setLoggers(new Logger[] { new Log4jLogger() });
+                    } catch (Throwable e3) {
+                    	try {
+                    		setLoggers(new Logger[] { new JdkLogger() });
+	                    } catch (Throwable e4) {
+	                        setLoggers(new Logger[] { new SimpleLogger() });
+	                    }
+                    }
+                }
+            }
+		}
+	}
+
 	public void trace(String msg, Throwable e) {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
 					logger.trace(msg, e);
+				}
+			}
+		} catch (Throwable t) {
+		}
+	}
+
+	public void trace(Throwable e) {
+		try {
+			if (loggers != null) {
+				for (Logger logger : loggers) {
+					logger.trace(e);
 				}
 			}
 		} catch (Throwable t) {
@@ -59,6 +92,17 @@ public class MultiLogger implements Logger {
 		}
 	}
 
+	public void debug(Throwable e) {
+		try {
+			if (loggers != null) {
+				for (Logger logger : loggers) {
+					logger.debug(e);
+				}
+			}
+		} catch (Throwable t) {
+		}
+	}
+
 	public void debug(String msg) {
 		try {
 			if (loggers != null) {
@@ -75,6 +119,17 @@ public class MultiLogger implements Logger {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
 					logger.info(msg, e);
+				}
+			}
+		} catch (Throwable t) {
+		}
+	}
+
+	public void info(Throwable e) {
+		try {
+			if (loggers != null) {
+				for (Logger logger : loggers) {
+					logger.info(e);
 				}
 			}
 		} catch (Throwable t) {
@@ -103,6 +158,17 @@ public class MultiLogger implements Logger {
 		}
 	}
 
+	public void warn(Throwable e) {
+		try {
+			if (loggers != null) {
+				for (Logger logger : loggers) {
+					logger.warn(e);
+				}
+			}
+		} catch (Throwable t) {
+		}
+	}
+
 	public void warn(String msg) {
 		try {
 			if (loggers != null) {
@@ -119,6 +185,17 @@ public class MultiLogger implements Logger {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
 					logger.error(msg, e);
+				}
+			}
+		} catch (Throwable t) {
+		}
+	}
+
+	public void error(Throwable e) {
+		try {
+			if (loggers != null) {
+				for (Logger logger : loggers) {
+					logger.error(e);
 				}
 			}
 		} catch (Throwable t) {

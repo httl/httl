@@ -35,6 +35,13 @@ public interface Logger {
     /**
      * trace.
      * 
+     * @param e
+     */
+    void trace(Throwable e);
+
+    /**
+     * trace.
+     * 
      * @param msg
      * @param e
      */
@@ -46,6 +53,13 @@ public interface Logger {
      * @param msg
      */
     void debug(String msg);
+
+    /**
+     * debug.
+     * 
+     * @param e
+     */
+    void debug(Throwable e);
 
     /**
      * debug.
@@ -65,6 +79,13 @@ public interface Logger {
     /**
      * info.
      * 
+     * @param e
+     */
+    void info(Throwable e);
+
+    /**
+     * info.
+     * 
      * @param msg
      * @param e
      */
@@ -80,6 +101,13 @@ public interface Logger {
     /**
      * warn.
      * 
+     * @param e
+     */
+    void warn(Throwable e);
+
+    /**
+     * warn.
+     * 
      * @param msg
      * @param e
      */
@@ -91,6 +119,13 @@ public interface Logger {
      * @param msg
      */
     void error(String msg);
+
+    /**
+     * error.
+     * 
+     * @param e
+     */
+    void error(Throwable e);
 
     /**
      * error.
