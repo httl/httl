@@ -633,7 +633,9 @@ public abstract class AbstractParser implements Parser {
         if (txt != null && txt.length() > 0) {
             txt = txt.replace(POUND_SPECIAL, POUND);
             txt = txt.replace(DOLLAR_SPECIAL, DOLLAR);
-            txt = filter.filter(txt);
+            if (filter != null) {
+            	txt = filter.filter(txt);
+            }
             if (txt != null && txt.length() > 0) {
                 String var = "$TXT" + seq.incrementAndGet();
                 if (stream) {
