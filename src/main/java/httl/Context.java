@@ -16,6 +16,7 @@
  */
 package httl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,7 +43,7 @@ public final class Context {
     public static Context getContext() {
         Context context = LOCAL.get();
         if (context == null) {
-            context = new Context(null, null, null);
+            context = new Context(null, null, new HashMap<String, Object>());
             LOCAL.set(context);
         }
         return context;

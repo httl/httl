@@ -38,6 +38,8 @@ public class WebEngine {
 
     private static final String CONFIGURATION = "httl.properties";
 
+    private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
+
     private static final String OUTPUT_STREAM = "output.stream";
 
     private static final String TEMPLATE_SUFFIX = "template.suffix";
@@ -65,7 +67,14 @@ public class WebEngine {
 			            	ENGINE = Engine.getEngine(config);
 			            }
 			        } else {
-			        	ENGINE = Engine.getEngine();
+			        	InputStream in = servletContext.getResourceAsStream(WEBINF_CONFIG);
+			        	if (in != null) {
+			        		Properties properties = new Properties();
+			        		properties.load(in);
+			        		ENGINE = Engine.getEngine(WEBINF_CONFIG);
+			        	} else {
+			        		ENGINE = Engine.getEngine();
+			        	}
 			        }
 			        IS_OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM, false);
 				}
