@@ -161,14 +161,61 @@ public class StringUtils {
         return value;
     }
     
-    public static String unescapeString(String text) { // TODO 性能
-        return text.replace("\\\"", "\"")
-                    .replace("\\t", "\t")
-                    .replace("\\n", "\n")
-                    .replace("\\r", "\r")
-                    .replace("\\b", "\b")
-                    .replace("\\f", "\f")
-                    .replace("\\\\", "\\");
+    public static String unescapeString(String value) {
+        if (value != null) {
+        	StringBuilder buf = null;
+        	int len = value.length() - 1;
+            for (int i = 0; i < len; i ++) {
+                char ch = value.charAt(i);
+                if (ch == '\\') {
+                	int j = i;
+                	i ++;
+                	ch = value.charAt(i);
+                    switch (ch) {
+                        case '\\':
+                        	ch = '\\';
+                            break;
+                        case '\"':
+                        	ch = '\"';
+                            break;
+                        case '\'':
+                        	ch = '\'';
+                            break;
+                        case 't':
+                        	ch = '\t';
+                            break;
+                        case 'n':
+                        	ch = '\n';
+                            break;
+                        case 'r':
+                        	ch = '\r';
+                            break;
+                        case 'b':
+                        	ch = '\b';
+                            break;
+                        case 'f':
+                        	ch = '\f';
+                            break;
+                        default:
+                        	j --;
+                    }
+                    if (buf == null) {
+                        buf = new StringBuilder();
+                        if(j > 0) {
+                            buf.append(value.substring(0, j));
+                        }
+                    }
+                    buf.append(ch);
+                } else if (buf != null) {
+                	buf.append(ch);
+                }
+            }
+            if (buf != null) {
+            	buf.append(value.charAt(len));
+                return buf.toString();
+            }
+        }
+        return value;
     }
 
     public static String escapeHtml(String value) {
@@ -186,12 +233,6 @@ public class StringUtils {
                         break;
                     case '>':
                         str = "&gt;";
-                        break;
-                    case '\"':
-                        str = "&quot;";
-                        break;
-                    case '\'':
-                        str = "&apos;";
                         break;
                     default:
                         str = null;
@@ -218,12 +259,51 @@ public class StringUtils {
         return value;
     }
     
-    public static String unescapeHtml(String text) { // TODO 性能
-        return text.replace("&lt;", "<")
+    public static String unescapeHtml(String value) { // TODO 性能
+    	value.replace("&lt;", "<")
                     .replace("&gt;", ">")
-                    .replace("&quot;", "\"")
-                    .replace("&apos;", "\'")
                     .replace("&amp;", "&");
+        if (value != null) {
+        	StringBuilder buf = null;
+        	int len = value.length();
+            for (int i = 0; i < len; i ++) {
+                char ch = value.charAt(i);
+                if (ch == '&' & i < len - 3) {
+                	int j = i;
+                	if (value.charAt(i + 1) == 'l' 
+                			&& value.charAt(i + 2) == 't' 
+                    		&& value.charAt(i + 3) == ';') {
+                		i += 3;
+                    	ch = '<';
+                    } else if (value.charAt(i + 1) == 'g' 
+                			&& value.charAt(i + 2) == 't' 
+                    		&& value.charAt(i + 3) == ';') {
+                		i += 3;
+                    	ch = '>';
+                    } else if (i < len - 4 
+                    		&& value.charAt(i + 1) == 'a' 
+                			&& value.charAt(i + 2) == 'm' 
+                			&& value.charAt(i + 3) == 'p' 
+                    		&& value.charAt(i + 4) == ';') {
+                		i += 4;
+                    	ch = '&';
+                    }
+                    if (buf == null) {
+                        buf = new StringBuilder();
+                        if(j > 0) {
+                            buf.append(value.substring(0, j));
+                        }
+                    }
+                    buf.append(ch);
+                } else if (buf != null) {
+                	buf.append(ch);
+                }
+            }
+            if (buf != null) {
+                return buf.toString();
+            }
+        }
+        return value;
     }
     
     public static String getConditionCode(Class<?> type, String code) throws ParseException {

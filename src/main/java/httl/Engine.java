@@ -140,6 +140,32 @@ public abstract class Engine {
     }
 
     /**
+     * Get config int value.
+     * 
+     * @see #getEngine()
+     * @param key config key.
+     * @param defaultValue default int value.
+     * @return config int value
+     */
+    public int getProperty(String key, int defaultValue) {
+        String value = getProperty(key);
+        return value == null || value.length() == 0 ? defaultValue : Integer.parseInt(value);
+    }
+
+    /**
+     * Get config boolean value.
+     * 
+     * @see #getEngine()
+     * @param key config key.
+     * @param defaultValue default boolean value.
+     * @return config boolean value
+     */
+    public boolean getProperty(String key, boolean defaultValue) {
+        String value = getProperty(key);
+        return value == null || value.length() == 0 ? defaultValue : "true".equalsIgnoreCase(value);
+    }
+
+    /**
      * Get expression.
      * 
      * @see #getEngine()
