@@ -36,7 +36,7 @@ import org.apache.struts2.ServletActionContext;
 
 public class WebEngine {
 
-    private static final String CONFIGURATION = "httl.properties";
+    private static final String CONFIG_KEY = "httl.properties";
 
     private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
 
@@ -53,7 +53,7 @@ public class WebEngine {
 			synchronized (WebEngine.class) {
 				if (ENGINE == null) {
 					ServletLoader.setServletContext(servletContext);
-					String config = servletContext.getInitParameter(CONFIGURATION);
+					String config = servletContext.getInitParameter(CONFIG_KEY);
 			        if (config != null && config.length() > 0) {
 			            if (config.startsWith("/")) {
 			                Properties properties = new Properties();
