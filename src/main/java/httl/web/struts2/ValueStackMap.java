@@ -32,6 +32,9 @@ public class ValueStackMap implements Map<String, Object> {
 	private final ValueStack valueStack;
 
 	public ValueStackMap(ValueStack valueStack) {
+		if (valueStack == null) {
+			throw new IllegalArgumentException("valueStack == null");
+		}
 		this.valueStack = valueStack;
 	}
 
