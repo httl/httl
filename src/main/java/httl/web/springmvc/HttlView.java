@@ -18,6 +18,7 @@ package httl.web.springmvc;
 
 import httl.web.WebEngine;
 
+import java.io.FileNotFoundException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -39,10 +40,14 @@ public class HttlView extends AbstractTemplateView {
 			throws Exception {
 		WebEngine.render(request, response, getUrl(), model);
 	}
-	
+
 	@Override
 	public boolean checkResource(Locale locale) throws Exception {
-		return WebEngine.getTemplate(getUrl()) != null;
+		try {
+			return WebEngine.getTemplate(getUrl()) != null;
+		} catch (FileNotFoundException e) {
+			return false;
+		}
 	}
 
 }
