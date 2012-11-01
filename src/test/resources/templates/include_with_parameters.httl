@@ -1,0 +1,2 @@
+$!{include("foreach.httl")}
+$!{include("macro.httl#xxx", ["aaa": "WWW"])}

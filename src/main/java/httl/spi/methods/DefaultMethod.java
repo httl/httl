@@ -27,6 +27,7 @@ import httl.util.IOUtils;
 import httl.util.NumberUtils;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
+import httl.util.WrappedMap;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -98,11 +99,24 @@ public class DefaultMethod {
     }
 
     public String include(String name) throws IOException, ParseException {
-        return include(name, null);
+        return include(name, null, null);
     }
 
     public String include(String name, String encoding) throws IOException, ParseException {
-        return parse(name, encoding).render(Context.getContext().getParameters());
+    	return include(name, encoding, null);
+    }
+
+    public String include(String name, Map<String, Object> parameters) throws IOException, ParseException {
+    	return include(name, null, parameters);
+    }
+
+    public String include(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+        Template template = parse(name, encoding);
+        Map<String, Object> map = Context.getContext().getParameters();
+        if (parameters != null) {
+        	map = new WrappedMap<String, Object>(map, parameters);
+        }
+        return template.render(map);
     }
 
     public String read(String name) throws IOException, ParseException {
