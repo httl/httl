@@ -40,14 +40,16 @@ public class WebEngine {
 
     private static final String OUTPUT_STREAM = "output.stream";
 
-	private static volatile Engine engine;
+    private static final String TEMPLATE_SUFFIX = "template.suffix";
+
+	private static volatile Engine ENGINE;
 	
-	private static volatile boolean outputStream;
+	private static volatile boolean IS_OUTPUT_STREAM;
 
 	public static void init(ServletContext servletContext) throws IOException {
-		if (engine == null) {
+		if (ENGINE == null) {
 			synchronized (WebEngine.class) {
-				if (engine == null) {
+				if (ENGINE == null) {
 					ServletLoader.setServletContext(servletContext);
 					String config = servletContext.getInitParameter(CONFIGURATION);
 			        if (config != null && config.length() > 0) {
@@ -58,25 +60,25 @@ public class WebEngine {
 			                	throw new FileNotFoundException("Failed to load httl config " + config + " in wepapp.");
 			                }
 			                properties.load(in);
-			                engine = Engine.getEngine(config, properties);
+			                ENGINE = Engine.getEngine(config, properties);
 			            } else {
-			            	engine = Engine.getEngine(config);
+			            	ENGINE = Engine.getEngine(config);
 			            }
 			        } else {
-			        	engine = Engine.getEngine();
+			        	ENGINE = Engine.getEngine();
 			        }
-			        outputStream = engine.getProperty(OUTPUT_STREAM, false);
+			        IS_OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM, false);
 				}
 			}
 		}
 	}
 
 	public static Template getTemplate(String path) throws IOException, ParseException {
-		return engine == null ? null : engine.getTemplate(path);
+		return ENGINE == null ? null : ENGINE.getTemplate(path);
 	}
 
 	public static Template getTemplate(String path, String encoding) throws IOException, ParseException {
-		return engine == null ? null : engine.getTemplate(path, encoding);
+		return ENGINE == null ? null : ENGINE.getTemplate(path, encoding);
 	}
 
 	public static void render(HttpServletRequest request, HttpServletResponse response) throws IOException, ParseException {
@@ -92,6 +94,18 @@ public class WebEngine {
         		path = path.substring(contextPath.length());
         	}
         }
+        if (path == null || path.length() == 0) {
+        	response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        	return;
+        }
+        Engine engine = ENGINE;
+        if (engine == null) {
+        	init(request.getSession().getServletContext());
+        }
+        String suffix = engine.getProperty(TEMPLATE_SUFFIX);
+        if (suffix != null && suffix.length() > 0 && ! path.endsWith(suffix)) {
+        	path += suffix;
+        }
 		render(request, response, path, null);
 	}
 
@@ -105,13 +119,17 @@ public class WebEngine {
 		if (model != null) {
 			parameters = new WrappedMap<String, Object>(parameters, model);
 		}
-		Template template = engine.getTemplate(path);
-		if (outputStream) {
-			template.render(parameters, ServletActionContext.getResponse().getOutputStream());
-		} else {
-			template.render(parameters, ServletActionContext.getResponse().getWriter());
+		try {
+			Template template = ENGINE.getTemplate(path);
+			if (IS_OUTPUT_STREAM) {
+				template.render(parameters, ServletActionContext.getResponse().getOutputStream());
+			} else {
+				template.render(parameters, ServletActionContext.getResponse().getWriter());
+			}
+			response.flushBuffer();
+		} catch (FileNotFoundException e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
-		response.flushBuffer();
 	}
 
 }
