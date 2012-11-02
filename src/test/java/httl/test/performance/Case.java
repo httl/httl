@@ -16,9 +16,9 @@
  */
 package httl.test.performance;
 
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
-
 
 /**
  * TemplateCase
@@ -27,6 +27,6 @@ import java.util.Map;
  */
 public interface Case {
 
-    void count(String name, Map<String, Object> context, Writer writer, Writer ignore, int times, Counter counter) throws Exception;
+    void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter, OutputStream discardStream) throws Exception;
 
 }

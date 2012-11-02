@@ -14,19 +14,31 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.caches;
+package httl.test.performance;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.IOException;
+import java.io.OutputStream;
 
-/**
- * StrongCache. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.Engine#setCache(Cache)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
- */
-public class StrongCache<K, V> extends ConcurrentHashMap<K, V> {
+public class DiscardOutputStream extends OutputStream {
 
-	private static final long serialVersionUID = 5079086354053387280L;
+	@Override
+	public void close() throws IOException {
+	}
+
+	@Override
+	public void flush() throws IOException {
+	}
+
+	@Override
+	public void write(byte[] buf, int off, int len) throws IOException {
+	}
+
+	@Override
+	public void write(byte[] buf) throws IOException {
+	}
+
+	@Override
+	public void write(int i) throws IOException {
+	}
 
 }

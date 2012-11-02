@@ -106,206 +106,299 @@ public class StringUtils {
     }
 
     public static String escapeString(String value) {
-        if (value != null) {
-            StringBuilder buf = null;
-            for (int i = 0; i < value.length(); i ++) {
-                char ch = value.charAt(i);
-                String str;
-                switch (ch) {
-                    case '\\':
-                        str = "\\\\";
-                        break;
-                    case '\"':
-                        str = "\\\"";
-                        break;
-                    case '\'':
-                        str = "\\\'";
-                        break;
-                    case '\t':
-                        str = "\\t";
-                        break;
-                    case '\n':
-                        str = "\\n";
-                        break;
-                    case '\r':
-                        str = "\\r";
-                        break;
-                    case '\b':
-                        str = "\\b";
-                        break;
-                    case '\f':
-                        str = "\\f";
-                        break;
-                    default:
-                        str = null;
-                        break;
-                }
-                if (str != null) {
-                    if (buf == null) {
-                        buf = new StringBuilder();
-                        if(i > 0) {
-                            buf.append(value.substring(0, i));
-                        }
-                    }
-                    buf.append(str);
-                } else {
-                    if (buf != null) {
-                        buf.append(ch);
+    	if (value == null || value.length() == 0) {
+            return value;
+        }
+        StringBuilder buf = null;
+        for (int i = 0; i < value.length(); i ++) {
+            char ch = value.charAt(i);
+            String str;
+            switch (ch) {
+                case '\\':
+                    str = "\\\\";
+                    break;
+                case '\"':
+                    str = "\\\"";
+                    break;
+                case '\'':
+                    str = "\\\'";
+                    break;
+                case '\t':
+                    str = "\\t";
+                    break;
+                case '\n':
+                    str = "\\n";
+                    break;
+                case '\r':
+                    str = "\\r";
+                    break;
+                case '\b':
+                    str = "\\b";
+                    break;
+                case '\f':
+                    str = "\\f";
+                    break;
+                default:
+                    str = null;
+                    break;
+            }
+            if (str != null) {
+                if (buf == null) {
+                    buf = new StringBuilder();
+                    if(i > 0) {
+                        buf.append(value.substring(0, i));
                     }
                 }
+                buf.append(str);
+            } else {
+                if (buf != null) {
+                    buf.append(ch);
+                }
             }
-            if (buf != null) {
-                return buf.toString();
-            }
+        }
+        if (buf != null) {
+            return buf.toString();
         }
         return value;
     }
     
     public static String unescapeString(String value) {
-        if (value != null) {
-        	StringBuilder buf = null;
-        	int len = value.length() - 1;
-            for (int i = 0; i < len; i ++) {
-                char ch = value.charAt(i);
-                if (ch == '\\') {
-                	int j = i;
-                	i ++;
-                	ch = value.charAt(i);
-                    switch (ch) {
-                        case '\\':
-                        	ch = '\\';
-                            break;
-                        case '\"':
-                        	ch = '\"';
-                            break;
-                        case '\'':
-                        	ch = '\'';
-                            break;
-                        case 't':
-                        	ch = '\t';
-                            break;
-                        case 'n':
-                        	ch = '\n';
-                            break;
-                        case 'r':
-                        	ch = '\r';
-                            break;
-                        case 'b':
-                        	ch = '\b';
-                            break;
-                        case 'f':
-                        	ch = '\f';
-                            break;
-                        default:
-                        	j --;
-                    }
-                    if (buf == null) {
-                        buf = new StringBuilder();
-                        if(j > 0) {
-                            buf.append(value.substring(0, j));
-                        }
-                    }
-                    buf.append(ch);
-                } else if (buf != null) {
-                	buf.append(ch);
+    	if (value == null || value.length() == 0) {
+            return value;
+        }
+    	StringBuilder buf = null;
+    	int len = value.length() - 1;
+        for (int i = 0; i < len; i ++) {
+            char ch = value.charAt(i);
+            if (ch == '\\') {
+            	int j = i;
+            	i ++;
+            	ch = value.charAt(i);
+                switch (ch) {
+                    case '\\':
+                    	ch = '\\';
+                        break;
+                    case '\"':
+                    	ch = '\"';
+                        break;
+                    case '\'':
+                    	ch = '\'';
+                        break;
+                    case 't':
+                    	ch = '\t';
+                        break;
+                    case 'n':
+                    	ch = '\n';
+                        break;
+                    case 'r':
+                    	ch = '\r';
+                        break;
+                    case 'b':
+                    	ch = '\b';
+                        break;
+                    case 'f':
+                    	ch = '\f';
+                        break;
+                    default:
+                    	j --;
                 }
+                if (buf == null) {
+                    buf = new StringBuilder();
+                    if(j > 0) {
+                        buf.append(value.substring(0, j));
+                    }
+                }
+                buf.append(ch);
+            } else if (buf != null) {
+            	buf.append(ch);
             }
-            if (buf != null) {
-            	buf.append(value.charAt(len));
-                return buf.toString();
-            }
+        }
+        if (buf != null) {
+        	buf.append(value.charAt(len));
+            return buf.toString();
         }
         return value;
     }
 
     public static String escapeHtml(String value) {
-        if (value != null) {
-            StringBuilder buf = null;
-            for (int i = 0; i < value.length(); i ++) {
-                char ch = value.charAt(i);
-                String str;
-                switch (ch) {
-                    case '&':
-                        str = "&amp;";
-                        break;
-                    case '<':
-                        str = "&lt;";
-                        break;
-                    case '>':
-                        str = "&gt;";
-                        break;
-                    default:
-                        str = null;
-                        break;
-                }
-                if (str != null) {
-                    if (buf == null) {
-                        buf = new StringBuilder();
-                        if(i > 0) {
-                            buf.append(value.substring(0, i));
-                        }
-                    }
-                    buf.append(str);
-                } else {
-                    if (buf != null) {
-                        buf.append(ch);
-                    }
-                }
-            }
-            if (buf != null) {
-                return buf.toString();
-            }
+        if (value == null || value.length() == 0) {
+            return value;
         }
-        return value;
-    }
-    
-    public static String unescapeHtml(String value) { // TODO 性能
-    	value.replace("&lt;", "<")
-                    .replace("&gt;", ">")
-                    .replace("&amp;", "&");
-        if (value != null) {
-        	StringBuilder buf = null;
-        	int len = value.length();
-            for (int i = 0; i < len; i ++) {
-                char ch = value.charAt(i);
-                if (ch == '&' & i < len - 3) {
-                	int j = i;
-                	if (value.charAt(i + 1) == 'l' 
-                			&& value.charAt(i + 2) == 't' 
-                    		&& value.charAt(i + 3) == ';') {
-                		i += 3;
-                    	ch = '<';
-                    } else if (value.charAt(i + 1) == 'g' 
-                			&& value.charAt(i + 2) == 't' 
-                    		&& value.charAt(i + 3) == ';') {
-                		i += 3;
-                    	ch = '>';
-                    } else if (i < len - 4 
-                    		&& value.charAt(i + 1) == 'a' 
-                			&& value.charAt(i + 2) == 'm' 
-                			&& value.charAt(i + 3) == 'p' 
-                    		&& value.charAt(i + 4) == ';') {
-                		i += 4;
-                    	ch = '&';
+        StringBuilder buf = null;
+        for (int i = 0; i < value.length(); i ++) {
+            char ch = value.charAt(i);
+            String str;
+            switch (ch) {
+                case '&':
+                    str = "&amp;";
+                    break;
+                case '<':
+                    str = "&lt;";
+                    break;
+                case '>':
+                    str = "&gt;";
+                    break;
+                default:
+                    str = null;
+                    break;
+            }
+            if (str != null) {
+                if (buf == null) {
+                    buf = new StringBuilder();
+                    if(i > 0) {
+                        buf.append(value.substring(0, i));
                     }
-                    if (buf == null) {
-                        buf = new StringBuilder();
-                        if(j > 0) {
-                            buf.append(value.substring(0, j));
-                        }
-                    }
+                }
+                buf.append(str);
+            } else {
+                if (buf != null) {
                     buf.append(ch);
-                } else if (buf != null) {
-                	buf.append(ch);
                 }
             }
-            if (buf != null) {
-                return buf.toString();
-            }
+        }
+        if (buf != null) {
+            return buf.toString();
         }
         return value;
     }
     
+    public static String unescapeHtml(String value) {
+    	if (value == null || value.length() == 0) {
+            return value;
+        }
+    	StringBuilder buf = null;
+    	int len = value.length();
+    	int len3 = len - 3;
+    	int len4 = len - 4;
+        for (int i = 0; i < len; i ++) {
+            char ch = value.charAt(i);
+            if (ch == '&' && i < len3) {
+            	int j = i;
+            	char ch1 = value.charAt(i + 1);
+            	switch (ch1) {
+					case 'l':
+						if (value.charAt(i + 2) == 't'
+							&& value.charAt(i + 3) == ';') {
+							i += 3;
+	                    	ch = '<';
+						}
+						break;
+					case 'g':
+						if (value.charAt(i + 2) == 't'
+							&&value.charAt(i + 3) == ';') {
+							i += 3;
+	                    	ch = '>';
+						}
+						break;
+					case 'a':
+						if (i < len4 && value.charAt(i + 2) == 'm'
+								&& value.charAt(i + 3) == 'p'
+								&& value.charAt(i + 4) == ';') {
+							i += 4;
+	                    	ch = '&';
+						}
+						break;
+				}
+                if (buf == null) {
+                    buf = new StringBuilder();
+                    if(j > 0) {
+                        buf.append(value.substring(0, j));
+                    }
+                }
+                buf.append(ch);
+            } else if (buf != null) {
+            	buf.append(ch);
+            }
+        }
+        if (buf != null) {
+            return buf.toString();
+        }
+        return value;
+    }
+
+    public static String clearBlank(String value) {
+    	if (value == null || value.length() == 0) {
+            return value;
+        }
+    	StringBuilder buf = null;
+    	boolean blank = false;
+    	for (int i = 0; i < value.length(); i ++) {
+    		char ch = value.charAt(i);
+    		switch (ch) {
+    			case ' ':
+    			case '\t':
+    			case '\n':
+				case '\r':
+				case '\b':
+				case '\f':
+					if (! blank) {
+						blank = true;
+						if (buf == null) {
+							buf = new StringBuilder(value.length());
+							if (i > 0) {
+								buf.append(value.substring(0, i));
+							}
+						}
+					}
+					break;
+				default:
+					if (blank) {
+						blank = false;
+					}
+					if (buf != null) {
+						buf.append(ch);
+					}
+					break;
+			}
+    	}
+    	if (buf != null) {
+            return buf.toString();
+        }
+        return value;
+    }
+
+    public static String compressBlank(String value) {
+    	if (value == null || value.length() == 0) {
+            return value;
+        }
+    	StringBuilder buf = null;
+    	boolean blank = false;
+    	for (int i = 0; i < value.length(); i ++) {
+    		char ch = value.charAt(i);
+    		switch (ch) {
+    			case ' ':
+    			case '\t':
+    			case '\n':
+				case '\r':
+				case '\b':
+				case '\f':
+					if (! blank) {
+						blank = true;
+						if (buf == null) {
+							buf = new StringBuilder(value.length());
+							if (i > 0) {
+								buf.append(value.substring(0, i));
+							}
+						}
+						buf.append(' ');
+					}
+					break;
+				default:
+					if (blank) {
+						blank = false;
+					}
+					if (buf != null) {
+						buf.append(ch);
+					}
+					break;
+			}
+    	}
+    	if (buf != null) {
+            return buf.toString();
+        }
+        return value;
+    }
+
     public static String getConditionCode(Class<?> type, String code) throws ParseException {
         if (type != boolean.class) {
             if (type == byte.class 
@@ -445,5 +538,5 @@ public class StringUtils {
 			return src.getBytes();
 		}
     }
-    
+
 }

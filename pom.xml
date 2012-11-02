@@ -191,6 +191,10 @@
 							<name>size</name>
 							<value>${size}</value>
 						</property>
+						<property>
+							<name>stream</name>
+							<value>${stream}</value>
+						</property>
 					</systemProperties>
 				</configuration>
 			</plugin>

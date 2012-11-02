@@ -17,9 +17,10 @@
 package httl.spi.filters;
 
 import httl.spi.Filter;
+import httl.util.StringUtils;
 
 /**
- * ClearBlankFilter. (SPI, Singleton, ThreadSafe)
+ * CompressBlankFilter. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.Engine#setTextFilter(Filter)
  * 
@@ -28,9 +29,7 @@ import httl.spi.Filter;
 public class CompressBlankFilter implements Filter {
     
     public String filter(String text) {
-        if (text == null)
-            return null;
-        return text.replaceAll("\\s+", " ");
+        return StringUtils.compressBlank(text);
     }
     
 }

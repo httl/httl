@@ -10,7 +10,6 @@ import httl.test.performance.HttlCase;
 import httl.test.performance.JavaCase;
 import httl.test.performance.Smarty4jCase;
 import httl.test.performance.VelocityCase;
-import httl.util.IgnoredWriter;
 
 import java.io.StringWriter;
 import java.util.Date;
@@ -43,7 +42,7 @@ public class ShowTest {
             Case c = cases[i % cases.length];
             Counter counter = new Counter();
             StringWriter writer = new StringWriter();
-            c.count("books", new HashMap<String, Object>(context), writer, new IgnoredWriter(), times, counter);
+            c.count(counter, times, "books", new HashMap<String, Object>(context), null, null, null);
             System.out.println(writer.getBuffer().toString());
         }
         System.out.println("=============");

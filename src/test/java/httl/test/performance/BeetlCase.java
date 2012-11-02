@@ -17,6 +17,7 @@
 package httl.test.performance;
 
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import org.bee.tl.core.Template;
 
 public class BeetlCase implements Case {
 
-    public void count(String name, Map<String, Object> context, Writer writer, Writer ignore, int times, Counter counter) throws Exception {
+    public void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter, OutputStream discardStream) throws Exception {
         counter.beginning();
         GroupTemplate group = new GroupTemplate();
         group.enableOptimize();
@@ -38,8 +39,14 @@ public class BeetlCase implements Case {
         counter.compiled();
         template.getText(writer);
         counter.executed();
-        for (int i = times; i >= 0; i --) {
-            template.getText(ignore);
+        if (discardStream != null) {
+	        for (int i = times; i >= 0; i --) {
+	            template.getText(discardStream);
+	        }
+        } else {
+        	for (int i = times; i >= 0; i --) {
+	            template.getText(discardWriter);
+	        }
         }
         counter.finished();
     }

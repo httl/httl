@@ -5,12 +5,13 @@ import httl.test.model.User;
 import httl.test.performance.BeetlCase;
 import httl.test.performance.Case;
 import httl.test.performance.Counter;
+import httl.test.performance.DiscardOutputStream;
+import httl.test.performance.DiscardWriter;
 import httl.test.performance.FreemarkerCase;
 import httl.test.performance.HttlCase;
 import httl.test.performance.JavaCase;
 import httl.test.performance.Smarty4jCase;
 import httl.test.performance.VelocityCase;
-import httl.util.IgnoredWriter;
 
 import java.io.StringWriter;
 import java.util.Date;
@@ -27,6 +28,7 @@ public class PerformanceTest {
     public void testPerformance() throws Exception {
     	int count = getProperty("count", 10000);
         int size = getProperty("size", 100);
+        boolean stream = "true".equals(System.getProperty("stream"));
         Random random = new Random();
         Book[] books = new Book[size];
         for (int i = 0; i < size; i ++) {
@@ -46,10 +48,10 @@ public class PerformanceTest {
             System.out.println("========" + name.toLowerCase() + "========");
             Counter counter = new Counter();
             StringWriter writer = new StringWriter();
-            c.count("books", new HashMap<String, Object>(context), writer, new IgnoredWriter(), count, counter);
-            System.out.println("initialize: " + counter.getInitialized() + "ms, " +
+            c.count(counter, count, "books", new HashMap<String, Object>(context), writer, new DiscardWriter(), stream ? new DiscardOutputStream() : null);
+            System.out.println("init: " + counter.getInitialized() + "ms, " +
             		"compile: " + counter.getCompiled() + "ms, " +
-            		"first: " + counter.getExecuted() + "ms/" + writer.getBuffer().length() + "b, " +
+            		"first: " + counter.getExecuted() + "ms/" + writer.getBuffer().length() + "byte, " +
             		"total: " + counter.getFinished() + "ms/" + count + ", " +
             		"tps: " + (counter.getFinished() == 0 ? 0L : (1000L * count / counter.getFinished())) + "/s.");
         }

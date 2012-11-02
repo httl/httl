@@ -26,7 +26,6 @@ import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.util.ClassUtils;
 import httl.util.StringUtils;
-import httl.util.UrlUtils;
 import httl.util.VolatileReference;
 
 import java.io.IOException;
@@ -142,10 +141,9 @@ public class DefaultEngine extends Engine {
      * @throws ParseException
      */
     private Template parseTemplate(String name, String encoding) throws IOException, ParseException {
-        if (name == null || name.trim().length() == 0) {
+        if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("template name == null");
         }
-        name = UrlUtils.cleanUrl(name.trim());
         Resource resource = loader.load(name, encoding);
         try {
             return parser.parse(resource);

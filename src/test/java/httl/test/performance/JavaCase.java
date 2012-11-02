@@ -16,6 +16,7 @@
  */
 package httl.test.performance;
 
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 public class JavaCase implements Case {
     
-    public void count(String name, Map<String, Object> context, Writer writer, Writer ignore, int times, Counter counter) throws Exception {
+    public void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter, OutputStream discardStream) throws Exception {
         counter.beginning();
         counter.initialized();
         Books template = new Books();
@@ -35,7 +36,7 @@ public class JavaCase implements Case {
         template.render(context, writer);
         counter.executed();
         for (int i = times; i >= 0; i --) {
-            template.render(context, ignore);
+            template.render(context, discardWriter);
         }
         counter.finished();
     }

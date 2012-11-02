@@ -43,4 +43,18 @@ public class StringUtilsTest {
 		Assert.assertEquals("a<table border=\"0\">b&lt;c</table>d", StringUtils.unescapeHtml("a&lt;table border=\"0\"&gt;b&amp;lt;c&lt;/table&gt;d"));
 	}
 
+	@Test
+	public void testClearBlank() {
+		Assert.assertEquals("12345678", StringUtils.clearBlank("12345678"));
+		Assert.assertEquals("12345678", StringUtils.clearBlank("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8"));
+		Assert.assertEquals("12345678", StringUtils.clearBlank(" 1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8 "));
+	}
+
+	@Test
+	public void testCompressBlank() {
+		Assert.assertEquals("12345678", StringUtils.clearBlank("12345678"));
+		Assert.assertEquals("1 2 3 4 5 6 7 8", StringUtils.compressBlank("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8"));
+		Assert.assertEquals(" 1 2 3 4 5 6 7 8 ", StringUtils.compressBlank(" 1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8 "));
+	}
+
 }
