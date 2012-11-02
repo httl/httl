@@ -32,8 +32,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts2.ServletActionContext;
-
 public class WebEngine {
 
     private static final String CONFIG_KEY = "httl.properties";
@@ -141,9 +139,9 @@ public class WebEngine {
 		try {
 			Template template = ENGINE.getTemplate(path);
 			if (IS_OUTPUT_STREAM) {
-				template.render(parameters, ServletActionContext.getResponse().getOutputStream());
+				template.render(parameters, response.getOutputStream());
 			} else {
-				template.render(parameters, ServletActionContext.getResponse().getWriter());
+				template.render(parameters, response.getWriter());
 			}
 			response.flushBuffer();
 		} catch (FileNotFoundException e) {
