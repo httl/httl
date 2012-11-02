@@ -18,7 +18,6 @@ package httl.spi.loaders;
 
 import httl.Engine;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
