@@ -37,36 +37,40 @@ import javax.servlet.ServletContextListener;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ServletLoader extends AbstractLoader implements ServletContextListener {
-    
+
     private static ServletContext SERVLET_CONTEXT;
-    
-    private ServletContext servletContext;
-    
-    public ServletLoader() {
+
+    public static ServletContext getServletContext() {
+    	if (SERVLET_CONTEXT == null) {
+			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>httl.spi.loaders.ServletLoader</listener-class></listener> in your /WEB-INF/web.xml");
+		}
+        return SERVLET_CONTEXT;
     }
-    
-    public ServletLoader(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
-    
-    public void contextInitialized(ServletContextEvent sce) {
-        this.servletContext = sce.getServletContext();
-    }
-    
-    public void contextDestroyed(ServletContextEvent sce) {
-        this.servletContext = null;
-    }
-    
+
     public static void setServletContext(ServletContext servletContext) {
         SERVLET_CONTEXT = servletContext;
     }
-    
+
+    public void contextInitialized(ServletContextEvent sce) {
+    	SERVLET_CONTEXT = sce.getServletContext();
+    }
+
+    public void contextDestroyed(ServletContextEvent sce) {
+        SERVLET_CONTEXT = null;
+    }
+
     public List<String> doList(String directory, String[] suffixes) throws IOException {
-        return UrlUtils.listUrl(servletContext.getResource(directory), suffixes);
+    	if (SERVLET_CONTEXT == null) {
+			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>httl.spi.loaders.ServletLoader</listener-class></listener> in your /WEB-INF/web.xml");
+		}
+        return UrlUtils.listUrl(SERVLET_CONTEXT.getResource(directory), suffixes);
     }
 
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new ServletResource(getEngine(), name, encoding, path, servletContext != null ? servletContext : SERVLET_CONTEXT);
+    	if (SERVLET_CONTEXT == null) {
+			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>httl.spi.loaders.ServletLoader</listener-class></listener> in your /WEB-INF/web.xml");
+		}
+		return new ServletResource(getEngine(), name, encoding, path, SERVLET_CONTEXT);
 	}
 
 }

@@ -9,5 +9,5 @@
     <uri>httl</uri>
     <display-name>HTTL</display-name>
     <description>Hyper-Text Template Language and Engine.</description>
-    <listener>httl.web.servlet.HttlListener</listener>
+    <listener>httl.spi.loaders.ServletLoader</listener>
 </taglib>

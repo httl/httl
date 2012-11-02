@@ -47,12 +47,20 @@ public class WebEngine {
 	private static volatile Engine ENGINE;
 	
 	private static volatile boolean IS_OUTPUT_STREAM;
+	
+	public static void init() throws IOException {
+		init(null);
+	}
 
 	public static void init(ServletContext servletContext) throws IOException {
 		if (ENGINE == null) {
 			synchronized (WebEngine.class) {
 				if (ENGINE == null) {
-					ServletLoader.setServletContext(servletContext);
+					if (servletContext != null) {
+						ServletLoader.setServletContext(servletContext);
+					} else {
+						servletContext = ServletLoader.getServletContext();
+					}
 					String config = servletContext.getInitParameter(CONFIG_KEY);
 			        if (config != null && config.length() > 0) {
 			            if (config.startsWith("/")) {
@@ -71,7 +79,7 @@ public class WebEngine {
 			        	if (in != null) {
 			        		Properties properties = new Properties();
 			        		properties.load(in);
-			        		ENGINE = Engine.getEngine(WEBINF_CONFIG);
+			        		ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
 			        	} else {
 			        		ENGINE = Engine.getEngine();
 			        	}
@@ -83,10 +91,12 @@ public class WebEngine {
 	}
 
 	public static Template getTemplate(String path) throws IOException, ParseException {
+		init();
 		return ENGINE == null ? null : ENGINE.getTemplate(path);
 	}
 
 	public static Template getTemplate(String path, String encoding) throws IOException, ParseException {
+		init();
 		return ENGINE == null ? null : ENGINE.getTemplate(path, encoding);
 	}
 

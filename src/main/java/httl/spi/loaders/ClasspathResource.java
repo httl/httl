@@ -19,6 +19,7 @@ package httl.spi.loaders;
 import httl.Engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -79,7 +80,7 @@ public class ClasspathResource extends InputStreamResource {
     }
 
     public InputStream getInputStream() throws IOException {
-        return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+    	return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
     }
 
 }

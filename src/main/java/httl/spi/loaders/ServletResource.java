@@ -18,6 +18,7 @@ package httl.spi.loaders;
 
 import httl.Engine;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -46,7 +47,7 @@ public class ServletResource extends InputStreamResource {
     }
 
     public InputStream getInputStream() throws IOException {
-        return servletContext.getResourceAsStream(path);
+    	return servletContext.getResourceAsStream(path);
     }
 
 }

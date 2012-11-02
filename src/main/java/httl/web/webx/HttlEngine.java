@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.text.ParseException;
+import java.util.Map;
+import java.util.Properties;
 
 import com.alibaba.citrus.service.template.TemplateContext;
 import com.alibaba.citrus.service.template.TemplateEngine;
@@ -32,7 +34,28 @@ import com.alibaba.citrus.service.template.TemplateException;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class HttlTemplateEngine implements TemplateEngine {
+public class HttlEngine implements TemplateEngine {
+
+	private final Properties properties = new Properties();
+
+	private String path;
+
+	private String templateEncoding;
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public void setTemplateEncoding(String templateEncoding) {
+		this.templateEncoding = templateEncoding;
+	}
+
+    public void setAdvancedProperties(Map<String, String> configuration) {
+        this.properties.clear();
+        for (Map.Entry<String, String> entry : configuration.entrySet()) {
+            this.properties.setProperty(entry.getKey(), entry.getValue());
+        }
+    }
 
 	public String[] getDefaultExtensions() {
 		return new String[] { "httl" };
@@ -40,6 +63,9 @@ public class HttlTemplateEngine implements TemplateEngine {
 
 	public boolean exists(String templateName) {
 		try {
+			if (path != null && path.length() > 0) {
+				templateName = path + "/" + templateName;
+			}
 			return WebEngine.getTemplate(templateName) != null;
 		} catch (Exception e) {
 			return true;
@@ -49,7 +75,10 @@ public class HttlTemplateEngine implements TemplateEngine {
 	public String getText(String templateName, TemplateContext context)
 			throws TemplateException, IOException {
 		try {
-			return WebEngine.getTemplate(templateName).render(new TemplateContextMap(context));
+			if (path != null && path.length() > 0) {
+				templateName = path + "/" + templateName;
+			}
+			return WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context));
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}
@@ -58,7 +87,10 @@ public class HttlTemplateEngine implements TemplateEngine {
 	public void writeTo(String templateName, TemplateContext context,
 			OutputStream ostream) throws TemplateException, IOException {
 		try {
-			WebEngine.getTemplate(templateName).render(new TemplateContextMap(context), ostream);
+			if (path != null && path.length() > 0) {
+				templateName = path + "/" + templateName;
+			}
+			WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context), ostream);
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}
@@ -67,7 +99,10 @@ public class HttlTemplateEngine implements TemplateEngine {
 	public void writeTo(String templateName, TemplateContext context,
 			Writer writer) throws TemplateException, IOException {
 		try {
-			WebEngine.getTemplate(templateName).render(new TemplateContextMap(context), writer);
+			if (path != null && path.length() > 0) {
+				templateName = path + "/" + templateName;
+			}
+			WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context), writer);
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}

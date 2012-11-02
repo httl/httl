@@ -63,12 +63,12 @@ public final class ConfigUtils {
 	 * @param path - File path
 	 * @return Properties map
 	 */
-    public static Properties loadProperties(String path, boolean ignore) {
+    public static Properties loadProperties(String path, boolean required) {
     	Properties properties = new Properties();
-		return loadProperties(properties, path, ignore);
+		return loadProperties(properties, path, required);
 	}
     
-    public static Properties loadProperties(Properties properties, String path, boolean ignore) {
+    public static Properties loadProperties(Properties properties, String path, boolean required) {
 		if (path == null || path.length() == 0) {
 			throw new IllegalArgumentException("path == null");
 		}
@@ -92,10 +92,10 @@ public final class ConfigUtils {
 			    }
 			}
 		} catch (IOException e) {
-		    if (ignore) {
-		        return properties;
+		    if (required) {
+		    	throw new IllegalStateException(e.getMessage(), e);
 		    } else {
-		        throw new IllegalStateException(e.getMessage(), e);
+		    	return properties;
 		    }
 		}
 	}

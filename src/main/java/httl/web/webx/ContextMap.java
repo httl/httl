@@ -28,11 +28,11 @@ import com.alibaba.citrus.service.template.TemplateContext;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class TemplateContextMap implements Map<String, Object> {
+public class ContextMap implements Map<String, Object> {
 	
 	private final TemplateContext templateContext;
 
-	public TemplateContextMap(TemplateContext templateContext) {
+	public ContextMap(TemplateContext templateContext) {
 		if (templateContext == null) {
 			throw new IllegalArgumentException("templateContext == null");
 		}
@@ -116,7 +116,7 @@ public class TemplateContextMap implements Map<String, Object> {
 
         public ContextEntry(String key){
             this.key = key;
-            this.value = TemplateContextMap.this.get(key);
+            this.value = ContextMap.this.get(key);
         }
 
         public String getKey() {
@@ -129,7 +129,7 @@ public class TemplateContextMap implements Map<String, Object> {
 
         public Object setValue(Object value) {
             this.value = value;
-            return TemplateContextMap.this.put(key, value);
+            return ContextMap.this.put(key, value);
         }
 
     }
