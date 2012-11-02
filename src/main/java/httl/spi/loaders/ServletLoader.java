@@ -18,7 +18,6 @@ package httl.spi.loaders;
 
 import httl.Resource;
 import httl.spi.Loader;
-import httl.spi.loaders.AbstractLoader;
 import httl.util.UrlUtils;
 
 import java.io.IOException;
@@ -41,9 +40,6 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
     private static ServletContext SERVLET_CONTEXT;
 
     public static ServletContext getServletContext() {
-    	if (SERVLET_CONTEXT == null) {
-			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>httl.spi.loaders.ServletLoader</listener-class></listener> in your /WEB-INF/web.xml");
-		}
         return SERVLET_CONTEXT;
     }
 

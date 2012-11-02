@@ -59,13 +59,13 @@ public class WebEngine {
 					} else {
 						servletContext = ServletLoader.getServletContext();
 					}
-					String config = servletContext.getInitParameter(CONFIG_KEY);
+					String config = servletContext == null ? null : servletContext.getInitParameter(CONFIG_KEY);
 			        if (config != null && config.length() > 0) {
 			            if (config.startsWith("/")) {
 			                Properties properties = new Properties();
-			                InputStream in = servletContext.getResourceAsStream(config);
+			                InputStream in = servletContext == null ? null : servletContext.getResourceAsStream(config);
 			                if (in == null) {
-			                	throw new FileNotFoundException("Failed to load httl config " + config + " in wepapp.");
+			                	throw new FileNotFoundException("Not found httl config " + config + " in wepapp.");
 			                }
 			                properties.load(in);
 			                ENGINE = Engine.getEngine(config, properties);
@@ -73,7 +73,7 @@ public class WebEngine {
 			            	ENGINE = Engine.getEngine(config);
 			            }
 			        } else {
-			        	InputStream in = servletContext.getResourceAsStream(WEBINF_CONFIG);
+			        	InputStream in = servletContext == null ? null : servletContext.getResourceAsStream(WEBINF_CONFIG);
 			        	if (in != null) {
 			        		Properties properties = new Properties();
 			        		properties.load(in);
