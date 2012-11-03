@@ -23,7 +23,6 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.util.ClassUtils;
 import httl.util.UnsafeByteArrayOutputStream;
-import httl.util.WrappedMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,11 +59,9 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
-        parameters = new WrappedMap<String, Object>(parameters);
-        parameters.putAll(getImportMacros());
-        Context.pushContext(this, parameters);
+        Context context = Context.pushContext(this, parameters);
         try {
-            doRender(parameters, output);
+            doRender(context, parameters, output);
         } catch (RuntimeException e) {
             throw (RuntimeException) e;
         } catch (IOException e) {
@@ -80,6 +77,6 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         writer.write(render(parameters));
     }
 
-    protected abstract void doRender(Map<String, Object> parameters, OutputStream output) throws Exception;
+    protected abstract void doRender(Context context, Map<String, Object> parameters, OutputStream output) throws Exception;
 
 }

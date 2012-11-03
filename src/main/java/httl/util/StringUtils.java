@@ -109,8 +109,9 @@ public class StringUtils {
     	if (value == null || value.length() == 0) {
             return value;
         }
+    	int len = value.length();
         StringBuilder buf = null;
-        for (int i = 0; i < value.length(); i ++) {
+        for (int i = 0; i < len; i ++) {
             char ch = value.charAt(i);
             String str;
             switch (ch) {
@@ -144,7 +145,7 @@ public class StringUtils {
             }
             if (str != null) {
                 if (buf == null) {
-                    buf = new StringBuilder();
+                    buf = new StringBuilder(len * 2);
                     if(i > 0) {
                         buf.append(value.substring(0, i));
                     }
@@ -203,7 +204,7 @@ public class StringUtils {
                     	j --;
                 }
                 if (buf == null) {
-                    buf = new StringBuilder();
+                    buf = new StringBuilder(len);
                     if(j > 0) {
                         buf.append(value.substring(0, j));
                     }
@@ -220,48 +221,72 @@ public class StringUtils {
         return value;
     }
 
+    /**
+     * HTML特殊符转义。
+     * 
+     * 注意：此escapeHtml是不完备转义，只转义影响页面安全的“&”，“<”，“>”三个符号，以保证过滤的效率。
+     * 
+     * @param value 可能带HTML特殊符的串
+     * @return 不带HTML特殊符的串
+     */
     public static String escapeHtml(String value) {
         if (value == null || value.length() == 0) {
             return value;
         }
+        int len = value.length();
         StringBuilder buf = null;
-        for (int i = 0; i < value.length(); i ++) {
+        for (int i = 0; i < len; i ++) {
             char ch = value.charAt(i);
-            String str;
             switch (ch) {
                 case '&':
-                    str = "&amp;";
+                    if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if(i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&amp;");
                     break;
                 case '<':
-                    str = "&lt;";
+                	if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if(i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&lt;");
                     break;
                 case '>':
-                    str = "&gt;";
+                	if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if(i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&gt;");
                     break;
                 default:
-                    str = null;
+                	if (buf != null) {
+                        buf.append(ch);
+                    }
                     break;
             }
-            if (str != null) {
-                if (buf == null) {
-                    buf = new StringBuilder();
-                    if(i > 0) {
-                        buf.append(value.substring(0, i));
-                    }
-                }
-                buf.append(str);
-            } else {
-                if (buf != null) {
-                    buf.append(ch);
-                }
-            }
+            
         }
         if (buf != null) {
             return buf.toString();
         }
         return value;
     }
-    
+
+    /**
+     * HTML特殊符转义还原。
+     * 
+     * 注意：此unescapeHtml是不完备转义还原，只还原转义影响页面安全的“&”，“<”，“>”三个符号，以保证过滤的效率。
+     * 
+     * @param value 被转义HTML特殊符的串
+     * @return 还原后带HTML特殊符的串
+     */
     public static String unescapeHtml(String value) {
     	if (value == null || value.length() == 0) {
             return value;
@@ -280,32 +305,54 @@ public class StringUtils {
 						if (value.charAt(i + 2) == 't'
 							&& value.charAt(i + 3) == ';') {
 							i += 3;
-	                    	ch = '<';
-						}
+	                    	if (buf == null) {
+	                            buf = new StringBuilder(len3);
+	                            if(j > 0) {
+	                                buf.append(value.substring(0, j));
+	                            }
+	                        }
+	                        buf.append('<');
+						} else if (buf != null) {
+			            	buf.append('&');
+			            }
 						break;
 					case 'g':
 						if (value.charAt(i + 2) == 't'
 							&&value.charAt(i + 3) == ';') {
 							i += 3;
-	                    	ch = '>';
-						}
+	                    	if (buf == null) {
+	                            buf = new StringBuilder(len3);
+	                            if(j > 0) {
+	                                buf.append(value.substring(0, j));
+	                            }
+	                        }
+	                        buf.append('>');
+						} else if (buf != null) {
+			            	buf.append('&');
+			            }
 						break;
 					case 'a':
 						if (i < len4 && value.charAt(i + 2) == 'm'
 								&& value.charAt(i + 3) == 'p'
 								&& value.charAt(i + 4) == ';') {
 							i += 4;
-	                    	ch = '&';
-						}
+	                    	if (buf == null) {
+	                            buf = new StringBuilder(len4);
+	                            if(j > 0) {
+	                                buf.append(value.substring(0, j));
+	                            }
+	                        }
+	                        buf.append('&');
+						} else if (buf != null) {
+			            	buf.append('&');
+			            }
+						break;
+					default:
+						if (buf != null) {
+				        	buf.append('&');
+				        }
 						break;
 				}
-                if (buf == null) {
-                    buf = new StringBuilder();
-                    if(j > 0) {
-                        buf.append(value.substring(0, j));
-                    }
-                }
-                buf.append(ch);
             } else if (buf != null) {
             	buf.append(ch);
             }
@@ -320,9 +367,10 @@ public class StringUtils {
     	if (value == null || value.length() == 0) {
             return value;
         }
+    	int len = value.length();
     	StringBuilder buf = null;
     	boolean blank = false;
-    	for (int i = 0; i < value.length(); i ++) {
+    	for (int i = 0; i < len; i ++) {
     		char ch = value.charAt(i);
     		switch (ch) {
     			case ' ':
@@ -334,7 +382,7 @@ public class StringUtils {
 					if (! blank) {
 						blank = true;
 						if (buf == null) {
-							buf = new StringBuilder(value.length());
+							buf = new StringBuilder(len);
 							if (i > 0) {
 								buf.append(value.substring(0, i));
 							}
@@ -361,9 +409,10 @@ public class StringUtils {
     	if (value == null || value.length() == 0) {
             return value;
         }
+    	int len = value.length();
     	StringBuilder buf = null;
     	boolean blank = false;
-    	for (int i = 0; i < value.length(); i ++) {
+    	for (int i = 0; i < len; i ++) {
     		char ch = value.charAt(i);
     		switch (ch) {
     			case ' ':
@@ -375,7 +424,7 @@ public class StringUtils {
 					if (! blank) {
 						blank = true;
 						if (buf == null) {
-							buf = new StringBuilder(value.length());
+							buf = new StringBuilder(len);
 							if (i > 0) {
 								buf.append(value.substring(0, i));
 							}

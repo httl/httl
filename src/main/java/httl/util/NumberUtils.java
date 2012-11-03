@@ -29,11 +29,18 @@ public class NumberUtils {
 
     private static final String DEFAULT_FORMAT = "###,##0.###";
 
+    private static final ThreadLocal<DecimalFormat> DEFAULT_LOCAL = new ThreadLocal<DecimalFormat>() {
+		@Override
+		protected DecimalFormat initialValue() {
+			return new DecimalFormat(DEFAULT_FORMAT);
+		}
+    };
+
     private static final ThreadLocal<Map<String, DecimalFormat>> LOCAL = new ThreadLocal<Map<String, DecimalFormat>>();
 
     public static DecimalFormat getDecimalFormat(String format) {
-        if (format == null || format.length() == 0) {
-            format = DEFAULT_FORMAT;
+    	if (format == null || format.length() == 0 || DEFAULT_FORMAT.equals(format)) {
+    		return DEFAULT_LOCAL.get();
         }
         Map<String, DecimalFormat> formatters = LOCAL.get();
         if (formatters == null) {

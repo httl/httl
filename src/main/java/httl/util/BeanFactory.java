@@ -39,7 +39,7 @@ public class BeanFactory {
     	List<Object> inits = new ArrayList<Object>();
     	String key = StringUtils.splitCamelName(beanClass.getSimpleName(), ".");
     	String value = properties.getProperty(key);
-    	T instance = getInstance(value, beanClass, properties, instances, inits);
+    	T instance = getInstance(key, value, beanClass, properties, instances, inits);
     	try {
     		for (int i = inits.size() - 1; i >= 0; i --) { // reverse init order.
     			try {
@@ -81,10 +81,10 @@ public class BeanFactory {
 							String[] values = COMMA_SPLIT_PATTERN.split(value);
 							obj = Array.newInstance(componentType, values.length);
 							for (int i = 0; i < values.length; i++) {
-								Array.set(obj, i, parseValue(values[i], componentType, properties, instances, inits));
+								Array.set(obj, i, parseValue(key, values[i], componentType, properties, instances, inits));
 							}
 						} else {
-							obj = parseValue(value, parameterType, properties, instances, inits);
+							obj = parseValue(key, value, parameterType, properties, instances, inits);
 						}
 						method.invoke(object, new Object[] { obj });
 					}
@@ -96,7 +96,7 @@ public class BeanFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T getInstance(String value, Class<T> type, Properties properties, Map<String, Object> instances, List<Object> inits) {
+    private static <T> T getInstance(String key, String value, Class<T> type, Properties properties, Map<String, Object> instances, List<Object> inits) {
         if (value == null || value.length() == 0 || "null".equals(value)) {
             return null;
         }
@@ -105,10 +105,11 @@ public class BeanFactory {
             throw new IllegalStateException("The class + " + value + " unimplemented interface " + cls.getName() + ".");
         }
         try {
-            Object instance = instances.get(value);
+        	String index = key + "=" + value;
+            Object instance = instances.get(index);
             if (instance == null) {
             	instance = cls.newInstance();
-            	instances.put(value, instance);
+            	instances.put(index, instance);
             	injectInstance(instance, properties, instances, inits);
             }
             return (T) instance;
@@ -117,7 +118,7 @@ public class BeanFactory {
         }
     }
 
-    private static Object parseValue(String value, Class<?> parameterType, Properties properties, Map<String, Object> instances, List<Object> inits) {
+    private static Object parseValue(String key, String value, Class<?> parameterType, Properties properties, Map<String, Object> instances, List<Object> inits) {
         if (parameterType == String.class) {
             return value;
         } else if (parameterType == char.class) {
@@ -139,7 +140,7 @@ public class BeanFactory {
         } else if (parameterType == Class.class) {
             return ClassUtils.forName(value);
         } else {
-            return getInstance(value, parameterType, properties, instances, inits);
+            return getInstance(key, value, parameterType, properties, instances, inits);
         }
     }
 

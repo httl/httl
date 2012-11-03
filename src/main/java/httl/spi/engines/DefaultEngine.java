@@ -38,42 +38,19 @@ import java.util.concurrent.ConcurrentMap;
 public class DefaultEngine extends Engine {
 
     private Logger logger;
-    
-    private Map<Object, Object> cache;
-    
+
     private Loader loader;
 
     private Parser parser;
 
     private Translator translator;
 
+    private Map<Object, Object> templateCache;
+
+    private Map<Object, Object> expressionCache;
+    
     private boolean reloadable;
 
-    /**
-     * Get expression.
-     * 
-     * @param source
-     * @param parameterTypes
-     * @return
-     * @throws ParseException
-     */
-    public Expression getExpression(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
-        return translator.translate(source, parameterTypes, offset);
-    }
-
-    /**
-     * Get resource.
-     * 
-     * @param name
-     * @param encoding
-     * @return
-     * @throws IOException
-     * @throws ParseException
-     */
-    public Resource getResource(String name, String encoding) throws IOException {
-        return loader.load(name, encoding);
-    }
-	
 	/**
 	 * Get template.
 	 * 
@@ -88,13 +65,13 @@ public class DefaultEngine extends Engine {
 		if (name == null || name.trim().length() == 0) {
 			throw new IllegalArgumentException("template name == null");
 		}
-		Map<Object, Object> cache = this.cache; // safe copy reference
+		Map<Object, Object> cache = this.templateCache; // safe copy reference
 		if (cache == null) {
 		    return parseTemplate(name, encoding);
 		}
 		long lastModified;
         if (reloadable) {
-        	lastModified = loader.load(name, encoding).getLastModified();
+        	lastModified = getResource(name, encoding).getLastModified();
         } else {
         	lastModified = -1;
         }
@@ -169,7 +146,67 @@ public class DefaultEngine extends Engine {
                                      + ", stack: " + ClassUtils.toString(e), offset);
         }
     }
-    
+
+    /**
+     * Get expression.
+     * 
+     * @param source
+     * @param parameterTypes
+     * @return
+     * @throws ParseException
+     */
+    @SuppressWarnings("unchecked")
+	public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
+    	Map<Object, Object> cache = this.expressionCache; // safe copy reference
+		if (cache == null) {
+		    return translator.translate(source, parameterTypes, 0);
+		}
+        VolatileReference<Expression> reference = (VolatileReference<Expression>) cache.get(source);
+        if (reference == null) {
+        	if (cache instanceof ConcurrentMap) {
+        		reference = new VolatileReference<Expression>(); // quickly
+        		VolatileReference<Expression> old = (VolatileReference<Expression>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(source, reference);
+        		if (old != null) { // duplicate
+        			reference = old;
+        		}
+        	} else {
+	        	synchronized (cache) { // cache lock
+	        		reference = (VolatileReference<Expression>) cache.get(source);
+	                if (reference == null) { // double check
+	                	reference = new VolatileReference<Expression>(); // quickly
+	                	cache.put(source, reference);
+	                }
+				}
+        	}
+        }
+        assert(reference != null);
+        Expression expression = (Expression) reference.get();
+		if (expression == null) {
+			synchronized (reference) { // reference lock
+				expression = (Expression) reference.get();
+				if (expression == null) { // double check
+					expression = translator.translate(source, parameterTypes, 0); // slowly
+					reference.set(expression);
+				}
+			}
+		}
+		assert(expression != null);
+		return expression;
+    }
+
+    /**
+     * Get resource.
+     * 
+     * @param name
+     * @param encoding
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    public Resource getResource(String name, String encoding) throws IOException {
+        return loader.load(name, encoding);
+    }
+
     public void setReloadable(boolean reloadable) {
     	this.reloadable = reloadable;
     }
@@ -199,14 +236,23 @@ public class DefaultEngine extends Engine {
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
+
+    /**
+     * Set expression cache.
+     * 
+     * @param cache expression cache.
+     */
+    public void setExpressionCache(Map<Object, Object> cache) {
+        this.expressionCache = cache;
+	}
     
     /**
      * Set template cache.
      * 
      * @param cache template cache.
      */
-    public void setCache(Map<Object, Object> cache) {
-        this.cache = cache;
+    public void setTemplateCache(Map<Object, Object> cache) {
+        this.templateCache = cache;
 	}
     
 	/**

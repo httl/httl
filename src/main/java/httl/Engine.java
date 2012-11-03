@@ -174,7 +174,7 @@ public abstract class Engine {
      * @throws ParseException
      */
     public Expression getExpression(String source) throws ParseException {
-        return getExpression(source, null, 0);
+        return getExpression(source, null);
     }
 
     /**
@@ -186,20 +186,7 @@ public abstract class Engine {
      * @return expression.
      * @throws ParseException
      */
-    public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
-        return getExpression(source, parameterTypes, 0);
-    }
-
-    /**
-     * Get expression.
-     * 
-     * @see #getEngine()
-     * @param source
-     * @param parameterTypes
-     * @return template resource.
-     * @throws ParseException
-     */
-    public abstract Expression getExpression(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException;
+    public abstract Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException;
 
     /**
      * Get template resource.

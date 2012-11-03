@@ -84,6 +84,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     private transient final String falseValue;
 
+    private transient final String outputEncoding;
+
 	private final Map<String, Template> importMacros;
 
 	private final Map<String, Template> macros;
@@ -124,6 +126,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.nullValue = engine.getProperty(NULL_VALUE, "");
 		this.trueValue = engine.getProperty(TRUE_VALUE, "true");
 		this.falseValue = engine.getProperty(FALSE_VALUE, "false");
+		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING);
 	}
 
 	protected Map<String, Template> getImportMacros() {
@@ -199,10 +202,9 @@ public abstract class AbstractTemplate implements Template, Serializable {
     }
 
     protected String toString(UnsafeByteArrayOutputStream output) {
-        String encoding = engine.getProperty(OUTPUT_ENCODING);
-        if (encoding != null && encoding.length() > 0) {
+        if (outputEncoding != null && outputEncoding.length() > 0) {
             try {
-                return new String(output.toByteArray(), encoding);
+                return new String(output.toByteArray(), outputEncoding);
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException(e);
             }
@@ -352,7 +354,15 @@ public abstract class AbstractTemplate implements Template, Serializable {
     }
     
     protected byte[] serialize(String value) {
-        return value == null ? new byte[0] : value.getBytes();
+    	if (value == null || value.length() == 0)
+    		return new byte[0];
+    	if (outputEncoding == null || outputEncoding.length() == 0)
+    		return value.getBytes();
+        try {
+			return value.getBytes(outputEncoding);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		}
     }
 
 }

@@ -20,12 +20,13 @@ import httl.Engine;
 import httl.Expression;
 import httl.spi.Compiler;
 import httl.util.ClassUtils;
+import httl.util.MD5;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * ExpressionImpl. (SPI, Prototype, ThreadSafe)
@@ -35,8 +36,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ExpressionImpl implements Expression {
 
 	private static final long serialVersionUID = 1L;
-
-    private static final AtomicInteger sequence = new AtomicInteger();
 
     private final Engine engine;
 
@@ -57,6 +56,8 @@ public class ExpressionImpl implements Expression {
     private final Set<String> importPackageSet;
 
     private final Map<Class<?>, Object> functions;
+
+    private volatile String md5;
     
     private volatile Evaluator evaluator;
     
@@ -83,8 +84,8 @@ public class ExpressionImpl implements Expression {
     	}
         return evaluator.evaluate(parameters);
     }
-
-    private Evaluator newEvaluator() {
+    
+    private Class<?> newEvaluatorClass(String className) {
     	StringBuilder imports = new StringBuilder();
         String[] packages = importPackages;
         if (packages != null && packages.length > 0) {
@@ -134,7 +135,6 @@ public class ExpressionImpl implements Expression {
         	functionInits.append(typeName);
         	functionInits.append(".class);\n");
         }
-        String className = (Evaluator.class.getSimpleName() + "_" + sequence.incrementAndGet());
         String sourceCode = "package " + Evaluator.class.getPackage().getName() + ";\n" 
                 + imports.toString()
                 + "public class " + className + " implements " + Evaluator.class.getName() + " {\n" 
@@ -148,9 +148,27 @@ public class ExpressionImpl implements Expression {
                 + "}\n"
                 + "}\n";
         try {
-            return (Evaluator) compiler.compile(sourceCode).getConstructor(Map.class).newInstance(functions);
+        	return compiler.compile(sourceCode);
+        } catch (ParseException e) {
+        	throw new IllegalStateException("Failed to create expression class. class: " + className + ", code: \n" + sourceCode + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
+        }
+    }
+
+    private Evaluator newEvaluator() {
+    	if (md5 == null) {
+    		md5 = MD5.getMD5(source);
+    	}
+    	String className = (Evaluator.class.getSimpleName() + "_" + md5);
+    	Class<?> cls;
+    	try {
+    		cls = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+    	} catch (ClassNotFoundException e) {
+    		cls = newEvaluatorClass(className);
+    	}
+        try {
+            return (Evaluator) cls.getConstructor(Map.class).newInstance(functions);
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to create expression instance. code: \n" + sourceCode + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
+            throw new IllegalStateException("Failed to create expression instance. class: " + className + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
         }
     }
 

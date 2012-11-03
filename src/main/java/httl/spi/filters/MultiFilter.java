@@ -61,6 +61,9 @@ public abstract class MultiFilter implements Filter {
     }
 
     public String filter(String value) {
+    	if (templateFilters.size() == 1) {
+    		return templateFilters.get(0).filter(value);
+    	}
         if (templateFilters.size() > 0) {
             for (Filter filter : templateFilters) {
                 value = filter.filter(value);

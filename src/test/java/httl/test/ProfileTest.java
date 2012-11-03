@@ -22,14 +22,9 @@ import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.User;
 import httl.util.ClassUtils;
-import httl.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.StringWriter;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,46 +79,34 @@ public class ProfileTest extends TestCase {
         context.put("mapbooklist", mapbooklist);
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
-        String[] configs = new String[] { "httl.properties", "httl-javassist.properties", "httl-attribute.properties" };
         for(;;) {
-	        for (String config : configs) {
-		        System.out.println("========" + config + "========");
-	        	Engine engine = Engine.getEngine(config);
-	        	String dir = engine.getProperty("template.directory");
-	        	if (dir.length() > 0) {
-	        		dir += "/";
-	        	}
-		        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-		        super.assertTrue(directory.isDirectory());
-		        File[] files = directory.listFiles();
-		        for (int i = 0, n = files.length; i < n; i ++) {
-		            File file = files[i];
-		            /*if (! "block.httl".equals(file.getName())) {
-		                continue;
-		            }*/
-		            System.out.println(file.getName());
-		            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName());
-		            if (url == null) {
-		                throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName());
-		            }
-		            File result = new File(url.getFile());
-		            if (! result.exists()) {
-		                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
-		            }
-		            Template template = engine.getTemplate("/templates/" + file.getName());
-		            super.assertEquals(AdaptiveTemplate.class, template.getClass());
-		            String expected = IOUtils.readToString(new FileReader(result));
-		            ByteArrayOutputStream actualStream = new ByteArrayOutputStream();
-		            StringWriter actualWriter = new StringWriter();;
-		            try {
-		            	template.render(context, actualWriter);
-		            	template.render(context, actualStream);
-		            } catch (Exception e) {
-		            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
-		            }
-		            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
-		            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
-		        }
+        	Engine engine = Engine.getEngine();
+        	String dir = engine.getProperty("template.directory");
+        	if (dir.length() > 0) {
+        		dir += "/";
+        	}
+	        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
+	        super.assertTrue(directory.isDirectory());
+	        File[] files = directory.listFiles();
+	        for (int i = 0, n = files.length; i < n; i ++) {
+	            File file = files[i];
+	            /*if (! "block.httl".equals(file.getName())) {
+	                continue;
+	            }*/
+	            //System.out.println(file.getName());
+	            Template template = engine.getTemplate("/templates/" + file.getName());
+	            super.assertEquals(AdaptiveTemplate.class, template.getClass());
+	            ByteArrayOutputStream actualStream = new ByteArrayOutputStream();
+	            //StringWriter actualWriter = new StringWriter();;
+	            try {
+	            	template.render(context, actualStream);
+	            	//template.render(context, actualWriter);
+	            } catch (Exception e) {
+	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
+	            }
+	            synchronized (ProfileTest.class) {
+	            	ProfileTest.class.wait(50);
+				}
 	        }
         }
     }

@@ -16,6 +16,8 @@
  */
 package httl;
 
+import httl.util.WrappedMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,8 +58,10 @@ public final class Context {
      * @param template
      * @param parameters
      */
-    public static void pushContext(Template template, Map<String, Object> parameters) {
-        LOCAL.set(new Context(LOCAL.get(), template, parameters));
+    public static Context pushContext(Template template, Map<String, Object> parameters) {
+    	Context context = new Context(LOCAL.get(), template, parameters);
+        LOCAL.set(context);
+        return context;
     }
 
     /**
@@ -87,6 +91,8 @@ public final class Context {
     private final Template template;
 
     private final Map<String, Object> parameters;
+
+    private Map<String, Object> contextParameters;
 
     private Context(Context parent, Template template, Map<String, Object> parameters) {
         this.parent = parent;
@@ -121,7 +127,10 @@ public final class Context {
      * @return current parameters.
      */
     public Map<String, Object> getParameters() {
-        return parameters;
+    	if (contextParameters == null) { // safe in thread local
+    		contextParameters = new WrappedMap<String, Object>(parameters);
+    	}
+        return contextParameters;
     }
 
 }

@@ -44,6 +44,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * ClassUtils. (Tool, Static, ThreadSafe)
@@ -55,6 +57,8 @@ public class ClassUtils {
     public static final String CLASS_EXTENSION = ".class";
 
     public static final String JAVA_EXTENSION = ".java";
+    
+    public static final ConcurrentMap<String, Class<?>> CLASS_CACHE = new ConcurrentHashMap<String, Class<?>>();
 
     public static Object newInstance(String name) {
         try {
@@ -106,57 +110,84 @@ public class ClassUtils {
         }
     }
     
-    public static Class<?> _forName(String className) throws ClassNotFoundException {
-        if ("boolean".equals(className))
-            return boolean.class;
-        if ("byte".equals(className))
-            return byte.class;
-        if ("char".equals(className))
-            return char.class;
-        if ("short".equals(className))
-            return short.class;
-        if ("int".equals(className))
-            return int.class;
-        if ("long".equals(className))
-            return long.class;
-        if ("float".equals(className))
-            return float.class;
-        if ("double".equals(className))
-            return double.class;
-        if ("boolean[]".equals(className))
-            return boolean[].class;
-        if ("byte[]".equals(className))
-            return byte[].class;
-        if ("char[]".equals(className))
-            return char[].class;
-        if ("short[]".equals(className))
-            return short[].class;
-        if ("int[]".equals(className))
-            return int[].class;
-        if ("long[]".equals(className))
-            return long[].class;
-        if ("float[]".equals(className))
-            return float[].class;
-        if ("double[]".equals(className))
-            return double[].class;
-        try {
-            return arrayForName(className);
-        } catch (ClassNotFoundException e) {
-            if (className.indexOf('.') == -1) { // 尝试java.lang包
-                try {
-                    return arrayForName("java.lang." + className);
-                } catch (ClassNotFoundException e2) {
-                    // 忽略尝试异常, 抛出原始异常
-                }
-            }
-            throw e;
-        }
-    }
-    
-    private static Class<?> arrayForName(String className) throws ClassNotFoundException {
-        return Class.forName(className.endsWith("[]")
-                ? "[L" + className.substring(0, className.length() - 2) + ";"
-                        : className, true, Thread.currentThread().getContextClassLoader());
+    private static Class<?> _forName(String name) throws ClassNotFoundException {
+		if (name == null || name.length() == 0)
+			return null;
+		int index = name.indexOf('[');
+		if (index > 0) {
+			int i = (name.length() - index) / 2;
+			name = name.substring(0, index);
+			StringBuilder sb = new StringBuilder();
+			while (i-- > 0)
+				sb.append("["); // int[][]
+			if ("void".equals(name))
+				sb.append("V");
+			else if ("boolean".equals(name))
+				sb.append("Z");
+			else if ("byte".equals(name))
+				sb.append("B");
+			else if ("char".equals(name))
+				sb.append("C");
+			else if ("double".equals(name))
+				sb.append("D");
+			else if ("float".equals(name))
+				sb.append("F");
+			else if ("int".equals(name))
+				sb.append("I");
+			else if ("long".equals(name))
+				sb.append("J");
+			else if ("short".equals(name))
+				sb.append("S");
+			else
+				sb.append('L').append(name).append(';');
+			name = sb.toString();
+		} else {
+			if ("void".equals(name))
+				return void.class;
+			else if ("boolean".equals(name))
+				return boolean.class;
+			else if ("byte".equals(name))
+				return byte.class;
+			else if ("char".equals(name))
+				return char.class;
+			else if ("double".equals(name))
+				return double.class;
+			else if ("float".equals(name))
+				return float.class;
+			else if ("int".equals(name))
+				return int.class;
+			else if ("long".equals(name))
+				return long.class;
+			else if ("short".equals(name))
+				return short.class;
+			else if ("Void".equals(name))
+				return Void.class;
+			else if ("Boolean".equals(name))
+				return Boolean.class;
+			else if ("Byte".equals(name))
+				return Byte.class;
+			else if ("Char".equals(name))
+				return Character.class;
+			else if ("Double".equals(name))
+				return Double.class;
+			else if ("Float".equals(name))
+				return Float.class;
+			else if ("Integer".equals(name))
+				return Integer.class;
+			else if ("Long".equals(name))
+				return Long.class;
+			else if ("Short".equals(name))
+				return Short.class;
+			else if ("String".equals(name))
+				return String.class;
+		}
+		Class<?> clazz = CLASS_CACHE.get(name);
+		if (clazz == null) {
+			clazz = Class.forName(name, true, Thread.currentThread()
+					.getContextClassLoader());
+			CLASS_CACHE.put(name, clazz);
+		}
+		return clazz;
     }
     
     public static Class<?> getBoxedClass(Class<?> type) {

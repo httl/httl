@@ -23,7 +23,6 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.util.ClassUtils;
 import httl.util.UnsafeStringWriter;
-import httl.util.WrappedMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -65,11 +64,9 @@ public abstract class WriterTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
     	if (writer == null) 
          	throw new IllegalArgumentException("writer == null");
-    	parameters = new WrappedMap<String, Object>(parameters);
-    	parameters.putAll(getImportMacros());
-        Context.pushContext(this, parameters);
+    	Context context = Context.pushContext(this, parameters);
         try {
-            doRender(parameters, writer);
+            doRender(context, parameters, writer);
         } catch (RuntimeException e) {
             throw (RuntimeException) e;
         } catch (IOException e) {
@@ -81,6 +78,6 @@ public abstract class WriterTemplate extends AbstractTemplate {
         }
     }
 
-    protected abstract void doRender(Map<String, Object> parameters, Writer output) throws Exception;
+    protected abstract void doRender(Context context, Map<String, Object> parameters, Writer output) throws Exception;
 
 }

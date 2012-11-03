@@ -33,11 +33,22 @@ public class DateUtils {
 
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    private static final ThreadLocal<SimpleDateFormat> DEFAULT_LOCAL = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		protected SimpleDateFormat initialValue() {
+			return new SimpleDateFormat(DEFAULT_FORMAT);
+		}
+    };
+
     private static final ThreadLocal<Map<String, SimpleDateFormat>> LOCAL = new ThreadLocal<Map<String, SimpleDateFormat>>();
 
     public static DateFormat getDateFormat(String format, TimeZone timeZone) {
-        if (format == null || format.length() == 0) {
-            format = DEFAULT_FORMAT;
+        if (format == null || format.length() == 0 || DEFAULT_FORMAT.equals(format)) {
+        	if (timeZone == null) {
+        		return DEFAULT_LOCAL.get();
+        	} else {
+        		format = DEFAULT_FORMAT;
+        	}
         }
         Map<String, SimpleDateFormat> formatters = LOCAL.get();
         if (formatters == null) {

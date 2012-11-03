@@ -179,7 +179,7 @@ public class DefaultMethod {
         if (template == null) {
             throw new IllegalArgumentException("display context template == null");
         }
-        return engine.getExpression(expr, template.getParameterTypes(), 0).evaluate(Context.getContext().getParameters());
+        return engine.getExpression(expr, template.getParameterTypes()).evaluate(Context.getContext().getParameters());
     }
 
     public static String escapeString(String value) {

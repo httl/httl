@@ -44,6 +44,8 @@ public final class ConfigUtils {
 	
 	private static final Pattern INTEGER_PATTERN = Pattern.compile("^\\d+$");
 
+    private static final String REF = "$";
+
     private static final String PLUS = "+";
 
     private static final String COMMA = ",";
@@ -131,6 +133,9 @@ public final class ConfigUtils {
 	    		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 	                String key = (String) entry.getKey();
 	                String value = (String) entry.getValue();
+	                while (value != null && value.length() > 0 && value.startsWith(REF)) {
+	                	value = properties.getProperty(value.substring(1));
+	                }
 	                if (key.endsWith(PLUS)) {
 	                	if (value != null && value.length() > 0) {
 	                		plusConfigs.put(key, value);

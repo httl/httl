@@ -16,6 +16,7 @@
  */
 package httl.spi.parsers;
 
+import httl.Context;
 import httl.Engine;
 import httl.Expression;
 import httl.Resource;
@@ -425,7 +426,7 @@ public abstract class AbstractParser implements Parser {
                     + textInits
                     + "}\n"
                     + "\n"
-                    + "protected void doRender(" + Map.class.getName() + " $parameters, " 
+                    + "protected void doRender(" + Context.class.getName() + " $context, " + Map.class.getName() + " $parameters, " 
                     + (stream ? OutputStream.class.getName() : Writer.class.getName())
                     + " $output) throws " + Exception.class.getName() + " {\n" 
                     + methodCode
@@ -786,7 +787,7 @@ public abstract class AbstractParser implements Parser {
             types.put(var, clazz);
             buf.append(var + " = (" + type + ")(" + expression.getCode() + ");\n");
             if (":=".equals(oper)) {
-	            buf.append("$parameters.put(\"");
+	            buf.append("$context.getParameters().put(\"");
 	            buf.append(var);
 	            buf.append("\", ");
 	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
