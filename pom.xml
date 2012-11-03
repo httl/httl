@@ -182,6 +182,7 @@
 				<configuration>
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<forkMode>once</forkMode>
+					<argLine>-server -Xms128m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=256m</argLine>
 					<systemProperties>
 						<property>
 							<name>count</name>
