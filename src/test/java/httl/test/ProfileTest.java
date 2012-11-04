@@ -18,7 +18,6 @@ package httl.test;
 
 import httl.Engine;
 import httl.Template;
-import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.User;
 import httl.test.performance.DiscardOutputStream;
@@ -51,10 +50,10 @@ public class ProfileTest extends TestCase {
 
     @Test
     public void testTemplate() throws Exception {
-    	/*boolean profile = "true".equals(System.getProperty("profile"));
+    	boolean profile = "true".equals(System.getProperty("profile"));
     	if (! profile) {
     		return;
-    	}*/
+    	}
         boolean stream = "true".equals(System.getProperty("stream"));
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         format.setTimeZone(TimeZone.getTimeZone("+0"));
@@ -87,6 +86,8 @@ public class ProfileTest extends TestCase {
         context.put("mapbooklist", mapbooklist);
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
+        OutputStream outputStream = new DiscardOutputStream();
+        Writer writer = new DiscardWriter();;
         for(;;) {
         	Engine engine = Engine.getEngine("httl-profile.properties");
         	String dir = engine.getProperty("template.directory");
@@ -94,7 +95,6 @@ public class ProfileTest extends TestCase {
         		dir += "/";
         	}
 	        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-	        super.assertTrue(directory.isDirectory());
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
@@ -103,9 +103,6 @@ public class ProfileTest extends TestCase {
 	            }*/
 	            //System.out.println(file.getName());
 	            Template template = engine.getTemplate("/templates/" + file.getName());
-	            super.assertEquals(AdaptiveTemplate.class, template.getClass());
-	            OutputStream outputStream = new DiscardOutputStream();
-	            Writer writer = new DiscardWriter();;
 	            try {
 	            	if (stream)
 	            		template.render(context, outputStream);
