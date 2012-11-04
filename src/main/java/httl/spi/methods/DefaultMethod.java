@@ -32,6 +32,7 @@ import httl.util.WrappedMap;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Collection;
@@ -186,12 +187,24 @@ public class DefaultMethod {
         return StringUtils.escapeString(value);
     }
 
+    public static String unescapeString(String value) {
+        return StringUtils.unescapeString(value);
+    }
+
     public static String escapeHtml(String value) {
         return StringUtils.escapeHtml(value);
     }
 
+    public static String unescapeHtml(String value) {
+        return StringUtils.unescapeHtml(value);
+    }
+
     public static String escapeXml(String value) {
         return StringUtils.escapeXml(value);
+    }
+
+    public static String unescapeXml(String value) {
+        return StringUtils.unescapeXml(value);
     }
 
     public String escapeUrl(String value) {
@@ -201,6 +214,18 @@ public class DefaultMethod {
     public static String escapeUrl(String value, String encoding) {
         try {
 			return value == null ? null : URLEncoder.encode(value, encoding);
+		} catch (UnsupportedEncodingException e) {
+			return value;
+		}
+    }
+
+    public String unescapeUrl(String value) {
+    	return unescapeUrl(value, outputEncoding);
+    }
+
+    public static String unescapeUrl(String value, String encoding) {
+        try {
+			return value == null ? null : URLDecoder.decode(value, encoding);
 		} catch (UnsupportedEncodingException e) {
 			return value;
 		}
