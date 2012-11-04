@@ -27,6 +27,7 @@ import httl.util.UnsafeByteArrayOutputStream;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -86,6 +87,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     private transient final String outputEncoding;
 
+    private transient final Charset outputCharset;
+
 	private final Map<String, Template> importMacros;
 
 	private final Map<String, Template> macros;
@@ -127,6 +130,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.trueValue = engine.getProperty(TRUE_VALUE, "true");
 		this.falseValue = engine.getProperty(FALSE_VALUE, "false");
 		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING);
+		this.outputCharset = outputEncoding == null || outputEncoding.length() == 0 ? null : Charset.forName(outputEncoding);
 	}
 
 	protected Map<String, Template> getImportMacros() {
@@ -356,13 +360,9 @@ public abstract class AbstractTemplate implements Template, Serializable {
     protected byte[] serialize(String value) {
     	if (value == null || value.length() == 0)
     		return new byte[0];
-    	if (outputEncoding == null || outputEncoding.length() == 0)
+    	if (outputCharset == null)
     		return value.getBytes();
-        try {
-			return value.getBytes(outputEncoding);
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e.getMessage(), e);
-		}
+    	return value.getBytes(outputCharset);
     }
 
 }

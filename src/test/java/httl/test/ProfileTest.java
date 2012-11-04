@@ -51,10 +51,10 @@ public class ProfileTest extends TestCase {
 
     @Test
     public void testTemplate() throws Exception {
-    	boolean profile = "true".equals(System.getProperty("profile"));
+    	/*boolean profile = "true".equals(System.getProperty("profile"));
     	if (! profile) {
     		return;
-    	}
+    	}*/
         boolean stream = "true".equals(System.getProperty("stream"));
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         format.setTimeZone(TimeZone.getTimeZone("+0"));
