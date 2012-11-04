@@ -88,7 +88,7 @@ public class ProfileTest extends TestCase {
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
         for(;;) {
-        	Engine engine = Engine.getEngine();
+        	Engine engine = Engine.getEngine("httl-profile.properties");
         	String dir = engine.getProperty("template.directory");
         	if (dir.length() > 0) {
         		dir += "/";
