@@ -224,12 +224,14 @@ public class StringUtils {
     /**
      * HTML特殊符转义。
      * 
-     * 注意：此escapeHtml是不完备转义，只转义影响页面安全的“&”，“<”，“>”三个符号，以保证过滤的效率。
-     * 
      * @param value 可能带HTML特殊符的串
      * @return 不带HTML特殊符的串
      */
     public static String escapeHtml(String value) {
+    	return escapeXml(value);
+    }
+    
+    public static String escapeXml(String value) {
         if (value == null || value.length() == 0) {
             return value;
         }
@@ -265,6 +267,24 @@ public class StringUtils {
                     }
                     buf.append("&gt;");
                     break;
+                case '\"':
+                	if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if(i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&quot;");
+                    break;
+                case '\'':
+                	if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if(i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&apos;");
+                    break;
                 default:
                 	if (buf != null) {
                         buf.append(ch);
@@ -282,12 +302,14 @@ public class StringUtils {
     /**
      * HTML特殊符转义还原。
      * 
-     * 注意：此unescapeHtml是不完备转义还原，只还原转义影响页面安全的“&”，“<”，“>”三个符号，以保证过滤的效率。
-     * 
      * @param value 被转义HTML特殊符的串
      * @return 还原后带HTML特殊符的串
      */
     public static String unescapeHtml(String value) {
+    	return unescapeXml(value);
+    }
+    
+    public static String unescapeXml(String value) {
     	if (value == null || value.length() == 0) {
             return value;
         }
@@ -295,6 +317,7 @@ public class StringUtils {
     	int len = value.length();
     	int len3 = len - 3;
     	int len4 = len - 4;
+    	int len5 = len - 5;
         for (int i = 0; i < len; i ++) {
             char ch = value.charAt(i);
             if (ch == '&' && i < len3) {
@@ -343,6 +366,35 @@ public class StringUtils {
 	                            }
 	                        }
 	                        buf.append('&');
+						} else if (i < len5 && value.charAt(i + 2) == 'p'
+								&& value.charAt(i + 3) == 'o'
+								&& value.charAt(i + 4) == 's'
+								&& value.charAt(i + 5) == ';') {
+							i += 5;
+	                    	if (buf == null) {
+	                            buf = new StringBuilder(len5);
+	                            if(j > 0) {
+	                                buf.append(value.substring(0, j));
+	                            }
+	                        }
+	                        buf.append('\'');
+						} else if (buf != null) {
+			            	buf.append('&');
+			            }
+						break;
+					case 'q':
+						if (i < len5 && value.charAt(i + 2) == 'u'
+								&& value.charAt(i + 3) == 'o'
+								&& value.charAt(i + 4) == 't'
+								&& value.charAt(i + 5) == ';') {
+							i += 5;
+	                    	if (buf == null) {
+	                            buf = new StringBuilder(len5);
+	                            if(j > 0) {
+	                                buf.append(value.substring(0, j));
+	                            }
+	                        }
+	                        buf.append('\"');
 						} else if (buf != null) {
 			            	buf.append('&');
 			            }
@@ -438,6 +490,57 @@ public class StringUtils {
 					}
 					if (buf != null) {
 						buf.append(ch);
+					}
+					break;
+			}
+    	}
+    	if (buf != null) {
+            return buf.toString();
+        }
+        return value;
+    }
+
+    public static String clearBlankLine(String value) {
+    	if (value == null || value.length() == 0) {
+            return value;
+        }
+    	int len = value.length();
+    	int len1 = len - 1;
+    	StringBuilder buf = null;
+    	int pre = 0;
+    	boolean blank = true;
+    	for (int i = 0; i < len; i ++) {
+    		char ch = value.charAt(i);
+    		if (buf != null) {
+				buf.append(ch);
+			}
+    		switch (ch) {
+	    		case ' ':
+				case '\t':
+				case '\r':
+				case '\b':
+				case '\f':
+					if (i < len1) {
+						break;
+					}
+				case '\n':
+    				if (blank) {
+	    				if (buf == null) {
+							buf = new StringBuilder(len);
+							if (pre > 0) {
+								buf.append(value.substring(0, pre + 1));
+							}
+						} else {
+							buf.setLength(buf.length() - i + pre);
+						}
+    				} else {
+    					blank = true;
+    				}
+    				pre = i;
+    				break;
+				default:
+					if (blank) {
+						blank = false;
 					}
 					break;
 			}

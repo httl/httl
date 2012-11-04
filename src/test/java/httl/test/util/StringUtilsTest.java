@@ -35,12 +35,20 @@ public class StringUtilsTest {
 
 	@Test
 	public void testEscapeHtml() {
-		Assert.assertEquals("a&lt;table border=\"0\"&gt;b&amp;lt;c&lt;/table&gt;d", StringUtils.escapeHtml("a<table border=\"0\">b&lt;c</table>d"));
+		Assert.assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", StringUtils.escapeHtml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d"));
 	}
 
 	@Test
 	public void testUnescapeHtml() {
-		Assert.assertEquals("a<table border=\"0\">b&lt;c</table>d", StringUtils.unescapeHtml("a&lt;table border=\"0\"&gt;b&amp;lt;c&lt;/table&gt;d"));
+		Assert.assertEquals("a<table border=\"0\" color=\'red\'>b&lt;c</table>d", StringUtils.unescapeHtml("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d"));
+	}
+
+	@Test
+	public void testClearBlankLine() {
+		Assert.assertEquals("12345678", StringUtils.clearBlankLine("12345678"));
+		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));
+		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine("\n\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t\n\n")));
+		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine(" \t\n\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t\n\n \t")));
 	}
 
 	@Test

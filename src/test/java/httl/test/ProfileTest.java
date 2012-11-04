@@ -21,10 +21,13 @@ import httl.Template;
 import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.User;
+import httl.test.performance.DiscardOutputStream;
+import httl.test.performance.DiscardWriter;
 import httl.util.ClassUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +51,11 @@ public class ProfileTest extends TestCase {
 
     @Test
     public void testTemplate() throws Exception {
+    	boolean profile = "true".equals(System.getProperty("profile"));
+    	if (! profile) {
+    		return;
+    	}
+        boolean stream = "true".equals(System.getProperty("stream"));
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         format.setTimeZone(TimeZone.getTimeZone("+0"));
         User user = new User("liangfei", "admin", "Y");
@@ -96,11 +104,13 @@ public class ProfileTest extends TestCase {
 	            //System.out.println(file.getName());
 	            Template template = engine.getTemplate("/templates/" + file.getName());
 	            super.assertEquals(AdaptiveTemplate.class, template.getClass());
-	            ByteArrayOutputStream actualStream = new ByteArrayOutputStream();
-	            //StringWriter actualWriter = new StringWriter();;
+	            OutputStream outputStream = new DiscardOutputStream();
+	            Writer writer = new DiscardWriter();;
 	            try {
-	            	template.render(context, actualStream);
-	            	//template.render(context, actualWriter);
+	            	if (stream)
+	            		template.render(context, outputStream);
+	            	else
+	            		template.render(context, writer);
 	            } catch (Exception e) {
 	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
 	            }

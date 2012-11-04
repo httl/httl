@@ -5,6 +5,8 @@ import httl.test.model.User;
 import httl.test.performance.BeetlCase;
 import httl.test.performance.Case;
 import httl.test.performance.Counter;
+import httl.test.performance.DiscardOutputStream;
+import httl.test.performance.DiscardWriter;
 import httl.test.performance.FreemarkerCase;
 import httl.test.performance.HttlCase;
 import httl.test.performance.JavaCase;
@@ -26,6 +28,7 @@ public class ShowTest {
     public void testShow() throws Exception {
         int size = 2;
         int times = 1;
+        boolean stream = "true".equals(System.getProperty("stream"));
         Random random = new Random();
         Book[] books = new Book[size];
         for (int i = 0; i < size; i ++) {
@@ -42,7 +45,7 @@ public class ShowTest {
             Case c = cases[i % cases.length];
             Counter counter = new Counter();
             StringWriter writer = new StringWriter();
-            c.count(counter, times, "books", new HashMap<String, Object>(context), null, null, null);
+            c.count(counter, times, "books", new HashMap<String, Object>(context), writer, new DiscardWriter(), stream ? new DiscardOutputStream() : null);
             System.out.println(writer.getBuffer().toString());
         }
         System.out.println("=============");

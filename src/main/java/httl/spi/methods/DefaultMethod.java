@@ -190,6 +190,10 @@ public class DefaultMethod {
         return StringUtils.escapeHtml(value);
     }
 
+    public static String escapeXml(String value) {
+        return StringUtils.escapeXml(value);
+    }
+
     public String escapeUrl(String value) {
     	return escapeUrl(value, outputEncoding);
     }
