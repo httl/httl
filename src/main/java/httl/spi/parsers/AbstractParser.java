@@ -315,7 +315,7 @@ public abstract class AbstractParser implements Parser {
     }
     
     protected Class<?> parseClass(Resource resource, boolean stream) throws IOException, ParseException {
-        String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified() + "_for_" + (stream ? "stream" : "writer")).replaceAll("_");
+        String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified() + "_" + (stream ? "stream" : "writer")).replaceAll("_");
         try {
             return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
