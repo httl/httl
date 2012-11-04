@@ -14,29 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.parsers.template;
-
-import httl.util.ArraySet;
-import httl.util.MapEntry;
+package httl.util;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
- * OrderedTypeMap
+ * OrderedMap
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class OrderedTypeMap implements Map<String, Class<?>> {
+public class OrderedMap<K, V> implements Map<K, V> {
     
-    private final String[] keys;
+    private final K[] keys;
 
-    private final Class<?>[] values;
+    private final V[] values;
 
-    public OrderedTypeMap(String[] keys, Class<?>[] values){
+    public OrderedMap(K[] keys, V[] values){
         if (keys == null)
             throw new IllegalArgumentException("keys == null");
         if (values == null)
@@ -59,7 +55,7 @@ public class OrderedTypeMap implements Map<String, Class<?>> {
         if (key == null) {
             return false;
         }
-        for (String k : keys) {
+        for (K k : keys) {
             if (key.equals(k)) {
                 return true;
             }
@@ -71,7 +67,7 @@ public class OrderedTypeMap implements Map<String, Class<?>> {
         if (value == null) {
             return false;
         }
-        for (Class<?> v : values) {
+        for (V v : values) {
             if (value.equals(v)) {
                 return true;
             }
@@ -79,7 +75,7 @@ public class OrderedTypeMap implements Map<String, Class<?>> {
         return false;
     }
 
-    public Class<?> get(Object key) {
+    public V get(Object key) {
         if (key == null) {
             return null;
         }
@@ -91,35 +87,35 @@ public class OrderedTypeMap implements Map<String, Class<?>> {
         return null;
     }
 
-    public Set<String> keySet() {
-        Set<String> set = new ArraySet<String>(keys.length);
-        for (String key : keys) {
+    public Set<K> keySet() {
+        Set<K> set = new ArraySet<K>(keys.length);
+        for (K key : keys) {
             set.add(key);
         }
         return set;
     }
 
-    public Collection<Class<?>> values() {
+    public Collection<V> values() {
         return Arrays.asList(values);
     }
 
-    public Set<java.util.Map.Entry<String, Class<?>>> entrySet() {
-        Set<Entry<String, Class<?>>> set = new ArraySet<Entry<String, Class<?>>>(keys.length);
+    public Set<java.util.Map.Entry<K, V>> entrySet() {
+        Set<Entry<K, V>> set = new ArraySet<Entry<K, V>>(keys.length);
         for (int i = 0; i < keys.length; i ++) {
-            set.add(new MapEntry<String, Class<?>>(keys[i], values[i]));
+            set.add(new MapEntry<K, V>(keys[i], values[i]));
         }
         return set;
     }
 
-    public Class<?> put(String key, Class<?> value) {
+    public V put(K key, V value) {
         throw new UnsupportedOperationException("Readonly.");
     }
 
-    public Class<?> remove(Object key) {
+    public V remove(Object key) {
         throw new UnsupportedOperationException("Readonly.");
     }
 
-    public void putAll(Map<? extends String, ? extends Class<?>> m) {
+    public void putAll(Map<? extends K, ? extends V> m) {
         throw new UnsupportedOperationException("Readonly.");
     }
 

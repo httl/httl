@@ -97,7 +97,7 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "block.httl".equals(file.getName())) {
+	            /*if (! "render.httl".equals(file.getName())) {
 	                continue;
 	            }*/
 	            System.out.println(file.getName());

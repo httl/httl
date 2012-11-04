@@ -24,6 +24,7 @@ import httl.spi.Loader;
 import httl.spi.Logger;
 import httl.spi.Parser;
 import httl.spi.Translator;
+import httl.spi.loaders.StringLoader;
 import httl.util.ClassUtils;
 import httl.util.StringUtils;
 import httl.util.VolatileReference;
@@ -50,6 +51,8 @@ public class DefaultEngine extends Engine {
     private Map<Object, Object> expressionCache;
     
     private boolean reloadable;
+
+    private final StringLoader stringLoader = new StringLoader();
 
 	/**
 	 * Get template.
@@ -121,7 +124,7 @@ public class DefaultEngine extends Engine {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("template name == null");
         }
-        Resource resource = loader.load(name, encoding);
+        Resource resource = getResource(name, encoding);
         try {
             return parser.parse(resource);
         } catch (ParseException e) {
@@ -194,6 +197,16 @@ public class DefaultEngine extends Engine {
 		return expression;
     }
 
+	@Override
+	public void addResource(String name, String source) {
+		stringLoader.add(name, source);
+	}
+
+	@Override
+	public void removeResource(String name) {
+		stringLoader.remove(name);
+	}
+
     /**
      * Get resource.
      * 
@@ -204,6 +217,8 @@ public class DefaultEngine extends Engine {
      * @throws ParseException
      */
     public Resource getResource(String name, String encoding) throws IOException {
+    	if (stringLoader.has(name))
+    		return stringLoader.load(name, encoding);
         return loader.load(name, encoding);
     }
 

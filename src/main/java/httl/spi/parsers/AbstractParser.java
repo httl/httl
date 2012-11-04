@@ -30,11 +30,11 @@ import httl.spi.Translator;
 import httl.spi.parsers.template.AbstractTemplate;
 import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.spi.parsers.template.ForeachStatus;
-import httl.spi.parsers.template.OrderedTypeMap;
 import httl.spi.parsers.template.OutputStreamTemplate;
 import httl.spi.parsers.template.WriterTemplate;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
+import httl.util.OrderedMap;
 import httl.util.StringCache;
 import httl.util.StringUtils;
 
@@ -484,7 +484,7 @@ public abstract class AbstractParser implements Parser {
     }
     
     protected String toTypeCode(List<String> names, List<Class<?>> types) {
-        StringBuilder buf = new StringBuilder("	return new " + OrderedTypeMap.class.getName() + "(");
+        StringBuilder buf = new StringBuilder("	return new " + OrderedMap.class.getName() + "(");
         if (names == null || names.size() == 0) {
             buf.append("new String[0]");
         } else {

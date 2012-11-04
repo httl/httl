@@ -214,6 +214,28 @@ public abstract class Engine {
     public abstract Resource getResource(String name, String encoding) throws IOException;
 
     /**
+     * Add template resource.
+     * 
+     * @see #getEngine()
+     * @param name
+     * @param source.
+     * @throws IOException
+     * @throws ParseException
+     */
+    public abstract void addResource(String name, String source);
+
+    /**
+     * Remove template resource.
+     * 
+     * @see #getEngine()
+     * @param name
+     * @param source.
+     * @throws IOException
+     * @throws ParseException
+     */
+    public abstract void removeResource(String name);
+
+    /**
      * Get template.
      * 
      * @see #getEngine()

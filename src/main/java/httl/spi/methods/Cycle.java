@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.parsers.template;
+package httl.spi.methods;
 
 import java.lang.reflect.Array;
 import java.util.Collection;

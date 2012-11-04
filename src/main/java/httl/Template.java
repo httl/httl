@@ -82,7 +82,6 @@ public interface Template extends Resource {
      * 
      * @return code.
      */
- 
     String getCode() throws ParseException;
 
 }

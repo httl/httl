@@ -18,12 +18,13 @@ package httl.spi.methods;
 
 import httl.Context;
 import httl.Engine;
+import httl.Expression;
 import httl.Resource;
 import httl.Template;
-import httl.spi.parsers.template.Cycle;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
 import httl.util.IOUtils;
+import httl.util.MD5;
 import httl.util.NumberUtils;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
@@ -128,6 +129,20 @@ public class DefaultMethod {
         return IOUtils.readToString(load(name, encoding).getSource());
     }
 
+    public Object evaluate(String expr) throws ParseException {
+        return translate(expr).evaluate(Context.getContext().getParameters());
+    }
+
+    public Object render(String source) throws IOException, ParseException {
+        Template template = Context.getContext().getTemplate();
+        if (template == null) {
+            throw new IllegalArgumentException("display context template == null");
+        }
+        String name = template.getName() + "$" + MD5.getMD5(source);
+        engine.addResource(name, source);
+        return engine.getTemplate(name).render(Context.getContext().getParameters());
+    }
+
     public Template parse(String name) throws IOException, ParseException {
         return parse(name, null);
     }
@@ -175,12 +190,12 @@ public class DefaultMethod {
         return engine.getResource(name, encoding);
     }
 
-    public Object evaluate(String expr) throws ParseException {
-        Template template = Context.getContext().getTemplate();
+    public Expression translate(String expr) throws ParseException {
+    	Template template = Context.getContext().getTemplate();
         if (template == null) {
             throw new IllegalArgumentException("display context template == null");
         }
-        return engine.getExpression(expr, template.getParameterTypes()).evaluate(Context.getContext().getParameters());
+    	return engine.getExpression(expr, template.getParameterTypes());
     }
 
     public static String escapeString(String value) {

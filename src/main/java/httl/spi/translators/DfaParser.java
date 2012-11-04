@@ -400,7 +400,7 @@ public class DfaParser {
                 beforeOperator = false;
             } else if ("(".equals(msg)) {
                 operatorStack.push(Bracket.ROUND);
-                beforeOperator = false;
+                beforeOperator = true;
             } else if (")".equals(msg)) {
                 while (popOperator() != Bracket.ROUND);
                 beforeOperator = false;
