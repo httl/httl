@@ -40,9 +40,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-
 /**
- * TemplateTest
+ * ProfileTest
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

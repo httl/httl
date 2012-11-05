@@ -25,25 +25,19 @@ public class ShowTest {
 
     @Test
     public void testShow() throws Exception {
-        int size = 2;
-        int times = 1;
         Random random = new Random();
-        Book[] books = new Book[size];
-        for (int i = 0; i < size; i ++) {
-            books[i] = new Book(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), new Date(), random.nextInt(100) + 10, random.nextInt(60) + 30);
-        }
+        Book[] books = new Book[] { new Book(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), new Date(), random.nextInt(100) + 10, random.nextInt(60) + 30) };
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("user", new User("liangfei", "admin", "Y"));
         context.put("books", books);
         Case[] cases = new Case[] { new BeetlCase(), new Smarty4jCase(), new FreemarkerCase(), new VelocityCase(), new HttlCase(), new JavaCase() };
         for (int i = 0; i < cases.length; i ++) {
-            System.out.println("=============");
-            System.out.println(cases[i].getClass().getSimpleName().replace("Case", ""));
-            System.out.println("=============");
-            Case c = cases[i % cases.length];
+        	Case c = cases[i % cases.length];
+            String name = c.getClass().getSimpleName().replace("Case", "");
+        	System.out.println("========" + name.toLowerCase() + "========");
             Counter counter = new Counter();
             StringWriter writer = new StringWriter();
-            c.count(counter, times, "books", new HashMap<String, Object>(context), writer, new DiscardWriter());
+            c.count(counter, 1, "books", new HashMap<String, Object>(context), writer, new DiscardWriter());
             System.out.println(writer.getBuffer().toString());
         }
         System.out.println("=============");
