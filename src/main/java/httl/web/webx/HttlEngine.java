@@ -64,7 +64,7 @@ public class HttlEngine implements TemplateEngine {
 	public boolean exists(String templateName) {
 		try {
 			if (path != null && path.length() > 0) {
-				templateName = path + "/" + templateName;
+				templateName = path + templateName;
 			}
 			return WebEngine.getTemplate(templateName) != null;
 		} catch (Exception e) {
@@ -76,7 +76,7 @@ public class HttlEngine implements TemplateEngine {
 			throws TemplateException, IOException {
 		try {
 			if (path != null && path.length() > 0) {
-				templateName = path + "/" + templateName;
+				templateName = path + templateName;
 			}
 			return WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context));
 		} catch (ParseException e) {
@@ -88,7 +88,7 @@ public class HttlEngine implements TemplateEngine {
 			OutputStream ostream) throws TemplateException, IOException {
 		try {
 			if (path != null && path.length() > 0) {
-				templateName = path + "/" + templateName;
+				templateName = path + templateName;
 			}
 			WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context), ostream);
 		} catch (ParseException e) {
@@ -100,7 +100,7 @@ public class HttlEngine implements TemplateEngine {
 			Writer writer) throws TemplateException, IOException {
 		try {
 			if (path != null && path.length() > 0) {
-				templateName = path + "/" + templateName;
+				templateName = path + templateName;
 			}
 			WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context), writer);
 		} catch (ParseException e) {

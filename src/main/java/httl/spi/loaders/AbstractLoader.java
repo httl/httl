@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * AbstractLoader. (SPI, Singleton, ThreadSafe)
  * 
@@ -64,19 +63,15 @@ public abstract class AbstractLoader implements Loader {
     }
     
     public void setInputEncoding(String encoding) {
-    	if (encoding != null && encoding.trim().length() > 0) {
-            encoding = encoding.trim();
+    	if (encoding != null && encoding.length() > 0) {
             Charset.forName(encoding);
             this.encoding = encoding;
         }
     }
 
     public void setTemplateDirectory(String directory) {
-    	if (directory != null && directory.trim().length() > 0) {
-            if (directory.endsWith("/") || directory.endsWith("\\")) {
-                directory = directory.substring(0, directory.length() - 1);
-            }
-            this.directory = directory.trim();
+    	if (directory != null && directory.length() > 0) {
+            this.directory = directory;
         }
     }
 
@@ -106,11 +101,7 @@ public abstract class AbstractLoader implements Loader {
         if (encoding == null || encoding.length() == 0) {
             encoding = this.encoding;
         }
-        String dir = directory;
-        if (! name.startsWith("/") && ! name.startsWith("\\")) {
-        	name = "/" + name;
-        }
-        return doLoad(name, encoding, dir == null ? name : dir + name);
+        return doLoad(name, encoding, directory == null ? name : directory + name);
     }
     
     protected abstract Resource doLoad(String name, String encoding, String path) throws IOException;
