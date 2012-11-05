@@ -5,7 +5,6 @@ import httl.test.model.User;
 import httl.test.performance.BeetlCase;
 import httl.test.performance.Case;
 import httl.test.performance.Counter;
-import httl.test.performance.DiscardOutputStream;
 import httl.test.performance.DiscardWriter;
 import httl.test.performance.FreemarkerCase;
 import httl.test.performance.HttlCase;
@@ -28,7 +27,6 @@ public class PerformanceTest {
     public void testPerformance() throws Exception {
     	int count = getProperty("count", 10000);
         int size = getProperty("size", 100);
-        boolean stream = "true".equals(System.getProperty("stream"));
         Random random = new Random();
         Book[] books = new Book[size];
         for (int i = 0; i < size; i ++) {
@@ -48,7 +46,11 @@ public class PerformanceTest {
             System.out.println("========" + name.toLowerCase() + "========");
             Counter counter = new Counter();
             StringWriter writer = new StringWriter();
-            c.count(counter, count, "books", new HashMap<String, Object>(context), writer, new DiscardWriter(), stream ? new DiscardOutputStream() : null);
+            // 当开启stream模式后，假设你的原生输出为byte[]流输出，比如HTTP的响应流。
+            // 这样Writer实际是包装流的，所有输出String都需要编码成byte[]流，下面使用StreamWriter模拟。
+            // 否则将不公平，因为httl会将静态文本编译byte[]，并为动态插值增加getBytes()。
+            // 这个getBytes()实际是将Writer的转码提前了，是会增加开销的，但会减少Writer的开销。
+            c.count(counter, count, "books", new HashMap<String, Object>(context), writer, new DiscardWriter());
             System.out.println("init: " + counter.getInitialized() + "ms, " +
             		"compile: " + counter.getCompiled() + "ms, " +
             		"first: " + counter.getExecuted() + "ms/" + writer.getBuffer().length() + "byte, " +

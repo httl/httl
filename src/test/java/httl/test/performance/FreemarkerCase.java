@@ -16,7 +16,6 @@
  */
 package httl.test.performance;
 
-import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
@@ -31,7 +30,7 @@ import freemarker.template.Template;
  */
 public class FreemarkerCase implements Case {
 
-    public void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter, OutputStream discardStream) throws Exception {
+    public void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter) throws Exception {
         counter.beginning();
         Configuration configuration = new Configuration();
         configuration.setTemplateLoader(new ClassTemplateLoader(FreemarkerCase.class, "/"));

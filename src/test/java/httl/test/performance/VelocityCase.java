@@ -16,7 +16,6 @@
  */
 package httl.test.performance;
 
-import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Properties;
@@ -33,7 +32,7 @@ import org.apache.velocity.app.VelocityEngine;
  */
 public class VelocityCase implements Case {
     
-    public void count(Counter counter, int times, String name, Map<String, Object> map, Writer writer, Writer discardWriter, OutputStream discardStream) throws Exception {
+    public void count(Counter counter, int times, String name, Map<String, Object> map, Writer writer, Writer discardWriter) throws Exception {
         VelocityContext context = new VelocityContext();
         context.put("date", new DateTool());
         for (Map.Entry<String, Object> entry : map.entrySet()) {

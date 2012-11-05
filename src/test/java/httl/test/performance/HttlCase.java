@@ -19,7 +19,6 @@ package httl.test.performance;
 import httl.Engine;
 import httl.Template;
 
-import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
@@ -30,23 +29,17 @@ import java.util.Map;
  */
 public class HttlCase implements Case {
 
-    public void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter, OutputStream discardStream) throws Exception {
+    public void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter) throws Exception {
         counter.beginning();
-        Engine engine = Engine.getEngine(discardStream != null ? "httl-performance-stream.properties" : "httl-performance-writer.properties");
+        Engine engine = Engine.getEngine("httl-performance.properties");
         counter.initialized();
         Template template = engine.getTemplate("performance/" + name + ".httl");
         counter.compiled();
         template.render(context, writer);
         counter.executed();
-        if (discardStream != null) {
-	        for (int i = times; i >= 0; i --) {
-	            template.render(context, discardStream);
-	        }
-        } else {
-        	for (int i = times; i >= 0; i --) {
-	            template.render(context, discardWriter);
-	        }
-        }
+		for (int i = times; i >= 0; i--) {
+			template.render(context, discardWriter);
+		}
         counter.finished();
     }
 
