@@ -16,6 +16,8 @@
  */
 package httl.test.performance;
 
+import httl.test.util.DateTool;
+
 import java.io.Writer;
 import java.util.Map;
 import java.util.Properties;

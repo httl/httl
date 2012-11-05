@@ -20,8 +20,8 @@ import httl.Engine;
 import httl.Template;
 import httl.test.model.Book;
 import httl.test.model.User;
-import httl.test.performance.DiscardOutputStream;
-import httl.test.performance.DiscardWriter;
+import httl.test.util.DiscardOutputStream;
+import httl.test.util.DiscardWriter;
 import httl.util.ClassUtils;
 
 import java.io.File;

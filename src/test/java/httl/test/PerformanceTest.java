@@ -5,12 +5,12 @@ import httl.test.model.User;
 import httl.test.performance.BeetlCase;
 import httl.test.performance.Case;
 import httl.test.performance.Counter;
-import httl.test.performance.DiscardWriter;
 import httl.test.performance.FreemarkerCase;
 import httl.test.performance.HttlCase;
 import httl.test.performance.JavaCase;
 import httl.test.performance.Smarty4jCase;
 import httl.test.performance.VelocityCase;
+import httl.test.util.DiscardWriter;
 
 import java.io.StringWriter;
 import java.util.Date;

@@ -14,15 +14,52 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.test.performance;
+package httl.test.util;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
-public class DiscardOutputStream extends OutputStream {
+/**
+ * DiscardWriter. (Tool, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
+public class DiscardWriter extends Writer {
 
 	@Override
-	public void close() throws IOException {
+	public Writer append(char c) throws IOException {
+		return this;
+	}
+
+	@Override
+	public Writer append(CharSequence csq, int start, int end)
+			throws IOException {
+		return this;
+	}
+
+	@Override
+	public Writer append(CharSequence csq) throws IOException {
+		return this;
+	}
+
+	@Override
+	public void write(char[] cbuf) throws IOException {
+	}
+
+	@Override
+	public void write(int c) throws IOException {
+	}
+
+	@Override
+	public void write(String str, int off, int len) throws IOException {
+	}
+
+	@Override
+	public void write(String str) throws IOException {
+	}
+
+	@Override
+	public void write(char[] cbuf, int off, int len) throws IOException {
 	}
 
 	@Override
@@ -30,15 +67,7 @@ public class DiscardOutputStream extends OutputStream {
 	}
 
 	@Override
-	public void write(byte[] buf, int off, int len) throws IOException {
-	}
-
-	@Override
-	public void write(byte[] buf) throws IOException {
-	}
-
-	@Override
-	public void write(int i) throws IOException {
+	public void close() throws IOException {
 	}
 
 }
