@@ -164,7 +164,6 @@ public class DefaultMethod {
             }
             name = UrlUtils.relativeUrl(name, template.getName());
         }
-        name = UrlUtils.cleanUrl(name.trim());
         template = engine.getTemplate(name, encoding);
         if (macro != null && macro.length() > 0) {
 			return template.getMacros().get(macro);
