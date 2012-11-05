@@ -107,6 +107,9 @@ public abstract class AbstractLoader implements Loader {
             encoding = this.encoding;
         }
         String dir = directory;
+        if (! name.startsWith("/") && ! name.startsWith("\\")) {
+        	name = "/" + name;
+        }
         return doLoad(name, encoding, dir == null ? name : dir + name);
     }
     
