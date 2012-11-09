@@ -73,9 +73,6 @@ public class JdkCompiler extends AbstractCompiler {
     private volatile List<String> options;
 
     public JdkCompiler(){
-        options = new ArrayList<String>();
-        options.add("-target");
-        options.add("1.6");
         if (compiler == null) {
         	throw new IllegalStateException("Can not get system java compiler. Please add jdk tools.jar to your classpath.");
         }

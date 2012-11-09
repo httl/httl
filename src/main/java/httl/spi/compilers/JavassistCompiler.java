@@ -53,8 +53,9 @@ public class JavassistCompiler extends AbstractCompiler {
 
     private static final Pattern FIELD_PATTERN = Pattern.compile("[^\n]+=[^\n]+;");
     
-    private ClassPool pool = ClassPool.getDefault();
-    {
+    private final ClassPool pool = ClassPool.getDefault();
+    
+    public JavassistCompiler() {
     	pool.appendClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
     }
 
