@@ -155,7 +155,7 @@ public class DefaultMethod {
     }
 
     public String read(String name, String encoding) throws IOException {
-        return IOUtils.readToString(load(name, encoding).getReader());
+        return load(name, encoding).getSource();
     }
 
     public Object evaluate(String expr) throws ParseException {

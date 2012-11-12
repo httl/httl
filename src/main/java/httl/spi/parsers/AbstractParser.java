@@ -332,7 +332,7 @@ public abstract class AbstractParser implements Parser {
             Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
             StringBuilder textFields = new StringBuilder();
             StringBuilder textInits = new StringBuilder();
-            String source = IOUtils.readToString(resource.getReader());
+            String source = resource.getSource();
             String src = source;
             src = filterCData(src);
             src = filterComment(src);
