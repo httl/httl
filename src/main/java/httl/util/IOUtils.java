@@ -28,7 +28,7 @@ public class IOUtils {
 
     public static String readToString(Reader reader) throws IOException {
     	try {
-	        StringBuffer buffer = new StringBuffer();
+	        StringBuilder buffer = new StringBuilder();
 	        char[] buf = new char[8192];
 	        int len = 0;
 	        while ((len = reader.read(buf)) != -1) {
