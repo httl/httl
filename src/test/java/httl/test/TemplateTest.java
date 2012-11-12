@@ -66,6 +66,9 @@ public class TemplateTest extends TestCase {
         books[7] = new Book("Design Patterns", "Erich Gamma", "Addison-Wesley Professional", format.parse("1994-11-10"), 60, 80);
         books[8] = new Book("Agile Software Development, Principles, Patterns, and Practices", " Robert C. Martin", "Prentice Hall", format.parse("2002-10-25"), 80, 75);
         books[9] = new Book("Design by Contract, by Example", "Richard Mitchell", "Addison-Wesley Publishing Company", format.parse("2001-10-22"), 50, 85);
+        Book[] books2 = new Book[2];
+        books2[0] = new Book("Practical API Design2", "Jaroslav Tulach", "Apress", format.parse("2010-07-29"), 75, 85);
+        books2[1] = new Book("Effective Java2", "Joshua Bloch", "Addison-Wesley Professional", format.parse("2010-05-28"), 55, 70);
         Map<String, Book> bookmap = new TreeMap<String, Book>();
         Map<String, Map<String, Object>> mapbookmap = new TreeMap<String, Map<String, Object>>();
         List<Map<String, Object>> mapbooklist = new ArrayList<Map<String, Object>>();
@@ -75,14 +78,21 @@ public class TemplateTest extends TestCase {
             mapbookmap.put(book.getTitle().replaceAll("\\s+", ""), genericBook);
             mapbooklist.add(genericBook);
         }
+        Map<String, Book> bookmap2 = new TreeMap<String, Book>();
+        for (Book book : books2) {
+            bookmap2.put(book.getTitle().replaceAll("\\s+", ""), book);
+        }
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("user", user);
+        context.put("books", books);
         context.put("booklist", Arrays.asList(books));
         context.put("bookmap", bookmap);
         context.put("mapbookmap", mapbookmap);
         context.put("mapbooklist", mapbooklist);
-        context.put("books", books);
         context.put("emptybooks", new Book[0]);
+        context.put("books2", books2);
+        context.put("booklist2", Arrays.asList(books2));
+        context.put("bookmap2", bookmap2);
         String[] configs = new String[] { "httl.properties", "httl-javassist.properties", "httl-attribute.properties" };
         for (String config : configs) {
 	        System.out.println("========" + config + "========");

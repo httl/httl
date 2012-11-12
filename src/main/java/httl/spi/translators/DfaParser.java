@@ -41,7 +41,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Deterministic Finite state Automata (DFA) Expression parser (Thread Safe)
  * 
@@ -52,13 +51,18 @@ import java.util.regex.Pattern;
 public class DfaParser {
 
 	//单字母命名, 保证状态机图简洁
+	
+	// END，结束片段，包含当前字符
 	private static final int E = -1;
 
+	// BACK，结束片段，退还当前字符
 	private static final int B = -2;
 
+	// BACK_TWO，结束片段，退还两个字符
 	private static final int T = -3;
 
-	private static final int R = -99;
+	// FAIL，解析出错
+	private static final int F = -99;
 
 	// 表达式语法状态机图
 	// 行表示状态
@@ -67,9 +71,9 @@ public class DfaParser {
 	private static final int states[][] = {
 		          // 0.空格, 1.字母, 2.数字, 3.点号, 4.双引号, 5.单引号, 6.反单引号, 7.反斜线, 8.括号, 9.其它
 		/* 0.起始  */ { 0, 1, 2, 5, 7, 9, 11, 4, 6, 4}, // 初始状态或上一片断刚接收完成状态
-		/* 1.变量  */{ B, 1, 1, B, R, R, R, B, B, B}, // 变量名识别
-		/* 2.数字  */{ B, 2, 2, 13, R, R, R, B, B, B}, // 数字识别
-		/* 3.小数  */{ B, 3, 3, B, R, R, R, B, B, B}, // 小数点号识别
+		/* 1.变量  */{ B, 1, 1, B, F, F, F, B, B, B}, // 变量名识别
+		/* 2.数字  */{ B, 2, 2, 13, F, F, F, B, B, B}, // 数字识别
+		/* 3.小数  */{ B, 3, 3, B, F, F, F, B, B, B}, // 小数点号识别
 		/* 4.操作*/{ B, B, B, 4, B, B, B, 4, B, 4}, // 操作符识别
 		/* 5.点号  */{ B, 1, 3, E, B, B, B, B, B, 4}, // 属性点号
 		/* 6.括号  */{ B, B, B, B, B, B, B, B, B, B}, // 括号

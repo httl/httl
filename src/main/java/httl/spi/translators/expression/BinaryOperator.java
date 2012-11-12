@@ -22,6 +22,7 @@ import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
 import httl.spi.sequences.StringSequence;
 import httl.util.ClassUtils;
+import httl.util.CollectionUtils;
 import httl.util.MapEntry;
 import httl.util.StringUtils;
 
@@ -284,6 +285,11 @@ public final class BinaryOperator extends Operator {
             }
             if ("+".equals(name)) {
             	Class<?> rightType = rightParameter.getReturnType();
+            	if ((Collection.class.isAssignableFrom(leftType) || leftType.isArray()) 
+		    					&& (Collection.class.isAssignableFrom(rightType) || rightType.isArray())
+		    			|| Map.class.isAssignableFrom(leftType) && Map.class.isAssignableFrom(rightType)) {
+		    		return CollectionUtils.class.getName() + ".merge(" + leftCode+ ", " + rightCode + ")";
+		    	}
             	Class<?> type;
             	if (rightType.isPrimitive() && rightType != boolean.class) {
             		type = rightType;
@@ -470,7 +476,11 @@ public final class BinaryOperator extends Operator {
             return Map.Entry.class;
         } else if ("+".equals(name)) {
         	Class<?> rightType = rightParameter.getReturnType();
-        	if (rightType.isPrimitive() && rightType != boolean.class) {
+        	if ((Collection.class.isAssignableFrom(leftType) || leftType.isArray()) 
+							&& (Collection.class.isAssignableFrom(rightType) || rightType.isArray())
+					|| Map.class.isAssignableFrom(leftType) && Map.class.isAssignableFrom(rightType)) {
+				return leftType;
+			} else if (rightType.isPrimitive() && rightType != boolean.class) {
         		return rightType;
         	} else if (leftType.isPrimitive() && leftType != boolean.class) {
         		return leftType;
