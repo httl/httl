@@ -23,8 +23,8 @@ import httl.test.model.Book;
 import httl.test.model.User;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
+import httl.util.UnsafeByteArrayOutputStream;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -111,7 +111,7 @@ public class TemplateTest extends TestCase {
 	            Template template = engine.getTemplate("/templates/" + file.getName());
 	            super.assertEquals(AdaptiveTemplate.class, template.getClass());
 	            String expected = IOUtils.readToString(new FileReader(result));
-	            ByteArrayOutputStream actualStream = new ByteArrayOutputStream();
+	            UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 	            StringWriter actualWriter = new StringWriter();;
 	            try {
 	            	template.render(context, actualWriter);

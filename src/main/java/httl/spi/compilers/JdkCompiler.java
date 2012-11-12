@@ -18,9 +18,9 @@ package httl.spi.compilers;
 
 import httl.spi.Compiler;
 import httl.util.ClassUtils;
+import httl.util.UnsafeByteArrayInputStream;
+import httl.util.UnsafeByteArrayOutputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -169,7 +169,7 @@ public class JdkCompiler extends AbstractCompiler {
                 String qualifiedClassName = name.substring(0, name.length() - ClassUtils.CLASS_EXTENSION.length()).replace('/', '.');
                 JavaFileObjectImpl file = (JavaFileObjectImpl) classes.get(qualifiedClassName);
                 if (file != null) {
-                    return new ByteArrayInputStream(file.getByteCode());
+                    return new UnsafeByteArrayInputStream(file.getByteCode());
                 }
             }
             return super.getResourceAsStream(name);
@@ -178,7 +178,7 @@ public class JdkCompiler extends AbstractCompiler {
     
     private static final class JavaFileObjectImpl extends SimpleJavaFileObject {
 
-        private ByteArrayOutputStream bytecode;
+        private UnsafeByteArrayOutputStream bytecode;
 
         private final CharSequence    source;
 
@@ -207,12 +207,12 @@ public class JdkCompiler extends AbstractCompiler {
 
         @Override
         public InputStream openInputStream() {
-            return new ByteArrayInputStream(getByteCode());
+            return new UnsafeByteArrayInputStream(getByteCode());
         }
 
         @Override
         public OutputStream openOutputStream() {
-            return bytecode = new ByteArrayOutputStream();
+            return bytecode = new UnsafeByteArrayOutputStream();
         }
 
         public byte[] getByteCode() {

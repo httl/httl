@@ -244,8 +244,8 @@ public class DfaParser {
     public List<Token> scan(String charStream) throws ParseException {
         List<Token> tokens = new ArrayList<Token>();
         // 解析时状态 ----
-        StringBuffer buffer = new StringBuffer(); // 缓存字符
-        StringBuffer remain = new StringBuffer(); // 残存字符
+        StringBuilder buffer = new StringBuilder(); // 缓存字符
+        StringBuilder remain = new StringBuilder(); // 残存字符
         int state = 0; // 当前状态
         char ch; // 当前字符
         int offset = -1;

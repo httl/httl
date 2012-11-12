@@ -237,7 +237,7 @@ public class IntegerSequence implements List<Integer>, Serializable {
 
 	public String toString() {
 		if (buffer == null) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append("[");
 			for (int i = min; i <= max; i ++) {
 				if (i != min)

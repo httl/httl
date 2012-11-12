@@ -211,7 +211,7 @@ public class CharacterSequence implements List<Character>, Serializable {
 
 	public String toString() {
 		if (buffer == null) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append("[");
 			for (char i = min; i <= max; i ++) {
 				if (i != min)

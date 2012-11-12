@@ -133,7 +133,7 @@ public class AttributeParser extends AbstractParser {
                 }
                 variables.add(var);
                 types.put(var, Template.class);
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 buf.append(LEFT);
                 buf.append(element.length());
                 buf.append(var + " = getMacros().get(\"" + var + "\");\n");
@@ -151,7 +151,7 @@ public class AttributeParser extends AbstractParser {
                     value = "";
                 }
                 value = value.trim();
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 buf.append(LEFT);
                 buf.append(comment + attribute.length() + 1);
                 comment = 0;
