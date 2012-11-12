@@ -40,8 +40,6 @@ import httl.util.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -448,8 +446,8 @@ public abstract class AbstractParser implements Parser {
     			    + "	return " + resource.getLength() + "L;\n"
     			    + "}\n"
                     + "\n"
-    			    + "public " + Reader.class.getName() + " getSource() throws " + IOException.class.getName() + " {\n"
-    			    + "	return new " + StringReader.class.getName() + "($SRC);\n"
+    			    + "public " + String.class.getSimpleName() + " getSource() throws " + IOException.class.getName() + " {\n"
+    			    + "	return $SRC;\n"
     			    + "}\n"
                     + "\n"
                     + "public " + String.class.getSimpleName() + " getCode() {\n"

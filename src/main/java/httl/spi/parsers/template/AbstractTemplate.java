@@ -25,7 +25,12 @@ import httl.spi.formatters.MultiFormatter;
 import httl.util.StringUtils;
 import httl.util.UnsafeByteArrayOutputStream;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -131,6 +136,14 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.falseValue = engine.getProperty(FALSE_VALUE, "false");
 		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING);
 		this.outputCharset = outputEncoding == null || outputEncoding.length() == 0 ? null : Charset.forName(outputEncoding);
+	}
+
+	public Reader getReader() throws IOException {
+		return new StringReader(getSource());
+	}
+
+	public InputStream getInputStream() throws IOException {
+		return new ByteArrayInputStream(getSource().getBytes(getEncoding()));
 	}
 
 	protected Map<String, Template> getImportMacros() {
