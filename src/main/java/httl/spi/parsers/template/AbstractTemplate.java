@@ -23,6 +23,7 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.formatters.MultiFormatter;
 import httl.util.StringUtils;
+import httl.util.UnsafeByteArrayInputStream;
 import httl.util.UnsafeByteArrayOutputStream;
 
 import java.io.ByteArrayInputStream;
@@ -143,7 +144,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	}
 
 	public InputStream getInputStream() throws IOException {
-		return new ByteArrayInputStream(getSource().getBytes(getEncoding()));
+		return new UnsafeByteArrayInputStream(getSource().getBytes(getEncoding()));
 	}
 
 	protected Map<String, Template> getImportMacros() {
