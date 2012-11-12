@@ -32,6 +32,7 @@ import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.spi.parsers.template.ForeachStatus;
 import httl.spi.parsers.template.OutputStreamTemplate;
 import httl.spi.parsers.template.WriterTemplate;
+import httl.util.ByteCache;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
 import httl.util.OrderedMap;
@@ -649,8 +650,8 @@ public abstract class AbstractParser implements Parser {
                 	if (textInClass) {
                 		textFields.append("private static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(StringUtils.toBytes(txt, outputEncoding)) + "};\n");
                 	} else {
-                		String txtId = StringCache.put(txt);
-                		textFields.append("private static final byte[] " + var + " = " + StringUtils.class.getName() + ".toBytes(" + StringCache.class.getName() +  ".get(\"" + txtId + "\"), \"" + outputEncoding + "\");\n");
+                		String txtId = ByteCache.put(StringUtils.toBytes(txt, outputEncoding));
+                		textFields.append("private static final byte[] " + var + " = " + ByteCache.class.getName() +  ".get(\"" + txtId + "\");\n");
                 	}
                 } else {
                 	if (textInClass) {
