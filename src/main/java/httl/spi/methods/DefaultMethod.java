@@ -147,15 +147,15 @@ public class DefaultMethod {
         return template.render(map);
     }
 
-    public String i18nFile(String name) {
-    	return i18nFile(name, getLocale());
+    public String locale(String name) {
+    	return locale(name, getLocale());
     }
 
-    public String i18nFile(String name, Locale locale) {
-    	return i18nFile(name, locale == null ? getLocale() : locale.toString());
+    public String locale(String name, Locale locale) {
+    	return locale(name, locale == null ? getLocale() : locale.toString());
     }
 
-    public String i18nFile(String name, String locale) {
+    public String locale(String name, String locale) {
     	if (name != null && name.length() > 0
     			&& locale != null && locale.length() > 0) {
     		int i = name.lastIndexOf('.');
