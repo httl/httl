@@ -29,6 +29,7 @@ import httl.util.ClassUtils;
 import httl.util.StringUtils;
 import httl.util.VolatileReference;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
@@ -219,9 +220,20 @@ public class DefaultEngine extends Engine {
      * @throws ParseException
      */
     public Resource getResource(String name, String encoding) throws IOException {
-    	if (stringLoader.has(name))
-    		return stringLoader.load(name, encoding);
-        return loader.load(name, encoding);
+    	Resource resource;
+    	if (stringLoader.exists(name)) {
+    		resource = stringLoader.load(name, encoding);
+    	} else {
+    		resource = loader.load(name, encoding);
+    	}
+    	if (resource == null) {
+    		throw new FileNotFoundException("Not found resource " + name);
+    	}
+    	return resource;
+    }
+
+    public boolean hasResource(String name) {
+    	return stringLoader.exists(name) || loader.exists(name);
     }
 
     /**

@@ -38,10 +38,6 @@ public class StringLoader extends AbstractLoader {
     
     private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
     
-    public boolean has(String name) {
-        return templates.containsKey(name);
-    }
-    
     public void add(String name, String source) {
         templates.put(name, new StringResource(getEngine(), name, getEncoding(), System.currentTimeMillis(), source));
     }
@@ -69,5 +65,13 @@ public class StringLoader extends AbstractLoader {
         }
         return resource;
     }
+
+	public boolean exists(String name) {
+        return templates.containsKey(name);
+    }
+
+	public boolean doExists(String name, String path) throws Exception {
+		return templates.containsKey(name);
+	}
     
 }

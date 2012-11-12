@@ -54,6 +54,8 @@ public class DefaultMethod {
 
     private Engine engine;
 
+    private String locale;
+
     private TimeZone timeZone;
 
     private String dateFormat;
@@ -70,6 +72,10 @@ public class DefaultMethod {
 
     public void setTimeZone(String timeZone) {
     	this.timeZone = TimeZone.getTimeZone(timeZone);
+    }
+
+    public void setLocale(String locale) {
+    	this.locale = locale;
     }
 
     public void setDateFormat(String dateFormat) {
@@ -119,6 +125,29 @@ public class DefaultMethod {
         	map = new WrappedMap<String, Object>(map, parameters);
         }
         return template.render(map);
+    }
+    
+    public String locale(String name) {
+    	return locale(name, locale);
+    }
+
+    public String locale(String name, String locale) {
+    	if (name != null && name.length() > 0
+    			&& locale != null && locale.length() > 0) {
+	    	for (;;) {
+	    		String path = name + "_" + locale;
+	        	if (engine.hasResource(path)) {
+	        		return path;
+	        	}
+	        	int i = locale.lastIndexOf('_');
+	        	if (i > 0) {
+	        		locale = locale.substring(0, i);
+	        	} else {
+	        		break;
+	        	}
+	    	}
+    	}
+        return name;
     }
 
     public String read(String name) throws IOException, ParseException {

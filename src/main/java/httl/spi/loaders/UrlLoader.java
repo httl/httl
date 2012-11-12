@@ -21,6 +21,7 @@ import httl.spi.Loader;
 import httl.util.UrlUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
@@ -41,5 +42,14 @@ public class UrlLoader extends AbstractLoader {
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
         return new UrlResource(getEngine(), name, encoding, path);
     }
-    
+
+	public boolean doExists(String name, String path) throws Exception {
+		InputStream in = new URL(path).openStream();
+		try {
+			return in != null;
+		} finally {
+			in.close();
+		}
+	}
+
 }

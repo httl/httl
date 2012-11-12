@@ -231,6 +231,15 @@ public abstract class Engine {
     public abstract void removeResource(String name);
 
     /**
+     * Tests whether the resource denoted by this abstract pathname exists.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @return exists
+     */
+    public abstract boolean hasResource(String name);
+
+    /**
      * Get template.
      * 
      * @see #getEngine()

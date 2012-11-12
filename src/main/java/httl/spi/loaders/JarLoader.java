@@ -55,4 +55,8 @@ public class JarLoader extends AbstractLoader {
 		return new JarResource(getEngine(), name, encoding, file);
 	}
 
+	public boolean doExists(String name, String path) throws Exception {
+		return file.exists() && new JarFile(file).getEntry(name) != null;
+	}
+
 }

@@ -69,4 +69,8 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
 		return new ServletResource(getEngine(), name, encoding, path, SERVLET_CONTEXT);
 	}
 
+	public boolean doExists(String name, String path) throws Exception {
+		return SERVLET_CONTEXT != null && SERVLET_CONTEXT.getResource(path) != null;
+	}
+
 }

@@ -38,11 +38,19 @@ public interface Loader {
     List<String> list() throws IOException;
 
     /**
-     * Load template source.
+     * exists resource.
      * 
-     * @param name - Template name
-     * @param encoding - Template encoding
-     * @return Template source
+     * @param name
+     * @return exists
+     */
+    boolean exists(String name);
+
+    /**
+     * Load template resource.
+     * 
+     * @param name - template name
+     * @param encoding - template encoding
+     * @return template resource
      */
     Resource load(String name, String encoding) throws IOException;
 

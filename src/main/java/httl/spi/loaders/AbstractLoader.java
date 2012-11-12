@@ -95,15 +95,29 @@ public abstract class AbstractLoader implements Loader {
         return list;
     }
     
+    protected String toPath(String name) {
+    	return directory == null ? name : directory + name;
+    }
+    
     protected abstract List<String> doList(String directory, String[] suffixes) throws IOException;
     
     public Resource load(String name, String encoding) throws IOException {
         if (encoding == null || encoding.length() == 0) {
             encoding = this.encoding;
         }
-        return doLoad(name, encoding, directory == null ? name : directory + name);
+        return doLoad(name, encoding, toPath(name));
     }
-    
+
+	public boolean exists(String name) {
+		try {
+			return doExists(name, toPath(name));
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public abstract boolean doExists(String name, String path) throws Exception;
+
     protected abstract Resource doLoad(String name, String encoding, String path) throws IOException;
     
 }

@@ -95,4 +95,19 @@ public class MultiLoader implements Loader {
         return all;
     }
 
+	public boolean exists(String name) {
+		if (templateLoaders.size() == 1) {
+    		return templateLoaders.get(0).exists(name);
+    	}
+        for (Loader loader : templateLoaders) {
+        	try {
+	        	if (loader.exists(name)) {
+	            	return true;
+	            }
+        	} catch (Exception e) {
+            }
+        }
+		return false;
+	}
+
 }

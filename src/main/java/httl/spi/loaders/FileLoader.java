@@ -42,5 +42,9 @@ public class FileLoader extends AbstractLoader {
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
         return new FileResource(getEngine(), name, encoding, path);
     }
-    
+
+	public boolean doExists(String name, String path) throws Exception {
+		return new File(path).exists();
+	}
+
 }
