@@ -17,8 +17,8 @@
 package httl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
-import java.io.Serializable;
 
 /**
  * Resource. (API, Prototype, ThreadSafe)
@@ -30,7 +30,7 @@ import java.io.Serializable;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Resource extends Serializable {
+public interface Resource {
 
     /**
      * Get the template name.
@@ -49,16 +49,23 @@ public interface Resource extends Serializable {
     /**
      * Get the the template last modified time.
      * 
-     * @return last modified
+     * @return last modified time
      */
     long getLastModified();
 
     /**
      * Get the the template length.
      * 
-     * @return length
+     * @return source length
      */
     long getLength();
+
+    /**
+     * Get the template source.
+     * 
+     * @return source
+     */
+    String getSource() throws IOException;
 
     /**
      * Get the template source reader.
@@ -66,22 +73,42 @@ public interface Resource extends Serializable {
      * NOTE: Don't forget close the reader.
      * 
      * <code>
-     * Reader reader = resource.getSource();
+     * Reader reader = resource.getReader();
      * try {
      *     // do something ...
      * } finally {
-     *     readerc.close();
+     *     reader.close();
      * }
      * </code>
      * 
      * @return source reader
+     * @throws IOException - If an I/O error occurs
      */
-    Reader getSource() throws IOException;
+    Reader getReader() throws IOException;
+
+    /**
+     * Get the template source input stream.
+     * 
+     * NOTE: Don't forget close the input stream.
+     * 
+     * <code>
+     * InputStream input = resource.getInputStream();
+     * try {
+     *     // do something ...
+     * } finally {
+     *     input.close();
+     * }
+     * </code>
+     * 
+     * @return source input stream
+     * @throws IOException - If an I/O error occurs
+     */
+    InputStream getInputStream() throws IOException;
 
     /**
      * Get the template engine.
      * 
-     * @return template engine.
+     * @return engine
      */
     Engine getEngine();
 

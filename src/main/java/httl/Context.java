@@ -38,9 +38,9 @@ public final class Context {
     private static ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
     /**
-     * Get current thread local context.
+     * Get the current context from thread local.
      * 
-     * @return current thread local context.
+     * @return current context
      */
     public static Context getContext() {
         Context context = LOCAL.get();
@@ -52,11 +52,10 @@ public final class Context {
     }
 
     /**
-     * Push context in thread local.
+     * Push the current context to thread local.
      * 
-     * @param parent
-     * @param template
-     * @param parameters
+     * @param template - current template
+     * @param parameters - current parameters
      */
     public static Context pushContext(Template template, Map<String, Object> parameters) {
     	Context context = new Context(LOCAL.get(), template, parameters);
@@ -65,7 +64,7 @@ public final class Context {
     }
 
     /**
-     * Pop context in thread local.
+     * Pop the current context from thread local, and restore parent context to thread local.
      */
     public static void popContext() {
         Context context = LOCAL.get();
@@ -80,7 +79,7 @@ public final class Context {
     }
 
     /**
-     * Remove current thread local context.
+     * Remove the current context from thread local.
      */
     public static void removeContext() {
         LOCAL.remove();
@@ -101,33 +100,33 @@ public final class Context {
     }
 
     /**
-     * Get parent context.
+     * Get the parent context.
      * 
      * @see #getContext()
-     * @return parent context.
+     * @return parent context
      */
     public Context getParent() {
         return parent;
     }
 
     /**
-     * Get current template.
+     * Get the current template.
      * 
      * @see #getContext()
-     * @return current template.
+     * @return current template
      */
     public Template getTemplate() {
         return template;
     }
 
     /**
-     * Get current parameters.
+     * Get the current parameters.
      * 
      * @see #getContext()
-     * @return current parameters.
+     * @return current parameters
      */
     public Map<String, Object> getParameters() {
-    	if (contextParameters == null) { // safe in thread local
+    	if (contextParameters == null) { // safely in thread local
     		contextParameters = new WrappedMap<String, Object>(parameters);
     	}
         return contextParameters;

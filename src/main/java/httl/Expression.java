@@ -16,7 +16,6 @@
  */
 package httl;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -24,60 +23,59 @@ import java.util.Map;
  * 
  * @see httl.Engine#getExpression(String)
  * @see httl.Engine#getExpression(String, Map)
- * @see httl.Engine#getExpression(String, Map, int)
  * @see httl.spi.Translator#translate(String, java.util.Map, int)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Expression extends Serializable {
+public interface Expression {
 
     /**
      * Evaluate the expression.
      * 
-     * @param parameters - parameters
-     * @return result.
+     * @param parameters - evaluate parameters
+     * @return evaluate result
      */
     Object evaluate(Map<String, Object> parameters);
 
     /**
      * Get the expression parameter types. (Ordered)
      * 
-     * @return parameter types.
+     * @return parameter types
      */
     Map<String, Class<?>> getParameterTypes();
 
     /**
      * Get the expression return type.
      * 
-     * @return return type.
+     * @return return type
      */
     Class<?> getReturnType();
 
     /**
      * Get the expression code.
      * 
-     * @return code.
+     * @return code
      */
     String getCode();
 
     /**
      * Get the expression source.
      * 
-     * @return source.
+     * @return source
      */
     String getSource();
 
     /**
      * Get the expression offset.
      * 
-     * @return offset.
+     * @return offset
      */
     int getOffset();
 
     /**
      * Get the expression engine.
      * 
-     * @return engine.
+     * @return engine
      */
     Engine getEngine();
 

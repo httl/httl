@@ -135,7 +135,7 @@ public class DefaultEngine extends Engine {
             String location = null;
             if (offset > 0) {
                 try {
-                    Reader reader = resource.getSource();
+                    Reader reader = resource.getReader();
                     try {
                         location = StringUtils.getLocationMessage(reader, offset);
                     } finally {

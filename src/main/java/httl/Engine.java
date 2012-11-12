@@ -52,7 +52,7 @@ public abstract class Engine {
     /**
      * Get template engine singleton.
      * 
-     * @return template engine.
+     * @return template engine
      */
     public static Engine getEngine() {
         return getEngine(HTTL_PROPERTIES, null);
@@ -61,8 +61,8 @@ public abstract class Engine {
     /**
      * Get template engine singleton.
      * 
-     * @param configPath config path.
-     * @return template engine.
+     * @param configPath - config path
+     * @return template engine
      */
     public static Engine getEngine(String configPath) {
         return getEngine(configPath, null);
@@ -71,8 +71,8 @@ public abstract class Engine {
     /**
      * Get template engine singleton.
      * 
-     * @param configProperties config properties.
-     * @return template engine.
+     * @param configProperties - config properties
+     * @return template engine
      */
     public static Engine getEngine(Properties configProperties) {
         return getEngine(HTTL_PROPERTIES, configProperties);
@@ -81,9 +81,9 @@ public abstract class Engine {
     /**
      * Get template engine singleton.
      * 
-     * @param configPath config path.
-     * @param configProperties config properties.
-     * @return template engine.
+     * @param configPath - config path
+     * @param configProperties - config properties
+     * @return template engine
      */
     public static Engine getEngine(String configPath, Properties configProperties) {
         if (configPath == null || configPath.length() == 0) {
@@ -118,8 +118,8 @@ public abstract class Engine {
      * Get config value.
      * 
      * @see #getEngine()
-     * @param key config key.
-     * @return config value.
+     * @param key - config key
+     * @return config value
      */
     public String getProperty(String key) {
         String value = properties.getProperty(key);
@@ -130,8 +130,8 @@ public abstract class Engine {
      * Get config value.
      * 
      * @see #getEngine()
-     * @param key config key.
-     * @param defaultValue default value.
+     * @param key - config key
+     * @param defaultValue - default value
      * @return config value
      */
     public String getProperty(String key, String defaultValue) {
@@ -143,8 +143,8 @@ public abstract class Engine {
      * Get config int value.
      * 
      * @see #getEngine()
-     * @param key config key.
-     * @param defaultValue default int value.
+     * @param key - config key
+     * @param defaultValue - default int value
      * @return config int value
      */
     public int getProperty(String key, int defaultValue) {
@@ -156,8 +156,8 @@ public abstract class Engine {
      * Get config boolean value.
      * 
      * @see #getEngine()
-     * @param key config key.
-     * @param defaultValue default boolean value.
+     * @param key - config key
+     * @param defaultValue - default boolean value
      * @return config boolean value
      */
     public boolean getProperty(String key, boolean defaultValue) {
@@ -169,9 +169,9 @@ public abstract class Engine {
      * Get expression.
      * 
      * @see #getEngine()
-     * @param source
-     * @return expression.
-     * @throws ParseException
+     * @param source - expression source
+     * @return expression instance
+     * @throws ParseException - If the expression cannot be parsed
      */
     public Expression getExpression(String source) throws ParseException {
         return getExpression(source, null);
@@ -181,10 +181,10 @@ public abstract class Engine {
      * Get expression.
      * 
      * @see #getEngine()
-     * @param source
-     * @param parameterTypes
-     * @return expression.
-     * @throws ParseException
+     * @param source - expression source
+     * @param parameterTypes - expression parameter types
+     * @return expression instance
+     * @throws ParseException - If the expression cannot be parsed
      */
     public abstract Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException;
 
@@ -192,9 +192,9 @@ public abstract class Engine {
      * Get template resource.
      * 
      * @see #getEngine()
-     * @param name
-     * @return template resource.
-     * @throws IOException
+     * @param name - template name
+     * @return template resource
+     * @throws IOException - If an I/O error occurs
      * @throws ParseException
      */
     public Resource getResource(String name) throws IOException {
@@ -205,10 +205,10 @@ public abstract class Engine {
      * Get template resource.
      * 
      * @see #getEngine()
-     * @param name
-     * @param encoding
-     * @return template resource.
-     * @throws IOException
+     * @param name - template name
+     * @param encoding - template encoding
+     * @return template resource
+     * @throws IOException - If an I/O error occurs
      * @throws ParseException
      */
     public abstract Resource getResource(String name, String encoding) throws IOException;
@@ -217,10 +217,8 @@ public abstract class Engine {
      * Add template resource.
      * 
      * @see #getEngine()
-     * @param name
-     * @param source.
-     * @throws IOException
-     * @throws ParseException
+     * @param name - template name
+     * @param source - template source
      */
     public abstract void addResource(String name, String source);
 
@@ -228,10 +226,7 @@ public abstract class Engine {
      * Remove template resource.
      * 
      * @see #getEngine()
-     * @param name
-     * @param source.
-     * @throws IOException
-     * @throws ParseException
+     * @param name - template name
      */
     public abstract void removeResource(String name);
 
@@ -239,10 +234,10 @@ public abstract class Engine {
      * Get template.
      * 
      * @see #getEngine()
-     * @param name
-     * @return template
-     * @throws IOException
-     * @throws ParseException
+     * @param name - template name
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
      */
     public Template getTemplate(String name) throws IOException, ParseException {
         return getTemplate(name, null);
@@ -252,11 +247,11 @@ public abstract class Engine {
      * Get template.
      * 
      * @see #getEngine()
-     * @param name
-     * @param encoding
-     * @return template
-     * @throws IOException
-     * @throws ParseException
+     * @param name - template name
+     * @param encoding - template encoding
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
      */
     public abstract Template getTemplate(String name, String encoding) throws IOException, ParseException;
 

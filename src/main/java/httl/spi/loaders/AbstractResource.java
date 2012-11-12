@@ -18,6 +18,10 @@ package httl.spi.loaders;
 
 import httl.Engine;
 import httl.Resource;
+import httl.util.IOUtils;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * AbstractResource. (SPI, Prototype, ThreadSafe)
@@ -26,7 +30,7 @@ import httl.Resource;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class AbstractResource implements Resource {
+public abstract class AbstractResource implements Resource, Serializable {
 
     private static final long serialVersionUID = 6834431114838915042L;
 
@@ -67,6 +71,10 @@ public abstract class AbstractResource implements Resource {
 
     public long getLength() {
         return -1;
+    }
+
+    public String getSource() throws IOException {
+    	return IOUtils.readToString(getReader());
     }
 
 }

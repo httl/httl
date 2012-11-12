@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-
 /**
  * InputStreamResource. (SPI, Prototype, ThreadSafe)
  * 
@@ -38,7 +37,7 @@ public abstract class InputStreamResource extends AbstractResource {
         super(engine, name, encoding);
     }
 
-    public Reader getSource() throws IOException {
+    public Reader getReader() throws IOException {
         InputStream in = getInputStream();
         if (in == null) {
             throw new FileNotFoundException("Not found template " + getName() + " in " + getClass().getSimpleName());
@@ -48,6 +47,4 @@ public abstract class InputStreamResource extends AbstractResource {
             ? new InputStreamReader(in) : new InputStreamReader(in, encoding);
     }
     
-    protected abstract InputStream getInputStream() throws IOException;
-
 }

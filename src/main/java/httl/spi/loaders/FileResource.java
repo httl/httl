@@ -21,8 +21,7 @@ import httl.Engine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 
 
 /**
@@ -32,7 +31,7 @@ import java.io.Reader;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class FileResource extends AbstractResource {
+public class FileResource extends InputStreamResource {
     
     private static final long serialVersionUID = 1L;
     
@@ -51,8 +50,8 @@ public class FileResource extends AbstractResource {
         return file.length();
     }
 
-    public Reader getSource() throws IOException {
-        return new InputStreamReader(new FileInputStream(this.file), super.getEncoding());
+    public InputStream getInputStream() throws IOException {
+        return new FileInputStream(this.file);
     }
     
 }

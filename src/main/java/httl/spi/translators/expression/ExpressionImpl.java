@@ -22,6 +22,7 @@ import httl.spi.Compiler;
 import httl.util.ClassUtils;
 import httl.util.MD5;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,7 +34,7 @@ import java.util.Set;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ExpressionImpl implements Expression {
+public class ExpressionImpl implements Expression, Serializable {
 
 	private static final long serialVersionUID = 1L;
 

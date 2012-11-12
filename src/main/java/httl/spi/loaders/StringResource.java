@@ -18,10 +18,11 @@ package httl.spi.loaders;
 
 import httl.Engine;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
-
 
 /**
  * StringResource. (SPI, Prototype, ThreadSafe)
@@ -51,8 +52,12 @@ public class StringResource extends AbstractResource {
     	return source.length();
     }
     
-    public Reader getSource() throws IOException {
+    public Reader getReader() throws IOException {
         return new StringReader(source);
     }
-    
+
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(source.getBytes(getEncoding()));
+    }
+
 }

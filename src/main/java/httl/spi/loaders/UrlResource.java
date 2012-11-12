@@ -25,7 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-
 /**
  * UrlResource. (SPI, Prototype, ThreadSafe)
  * 
@@ -74,8 +73,7 @@ public class UrlResource extends InputStreamResource {
         return super.getLength();
     }
 
-    @Override
-    protected InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() throws IOException {
         return url.openStream();
     }
     

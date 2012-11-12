@@ -19,7 +19,6 @@ package httl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -35,11 +34,11 @@ import java.util.Map;
 public interface Template extends Resource {
 
     /**
-     * Render the template to a string.
+     * Render the template as a string.
      * 
      * @see httl.Context#getParameters()
-     * @param parameters - parameters
-     * @return Template render result
+     * @param parameters - render parameters
+     * @return render result
      */
     String render(Map<String, Object> parameters);
 
@@ -47,9 +46,9 @@ public interface Template extends Resource {
      * Render the template to output stream.
      * 
      * @see httl.Context#getParameters()
-     * @param parameters - parameters
+     * @param parameters - render parameters
      * @param output - output stream
-     * @throws IOException Failed to output
+     * @throws IOException - If an I/O error occurs
      */
     void render(Map<String, Object> parameters, OutputStream output) throws IOException;
 
@@ -57,31 +56,45 @@ public interface Template extends Resource {
      * Render the template to writer.
      * 
      * @see httl.Context#getParameters()
-     * @param parameters - parameters
+     * @param parameters - render parameters
      * @param writer - writer
-     * @throws IOException Failed to writer
+     * @throws IOException - If an I/O error occurs
      */
     void render(Map<String, Object> parameters, Writer writer) throws IOException;
 
     /**
      * Get the template parameter types. (Ordered)
      * 
-     * @return parameter types.
+     * @return parameter types
      */
     Map<String, Class<?>> getParameterTypes();
 
     /**
      * Get the macro templates.
      * 
-     * @return macro templates.
+     * @return macro templates
      */
     Map<String, Template> getMacros();
 
     /**
      * Get the template code.
      * 
-     * @return code.
+     * @return code
      */
-    String getCode() throws ParseException;
+    String getCode();
+
+    /**
+     * Get the template macro flag.
+     * 
+     * @return true - if this template is a macro.
+     */
+    boolean isMacro();
+
+    /**
+     * Get the macro template offset.
+     * 
+     * @return offset
+     */
+    int getOffset();
 
 }

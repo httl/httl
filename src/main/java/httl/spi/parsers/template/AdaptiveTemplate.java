@@ -17,10 +17,11 @@
 package httl.spi.parsers.template;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.Writer;
-import java.text.ParseException;
 import java.util.Map;
 
 import httl.Engine;
@@ -33,7 +34,7 @@ import httl.Template;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class AdaptiveTemplate implements Template {
+public class AdaptiveTemplate implements Template, Serializable {
 
 	private static final long serialVersionUID = 3094907176375413567L;
 
@@ -66,8 +67,16 @@ public class AdaptiveTemplate implements Template {
 		return writerTemplate.getLength();
 	}
 
-	public Reader getSource() throws IOException {
+	public String getSource() throws IOException {
 		return writerTemplate.getSource();
+	}
+
+	public Reader getReader() throws IOException {
+		return writerTemplate.getReader();
+	}
+
+	public InputStream getInputStream() throws IOException {
+		return streamTemplate.getInputStream();
 	}
 
 	public Engine getEngine() {
@@ -96,8 +105,16 @@ public class AdaptiveTemplate implements Template {
 		return writerTemplate.getMacros();
 	}
 
-	public String getCode() throws ParseException {
+	public String getCode() {
 		return writerTemplate.getCode();
+	}
+
+	public int getOffset() {
+		return writerTemplate.getOffset();
+	}
+
+	public boolean isMacro() {
+		return writerTemplate.isMacro();
 	}
 
 }

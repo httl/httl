@@ -293,12 +293,12 @@ public abstract class AbstractParser implements Parser {
     		Template writerTemplate = null;
 	    	Template streamTemplate = null;
 	    	if (isOutputWriter || ! isOutputStream) {
-	    		Class<?> clazz = parseClass(resource, false);
+	    		Class<?> clazz = parseClass(resource, false, 0);
 	        	writerTemplate = (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
 						.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
 	    	}
 	    	if (isOutputStream) {
-	    		Class<?> clazz = parseClass(resource, true);
+	    		Class<?> clazz = parseClass(resource, true, 0);
 	    		streamTemplate = (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
 						.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
 	    	}
@@ -314,7 +314,7 @@ public abstract class AbstractParser implements Parser {
 		}
     }
     
-    protected Class<?> parseClass(Resource resource, boolean stream) throws IOException, ParseException {
+    protected Class<?> parseClass(Resource resource, boolean stream, int offset) throws IOException, ParseException {
         String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified() + "_" + (stream ? "stream" : "writer")).replaceAll("_");
         try {
             return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
@@ -333,7 +333,7 @@ public abstract class AbstractParser implements Parser {
             Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
             StringBuilder textFields = new StringBuilder();
             StringBuilder textInits = new StringBuilder();
-            String source = IOUtils.readToString(resource.getSource());
+            String source = IOUtils.readToString(resource.getReader());
             String src = source;
             src = filterCData(src);
             src = filterComment(src);
@@ -462,6 +462,14 @@ public abstract class AbstractParser implements Parser {
                     + "\n"
                     + "public " + Map.class.getName() + " getMacroTypes() {\n"
                     + toTypeCode(macros)
+                    + "}\n"
+                    + "\n"
+                    + "public boolean isMacro() {\n"
+                    + "	return " + (offset > 0 || resource.getName().indexOf(POUND) >= 0) + ";\n"
+                    + "}\n"
+                    + "\n"
+                    + "public int getOffset() {\n"
+                    + "	return " + offset + ";\n"
                     + "}\n"
                     + "\n"
                     + "}\n";
@@ -913,7 +921,7 @@ public abstract class AbstractParser implements Parser {
             value = "";
         }
         value = value.trim();
-        return template + "#" + value;
+        return template + POUND + value;
     }
 
 }
