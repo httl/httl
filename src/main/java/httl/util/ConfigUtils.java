@@ -22,7 +22,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -120,7 +122,7 @@ public final class ConfigUtils {
     }
 
     public static Properties mergeProperties(Object... configs) {
-    	Properties result = new Properties();
+    	List<Properties> list = new ArrayList<Properties>();
     	for (Object config : configs) {
     		if (config != null) {
     			Properties properties;
@@ -129,31 +131,48 @@ public final class ConfigUtils {
     			} else {
     				properties = (Properties) config;
     			}
-	    		Map<String, String> plusConfigs = new HashMap<String, String>();
-	    		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-	                String key = (String) entry.getKey();
-	                String value = (String) entry.getValue();
-	                while (value != null && value.length() > 0 && value.startsWith(REF)) {
-	                	value = properties.getProperty(value.substring(1));
-	                }
-	                if (key.endsWith(PLUS)) {
-	                	if (value != null && value.length() > 0) {
-	                		plusConfigs.put(key, value);
-	                    }
-	                } else {
-	                	result.setProperty(key, value);
-	                }
-	            }
-	    		for (Map.Entry<String, String> entry : plusConfigs.entrySet()) {
-	                String key = (String) entry.getKey();
-	                String value = (String) entry.getValue();
-	                String k = key.substring(0, key.length() - PLUS.length());
-	                String v = result.getProperty(k);
-	                if (v != null && v.length() > 0) {
-	                	result.setProperty(k, v + COMMA + value);
-	                }
-	    		}
+    			list.add(properties);
     		}
+    	}
+    	Properties result = new Properties();
+    	for (Properties properties : list) {
+    		Map<String, String> plusConfigs = new HashMap<String, String>();
+    		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+                if (key.endsWith(PLUS)) {
+                	if (value != null && value.length() > 0) {
+                		plusConfigs.put(key, value);
+                    }
+                } else {
+                	result.setProperty(key, value);
+                }
+            }
+    		for (Map.Entry<String, String> entry : plusConfigs.entrySet()) {
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+                String k = key.substring(0, key.length() - PLUS.length());
+                String v = result.getProperty(k);
+                if (v != null && v.length() > 0) {
+                	result.setProperty(k, v + COMMA + value);
+                }
+    		}
+    	}
+    	for (Map.Entry<Object, Object> entry : new HashMap<Object, Object>(result).entrySet()) {
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            while (value != null && value.length() > 0 && value.startsWith(REF)) {
+            	String ref = value.substring(1);
+            	value = result.getProperty(ref);
+            	if (value == null) {
+            		value = System.getProperty(ref);
+            	}
+            	if (value == null) {
+                	result.remove(key);
+            	} else {
+            		result.put(key, value);
+            	}
+            }
     	}
     	return result;
     }
