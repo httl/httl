@@ -21,8 +21,10 @@ import httl.Engine;
 import httl.Expression;
 import httl.Resource;
 import httl.Template;
+import httl.spi.Resolver;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
+import httl.util.LocaleUtils;
 import httl.util.MD5;
 import httl.util.NumberUtils;
 import httl.util.StringUtils;
@@ -34,11 +36,14 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -52,8 +57,8 @@ public class DefaultMethod {
     private static final Random RANDOM = new Random();
 
     private Engine engine;
-
-    private String locale;
+    
+    private Resolver resolver;
 
     private TimeZone timeZone;
 
@@ -64,6 +69,26 @@ public class DefaultMethod {
     private String outputEncoding;
 
 	private String[] importPackages;
+	
+	private String i18nBasename;
+	
+	private String i18nFormat;
+	
+	public void setI18nFormat(String i18nFormat) {
+		this.i18nFormat = i18nFormat;
+	}
+
+	public void setI18nBasename(String i18nBasename) {
+		this.i18nBasename = i18nBasename;
+	}
+
+	public String getLocale() {
+		return resolver.getProperty("locale");
+	}
+
+    public void setResolver(Resolver resolver) {
+		this.resolver = resolver;
+	}
 
     public void setEngine(Engine engine) {
         this.engine = engine;
@@ -71,10 +96,6 @@ public class DefaultMethod {
 
     public void setTimeZone(String timeZone) {
     	this.timeZone = TimeZone.getTimeZone(timeZone);
-    }
-
-    public void setLocale(String locale) {
-    	this.locale = locale;
     }
 
     public void setDateFormat(String dateFormat) {
@@ -125,28 +146,109 @@ public class DefaultMethod {
         }
         return template.render(map);
     }
-    
-    public String locale(String name) {
-    	return locale(name, locale);
+
+    public String i18nFile(String name) {
+    	return i18nFile(name, getLocale());
     }
 
-    public String locale(String name, String locale) {
+    public String i18nFile(String name, Locale locale) {
+    	return i18nFile(name, locale == null ? getLocale() : locale.toString());
+    }
+
+    public String i18nFile(String name, String locale) {
     	if (name != null && name.length() > 0
     			&& locale != null && locale.length() > 0) {
+    		int i = name.lastIndexOf('.');
+    		String prefix;
+    		String suffix;
+    		if (i > 0) {
+    			prefix = name.substring(0, i);
+    			suffix = name.substring(i);
+    		} else {
+    			prefix = name;
+    			suffix = "";
+    		}
 	    	for (;;) {
-	    		String path = name + "_" + locale;
+	    		String path = prefix + "_" + locale + suffix;
 	        	if (engine.hasResource(path)) {
 	        		return path;
 	        	}
-	        	int i = locale.lastIndexOf('_');
-	        	if (i > 0) {
-	        		locale = locale.substring(0, i);
+	        	int j = locale.lastIndexOf('_');
+	        	if (j > 0) {
+	        		locale = locale.substring(0, j);
 	        	} else {
 	        		break;
 	        	}
 	    	}
     	}
         return name;
+    }
+
+    public String i18n(String key) {
+    	return i18n(key, null, new String[0]);
+    }
+
+    public String i18n(String key, Object arg0) {
+    	return i18n(key, null, new Object[] {arg0});
+    }
+
+    public String i18n(String key, Object arg0, Object arg1) {
+    	return i18n(key, null, new Object[] {arg0, arg1});
+    }
+
+    public String i18n(String key, Object arg0, Object arg1, Object arg2) {
+    	return i18n(key, null, new Object[] {arg0, arg1, arg2});
+    }
+
+    public String i18n(String key, Object[] args) {
+    	return i18n(key, null, args);
+    }
+
+    public String i18n(String key, Locale locale) {
+    	return i18n(key, locale, new String[0]);
+    }
+
+    public String i18n(String key, Locale locale, Object arg0) {
+    	return i18n(key, locale, new Object[] {arg0});
+    }
+
+    public String i18n(String key, Locale locale, Object arg0, Object arg1) {
+    	return i18n(key, locale, new Object[] {arg0, arg1});
+    }
+
+    public String i18n(String key, Locale locale, Object arg0, Object arg1, Object arg2) {
+    	return i18n(key, locale, new Object[] {arg0, arg1, arg2});
+    }
+
+    public String i18n(String key, Locale locale, Object[] args) {
+    	if (i18nBasename != null) {
+    		if (locale == null) {
+    			locale = toLocale(getLocale());
+    		}
+    		ResourceBundle resourceBundle;
+    		if (locale == null) {
+    			resourceBundle = ResourceBundle.getBundle(i18nBasename);
+    		} else {
+    			resourceBundle = ResourceBundle.getBundle(i18nBasename, locale);
+    		}
+    		String value = resourceBundle.getString(key);
+    		if (value != null && value.length() > 0) {
+    			if (args != null && args.length > 0) {
+    				if ("string".equals(i18nFormat)) {
+    					return String.format(value, args);
+    				} else {
+    					return MessageFormat.format(value, args);
+    				}
+    			} else {
+    				return value;
+    			}
+    		}
+    	}
+    	return key;
+    }
+    
+    public static Locale toLocale(String name) {
+    	return LocaleUtils.getLocale(name);
     }
 
     public String read(String name) throws IOException, ParseException {

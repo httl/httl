@@ -136,6 +136,7 @@ public class WebEngine {
 		if (model != null) {
 			parameters = new WrappedMap<String, Object>(parameters, model);
 		}
+		WebContext.setWebContext(request, response);
 		try {
 			Template template = ENGINE.getTemplate(path);
 			if (IS_OUTPUT_STREAM) {
@@ -146,6 +147,8 @@ public class WebEngine {
 			response.flushBuffer();
 		} catch (FileNotFoundException e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		} finally {
+			WebContext.removeWebContext();
 		}
 	}
 
