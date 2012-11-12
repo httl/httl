@@ -23,7 +23,6 @@ import httl.Resource;
 import httl.Template;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
-import httl.util.IOUtils;
 import httl.util.MD5;
 import httl.util.NumberUtils;
 import httl.util.StringUtils;

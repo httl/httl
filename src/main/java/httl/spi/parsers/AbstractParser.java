@@ -34,7 +34,6 @@ import httl.spi.parsers.template.OutputStreamTemplate;
 import httl.spi.parsers.template.WriterTemplate;
 import httl.util.ByteCache;
 import httl.util.ClassUtils;
-import httl.util.IOUtils;
 import httl.util.OrderedMap;
 import httl.util.StringCache;
 import httl.util.StringUtils;
