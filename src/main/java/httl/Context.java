@@ -84,12 +84,16 @@ public final class Context {
         LOCAL.remove();
     }
 
+	// The parent context.
     private final Context parent;
 
+    // The current template.
     private final Template template;
 
+	// The current parameters.
     private final Map<String, Object> parameters;
 
+	// The current context parameters.
     private Map<String, Object> contextParameters;
 
     private Context(Context parent, Template template, Map<String, Object> parameters) {
