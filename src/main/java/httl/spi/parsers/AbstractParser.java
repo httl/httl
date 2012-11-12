@@ -611,17 +611,29 @@ public abstract class AbstractParser implements Parser {
         int last = 0;
         while (matcher.find()) {
             int off = matcher.start(2) + offset;
-            String expression = translator.translate(matcher.group(2), types, off).getCode();
-            expression = "format(" + expression + ")";
-            if (! "$!".equals(matcher.group(1))) {
-                expression = "filter(" + expression + ")";
+            Expression expr = translator.translate(matcher.group(2), types, off);
+            String code = expr.getCode();
+            Class<?> returnType = expr.getReturnType();
+            boolean direct = false;
+            if ("$!".equals(matcher.group(1))) {
+            	if (stream) {
+            		direct = byte[].class.equals(returnType);
+            	} else {
+            		direct = String.class.equals(returnType);
+            	}
             }
-            if (stream) {
-                expression = "serialize(" + expression + ")";
+            if (! direct) {
+            	code = "format(" + code + ")";
+                if (! "$!".equals(matcher.group(1))) {
+                    code = "filter(" + code + ")";
+                }
+                if (stream) {
+                    code = "serialize(" + code + ")";
+                }
             }
             String txt = message.substring(last, matcher.start());
             appendText(buf, txt, filter, textFields, textInits, seq, stream);
-            buf.append(");\n$output.write(" + expression + ");\n$output.write(");
+            buf.append(");\n$output.write(" + code + ");\n$output.write(");
             last = matcher.end();
         }
         String txt;
