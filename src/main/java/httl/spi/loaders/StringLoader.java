@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * StringLoader. (SPI, Singleton, ThreadSafe)
  * 
@@ -37,14 +36,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StringLoader extends AbstractLoader {
     
-    private final Map<String, String> templates = new ConcurrentHashMap<String, String>();
+    private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
     
     public boolean has(String name) {
         return templates.containsKey(name);
     }
     
     public void add(String name, String source) {
-        templates.put(name, source);
+        templates.put(name, new StringResource(getEngine(), name, getEncoding(), System.currentTimeMillis(), source));
     }
 
     public void remove(String name) {
@@ -64,11 +63,11 @@ public class StringLoader extends AbstractLoader {
     }
     
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
-        String source = templates.get(path);
-        if (source == null) {
+    	StringResource resource = templates.get(path);
+        if (resource == null) {
             throw new FileNotFoundException("Not found template " + name);
         }
-        return new StringResource(getEngine(), name, encoding, source);
+        return resource;
     }
     
 }

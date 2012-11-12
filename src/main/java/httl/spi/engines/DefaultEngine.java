@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class DefaultEngine extends Engine {
 
-    private Logger logger;
+    private final StringLoader stringLoader = new StringLoader();
 
     private Loader loader;
 
@@ -46,13 +46,15 @@ public class DefaultEngine extends Engine {
 
     private Translator translator;
 
+    private Logger logger;
+
     private Map<Object, Object> templateCache;
 
     private Map<Object, Object> expressionCache;
-    
-    private boolean reloadable;
 
-    private final StringLoader stringLoader = new StringLoader();
+    private boolean reloadable;
+    
+    private boolean precompiled;
 
 	/**
 	 * Get template.
@@ -76,7 +78,7 @@ public class DefaultEngine extends Engine {
         if (reloadable) {
         	lastModified = getResource(name, encoding).getLastModified();
         } else {
-        	lastModified = -1;
+        	lastModified = Long.MIN_VALUE;
         }
         VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(name);
         if (reference == null) {
@@ -222,12 +224,11 @@ public class DefaultEngine extends Engine {
         return loader.load(name, encoding);
     }
 
-    public void setReloadable(boolean reloadable) {
-    	this.reloadable = reloadable;
-    }
-
-    public void setPrecompiled(boolean precompiled) {
-        if (precompiled) {
+    /**
+     * init the engine.
+     */
+    public void init() {
+    	if (precompiled) {
             try {
                 List<String> list = loader.list();
                 for (String name : list) {
@@ -241,6 +242,24 @@ public class DefaultEngine extends Engine {
                 logger.error(e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * Set reloadable.
+     * 
+     * @param reloadable
+     */
+    public void setReloadable(boolean reloadable) {
+    	this.reloadable = reloadable;
+    }
+
+    /**
+     * Set precompiled.
+     * 
+     * @param precompiled
+     */
+    public void setPrecompiled(boolean precompiled) {
+    	this.precompiled = precompiled;
     }
 
     /**

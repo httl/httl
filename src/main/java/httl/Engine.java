@@ -214,7 +214,7 @@ public abstract class Engine {
     public abstract Resource getResource(String name, String encoding) throws IOException;
 
     /**
-     * Add template resource.
+     * Add literal template resource.
      * 
      * @see #getEngine()
      * @param name - template name
@@ -223,7 +223,7 @@ public abstract class Engine {
     public abstract void addResource(String name, String source);
 
     /**
-     * Remove template resource.
+     * Remove literal template resource.
      * 
      * @see #getEngine()
      * @param name - template name
