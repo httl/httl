@@ -26,7 +26,6 @@ import httl.util.StringUtils;
 import httl.util.UnsafeByteArrayInputStream;
 import httl.util.UnsafeByteArrayOutputStream;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
