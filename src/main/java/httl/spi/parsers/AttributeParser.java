@@ -50,10 +50,10 @@ public class AttributeParser extends AbstractParser {
 
     protected String doParse(Resource resource, boolean stream, String reader, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
-                             Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
+                             Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
         Source source = new Source(reader);
         OutputDocument document = new OutputDocument(source);
-        parseAttribute(resource, stream, source, source, document, translator, parameters, parameterTypes, variables, types, macros);
+        parseAttribute(resource, stream, source, source, document, translator, parameters, parameterTypes, variables, types, returnTypes, macros);
         return document.toString();
     }
 
@@ -62,7 +62,7 @@ public class AttributeParser extends AbstractParser {
                                  Segment segment, OutputDocument document, 
                                  Translator translator, 
                                  List<String> parameters, List<Class<?>> parameterTypes, 
-                                 Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
+                                 Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
         List<Element> elements = segment.getChildElements();
         if (elements == null) {
             return;
@@ -160,7 +160,7 @@ public class AttributeParser extends AbstractParser {
                 } else {
                     offset ++;
                 }
-                String code = getStatementCode(name, value, attribute.getBegin(), offset, translator, variables, types, parameters, parameterTypes, false);
+                String code = getStatementCode(name, value, attribute.getBegin(), offset, translator, variables, types, returnTypes, parameters, parameterTypes, false);
                 buf.append(code);
                 buf.append(RIGHT);
                 document.insert(element.getBegin(), buf.toString()); // 插入块指令
@@ -174,7 +174,7 @@ public class AttributeParser extends AbstractParser {
                 String end = ends.pop();
                 document.insert(element.getEnd(), LEFT + end + RIGHT); // 插入结束指令
             }
-            parseAttribute(resource, stream, source, element, document, translator, parameters, parameterTypes, variables, types, macros); // 递归处理子标签
+            parseAttribute(resource, stream, source, element, document, translator, parameters, parameterTypes, variables, types, returnTypes, macros); // 递归处理子标签
         }
     }
     

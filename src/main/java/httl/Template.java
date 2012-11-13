@@ -70,6 +70,13 @@ public interface Template extends Resource {
     Map<String, Class<?>> getParameterTypes();
 
     /**
+     * Get the template return types.
+     * 
+     * @return return types
+     */
+    Map<String, Class<?>> getReturnTypes();
+
+    /**
      * Get the macro templates.
      * 
      * @return macro templates

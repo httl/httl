@@ -346,7 +346,7 @@ public abstract class AbstractParser implements Parser {
 
     protected abstract String doParse(Resource resoure, boolean stream, String source, Translator translator, 
                                       List<String> parameters, List<Class<?>> parameterTypes, 
-                                      Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException;
+                                      Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException;
 
     public Template parse(Resource resource) throws IOException, ParseException {
     	try {
@@ -381,6 +381,7 @@ public abstract class AbstractParser implements Parser {
         } catch (ClassNotFoundException e) {
         	Set<String> variables = new HashSet<String>();
         	Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+        	Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
         	StringBuilder statusInit = new StringBuilder();
             types.put(foreachStatus, ForeachStatus.class);
             for (String macro : importMacroTemplates.keySet()) {
@@ -398,7 +399,7 @@ public abstract class AbstractParser implements Parser {
             src = filterCData(src);
             src = filterComment(src);
             src = filterEscape(src);
-            src = doParse(resource, stream, src, translator, parameters, parameterTypes, variables, types, macros);
+            src = doParse(resource, stream, src, translator, parameters, parameterTypes, variables, types, returnTypes, macros);
             String code = filterStatement(src, textFilter, translator, textFields, textInits, types, new AtomicInteger(), stream);
             int i = name.lastIndexOf('.');
             String packageName = i < 0 ? "" : name.substring(0, i);
@@ -521,6 +522,10 @@ public abstract class AbstractParser implements Parser {
                     + "\n"
                     + "public " + Map.class.getName() + " getParameterTypes() {\n"
                     + toTypeCode(parameters, parameterTypes)
+                    + "}\n"
+                    + "\n"
+                    + "public " + Map.class.getName() + " getReturnTypes() {\n"
+                    + toTypeCode(returnTypes)
                     + "}\n"
                     + "\n"
                     + "public " + Map.class.getName() + " getMacroTypes() {\n"
@@ -752,7 +757,7 @@ public abstract class AbstractParser implements Parser {
     }
     
     protected String getStatementCode(String name, String value, int begin, int offset, Translator translator,
-                                    Set<String> variables, Map<String, Class<?>> types, 
+                                    Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, 
                                     List<String> parameters, List<Class<?>> parameterTypes, boolean comment) throws ParseException {
         name = name == null ? null : name.trim();
         value = value == null ? null : value.trim();
@@ -881,6 +886,7 @@ public abstract class AbstractParser implements Parser {
 	            buf.append("\", ");
 	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
 	            buf.append(");\n");
+	            returnTypes.put(var, clazz);
             }
         } else if (varName.equals(name)) {
             if (value == null || value.length() == 0) {
