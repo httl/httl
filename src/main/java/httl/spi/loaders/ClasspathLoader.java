@@ -23,11 +23,10 @@ import httl.util.UrlUtils;
 import java.io.IOException;
 import java.util.List;
 
-
 /**
  * ClasspathLoader. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setLoader(Loader)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

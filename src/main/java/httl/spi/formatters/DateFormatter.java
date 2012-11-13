@@ -26,7 +26,7 @@ import java.util.TimeZone;
 /**
  * DateFormatter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setFormatter(Formatter)
+ * @see httl.spi.parsers.AbstractParser#setFormatter(Formatter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -36,6 +36,9 @@ public class DateFormatter implements Formatter<Date> {
 
     private TimeZone timeZone;
 
+    /**
+	 * httl.properties: date.format=yyyy-MM-dd HH:mm:ss
+	 */
     public void setDateFormat(String dateFormat) {
     	new SimpleDateFormat(dateFormat).format(new Date());
 		this.dateFormat = dateFormat;

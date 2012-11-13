@@ -32,13 +32,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-
 /**
  * DfaTranslator. (SPI, Singleton, ThreadSafe)
  * 
  * Deterministic Finite state Automata (DFA)
  * 
- * @see httl.Engine#setTranslator(Translator)
+ * @see httl.spi.parsers.AbstractParser#setTranslator(translator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -54,14 +53,23 @@ public class DfaTranslator implements Translator {
 
     private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
+    /**
+     * httl.properties: engine=httl.spi.engines.DefaultEngine
+     */
     public void setEngine(Engine engine) {
         this.engine = engine;
     }
 
+    /**
+     * httl.properties: compiler=httl.spi.compilers.JdkCompiler
+     */
     public void setCompiler(Compiler compiler) {
         this.compiler = compiler;
     }
 
+    /**
+     * httl.properties: import.packages=java.util
+     */
     public void setImportPackages(String[] importPackages) {
     	this.importPackages = importPackages;
     }
@@ -72,6 +80,9 @@ public class DfaTranslator implements Translator {
     	}
     }
 
+    /**
+     * httl.properties: sequences=Mon Tue Wed Thu Fri Sat Sun Mon
+     */
     public void setSequences(String[] sequences) {
     	for (String s : sequences) {
             s = s.trim();

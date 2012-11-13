@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * AbstractLoader. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setLoader(Loader)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -42,26 +42,16 @@ public abstract class AbstractLoader implements Loader {
     
     private String[] suffixes;
 
-	public Engine getEngine() {
-		return engine;
-	}
-
+	/**
+	 * httl.properties: engine=httl.spi.engines.DefaultEngine
+	 */
     public void setEngine(Engine engine) {
 		this.engine = engine;
 	}
 
-    protected String getEncoding() {
-        return encoding;
-    }
-    
-    protected String getDirectory() {
-        return directory;
-    }
-    
-    public String[] getSuffixes() {
-        return suffixes;
-    }
-    
+    /**
+	 * httl.properties: input.encoding=UTF-8
+	 */
     public void setInputEncoding(String encoding) {
     	if (encoding != null && encoding.length() > 0) {
             Charset.forName(encoding);
@@ -69,14 +59,40 @@ public abstract class AbstractLoader implements Loader {
         }
     }
 
+    /**
+	 * httl.properties: template.directory=/META-INF/templates
+	 */
     public void setTemplateDirectory(String directory) {
     	if (directory != null && directory.length() > 0) {
             this.directory = directory;
         }
     }
 
+    /**
+	 * httl.properties: template.suffix=.httl
+	 */
     public void setTemplateSuffix(String[] suffix) {
     	this.suffixes = suffix;
+    }
+
+	protected Engine getEngine() {
+		return engine;
+	}
+
+    protected String getEncoding() {
+        return encoding;
+    }
+
+    protected String getDirectory() {
+        return directory;
+    }
+
+    protected String[] getSuffixes() {
+        return suffixes;
+    }
+
+    protected String toPath(String name) {
+    	return directory == null ? name : directory + name;
     }
 
     public List<String> list() throws IOException {
@@ -94,19 +110,8 @@ public abstract class AbstractLoader implements Loader {
         }
         return list;
     }
-    
-    protected String toPath(String name) {
-    	return directory == null ? name : directory + name;
-    }
-    
+
     protected abstract List<String> doList(String directory, String[] suffixes) throws IOException;
-    
-    public Resource load(String name, String encoding) throws IOException {
-        if (encoding == null || encoding.length() == 0) {
-            encoding = this.encoding;
-        }
-        return doLoad(name, encoding, toPath(name));
-    }
 
 	public boolean exists(String name) {
 		try {
@@ -118,6 +123,13 @@ public abstract class AbstractLoader implements Loader {
 
 	public abstract boolean doExists(String name, String path) throws Exception;
 
+    public Resource load(String name, String encoding) throws IOException {
+        if (encoding == null || encoding.length() == 0) {
+            encoding = this.encoding;
+        }
+        return doLoad(name, encoding, toPath(name));
+    }
+
     protected abstract Resource doLoad(String name, String encoding, String path) throws IOException;
-    
+
 }

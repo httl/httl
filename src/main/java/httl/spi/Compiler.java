@@ -21,7 +21,7 @@ import java.text.ParseException;
 /**
  * Compiler. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setCompiler(Compiler)
+ * @see httl.spi.parsers.AbstractParser#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

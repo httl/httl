@@ -60,7 +60,7 @@ import java.util.regex.Pattern;
 /**
  * AbstractParser. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setParser(Parser)
+ * @see httl.spi.engines.DefaultEngine#setParser(Parser)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -182,58 +182,100 @@ public abstract class AbstractParser implements Parser {
 	
 	protected Logger logger;
 
+	/**
+	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
+	 */
     public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
 
+    /**
+	 * httl.properties: import.macros=common.httl
+	 */
 	public void setImportMacros(String[] importMacros) {
 		this.importMacros = importMacros;
 	}
 
+	/**
+	 * httl.properties: output.encoding=UTF-8
+	 */
     public void setOutputEncoding(String outputEncoding) {
 		this.outputEncoding = outputEncoding;
 	}
 
+    /**
+     * httl.properties: engine=httl.spi.engines.DefaultEngine
+     */
 	public void setEngine(Engine engine) {
         this.engine = engine;
     }
 
+	/**
+     * httl.properties: compiler=httl.spi.compilers.JdkCompiler
+     */
     public void setCompiler(Compiler compiler) {
 		this.compiler = compiler;
 	}
 
+    /**
+     * httl.properties: translator=httl.spi.translators.DfaTranslator
+     */
     public void setTranslator(Translator translator) {
 		this.translator = translator;
 	}
 
+    /**
+     * httl.properties: text.filters=httl.spi.filters.CompressBlankFilter
+     */
     public void setTextFilter(Filter filter) {
 		this.textFilter = filter;
 	}
 
+    /**
+     * httl.properties: value.filters=httl.spi.filters.EscapeXmlFilter
+     */
 	public void setValueFilter(Filter filter) {
 		this.valueFilter = filter;
 	}
 
+    /**
+     * httl.properties: formatters=httl.spi.formatters.DateFormatter
+     */
 	public void setFormatter(Formatter<?> formatter) {
 		this.formatter = formatter;
 	}
-	
+
+    /**
+     * httl.properties: output.stream=true
+     */
 	public void setOutputStream(boolean outputStream) {
 		this.isOutputStream = outputStream;
 	}
-	
+
+    /**
+     * httl.properties: output.writer=true
+     */
 	public void setOutputWriter(boolean outputWriter) {
 		this.isOutputWriter = outputWriter;
 	}
 
+    /**
+     * httl.properties: source.in.class=false
+     */
     public void setSourceInClass(boolean sourceInClass) {
 		this.sourceInClass = sourceInClass;
 	}
 
+    /**
+     * httl.properties: text.in.class=false
+     */
 	public void setTextInClass(boolean textInClass) {
 		this.textInClass = textInClass;
 	}
 
+    /**
+     * httl.properties: attribute.namespace=httl
+     */
 	public void setAttributeNamespace(String namespace) {
 		if (namespace != null && namespace.length() > 0) {
             namespace = namespace + ":";
@@ -248,14 +290,23 @@ public abstract class AbstractParser implements Parser {
         }
 	}
 
+    /**
+     * httl.properties: foreach.status=foreach
+     */
 	public void setForeachStatus(String foreachStatus) {
 		this.foreachStatus = foreachStatus;
 	}
 
+    /**
+     * httl.properties: java.version=1.7
+     */
 	public void setJavaVersion(String version) {
 		this.version = version;
 	}
 
+    /**
+     * httl.properties: import.packages=java.util
+     */
 	public void setImportPackages(String packages) {
 		if (packages != null && packages.trim().length() > 0) {
             importPackages = packages.trim().split("\\s*\\,\\s*");
@@ -263,12 +314,18 @@ public abstract class AbstractParser implements Parser {
         }
 	}
 
+    /**
+     * httl.properties: import.methods=httl.spi.methods.DefaultMethod
+     */
     public void setImportMethods(Object[] importMethods) {
     	for (Object function : importMethods) {
     		this.functions.put(function.getClass(), function);
     	}
     }
 
+    /**
+     * init the parser.
+     */
     public void init() {
     	if (importMacros != null && importMacros.length > 0) {
         	for (String importMacro : importMacros) {

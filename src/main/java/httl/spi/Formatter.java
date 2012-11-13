@@ -19,7 +19,7 @@ package httl.spi;
 /**
  * Formatter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setFormatter(Formatter)
+ * @see httl.spi.parsers.AbstractParser#setFormatter(Formatter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

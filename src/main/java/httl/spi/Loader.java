@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Loader. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setLoader(Loader)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

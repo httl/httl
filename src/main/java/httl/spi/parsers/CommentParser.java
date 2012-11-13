@@ -31,11 +31,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * CommentParser. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setParser(Parser)
+ * @see httl.spi.engines.DefaultEngine#setParser(Parser)
  *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

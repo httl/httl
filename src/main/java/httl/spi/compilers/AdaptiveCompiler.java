@@ -21,11 +21,10 @@ import httl.util.ClassUtils;
 
 import java.text.ParseException;
 
-
 /**
  * AdaptiveCompiler. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setCompiler(Compiler)
+ * @see httl.spi.engines.DefaultEngine#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -33,6 +32,9 @@ public class AdaptiveCompiler implements Compiler {
     
     private Compiler compiler;
 
+    /**
+	 * httl.properties: java.version=1.7
+	 */
     public void setJavaVersion(String version) {
         if (version == null || ClassUtils.isBeforeJava6(version.trim())) {
             compiler = new JavassistCompiler();

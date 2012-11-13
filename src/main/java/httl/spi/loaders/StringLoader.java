@@ -29,8 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * StringLoader. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setLoader(Loader)
- * @see httl.Engine#addResource(String, String)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
+ * @see httl.spi.engines.DefaultEngine#addResource(String, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

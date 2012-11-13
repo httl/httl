@@ -37,6 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * DefaultEngine. (SPI, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class DefaultEngine extends Engine {
 
     private final StringLoader stringLoader = new StringLoader();
@@ -57,15 +62,16 @@ public class DefaultEngine extends Engine {
     
     private boolean precompiled;
 
-	/**
-	 * Get template.
-	 * 
-	 * @param name
-	 * @param encoding
-	 * @return template
-	 * @throws IOException
-	 * @throws ParseException
-	 */
+    /**
+     * Get template.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param encoding - template encoding
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
+     */
     @SuppressWarnings("unchecked")
 	public Template getTemplate(String name, String encoding) throws IOException, ParseException {
 		if (name == null || name.trim().length() == 0) {
@@ -114,15 +120,7 @@ public class DefaultEngine extends Engine {
 		return template;
 	}
 
-    /**
-     * Parse the template. (No cache)
-     * 
-     * @param name - Template name
-     * @param encoding - Template encoding
-     * @return Template instance.
-     * @throws IOException
-     * @throws ParseException
-     */
+    // Parse the template. (No cache)
     private Template parseTemplate(String name, String encoding) throws IOException, ParseException {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("template name == null");
@@ -156,10 +154,11 @@ public class DefaultEngine extends Engine {
     /**
      * Get expression.
      * 
-     * @param source
-     * @param parameterTypes
-     * @return
-     * @throws ParseException
+     * @see #getEngine()
+     * @param source - expression source
+     * @param parameterTypes - expression parameter types
+     * @return expression instance
+     * @throws ParseException - If the expression cannot be parsed
      */
     @SuppressWarnings("unchecked")
 	public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
@@ -200,23 +199,14 @@ public class DefaultEngine extends Engine {
 		return expression;
     }
 
-	@Override
-	public void addResource(String name, String source) {
-		stringLoader.add(name, source);
-	}
-
-	@Override
-	public void removeResource(String name) {
-		stringLoader.remove(name);
-	}
-
-    /**
-     * Get resource.
+	/**
+     * Get template resource.
      * 
-     * @param name
-     * @param encoding
-     * @return
-     * @throws IOException
+     * @see #getEngine()
+     * @param name - template name
+     * @param encoding - template encoding
+     * @return template resource
+     * @throws IOException - If an I/O error occurs
      * @throws ParseException
      */
     public Resource getResource(String name, String encoding) throws IOException {
@@ -232,6 +222,34 @@ public class DefaultEngine extends Engine {
     	return resource;
     }
 
+    /**
+     * Add literal template resource.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param source - template source
+     */
+	public void addResource(String name, String source) {
+		stringLoader.add(name, source);
+	}
+
+	/**
+     * Remove literal template resource.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     */
+	public void removeResource(String name) {
+		stringLoader.remove(name);
+	}
+
+	/**
+     * Tests whether the resource denoted by this abstract pathname exists.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @return exists
+     */
     public boolean hasResource(String name) {
     	return stringLoader.exists(name) || loader.exists(name);
     }
@@ -257,72 +275,56 @@ public class DefaultEngine extends Engine {
     }
 
     /**
-     * Set reloadable.
-     * 
-     * @param reloadable
-     */
+	 * httl.properties: reloadable=true
+	 */
     public void setReloadable(boolean reloadable) {
     	this.reloadable = reloadable;
     }
 
     /**
-     * Set precompiled.
-     * 
-     * @param precompiled
-     */
+	 * httl.properties: precompiled=true
+	 */
     public void setPrecompiled(boolean precompiled) {
     	this.precompiled = precompiled;
     }
 
     /**
-     * Set logger.
-     * 
-     * @param logger - logger.
-     */
+	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
+	 */
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
 
     /**
-     * Set expression cache.
-     * 
-     * @param cache expression cache.
-     */
+	 * httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
+	 */
     public void setExpressionCache(Map<Object, Object> cache) {
         this.expressionCache = cache;
 	}
     
     /**
-     * Set template cache.
-     * 
-     * @param cache template cache.
-     */
+	 * httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
+	 */
     public void setTemplateCache(Map<Object, Object> cache) {
         this.templateCache = cache;
 	}
     
-	/**
-	 * Set template loader.
-	 * 
-	 * @param loader template loader.
+    /**
+	 * httl.properties: loaders=httl.spi.loaders.ClasspathLoader
 	 */
 	public void setLoader(Loader loader) {
 	    this.loader = loader;
 	}
 
 	/**
-	 * Set template parser.
-	 * 
-	 * @param parser template parser.
+	 * httl.properties: parser=httl.spi.parsers.CommentParser
 	 */
 	public void setParser(Parser parser) {
 		this.parser = parser;
 	}
 
 	/**
-	 * Set expression translator.
-	 * 
-	 * @param translator expression translator.
+	 * httl.properties: translator=httl.spi.translators.DfaTranslator
 	 */
 	public void setTranslator(Translator translator) {
 		this.translator = translator;

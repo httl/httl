@@ -52,11 +52,10 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
-
 /**
  * JdkCompiler. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setCompiler(Compiler)
+ * @see httl.spi.engines.DefaultEngine#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -98,7 +97,10 @@ public class JdkCompiler extends AbstractCompiler {
         });
         javaFileManager = new JavaFileManagerImpl(manager, classLoader);
     }
-    
+
+    /**
+	 * httl.properties: java.version=1.7
+	 */
     public void setJavaVersion(String version) {
         if (version != null && version.trim().length() > 0) {
             options = new ArrayList<String>();
@@ -106,7 +108,7 @@ public class JdkCompiler extends AbstractCompiler {
             options.add(version.trim());
         }
     }
-    
+
     @Override
     public Class<?> doCompile(String name, String sourceCode) throws Throwable {
         int i = name.lastIndexOf('.');

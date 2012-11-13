@@ -73,46 +73,73 @@ public class DefaultMethod {
 	private String i18nBasename;
 	
 	private String i18nFormat;
-	
+
+	/**
+	 * httl.properties: i18n.format=string
+	 */
 	public void setI18nFormat(String i18nFormat) {
 		this.i18nFormat = i18nFormat;
 	}
 
+	/**
+	 * httl.properties: i18n.basename=messsages
+	 */
 	public void setI18nBasename(String i18nBasename) {
 		this.i18nBasename = i18nBasename;
 	}
 
-	public String getLocale() {
-		return resolver.getProperty("locale");
-	}
-
+	/**
+	 * httl.properties: resolver=httl.spi.resolvers.EngineResolver
+	 */
     public void setResolver(Resolver resolver) {
 		this.resolver = resolver;
 	}
 
+    /**
+     * httl.properties: engine=httl.spi.engines.DefaultEngine
+     */
     public void setEngine(Engine engine) {
         this.engine = engine;
     }
 
+    /**
+     * httl.properties: time.zone=+8
+     */
     public void setTimeZone(String timeZone) {
     	this.timeZone = TimeZone.getTimeZone(timeZone);
     }
 
+    /**
+     * httl.properties: date.format=yyyy-MM-dd HH:mm:ss
+     */
     public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
     }
 
+    /**
+	 * httl.properties: number.format=###,##0.###
+	 */
     public void setNumberFormat(String numberFormat) {
         this.numberFormat = numberFormat;
     }
 
+    /**
+	 * httl.properties: output.encoding=UTF-8
+	 */
     public void setOutputEncoding(String outputEncoding) {
 		this.outputEncoding = outputEncoding;
 	}
 
+    /**
+	 * httl.properties: import.packages=java.util
+	 */
     public void setImportPackages(String[] importPackages) {
         this.importPackages = importPackages;
     }
+
+	public String getLocale() {
+		return resolver.getProperty("locale");
+	}
 
     public static Date now() {
         return new Date();

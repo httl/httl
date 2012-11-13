@@ -25,7 +25,7 @@ import java.text.ParseException;
 /**
  * Template Parser. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setParser(Parser)
+ * @see httl.spi.engines.DefaultEngine#setParser(Parser)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

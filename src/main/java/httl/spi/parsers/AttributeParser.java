@@ -39,11 +39,10 @@ import net.htmlparser.jericho.OutputDocument;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 
-
 /**
  * AttributeParser. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setParser(Parser)
+ * @see httl.spi.engines.DefaultEngine#setParser(Parser)
  *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

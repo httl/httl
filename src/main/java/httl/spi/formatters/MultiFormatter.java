@@ -23,11 +23,10 @@ import httl.util.StringUtils;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * MultiFormatter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setFormatter(Formatter)
+ * @see httl.spi.parsers.AbstractParser#setFormatter(Formatter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

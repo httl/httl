@@ -33,11 +33,10 @@ import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
 
-
 /**
  * JavassistCompiler. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setCompiler(Compiler)
+ * @see httl.spi.engines.DefaultEngine#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

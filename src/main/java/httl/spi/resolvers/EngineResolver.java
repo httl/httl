@@ -22,6 +22,9 @@ public class EngineResolver implements Resolver {
 
 	private Engine engine;
 
+	/**
+     * httl.properties: engine=httl.spi.engines.DefaultEngine
+     */
 	public void setEngine(Engine engine) {
 		this.engine = engine;
 	}

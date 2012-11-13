@@ -21,7 +21,7 @@ import httl.spi.Filter;
 /**
  * MultiTextFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setTextFilter(Filter)
+ * @see httl.spi.parsers.AbstractParser#setTextFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

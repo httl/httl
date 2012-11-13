@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 /**
  * NumberFormatter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setFormatter(Formatter)
+ * @see httl.spi.parsers.AbstractParser#setFormatter(Formatter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -32,6 +32,9 @@ public class NumberFormatter implements Formatter<Number> {
     
     private String numberFormat;
     
+    /**
+	 * httl.properties: number.format=###,##0.###
+	 */
     public void setNumberFormat(String numberFormat) {
     	new DecimalFormat(numberFormat).format(0);
 		this.numberFormat = numberFormat;

@@ -26,9 +26,10 @@ import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Abstract compiler. (SPI, Prototype, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -39,7 +40,10 @@ public abstract class AbstractCompiler implements Compiler {
     private static final Pattern CLASS_PATTERN = Pattern.compile("class\\s+([_a-zA-Z][_a-zA-Z0-9]*)\\s+");
     
     private File compileDirectory;
-    
+
+    /**
+	 * httl.properties: compile.directory=classes
+	 */
     public void setCompileDirectory(String directory) {
         if (directory != null && directory.trim().length() > 0) {
             File file = new File(directory);
