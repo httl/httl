@@ -15,20 +15,32 @@
  */
 package httl.spi.caches;
 
+import httl.util.ConcurrentLinkedHashMap;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-public class AdaptiveCache<K, V> implements Map<K, V> {
+/**
+ * LruCache. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setTemplateCache(java.util.Map)
+ * @see httl.spi.engines.DefaultEngine#setExpressionCache(java.util.Map)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
+public class AdaptiveCache<K, V> implements ConcurrentMap<K, V> {
 
-	private Map<K, V> cache;
+	private ConcurrentMap<K, V> cache;
 
+	/**
+	 * httl.properties: cache.capacity=1000
+	 */
 	public void setCacheCapacity(int capacity) {
 		if (capacity > 0) {
-			LruCache<K, V> lruCache = new LruCache<K, V>();
-			lruCache.setCacheCapacity(capacity);
-			cache = lruCache;
+			cache = new ConcurrentLinkedHashMap<K, V>(capacity);
 		} else {
 			cache = new ConcurrentHashMap<K, V>();
 		}
@@ -94,6 +106,22 @@ public class AdaptiveCache<K, V> implements Map<K, V> {
 
 	public Collection<V> values() {
 		return cache.values();
+	}
+
+	public V putIfAbsent(K key, V value) {
+		return cache.putIfAbsent(key, value);
+	}
+
+	public boolean remove(Object key, Object value) {
+		return cache.remove(key, value);
+	}
+
+	public boolean replace(K key, V oldValue, V newValue) {
+		return cache.replace(key, oldValue, newValue);
+	}
+
+	public V replace(K key, V value) {
+		return cache.replace(key, value);
 	}
 
 }

@@ -16,32 +16,25 @@
  */
 package httl.spi.caches;
 
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
+import httl.util.ConcurrentLinkedHashMap;
 
 /**
  * LruCache. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.Engine#setCache(Cache)
+ * @see httl.spi.engines.DefaultEngine#setTemplateCache(java.util.Map)
+ * @see httl.spi.engines.DefaultEngine#setExpressionCache(java.util.Map)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class LruCache<K, V> extends LinkedHashMap<K, V> {
+public class LruCache<K, V> extends ConcurrentLinkedHashMap<K, V> {
     
-	private static final long serialVersionUID = -8785845664009537492L;
+	private static final long serialVersionUID = 1384756602324047236L;
 
-	private static final int DEFAULT_CAPACITY = 1000;
-
-    private final AtomicInteger capacity = new AtomicInteger(DEFAULT_CAPACITY);
-
-    @Override
-    protected boolean removeEldestEntry(Entry<K, V> eldest) {
-        return size() > capacity.get();
-    }
-
-    public void setCacheCapacity(int capacity) {
-        this.capacity.set(capacity);
+	/**
+	 * httl.properties: cache.capacity=1000
+	 */
+	public void setCacheCapacity(int capacity) {
+        super.setCapacity(capacity);
     }
 
 }
