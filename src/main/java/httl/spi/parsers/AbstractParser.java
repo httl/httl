@@ -800,7 +800,7 @@ public abstract class AbstractParser implements Parser {
             String var;
             String varName = code.trim();
             if (expression instanceof ExpressionImpl) {
-            	String vn = ((ExpressionImpl) expression).getNode().getVariableName();
+            	String vn = ((ExpressionImpl) expression).getNode().getGenericVariableName();
             	if (vn != null) {
             		varName = vn;
             	}

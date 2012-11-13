@@ -53,21 +53,27 @@ public abstract class Node implements Serializable {
         return type == null ? new Class<?>[0] : new Class<?>[] { type };
     }
 
-    public String getVariableName() {
-    	return getVariableName(this);
+    public String getGenericVariableName() {
+    	return getGenericVariableName(this);
     }
 
-    protected static String getVariableName(Node node) {
-    	do {
-			if (node instanceof BinaryOperator) {
+    protected static String getGenericVariableName(Node node) {
+    	if (node instanceof Variable) {
+    		return ((Variable)node).getName();
+		}
+		while (node instanceof BinaryOperator) {
+			String name = ((BinaryOperator)node).getName();
+			if ("+".equals(name) || "||".equals(name)
+					 || "&&".equals(name)
+					 || "entrySet".equals(name)) {
 				node = ((BinaryOperator)node).getLeftParameter();
-			} else if (node instanceof UnaryOperator) {
-				node = ((UnaryOperator)node).getParameter();
+				if (node instanceof Variable) {
+	        		return ((Variable)node).getName();
+				}
+			} else {
+				return null;
 			}
-			if (node instanceof Variable) {
-        		return ((Variable)node).getName();
-			}
-		} while (node instanceof Operator);
+		}
     	return null;
     }
 
