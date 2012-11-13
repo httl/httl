@@ -34,7 +34,7 @@ import java.util.Map;
 public final class Context {
 
     // The thread local holder.
-    private static ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
+    private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
     /**
      * Get the current context from thread local.
