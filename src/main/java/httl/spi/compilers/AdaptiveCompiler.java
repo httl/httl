@@ -42,6 +42,12 @@ public class AdaptiveCompiler implements Compiler {
         	compiler = jdkCompiler;
         }
     }
+    
+    public void init() {
+    	if (compiler == null) {
+    		compiler = new JdkCompiler();
+    	}
+    }
 
     public Class<?> compile(String code) throws ParseException {
         return compiler.compile(code);

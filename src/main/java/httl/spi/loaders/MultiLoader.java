@@ -23,8 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 
 /**
  * MultiLoader. (SPI, Singleton, ThreadSafe)
@@ -35,43 +33,21 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class MultiLoader implements Loader {
 
-    private final List<Loader> templateLoaders = new CopyOnWriteArrayList<Loader>();
+    private Loader[] loaders;
     
 	public void setLoaders(Loader[] loaders) {
-		add(loaders);
+		this.loaders = loaders;
 	}
 
-    public void add(Loader... loaders) {
-        if (loaders != null && loaders.length > 0) {
-            for (Loader loader : loaders) {
-                if (loader != null && ! templateLoaders.contains(loader)) {
-                    templateLoaders.add(loader);
-                }
-            }
-        }
-    }
-    
-    public void remove(Loader... loaders) {
-        if (loaders != null && loaders.length > 0) {
-            for (Loader loader : loaders) {
-                if (loader != null) {
-                    templateLoaders.remove(loader);
-                }
-            }
-        }
-    }
-    
-    public void clear() {
-        templateLoaders.clear();
-    }
-
     public Resource load(String name, String encoding) throws IOException {
-    	if (templateLoaders.size() == 1) {
-    		return templateLoaders.get(0).load(name, encoding);
+    	if (loaders.length == 1) {
+    		return loaders[0].load(name, encoding);
     	}
-        for (Loader loader : templateLoaders) {
+        for (Loader loader : loaders) {
             try {
-                return loader.load(name, encoding);
+            	if (loader.exists(name)) {
+            		return loader.load(name, encoding);
+            	}
             } catch (Exception e) {
             }
         }
@@ -79,11 +55,11 @@ public class MultiLoader implements Loader {
     }
 
     public List<String> list() throws IOException {
-    	if (templateLoaders.size() == 1) {
-    		return templateLoaders.get(0).list();
+    	if (loaders.length == 1) {
+    		return loaders[0].list();
     	}
         List<String> all = new ArrayList<String>();
-        for (Loader loader : templateLoaders) {
+        for (Loader loader : loaders) {
             try {
                 List<String> list = loader.list();
                 if (list != null && list.size() > 0) {
@@ -96,10 +72,10 @@ public class MultiLoader implements Loader {
     }
 
 	public boolean exists(String name) {
-		if (templateLoaders.size() == 1) {
-    		return templateLoaders.get(0).exists(name);
+    	if (loaders.length == 1) {
+    		return loaders[0].exists(name);
     	}
-        for (Loader loader : templateLoaders) {
+        for (Loader loader : loaders) {
         	try {
 	        	if (loader.exists(name)) {
 	            	return true;

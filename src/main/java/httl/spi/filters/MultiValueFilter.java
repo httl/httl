@@ -28,7 +28,7 @@ import httl.spi.Filter;
 public class MultiValueFilter extends MultiFilter {
     
     public void setValueFilters(Filter[] filters) {
-    	add(filters);
+    	setFilters(filters);
     }
 
 }

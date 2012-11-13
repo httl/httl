@@ -26,7 +26,6 @@ public class MultiResolver implements Resolver {
 	}
 
 	public String getProperty(String key) {
-		Resolver[] resolvers = this.resolvers;
 		if (resolvers == null || resolvers.length == 0) {
 			return null;
 		}

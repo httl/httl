@@ -16,14 +16,12 @@
  */
 package httl.spi.parsers;
 
-import httl.Engine;
 import httl.Resource;
 import httl.spi.Parser;
 import httl.spi.Translator;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,49 +36,19 @@ import java.util.Set;
  */
 public class MultiParser extends AbstractParser {
     
-    private final List<AbstractParser> parsers = new ArrayList<AbstractParser>();
+    private AbstractParser[] parsers;
 
     public void setParsers(AbstractParser[] parsers) {
-        add(parsers);
-    }
-
-    public void add(AbstractParser... parsers) {
-        if (parsers != null && parsers.length > 0) {
-            for (AbstractParser parser : parsers) {
-                if (parser != null && ! this.parsers.contains(parser)) {
-                    this.parsers.add(parser);
-                }
-            }
-        }
-    }
-
-    public void remove(AbstractParser... parsers) {
-        if (parsers != null && parsers.length > 0) {
-            for (AbstractParser parser : parsers) {
-                if (parser != null) {
-                    this.parsers.remove(parser);
-                }
-            }
-        }
-    }
-    
-    public void clear() {
-        this.parsers.clear();
-    }
-
-    @Override
-    public void setEngine(Engine engine) {
-        super.setEngine(engine);
-        this.engine = engine;
-        for (AbstractParser parser : parsers) {
-            parser.setEngine(engine);
-        }
+        this.parsers = parsers;
     }
 
     protected String doParse(Resource resource, boolean stream, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
                              Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> macros) throws IOException, ParseException {
-        for (AbstractParser parser : parsers) {
+        if (parsers == null || parsers.length == 0) {
+        	throw new IllegalStateException("parsers == null");
+        }
+    	for (AbstractParser parser : parsers) {
             source = parser.doParse(resource, stream, source, translator, parameters, parameterTypes, variables, types, macros);
         }
         return source;

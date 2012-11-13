@@ -18,11 +18,8 @@ package httl.spi.filters;
 
 import httl.spi.Filter;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 /**
- * AbstractMultiFilter. (SPI, Singleton, ThreadSafe)
+ * MultiFilter. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.Engine#setFilter(Filter)
  * 
@@ -30,44 +27,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class MultiFilter implements Filter {
     
-    private final List<Filter> templateFilters = new CopyOnWriteArrayList<Filter>();
+    private Filter[] filters;
     
     public void setFilters(Filter[] filters) {
-    	add(filters);
-    }
-
-    public void add(Filter... filters) {
-        if (filters != null && filters.length > 0) {
-            for (Filter filter : filters) {
-                if (filter != null && ! templateFilters.contains(filter)) {
-                    templateFilters.add(filter);
-                }
-            }
-        }
-    }
-    
-    public void remove(Filter... filters) {
-        if (filters != null && filters.length > 0) {
-            for (Filter filter : filters) {
-                if (filter != null) {
-                    templateFilters.remove(filter);
-                }
-            }
-        }
-    }
-    
-    public void clear() {
-        templateFilters.clear();
+    	if (filters != null && filters.length > 0 
+    			&& this.filters != null && this.filters.length > 0) {
+    		Filter[] oldFilters = this.filters;
+    		this.filters = new Filter[oldFilters.length + filters.length];
+    		System.arraycopy(oldFilters, 0, this.filters, 0, oldFilters.length);
+    		System.arraycopy(filters, 0, this.filters, oldFilters.length, filters.length);
+    	} else {
+    		this.filters = filters;
+    	}
     }
 
     public String filter(String value) {
-    	if (templateFilters.size() == 1) {
-    		return templateFilters.get(0).filter(value);
+    	if (filters == null || filters.length == 0) {
+    		return value;
     	}
-        if (templateFilters.size() > 0) {
-            for (Filter filter : templateFilters) {
-                value = filter.filter(value);
-            }
+    	if (filters.length == 1) {
+    		return filters[0].filter(value);
+    	}
+        for (Filter filter : filters) {
+            value = filter.filter(value);
         }
         return value;
     }

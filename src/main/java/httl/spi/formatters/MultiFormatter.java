@@ -33,68 +33,41 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MultiFormatter implements Formatter<Object> {
     
-    private final Map<Class<?>, Formatter<?>> templateFormatters = new ConcurrentHashMap<Class<?>, Formatter<?>>();
+    private final Map<Class<?>, Formatter<?>> formatters = new ConcurrentHashMap<Class<?>, Formatter<?>>();
     
     public void setFormatters(Formatter<?>[] formatters) {
-        add(formatters);
+    	if (formatters != null && formatters.length > 0) {
+            for (Formatter<?> formatter : formatters) {
+                if (formatter != null) {
+                    Class<?> type = ClassUtils.getGenericClass(formatter.getClass());
+                    if (type != null) {
+                        this.formatters.put(type, formatter);
+                    }
+                }
+            }
+        }
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> Formatter<T> get(Class<T> type) {
-        return (Formatter)templateFormatters.get((Class)type);
-    }
-    
-    public void add(Formatter<?>... formatters) {
-        if (formatters != null && formatters.length > 0) {
-            for (Formatter<?> formatter : formatters) {
-                if (formatter != null) {
-                    Class<?> type = ClassUtils.getGenericClass(formatter.getClass());
-                    if (type != null) {
-                        templateFormatters.put(type, formatter);
-                    }
-                }
-            }
-        }
-    }
-    
-    public void remove(Formatter<?>... formatters) {
-        if (formatters != null && formatters.length > 0) {
-            for (Formatter<?> formatter : formatters) {
-                if (formatter != null) {
-                    Class<?> type = ClassUtils.getGenericClass(formatter.getClass());
-                    if (type != null) {
-                        if (templateFormatters.get(type) == formatter) {
-                            templateFormatters.remove(type);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    public void clear() {
-        templateFormatters.clear();
+        return (Formatter)formatters.get((Class)type);
     }
 
     @SuppressWarnings("unchecked")
     public String format(Object value) {
         if (value == null) {
-            Formatter<?> formatter = templateFormatters.get(Void.class);
+            Formatter<?> formatter = formatters.get(Void.class);
             if (formatter != null) {
                 return formatter.format(null);
             }
             return null;
         } else {
-            Formatter<Object> formatter = (Formatter<Object>) templateFormatters.get(value.getClass());
+            Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
             if (formatter != null) {
                 return formatter.format(value);
             }
             return StringUtils.toString(value);
         }
     }
-    
-    public Class<? extends Object>[] getSupported() {
-        return new Class<?>[]{ Object.class };
-    }
-    
+
 }
