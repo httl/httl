@@ -114,6 +114,9 @@ public class ExpressionImpl implements Expression, Serializable {
         StringBuilder functionInits = new StringBuilder();
         for (Map.Entry<Class<?>, Object> function : functions.entrySet()) {
         	Class<?> functionType = function.getKey();
+        	if (function.getValue() instanceof Class) {
+        		continue;
+        	}
         	String pkgName = functionType.getPackage() == null ? null : functionType.getPackage().getName();
             String typeName;
             if (pkgName != null && ("java.lang".equals(pkgName) 

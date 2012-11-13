@@ -76,7 +76,11 @@ public class DfaTranslator implements Translator {
 
     public void setImportMethods(Object[] importMethods) {
     	for (Object function : importMethods) {
-    		this.functions.put(function.getClass(), function);
+    		if (function instanceof Class) {
+    			this.functions.put((Class<?>) function, function);
+    		} else {
+    			this.functions.put(function.getClass(), function);
+    		}
     	}
     }
 

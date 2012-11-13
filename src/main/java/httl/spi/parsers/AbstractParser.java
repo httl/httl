@@ -319,7 +319,11 @@ public abstract class AbstractParser implements Parser {
      */
     public void setImportMethods(Object[] importMethods) {
     	for (Object function : importMethods) {
-    		this.functions.put(function.getClass(), function);
+    		if (function instanceof Class) {
+    			this.functions.put((Class<?>) function, function);
+    		} else {
+    			this.functions.put(function.getClass(), function);
+    		}
     	}
     }
 
@@ -424,6 +428,9 @@ public abstract class AbstractParser implements Parser {
             StringBuilder functionInits = new StringBuilder();
             for (Map.Entry<Class<?>, Object> function : functions.entrySet()) {
             	Class<?> functionType = function.getKey();
+            	if (function.getValue() instanceof Class) {
+            		continue;
+            	}
             	String pkgName = functionType.getPackage() == null ? null : functionType.getPackage().getName();
                 String typeName;
                 if (pkgName != null && ("java.lang".equals(pkgName) 

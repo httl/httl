@@ -17,6 +17,7 @@
 package httl.util;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -118,7 +119,20 @@ public class BeanFactory {
         	String index = key + "=" + value;
             Object instance = instances.get(index);
             if (instance == null) {
-            	instance = cls.newInstance();
+            	try {
+	            	Constructor<?> constructor = cls.getConstructor(new Class<?>[0]);
+	            	if (Modifier.isPublic(constructor.getModifiers())) {
+	            		instance = constructor.newInstance();
+	            	}
+            	} catch (NoSuchMethodException e) {
+            	}
+            	if (instance == null) {
+	            	if (type.isAssignableFrom(Class.class)) {
+	            		instance = cls;
+	            	} else {
+	            		throw new NoSuchMethodException("No such public empty constructor in " + cls.getName());
+	            	}
+            	}
             	instances.put(index, instance);
             	injectInstance(instance, properties, instances, inits);
             }
