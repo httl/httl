@@ -1,6 +1,6 @@
 <!--#var(List<Book> booklist, List<Book> booklist2)-->
 <table>
-  <!--#foreach(Book book in booklist + booklist2)-->
+  <!--#foreach(book in booklist + booklist2)-->
   <tr>
     <td>${foreach.count}</td>
     <td>${book.title}</td>

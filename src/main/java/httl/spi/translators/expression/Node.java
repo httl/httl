@@ -52,7 +52,25 @@ public abstract class Node implements Serializable {
         Class<?> type = getReturnType();
         return type == null ? new Class<?>[0] : new Class<?>[] { type };
     }
-    
+
+    public String getVariableName() {
+    	return getVariableName(this);
+    }
+
+    protected static String getVariableName(Node node) {
+    	do {
+			if (node instanceof BinaryOperator) {
+				node = ((BinaryOperator)node).getLeftParameter();
+			} else if (node instanceof UnaryOperator) {
+				node = ((UnaryOperator)node).getParameter();
+			}
+			if (node instanceof Variable) {
+        		return ((Variable)node).getName();
+			}
+		} while (node instanceof Operator);
+    	return null;
+    }
+
     public abstract Class<?> getReturnType() throws ParseException;
 
     public abstract String getCode() throws ParseException;

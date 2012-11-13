@@ -32,6 +32,7 @@ import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.spi.parsers.template.ForeachStatus;
 import httl.spi.parsers.template.OutputStreamTemplate;
 import httl.spi.parsers.template.WriterTemplate;
+import httl.spi.translators.expression.ExpressionImpl;
 import httl.util.ByteCache;
 import httl.util.ClassUtils;
 import httl.util.OrderedMap;
@@ -797,6 +798,13 @@ public abstract class AbstractParser implements Parser {
             String[] tokens = value.substring(0, start).trim().split("\\s+");
             String type;
             String var;
+            String varName = code.trim();
+            if (expression instanceof ExpressionImpl) {
+            	String vn = ((ExpressionImpl) expression).getNode().getVariableName();
+            	if (vn != null) {
+            		varName = vn;
+            	}
+            }
             if (tokens.length == 1) {
                 // TODO 获取in参数List的泛型
                 if (returnType.isArray()) {
@@ -804,9 +812,8 @@ public abstract class AbstractParser implements Parser {
                 } else if (Map.class.isAssignableFrom(returnType)) {
                     type = Map.class.getName() + ".Entry";
                 } else if (Collection.class.isAssignableFrom(returnType)
-                        && StringUtils.isNamed(code.trim()) 
-                        && types.get(code.trim() + ":0") != null) {
-                    type = types.get(code.trim() + ":0").getName();
+                        && types.get(varName + ":0") != null) {
+                    type = types.get(varName + ":0").getName();
                 } else {
                     type = Object.class.getSimpleName();
                 }
@@ -820,11 +827,11 @@ public abstract class AbstractParser implements Parser {
             Class<?> clazz = ClassUtils.forName(importPackages, type);
             types.put(var, clazz);
             if (Map.class.isAssignableFrom(returnType)) {
-            	Class<?> keyType = types.get(code.trim() + ":0");
+            	Class<?> keyType = types.get(varName + ":0");
             	if (keyType != null) {
             		types.put(var + ":0", keyType);
             	}
-            	Class<?> valueType = types.get(code.trim() + ":1");
+            	Class<?> valueType = types.get(varName + ":1");
             	if (valueType != null) {
             		types.put(var + ":1", valueType);
             	}

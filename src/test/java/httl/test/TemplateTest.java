@@ -106,9 +106,9 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "render.httl".equals(file.getName())) {
+	            if (! "add_list.httl".equals(file.getName())) {
 	                continue;
-	            }*/
+	            }
 	            System.out.println(file.getName());
 	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName());
 	            if (url == null) {

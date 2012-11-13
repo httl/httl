@@ -45,8 +45,10 @@ public class ExpressionImpl implements Expression, Serializable {
     private final String source;
     
     private final int offset;
+    
+    private final Node node;
 
-    private final String code;
+	private final String code;
 
     private final Map<String, Class<?>> parameterTypes;
 
@@ -62,11 +64,12 @@ public class ExpressionImpl implements Expression, Serializable {
     
     private volatile Evaluator evaluator;
     
-    public ExpressionImpl(String source, Map<String, Class<?>> parameterTypes, int offset, String code, Class<?> returnType, Engine engine, Compiler compiler, String[] importPackages, Map<Class<?>, Object> functions){
+    public ExpressionImpl(String source, Map<String, Class<?>> parameterTypes, int offset, Node node, String code, Class<?> returnType, Engine engine, Compiler compiler, String[] importPackages, Map<Class<?>, Object> functions){
         this.engine = engine;
         this.compiler = compiler;
         this.source = source;
         this.offset = offset;
+        this.node = node;
         this.code = code;
         this.parameterTypes = parameterTypes;
         this.returnType = returnType;
@@ -74,6 +77,10 @@ public class ExpressionImpl implements Expression, Serializable {
         this.importPackageSet = new HashSet<String>(Arrays.asList(importPackages));
         this.functions = functions;
     }
+
+    public Node getNode() {
+		return node;
+	}
 
     public Object evaluate(Map<String, Object> parameters) {
     	if (evaluator == null) {
