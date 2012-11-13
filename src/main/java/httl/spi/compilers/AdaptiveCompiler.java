@@ -29,7 +29,7 @@ import java.text.ParseException;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class AdaptiveCompiler implements Compiler {
-    
+
     private Compiler compiler;
 
     /**
@@ -44,10 +44,10 @@ public class AdaptiveCompiler implements Compiler {
         	compiler = jdkCompiler;
         }
     }
-    
+
     public void init() {
     	if (compiler == null) {
-    		compiler = new JdkCompiler();
+    		setJavaVersion(ClassUtils.getJavaVersion());
     	}
     }
 

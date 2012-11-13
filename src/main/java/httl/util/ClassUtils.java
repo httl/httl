@@ -366,6 +366,10 @@ public class ClassUtils {
         }
     }
     
+    public static String getJavaVersion() {
+    	return System.getProperty("java.specification.version");
+    }
+    
     public static boolean isBeforeJava5(String javaVersion) {
         return (javaVersion == null || javaVersion.length() == 0 || "1.0".equals(javaVersion) 
                 || "1.1".equals(javaVersion) || "1.2".equals(javaVersion) 

@@ -48,7 +48,7 @@ public class AdaptiveCache<K, V> implements ConcurrentMap<K, V> {
 	
 	public void init() {
 		if (cache == null) {
-			cache = new ConcurrentHashMap<K, V>();
+			setCacheCapacity(0);
 		}
 	}
 
