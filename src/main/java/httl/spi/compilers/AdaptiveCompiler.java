@@ -36,7 +36,7 @@ public class AdaptiveCompiler implements Compiler {
 	 * httl.properties: java.version=1.7
 	 */
     public void setJavaVersion(String version) {
-        if (version == null || ClassUtils.isBeforeJava6(version.trim())) {
+        if (version == null || ClassUtils.isBeforeJava6(version)) {
             compiler = new JavassistCompiler();
         } else {
         	JdkCompiler jdkCompiler = new JdkCompiler();

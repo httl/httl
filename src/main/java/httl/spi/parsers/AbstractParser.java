@@ -326,7 +326,7 @@ public abstract class AbstractParser implements Parser {
     /**
      * init the parser.
      */
-    public void init() {
+    public void inited() {
     	if (importMacros != null && importMacros.length > 0) {
         	for (String importMacro : importMacros) {
         		try {

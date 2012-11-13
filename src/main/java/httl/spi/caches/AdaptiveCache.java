@@ -68,16 +68,8 @@ public class AdaptiveCache<K, V> implements ConcurrentMap<K, V> {
 		return cache.entrySet();
 	}
 
-	public boolean equals(Object o) {
-		return cache.equals(o);
-	}
-
 	public V get(Object key) {
 		return cache.get(key);
-	}
-
-	public int hashCode() {
-		return cache.hashCode();
 	}
 
 	public boolean isEmpty() {

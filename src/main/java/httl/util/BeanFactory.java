@@ -27,10 +27,12 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 public class BeanFactory {
-    
-    private static final String INIT_METHOD = "init";
 
     private static final String SET_METHOD = "set";
+
+    private static final String INIT_METHOD = "init";
+
+    private static final String INITED_METHOD = "inited";
 
     private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
     
@@ -44,7 +46,7 @@ public class BeanFactory {
     		for (int i = inits.size() - 1; i >= 0; i --) { // reverse init order.
     			try {
     				Object object = inits.get(i);
-	    			Method method = object.getClass().getMethod(INIT_METHOD, new Class<?>[0]);
+	    			Method method = object.getClass().getMethod(INITED_METHOD, new Class<?>[0]);
 	    			if (Modifier.isPublic(method.getModifiers())
 	    					&& ! Modifier.isStatic(method.getModifiers())) {
 	    				method.invoke(object, new Object[0]);
@@ -89,6 +91,14 @@ public class BeanFactory {
 						method.invoke(object, new Object[] { obj });
 					}
 				}
+			}
+			try {
+    			Method method = object.getClass().getMethod(INIT_METHOD, new Class<?>[0]);
+    			if (Modifier.isPublic(method.getModifiers())
+    					&& ! Modifier.isStatic(method.getModifiers())) {
+    				method.invoke(object, new Object[0]);
+    			}
+			} catch (NoSuchMethodException e) {
 			}
 		} catch (Exception e) {
 			throw new IllegalStateException(e.getMessage(), e);
