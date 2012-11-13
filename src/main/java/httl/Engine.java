@@ -91,24 +91,24 @@ public abstract class Engine {
         }
         VolatileReference<Engine> reference = ENGINES.get(configPath);
         if (reference == null) {
-        	reference = new VolatileReference<Engine>(); // quickly
-        	VolatileReference<Engine> old = ENGINES.putIfAbsent(configPath, reference);
-        	if (old != null) { // duplicate
-        		reference = old;
-        	}
+            reference = new VolatileReference<Engine>(); // quickly
+            VolatileReference<Engine> old = ENGINES.putIfAbsent(configPath, reference);
+            if (old != null) { // duplicate
+                reference = old;
+            }
         }
         assert(reference != null);
         Engine engine = reference.get();
         if (engine == null) {
             synchronized (reference) { // reference lock
-            	engine = reference.get();
-            	if (engine == null) { // double check
-            		Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
-                	engine = BeanFactory.createBean(Engine.class, properties); // slowly
+                engine = reference.get();
+                if (engine == null) { // double check
+                    Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
+                    engine = BeanFactory.createBean(Engine.class, properties); // slowly
                     engine.properties.putAll(properties);
-            		reference.set(engine);
-            	}
-			}
+                    reference.set(engine);
+                }
+            }
         }
         assert(engine != null);
         return engine;

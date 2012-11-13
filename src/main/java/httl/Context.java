@@ -57,7 +57,7 @@ public final class Context {
      * @param parameters - current parameters
      */
     public static Context pushContext(Template template, Map<String, Object> parameters) {
-    	Context context = new Context(LOCAL.get(), template, parameters);
+        Context context = new Context(LOCAL.get(), template, parameters);
         LOCAL.set(context);
         return context;
     }
@@ -84,16 +84,16 @@ public final class Context {
         LOCAL.remove();
     }
 
-	// The parent context.
+    // The parent context.
     private final Context parent;
 
     // The current template.
     private final Template template;
 
-	// The current parameters.
+    // The current parameters.
     private final Map<String, Object> parameters;
 
-	// The current context parameters.
+    // The current context parameters.
     private Map<String, Object> contextParameters;
 
     private Context(Context parent, Template template, Map<String, Object> parameters) {
@@ -129,9 +129,9 @@ public final class Context {
      * @return current parameters
      */
     public Map<String, Object> getParameters() {
-    	if (contextParameters == null) { // safely in thread local
-    		contextParameters = new WrappedMap<String, Object>(parameters);
-    	}
+        if (contextParameters == null) { // safely in thread local
+            contextParameters = new WrappedMap<String, Object>(parameters);
+        }
         return contextParameters;
     }
 
