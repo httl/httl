@@ -64,7 +64,7 @@ public abstract class WriterTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
     	if (writer == null) 
          	throw new IllegalArgumentException("writer == null");
-    	Context context = Context.pushContext(this, parameters);
+    	Context context = Context.pushContext(this, parameters, writer);
         try {
             doRender(context, parameters, writer);
         } catch (RuntimeException e) {

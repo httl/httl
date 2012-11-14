@@ -59,7 +59,7 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
-        Context context = Context.pushContext(this, parameters);
+        Context context = Context.pushContext(this, parameters, output);
         try {
             doRender(context, parameters, output);
         } catch (RuntimeException e) {

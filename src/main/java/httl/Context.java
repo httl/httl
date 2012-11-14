@@ -36,54 +36,6 @@ public final class Context {
     // The thread local holder.
     private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
-    /**
-     * Get the current context from thread local.
-     * 
-     * @return current context
-     */
-    public static Context getContext() {
-        Context context = LOCAL.get();
-        if (context == null) {
-            context = new Context(null, null, null);
-            LOCAL.set(context);
-        }
-        return context;
-    }
-
-    /**
-     * Push the current context to thread local.
-     * 
-     * @param template - current template
-     * @param parameters - current parameters
-     */
-    public static Context pushContext(Template template, Map<String, Object> parameters) {
-        Context context = new Context(LOCAL.get(), template, parameters);
-        LOCAL.set(context);
-        return context;
-    }
-
-    /**
-     * Pop the current context from thread local, and restore parent context to thread local.
-     */
-    public static void popContext() {
-        Context context = LOCAL.get();
-        if (context != null) {
-            Context parent = context.getParent();
-            if (parent != null) {
-                LOCAL.set(parent);
-            } else {
-                LOCAL.remove();
-            }
-        }
-    }
-
-    /**
-     * Remove the current context from thread local.
-     */
-    public static void removeContext() {
-        LOCAL.remove();
-    }
-
     // The parent context.
     private final Context parent;
 
@@ -93,13 +45,17 @@ public final class Context {
     // The current parameters.
     private final Map<String, Object> parameters;
 
-    // The current context parameters.
+    // The current output.
+    private final Object output;
+
+	// The current context parameters.
     private Map<String, Object> contextParameters;
 
-    private Context(Context parent, Template template, Map<String, Object> parameters) {
+    private Context(Context parent, Template template, Map<String, Object> parameters, Object output) {
         this.parent = parent;
         this.template = template;
         this.parameters = parameters;
+        this.output = output;
     }
 
     /**
@@ -133,6 +89,64 @@ public final class Context {
             contextParameters = new WrappedMap<String, Object>(parameters);
         }
         return contextParameters;
+    }
+
+    /**
+     * Get the current output.
+     * 
+     * @see #getContext()
+     * @return current output
+     */
+    public Object getOutput() {
+		return output;
+	}
+
+    /**
+     * Get the current context from thread local.
+     * 
+     * @return current context
+     */
+    public static Context getContext() {
+        Context context = LOCAL.get();
+        if (context == null) {
+            context = new Context(null, null, null, null);
+            LOCAL.set(context);
+        }
+        return context;
+    }
+
+    /**
+     * Push the current context to thread local.
+     * 
+     * @param template - current template
+     * @param parameters - current parameters
+     */
+    public static Context pushContext(Template template, Map<String, Object> parameters, Object output) {
+        Context context = new Context(LOCAL.get(), template, parameters, output);
+        LOCAL.set(context);
+        return context;
+    }
+
+    /**
+     * Pop the current context from thread local, and restore parent context to thread local.
+     */
+    public static void popContext() {
+        Context context = LOCAL.get();
+        if (context != null) {
+            Context parent = context.getParent();
+            if (parent != null) {
+                LOCAL.set(parent);
+            } else {
+                LOCAL.remove();
+            }
+        }
+    }
+
+    /**
+     * Remove the current context from thread local.
+     */
+    public static void removeContext() {
+        LOCAL.remove();
     }
 
 }
