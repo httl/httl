@@ -82,10 +82,11 @@ public class BeanFactory {
 						if (parameterType.isArray()) {
 							Class<?> componentType = parameterType.getComponentType();
 							String[] values = COMMA_SPLIT_PATTERN.split(value);
-							obj = Array.newInstance(componentType, values.length);
+							Object[] objs = (Object[]) Array.newInstance(componentType, values.length);
 							for (int i = 0; i < values.length; i++) {
-								Array.set(obj, i, parseValue(key, values[i], componentType, properties, instances, inits));
+								objs[i] = parseValue(key, values[i], componentType, properties, instances, inits);
 							}
+							obj = objs;
 						} else {
 							obj = parseValue(key, value, parameterType, properties, instances, inits);
 						}

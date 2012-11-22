@@ -114,9 +114,9 @@ public final class BinaryOperator extends Operator {
 	            	Class<?> keyType = types.get(var + ":0"); // Map<K,V>第一个泛型
 	            	Class<?> valueType = types.get(var + ":1"); // Map<K,V>第二个泛型
 	                if ("key".equals(name) && keyType != null) {
-	            		return "((" + keyType.getName() + ")" + leftCode + ".getKey(" + rightCode + "))";
+	            		return "((" + keyType.getCanonicalName() + ")" + leftCode + ".getKey(" + rightCode + "))";
 	            	} else if ("value".equals(name) && valueType != null) {
-	            		return "((" + valueType.getName() + ")" + leftCode + ".getValue(" + rightCode + "))";
+	            		return "((" + valueType.getCanonicalName() + ")" + leftCode + ".getValue(" + rightCode + "))";
 	            	}
             	}
             }
@@ -128,7 +128,7 @@ public final class BinaryOperator extends Operator {
             	if (var != null) {
 	                Class<?> type = types.get(var + ":1"); // Map<K,V>第二个泛型 
 	                if (type != null) {
-	                    return "((" + type.getName() + ")" + leftCode + ".get(" + rightCode + "))";
+	                    return "((" + type.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))";
 	                }
             	}
             }
@@ -139,7 +139,7 @@ public final class BinaryOperator extends Operator {
             	if (var != null) {
 	                Class<?> type = types.get(var + ":0"); // List<T>第一个泛型
 	                if (type != null) {
-	                	return "((" + type.getName() + ")" + leftCode + ".get(" + rightCode + "))";
+	                	return "((" + type.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))";
 	                }
             	}
             }
@@ -197,7 +197,7 @@ public final class BinaryOperator extends Operator {
                     }
                     return leftCode + ".get(" + rightCode + ")";
                 } else {
-                    throw new ParseException("The \"[]\" index type: " + rightType.getName() + " must be int!", getOffset());
+                    throw new ParseException("The \"[]\" index type: " + rightType + " must be int!", getOffset());
                 }
             } else if (leftType.isArray()) {
                 if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
@@ -205,10 +205,10 @@ public final class BinaryOperator extends Operator {
                 } else if (int.class.equals(rightType)) {
                     return leftCode + "[" + rightCode + "]";
                 } else {
-                    throw new ParseException("The \"[]\" index type: " + rightType.getName() + " must be int!", getOffset());
+                    throw new ParseException("The \"[]\" index type: " + rightType + " must be int!", getOffset());
                 }
             }
-            throw new ParseException("Unsuptorted \"[]\" for non-array type: " + leftType.getName(), getOffset());
+            throw new ParseException("Unsuptorted \"[]\" for non-array type: " + leftType, getOffset());
         } else if (name.equals("..")) {
             if (leftType == int.class || leftType == Integer.class 
                     || leftType == short.class  || leftType == Short.class

@@ -21,6 +21,7 @@ import httl.util.iterators.BooleanArrayIterator;
 import httl.util.iterators.ByteArrayIterator;
 import httl.util.iterators.CharArrayIterator;
 import httl.util.iterators.DoubleArrayIterator;
+import httl.util.iterators.EmptyIterator;
 import httl.util.iterators.FloatArrayIterator;
 import httl.util.iterators.IntArrayIterator;
 import httl.util.iterators.LongArrayIterator;
@@ -39,11 +40,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -295,16 +296,87 @@ public class ClassUtils {
             return ((Collection<?>)object).size();
         } else if (object instanceof Map<?, ?>) {
             return ((Map<?, ?>)object).size();
-        } else if (object.getClass().isArray()) {
-            return Array.getLength(object);
+        } else if (object instanceof Object[]) {
+            return ((Object[]) object).length;
+        } else if (object instanceof int[]) {
+            return ((int[]) object).length;
+        } else if (object instanceof long[]) {
+            return ((long[]) object).length;
+        } else if (object instanceof float[]) {
+            return ((float[]) object).length;
+        } else if (object instanceof double[]) {
+            return ((double[]) object).length;
+        } else if (object instanceof short[]) {
+            return ((short[]) object).length;
+        } else if (object instanceof byte[]) {
+            return ((byte[]) object).length;
+        } else if (object instanceof char[]) {
+            return ((char[]) object).length;
+        } else if (object instanceof boolean[]) {
+            return ((boolean[]) object).length;
         } else {
             return -1;
         }
     }
 
+    public static Iterator<Boolean> toIterator(boolean[] object) {
+    	return new BooleanArrayIterator(object);
+    }
+
+    public static Iterator<Character> toIterator(char[] object) {
+    	return new CharArrayIterator(object);
+    }
+
+    public static Iterator<Byte> toIterator(byte[] object) {
+    	return new ByteArrayIterator(object);
+    }
+
+    public static Iterator<Short> toIterator(short[] object) {
+    	return new ShortArrayIterator(object);
+    }
+
+    public static Iterator<Integer> toIterator(int[] object) {
+    	return new IntArrayIterator(object);
+    }
+
+    public static Iterator<Long> toIterator(long[] object) {
+    	return new LongArrayIterator(object);
+    }
+
+    public static Iterator<Float> toIterator(float[] object) {
+    	return new FloatArrayIterator(object);
+    }
+
+    public static Iterator<Double> toIterator(double[] object) {
+    	return new DoubleArrayIterator(object);
+    }
+
+    public static <T> Iterator<T> toIterator(T[] object) {
+    	return new ObjectArrayIterator<T>(object);
+    }
+
+    public static <T> Iterator<T> toIterator(Iterator<T> object) {
+    	return object;
+    }
+
+    @SuppressWarnings("unchecked")
+	public static <T> Iterator<T> toIterator(Collection<T> object) {
+    	return object == null ? (Iterator<T>) EmptyIterator.getEmptyIterator(): object.iterator();
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <K, V> Iterator<Entry<K, V>> toIterator(Map<K, V> object) {
+    	return object == null ? (Iterator) EmptyIterator.getEmptyIterator(): object.entrySet().iterator();
+    }
+
+    @SuppressWarnings("unchecked")
+	public static <T> Iterator<T> toIterator(Iterable<T> object) {
+    	return object == null ? (Iterator<T>) EmptyIterator.getEmptyIterator(): object.iterator();
+    }
+
     public static Iterator<?> toIterator(Object object) {
         if (object == null) {
-            return Collections.EMPTY_LIST.iterator();
+            return EmptyIterator.getEmptyIterator();
         } else if (object instanceof Iterator<?>) {
             return ((Iterator<?>)object);
         } else if (object instanceof Iterable<?>) {
@@ -512,126 +584,234 @@ public class ClassUtils {
         return map;
     }
 
-    public static boolean[] subArray(boolean[] list, IntegerSequence sequence) {
-        return (boolean[])doSubArray(list, sequence);
+    public static boolean[] subArray(boolean[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static char[] subArray(char[] list, IntegerSequence sequence) {
-        return (char[])doSubArray(list, sequence);
+    public static char[] subArray(char[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static byte[] subArray(byte[] list, IntegerSequence sequence) {
-        return (byte[])doSubArray(list, sequence);
+    public static byte[] subArray(byte[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static short[] subArray(short[] list, IntegerSequence sequence) {
-        return (short[])doSubArray(list, sequence);
+    public static short[] subArray(short[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static int[] subArray(int[] list, IntegerSequence sequence) {
-        return (int[])doSubArray(list, sequence);
+    public static int[] subArray(int[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static long[] subArray(long[] list, IntegerSequence sequence) {
-        return (long[])doSubArray(list, sequence);
+    public static long[] subArray(long[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static float[] subArray(float[] list, IntegerSequence sequence) {
-        return (float[])doSubArray(list, sequence);
+    public static float[] subArray(float[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static double[] subArray(double[] list, IntegerSequence sequence) {
-        return (double[])doSubArray(list, sequence);
+    public static double[] subArray(double[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
     
-    public static Object[] subArray(Object[] list, IntegerSequence sequence) {
-        return (Object[])doSubArray(list, sequence);
-    }
-    
-    public static boolean[] subArray(boolean[] list, int[] sequence) {
-        return (boolean[])doSubArray(list, sequence);
+    public static <T> T[] subArray(T[] array, IntegerSequence sequence) {
+        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
     }
 
-    public static char[] subArray(char[] list, int[] sequence) {
-        return (char[])doSubArray(list, sequence);
-    }
-
-    public static byte[] subArray(byte[] list, int[] sequence) {
-        return (byte[])doSubArray(list, sequence);
-    }
-
-    public static short[] subArray(short[] list, int[] sequence) {
-        return (short[])doSubArray(list, sequence);
-    }
-
-    public static int[] subArray(int[] list, int[] sequence) {
-        return (int[])doSubArray(list, sequence);
-    }
-
-    public static long[] subArray(long[] list, int[] sequence) {
-        return (long[])doSubArray(list, sequence);
-    }
-
-    public static float[] subArray(float[] list, int[] sequence) {
-        return (float[])doSubArray(list, sequence);
-    }
-
-    public static double[] subArray(double[] list, int[] sequence) {
-        return (double[])doSubArray(list, sequence);
-    }
-    
-    public static Object[] subArray(Object[] list, int[] sequence) {
-        return (Object[])doSubArray(list, sequence);
-    }
-    
-    private static Object doSubArray(Object array, IntegerSequence sequence) {
-        if (array == null || ! array.getClass().isArray() 
-                || Array.getLength(array) == 0) {
-            return array;
-        }
-        if (sequence == null) {
-            return array;
-        }
-        int[] index = getIntegerSequenceBeginAndEnd(Array.getLength(array), sequence);
-        int len = index[1] - index[0];
-        Object sub = Array.newInstance(array.getClass().getComponentType(), len);
-        for (int i = 0; i < len; i ++) {
-            Array.set(sub, i, Array.get(array, i + index[0]));
-        }
-        return sub;
-    }
-
-    private static Object doSubArray(Object array, int[] indexs) {
-        if (array == null || ! array.getClass().isArray() 
-                || Array.getLength(array) == 0) {
+    public static boolean[] subArray(boolean[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
             return array;
         }
         if (indexs == null || indexs.length == 0) {
-            return Array.newInstance(array.getClass().getComponentType(), 0);
+            return new boolean[0];
         }
-        int len = Array.getLength(array);
-        Object sub = Array.newInstance(array.getClass().getComponentType(), indexs.length);
+        int len = array.length;
+        boolean[] sub = new boolean[indexs.length];
         for (int i = 0; i < indexs.length; i ++) {
             int index = indexs[i];
             if (index < 0) {
                 index = len + index;
             }
             if (index >= 0 && index < len) {
-                Array.set(sub, i, Array.get(array, index));
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
+    public static char[] subArray(char[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return new char[0];
+        }
+        int len = array.length;
+        char[] sub = new char[indexs.length];
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
+    public static byte[] subArray(byte[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return new byte[0];
+        }
+        int len = array.length;
+        byte[] sub = new byte[indexs.length];
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
+    public static short[] subArray(short[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return new short[0];
+        }
+        int len = array.length;
+        short[] sub = new short[indexs.length];
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
+    public static int[] subArray(int[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return new int[0];
+        }
+        int len = array.length;
+        int[] sub = new int[indexs.length];
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
+    public static long[] subArray(long[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return new long[0];
+        }
+        int len = array.length;
+        long[] sub = new long[indexs.length];
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
+    public static float[] subArray(float[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return new float[0];
+        }
+        int len = array.length;
+        float[] sub = new float[indexs.length];
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
+    public static double[] subArray(double[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return new double[0];
+        }
+        int len = array.length;
+        double[] sub = new double[indexs.length];
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
             }
         }
         return sub;
     }
     
+    @SuppressWarnings("unchecked")
+	public static <T> T[] subArray(T[] array, int[] indexs) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (indexs == null || indexs.length == 0) {
+            return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
+        }
+        int len = array.length;
+        T[] sub = (T[]) Array.newInstance(array.getClass().getComponentType(), indexs.length);
+        for (int i = 0; i < indexs.length; i ++) {
+            int index = indexs[i];
+            if (index < 0) {
+                index = len + index;
+            }
+            if (index >= 0 && index < len) {
+                sub[i] = array[index];
+            }
+        }
+        return sub;
+    }
+
     public static <T> List<T> subList(List<T> list, IntegerSequence sequence) {
-        if (list == null || list.size() == 0) {
-            return list;
-        }
-        if (sequence == null) {
-            return list;
-        }
-        int[] index = getIntegerSequenceBeginAndEnd(list.size(), sequence);
-        return list.subList(index[0], index[1]);
+    	return subList(list, list == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(list.size(), sequence));
     }
 
     public static <T> List<T> subList(List<T> list, int[] indexs) {

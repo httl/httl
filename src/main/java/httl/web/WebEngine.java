@@ -19,6 +19,7 @@ package httl.web;
 import httl.Engine;
 import httl.Template;
 import httl.spi.loaders.ServletLoader;
+import httl.spi.resolvers.RequestResolver;
 import httl.util.WrappedMap;
 
 import java.io.FileNotFoundException;
@@ -68,8 +69,11 @@ public class WebEngine {
 			                	throw new FileNotFoundException("Not found httl config " + config + " in wepapp.");
 			                }
 			                properties.load(in);
+			                addProperties(properties);
 			                ENGINE = Engine.getEngine(config, properties);
 			            } else {
+			            	Properties properties = new Properties();
+			        		addProperties(properties);
 			            	ENGINE = Engine.getEngine(config);
 			            }
 			        } else {
@@ -77,15 +81,31 @@ public class WebEngine {
 			        	if (in != null) {
 			        		Properties properties = new Properties();
 			        		properties.load(in);
+			        		addProperties(properties);
 			        		ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
 			        	} else {
-			        		ENGINE = Engine.getEngine();
+			        		Properties properties = new Properties();
+			        		addProperties(properties);
+			        		ENGINE = Engine.getEngine(properties);
 			        	}
 			        }
 			        IS_OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM, false);
 				}
 			}
 		}
+	}
+	
+	private static void addProperties(Properties properties) {
+		if (! properties.containsKey("loader") 
+        		&& ! properties.containsKey("loaders")
+        		&& ! properties.containsKey("loaders+")) {
+        	properties.setProperty("loaders+", ServletLoader.class.getName());
+        }
+        if (! properties.containsKey("resolver") 
+        		&& ! properties.containsKey("resolvers")
+        		&& ! properties.containsKey("resolvers+")) {
+        	properties.setProperty("resolvers+", RequestResolver.class.getName());
+        }
 	}
 
 	public static Template getTemplate(String path) throws IOException, ParseException {
@@ -137,6 +157,11 @@ public class WebEngine {
 			parameters = new WrappedMap<String, Object>(parameters, model);
 		}
 		WebContext.setWebContext(request, response);
+		boolean unresolved = RequestResolver.getServletRequest() == null;
+		if (unresolved) {
+			RequestResolver.setServletRequest(request);
+			RequestResolver.setServletResponse(response);
+		}
 		try {
 			Template template = ENGINE.getTemplate(path);
 			if (IS_OUTPUT_STREAM) {
@@ -149,6 +174,10 @@ public class WebEngine {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		} finally {
 			WebContext.removeWebContext();
+			if (unresolved) {
+				RequestResolver.removeServletRequest();
+				RequestResolver.removeServletResponse();
+			}
 		}
 	}
 

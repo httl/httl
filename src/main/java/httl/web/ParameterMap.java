@@ -126,15 +126,18 @@ public class ParameterMap implements Map<String, Object> {
             if (value == null) {
                 value = getParameterValue(k);
                 if (value == null) {
-                    value = request.getAttribute(k);
+                	value = request.getHeader(k);
                     if (value == null) {
-                        value = request.getSession().getAttribute(k);
-                        if (value == null) {
-                            value = getCookieValue(k);
-                            if (value == null) {
-                                value = request.getSession().getServletContext().getAttribute(k);
-                            }
-                        }
+	                    value = request.getAttribute(k);
+	                    if (value == null) {
+	                        value = request.getSession().getAttribute(k);
+	                        if (value == null) {
+	                            value = getCookieValue(k);
+	                            if (value == null) {
+	                                value = request.getSession().getServletContext().getAttribute(k);
+	                            }
+	                        }
+	                    }
                     }
                 }
             }

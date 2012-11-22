@@ -17,6 +17,7 @@
 package httl.spi.compilers;
 
 import httl.spi.Compiler;
+import httl.spi.Logger;
 import httl.util.ClassUtils;
 
 import java.io.File;
@@ -40,8 +41,14 @@ public abstract class AbstractCompiler implements Compiler {
     private static final Pattern CLASS_PATTERN = Pattern.compile("class\\s+([_a-zA-Z][_a-zA-Z0-9]*)\\s+");
     
     private File compileDirectory;
+    
+    private Logger logger;
 
-    /**
+    public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
+	/**
 	 * httl.properties: compile.directory=classes
 	 */
     public void setCompileDirectory(String directory) {
@@ -75,35 +82,40 @@ public abstract class AbstractCompiler implements Compiler {
     }
 
     public Class<?> compile(String code) throws ParseException {
-        code = code.trim();
-        Matcher matcher = PACKAGE_PATTERN.matcher(code);
-        String pkg;
-        if (matcher.find()) {
-            pkg = matcher.group(1);
-        } else {
-            pkg = "";
-        }
-        matcher = CLASS_PATTERN.matcher(code);
-        String cls;
-        if (matcher.find()) {
-            cls = matcher.group(1);
-        } else {
-            throw new IllegalArgumentException("No such class name in " + code);
-        }
-        String className = pkg != null && pkg.length() > 0 ? pkg + "." + cls : cls;
-        try {
-            return Class.forName(className, true, Thread.currentThread().getContextClassLoader());
-        } catch (ClassNotFoundException e) {
-            if (! code.endsWith("}")) {
-                throw new ParseException("The java code not endsWith \"}\", code: \n" + code + "\n", code.length() - 1);
-            }
-            try {
-                return doCompile(className, code);
-            } catch (ParseException t) {
-                throw t;
-            } catch (Throwable t) {
-                throw new ParseException("Failed to compile class, cause: " + t.getMessage() + ", class: " + className + ", code: \n================================\n" + code + "\n================================\n, stack: " + ClassUtils.toString(t), 0);
-            }
+    	String className = null;
+    	try {
+	        code = code.trim();
+	        Matcher matcher = PACKAGE_PATTERN.matcher(code);
+	        String pkg;
+	        if (matcher.find()) {
+	            pkg = matcher.group(1);
+	        } else {
+	            pkg = "";
+	        }
+	        matcher = CLASS_PATTERN.matcher(code);
+	        String cls;
+	        if (matcher.find()) {
+	            cls = matcher.group(1);
+	        } else {
+	            throw new ParseException("No such class name in java code.", 0);
+	        }
+	        className = pkg != null && pkg.length() > 0 ? pkg + "." + cls : cls;
+	        try {
+	            return Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+	        } catch (ClassNotFoundException e) {
+	            if (! code.endsWith("}")) {
+	                throw new ParseException("The java code not endsWith \"}\"", code.length() - 1);
+	            }
+	            return doCompile(className, code);
+	        }
+    	} catch (Throwable t) {
+        	if (logger.isErrorEnabled()) {
+        		logger.error("Failed to compile class, cause: " + t.getMessage() + ", class: " + className + ", code: \n================================\n" + code + "\n================================\n", t);
+        	}
+        	if (t instanceof ParseException) {
+        		throw (ParseException) t;
+        	}
+            throw new ParseException("Failed to compile class, cause: " + t.getMessage() + ", class: " + className + ", stack: " + ClassUtils.toString(t), 0);
         }
     }
     

@@ -341,7 +341,7 @@ public class DfaParser {
                     && (msg.startsWith("\"") && msg.endsWith("\"") 
                     || msg.startsWith("\'") && msg.endsWith("\'") 
                     || msg.startsWith("`") && msg.endsWith("`"))) {
-                if (msg.length() == 3 && msg.startsWith("\'")) {
+                if (msg.length() == 3 && msg.startsWith("`")) {
                     char value = msg.charAt(1);
                     parameterStack.push(new Constant(value, char.class, "\'" + value + "\'"));
                 } else {

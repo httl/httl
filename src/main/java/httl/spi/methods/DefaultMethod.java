@@ -22,6 +22,16 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Resolver;
+import httl.spi.methods.cycles.ArrayCycle;
+import httl.spi.methods.cycles.BooleanArrayCycle;
+import httl.spi.methods.cycles.ByteArrayCycle;
+import httl.spi.methods.cycles.CharArrayCycle;
+import httl.spi.methods.cycles.DoubleArrayCycle;
+import httl.spi.methods.cycles.FloatArrayCycle;
+import httl.spi.methods.cycles.IntArrayCycle;
+import httl.spi.methods.cycles.ListCycle;
+import httl.spi.methods.cycles.LongArrayCycle;
+import httl.spi.methods.cycles.ShortArrayCycle;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
 import httl.util.LocaleUtils;
@@ -38,10 +48,13 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
@@ -258,17 +271,21 @@ public class DefaultMethod {
     		} else {
     			resourceBundle = ResourceBundle.getBundle(i18nBasename, locale);
     		}
-    		String value = resourceBundle.getString(key);
-    		if (value != null && value.length() > 0) {
-    			if (args != null && args.length > 0) {
-    				if ("string".equals(i18nFormat)) {
-    					return String.format(value, args);
-    				} else {
-    					return MessageFormat.format(value, args);
-    				}
-    			} else {
-    				return value;
-    			}
+    		try {
+    			String value = resourceBundle.getString(key);
+    			if (value != null && value.length() > 0) {
+        			if (args != null && args.length > 0) {
+        				if ("string".equals(i18nFormat)) {
+        					return String.format(value, args);
+        				} else {
+        					return MessageFormat.format(value, args);
+        				}
+        			} else {
+        				return value;
+        			}
+        		}
+    		} catch (MissingResourceException e) {
+    			return key;
     		}
     	}
     	return key;
@@ -501,9 +518,13 @@ public class DefaultMethod {
         return value == null || value.length() == 0 ? null : ClassUtils.forName(value);
     }
 
-    public Object[] toArray(Collection<?> value, String type) {
-        Class<?> cls = ClassUtils.forName(importPackages, type);
-        return value.toArray((Object[])Array.newInstance(cls, 0));
+    @SuppressWarnings("unchecked")
+	public <T> T[] toArray(Collection<T> value, String type) {
+        Class<T> cls = (Class<T>) ClassUtils.forName(importPackages, type);
+        if (value == null) {
+        	return (T[]) Array.newInstance(cls, 0);
+        }
+        return (T[]) value.toArray((Object[])Array.newInstance(cls, value.size()));
     }
 
     public Date toDate(String value) {
@@ -602,44 +623,44 @@ public class DefaultMethod {
         return value == null ? null : NumberUtils.format(value, format);
     }
 
-    public static Cycle toCycle(Collection<?> values) {
-        return new Cycle(values);
+    public static <T> ListCycle<T> toCycle(Collection<T> values) {
+        return new ListCycle<T>(values);
     }
 
-    public static Cycle toCycle(Object[] values) {
-        return new Cycle(values);
+    public static <T> ArrayCycle<T> toCycle(T[] values) {
+        return new ArrayCycle<T>(values);
     }
 
-    public static Cycle toCycle(boolean[] values) {
-        return new Cycle(values);
+    public static BooleanArrayCycle toCycle(boolean[] values) {
+        return new BooleanArrayCycle(values);
     }
 
-    public static Cycle toCycle(char[] values) {
-        return new Cycle(values);
+    public static CharArrayCycle toCycle(char[] values) {
+        return new CharArrayCycle(values);
     }
 
-    public static Cycle toCycle(byte[] values) {
-        return new Cycle(values);
+    public static ByteArrayCycle toCycle(byte[] values) {
+        return new ByteArrayCycle(values);
     }
 
-    public static Cycle toCycle(short[] values) {
-        return new Cycle(values);
+    public static ShortArrayCycle toCycle(short[] values) {
+        return new ShortArrayCycle(values);
     }
 
-    public static Cycle toCycle(int[] values) {
-        return new Cycle(values);
+    public static IntArrayCycle toCycle(int[] values) {
+        return new IntArrayCycle(values);
     }
 
-    public static Cycle toCycle(long[] values) {
-        return new Cycle(values);
+    public static LongArrayCycle toCycle(long[] values) {
+        return new LongArrayCycle(values);
     }
 
-    public static Cycle toCycle(float[] values) {
-        return new Cycle(values);
+    public static FloatArrayCycle toCycle(float[] values) {
+        return new FloatArrayCycle(values);
     }
 
-    public static Cycle toCycle(double[] values) {
-        return new Cycle(values);
+    public static DoubleArrayCycle toCycle(double[] values) {
+        return new DoubleArrayCycle(values);
     }
 
     public static int length(Map<?, ?> values) {
@@ -696,5 +717,25 @@ public class DefaultMethod {
         }
         return buf.toString();
     }
+
+	public static String[] split(String value, char separator) {
+		List<String> list = new ArrayList<String>();
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < value.length(); i ++) {
+			char ch = value.charAt(i);
+			if (ch == separator) {
+				if (buf.length() > 0) {
+					list.add(buf.toString());
+					buf.setLength(0);
+				}
+			} else {
+				buf.append(ch);
+			}
+		}
+		if (buf.length() > 0) {
+			list.add(buf.toString());
+		}
+		return list.toArray(new String[list.size()]);
+	}
 
 }

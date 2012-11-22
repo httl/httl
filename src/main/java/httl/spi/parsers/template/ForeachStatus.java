@@ -17,10 +17,8 @@
 package httl.spi.parsers.template;
 
 import httl.util.ClassUtils;
-import httl.util.LinkedStack;
 
 import java.io.Serializable;
-
 
 /**
  * ForeachStatus. (SPI, Prototype, ThreadSafe)
@@ -28,64 +26,71 @@ import java.io.Serializable;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ForeachStatus implements Serializable {
-    
+
     private static final long serialVersionUID = -6011370058720809056L;
     
-    private final LinkedStack<ForeachCounter> stack = new LinkedStack<ForeachCounter>();
+    private final ForeachStatus parent;
+
+    private final Object data;
     
-    public <T> T push(T list) {
-        stack.push(new ForeachCounter(stack.peek(), ClassUtils.getSize(list), stack.size()));
-        return list;
+    private final int size;
+    
+    private final int level;
+    
+    private int index = 0;
+
+    public ForeachStatus(ForeachStatus parent, Object data) {
+        this.parent = parent;
+        this.data = data;
+        this.size = ClassUtils.getSize(data);
+        this.level = parent == null ? 0 : parent.getLevel() + 1;
     }
-    
-    public void pop() {
-        stack.pop();
-    }
-    
+
     public void increment() {
-        stack.peek().increment();
+        index ++;
+    }
+    
+    public ForeachStatus getParent() {
+        return parent;
     }
 
-    public ForeachCounter getParent() {
-        return stack.peek().getParent();
+    public Object getData() {
+        return data;
     }
-
+    
     public int getSize() {
-        return stack.peek().getSize();
+        return size;
     }
     
     public int getLevel() {
-        return stack.peek().getLevel();
+        return level;
     }
     
     public int getIndex() {
-        return stack.peek().getIndex();
+        return index;
     }
-    
+
     public int getCount() {
-        return stack.peek().getIndex() + 1;
+        return index + 1;
     }
     
     public boolean isOdd() {
-        return stack.peek().getIndex() % 2 != 0;
+        return index % 2 != 0;
     }
     
     public boolean isEven() {
-        return stack.peek().getIndex() % 2 == 0;
+        return index % 2 == 0;
     }
     
     public boolean isFirst() {
-        return stack.peek().getIndex() == 0;
+        return index == 0;
     }
     
     public boolean isLast() {
-        ForeachCounter counter = stack.peek();
-        return counter.getIndex() >= counter.getSize() - 1;
+        return index >= size - 1;
     }
     
     public boolean isMiddle() {
-        ForeachCounter counter = stack.peek();
-        return counter.getIndex() > 0 && counter.getIndex() < counter.getSize() - 1;
+        return index > 0 && index < size - 1;
     }
-    
 }

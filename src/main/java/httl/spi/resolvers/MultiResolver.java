@@ -32,7 +32,8 @@ public class MultiResolver implements Resolver {
 		if (resolvers.length == 1) {
 			return resolvers[0].getProperty(key);
 		}
-		for (Resolver resolver : resolvers) {
+		for (int i = resolvers.length - 1; i >= 0; i --) {
+			Resolver resolver = resolvers[i];
 			String value = resolver.getProperty(key);
 			if (value != null && value.length() > 0) {
 				return value;

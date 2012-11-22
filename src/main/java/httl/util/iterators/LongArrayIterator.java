@@ -28,13 +28,13 @@ public class LongArrayIterator implements Iterator<Long> {
 
     private final long[] array;
 
-    private final int    length;
+    private final int length;
 
-    private volatile int index;
+    private int index;
 
     public LongArrayIterator(long[] array){
         this.array = array;
-        this.length = array.length;
+        this.length = array == null ? 0 : array.length;
     }
 
     public Object getArray() {

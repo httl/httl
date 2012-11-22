@@ -17,6 +17,7 @@
 package httl.spi.compilers;
 
 import httl.spi.Compiler;
+import httl.spi.Logger;
 import httl.util.ClassUtils;
 
 import java.text.ParseException;
@@ -32,15 +33,27 @@ public class AdaptiveCompiler implements Compiler {
 
     private Compiler compiler;
 
+    private Logger logger;
+
+    public void setLogger(Logger logger) {
+		this.logger = logger;
+		if (compiler instanceof AbstractCompiler) {
+			((AbstractCompiler) compiler).setLogger(logger);
+		}
+	}
+
     /**
 	 * httl.properties: java.version=1.7
 	 */
     public void setJavaVersion(String version) {
         if (version == null || ClassUtils.isBeforeJava6(version)) {
-            compiler = new JavassistCompiler();
+        	JavassistCompiler javassistCompiler = new JavassistCompiler();
+        	javassistCompiler.setLogger(logger);
+        	compiler = javassistCompiler;
         } else {
         	JdkCompiler jdkCompiler = new JdkCompiler();
         	jdkCompiler.setJavaVersion(version);
+        	jdkCompiler.setLogger(logger);
         	compiler = jdkCompiler;
         }
     }

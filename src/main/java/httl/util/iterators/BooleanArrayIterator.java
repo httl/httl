@@ -28,13 +28,13 @@ public class BooleanArrayIterator implements Iterator<Boolean> {
 
     private final boolean[] array;
 
-    private final int    length;
+    private final int length;
 
-    private volatile int index;
+    private int index;
 
     public BooleanArrayIterator(boolean[] array){
         this.array = array;
-        this.length = array.length;
+        this.length = array == null ? 0 : array.length;
     }
 
     public Object getArray() {

@@ -28,13 +28,13 @@ public class ByteArrayIterator implements Iterator<Byte> {
 
     private final byte[] array;
 
-    private final int    length;
+    private final int length;
 
-    private volatile int index;
+    private int index;
 
     public ByteArrayIterator(byte[] array){
         this.array = array;
-        this.length = array.length;
+        this.length = array == null ? 0 : array.length;
     }
 
     public Object getArray() {

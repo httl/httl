@@ -78,17 +78,6 @@ public class StringUtils {
                 return Arrays.toString((double[]) value);
             } else if (value instanceof Object[]) {
                 return Arrays.toString((Object[]) value);
-            } else {
-                int len = Array.getLength(value);
-                StringBuilder buf = new StringBuilder("[");
-                for (int i = 0; i < len; i ++) {
-                    if (i != 0) {
-                        buf.append(", ");
-                    }
-                    buf.append(Array.get(value, i));
-                }
-                buf.append("]");
-                return buf.toString();
             }
         }
         return String.valueOf(value);

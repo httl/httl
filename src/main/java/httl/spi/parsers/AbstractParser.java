@@ -89,7 +89,7 @@ public abstract class AbstractParser implements Parser {
 
     protected static final Pattern IN_PATTERN = Pattern.compile("(\\s+in\\s+)");
 
-    protected static final Pattern ASSIGN_PATTERN = Pattern.compile("(\\s*:?=\\s*)");
+    protected static final Pattern ASSIGN_PATTERN = Pattern.compile(";\\s*(\\w+)\\s*(\\w*)\\s*(:?=)");
 
     protected static final Pattern ESCAPE_PATTERN = Pattern.compile("(\\\\+)([#$])");
     
@@ -388,7 +388,7 @@ public abstract class AbstractParser implements Parser {
             	types.put(macro, Template.class);
             	statusInit.append(Template.class.getName() + " " + macro + " = getImportMacros().get(\"" + macro + "\");");
             }
-            statusInit.append(ForeachStatus.class.getName() + " " + foreachStatus + " = new " + ForeachStatus.class.getName() + "();\n");
+            statusInit.append(ForeachStatus.class.getName() + " " + foreachStatus + " = null;\n");
             List<String> parameters = new ArrayList<String>();
             List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
             Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
@@ -751,7 +751,7 @@ public abstract class AbstractParser implements Parser {
         if (ifName.equals(name) || elseifName.equals(name) || elseName.equals(name)) {
             return "}\n"; // 插入结束指令
         } else if (foreachName.equals(name)) {
-            return foreachStatus + ".increment();\n}\n" + foreachStatus + ".pop();\n"; // 插入结束指令
+            return foreachStatus + ".increment();\n}\n" + foreachStatus + " = " + foreachStatus + ".getParent();\n"; // 插入结束指令
         }
         return null;
     }
@@ -851,42 +851,59 @@ public abstract class AbstractParser implements Parser {
             buf.append(getConditionCode(translator.translate(value, types, offset)));
             buf.append(") break;");
         } else if (setName.equals(name)) {
-            Matcher matcher = ASSIGN_PATTERN.matcher(value);
-            if (! matcher.find()) {
-                throw new ParseException("Not found \"=\" in set", offset);
+            Matcher matcher = ASSIGN_PATTERN.matcher(";" + value);
+            List<Object[]> list = new ArrayList<Object[]>();
+            Object[] pre = null;
+            while (matcher.find()) {
+            	if (pre != null) {
+            		pre[4] = value.substring(((Integer) pre[3]) - 1, matcher.start() - 1).trim();
+            	}
+            	Object[] item = new Object[5];
+            	if (matcher.group(2) == null || matcher.group(2).length() == 0) {
+            		item[0] = null;
+            		item[1] = matcher.group(1);
+            	} else {
+            		item[0] = matcher.group(1);
+            		item[1] = matcher.group(2);
+            	}
+                item[2] = matcher.group(3);
+                item[3] = matcher.end();
+                list.add(item);
+            	pre = item;
             }
-            int start = matcher.start(1);
-            int end = matcher.end(1);
-            String oper = matcher.group(1).trim();
-            String expr = value.substring(end).trim();
-            Expression expression = translator.translate(expr, types, offset + end);
-            String[] tokens = value.substring(0, start).trim().split("\\s+");
-            String type;
-            String var;
-            if (tokens.length == 1) {
-                type = expression.getReturnType().getName();
-                var = tokens[0].trim();
-            } else if (tokens.length == 2) {
-                type = tokens[0].trim();
-                var = tokens[1].trim();
-            } else {
-                throw new ParseException("Illegal: " + value, offset);
+            if (pre != null) {
+            	pre[4] = value.substring(((Integer) pre[3]) - 1).trim();
+        	}
+            if (list.isEmpty()) {
+            	throw new ParseException("Not found \"=\" in set", offset);
             }
-            Class<?> clazz = ClassUtils.forName(importPackages, type);
-            Class<?> cls = types.get(var);
-            if (cls != null && ! cls.equals(clazz)) {
-                throw new ParseException("set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), begin);
-            }
-            variables.add(var);
-            types.put(var, clazz);
-            buf.append(var + " = (" + type + ")(" + expression.getCode() + ");\n");
-            if (":=".equals(oper)) {
-	            buf.append("$context.getParameters().put(\"");
-	            buf.append(var);
-	            buf.append("\", ");
-	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
-	            buf.append(");\n");
-	            returnTypes.put(var, clazz);
+            for (Object[] item : list) {
+            	String type = (String) item[0];
+                String var = (String) item[1];
+                String oper = (String) item[2];
+                int end = (Integer) item[3];
+                String expr = (String) item[4];
+                Expression expression = translator.translate(expr, types, offset + end);
+                if (type == null || type.length() == 0) {
+                    type = expression.getReturnType().getCanonicalName();
+                }
+                Class<?> clazz = ClassUtils.forName(importPackages, type);
+                Class<?> cls = types.get(var);
+                if (cls != null && ! cls.equals(clazz)) {
+                    throw new ParseException("set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), begin);
+                }
+                variables.add(var);
+                types.put(var, clazz);
+                buf.append(var + " = (" + type + ")(" + expression.getCode() + ");\n");
+                if (":=".equals(oper)) {
+    	            buf.append("$context.getParameters().put(\"");
+    	            buf.append(var);
+    	            buf.append("\", ");
+    	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
+    	            buf.append(");\n");
+    	            returnTypes.put(var, clazz);
+                }
+                
             }
         } else if (varName.equals(name)) {
             if (value == null || value.length() == 0) {
@@ -994,7 +1011,7 @@ public abstract class AbstractParser implements Parser {
     protected String getForeachCode(String type, Class<?> clazz, String var, String code) {
         StringBuilder buf = new StringBuilder();
         String name = "_i_" + var;
-        buf.append("for (" + Iterator.class.getName() + " " + name + " = " + ClassUtils.class.getName() + ".toIterator(" + foreachStatus + ".push(" + code + ")); " + name + ".hasNext();) {\n");
+        buf.append("for (" + Iterator.class.getName() + " " + name + " = " + ClassUtils.class.getName() + ".toIterator((" + foreachStatus + " = new " + ForeachStatus.class.getName() + "(" + foreachStatus + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
         if (clazz.isPrimitive()) {
             buf.append(type + " " + var + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next());\n");
         } else {

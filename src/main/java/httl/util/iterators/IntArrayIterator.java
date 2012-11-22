@@ -28,13 +28,13 @@ public class IntArrayIterator implements Iterator<Integer> {
 
     private final int[] array;
 
-    private final int    length;
+    private final int length;
 
-    private volatile int index;
+    private int index;
 
     public IntArrayIterator(int[] array){
         this.array = array;
-        this.length = array.length;
+        this.length = array == null ? 0 : array.length;
     }
 
     public Object getArray() {

@@ -26,18 +26,18 @@ import java.util.NoSuchElementException;
  */
 public class ObjectArrayIterator<T> implements Iterator<T> {
 
-    private final Object[] array;
+    private final T[] array;
 
-    private final int    length;
+    private final int length;
 
-    private volatile int index;
+    private int index;
 
-    public ObjectArrayIterator(Object[] array){
+    public ObjectArrayIterator(T[] array){
         this.array = array;
-        this.length = array.length;
+        this.length = array == null ? 0 : array.length;
     }
 
-    public Object getArray() {
+    public T[] getArray() {
         return array;
     }
 
@@ -45,12 +45,11 @@ public class ObjectArrayIterator<T> implements Iterator<T> {
         return index < length;
     }
 
-    @SuppressWarnings("unchecked")
     public T next() {
         if (! hasNext()) {
             throw new NoSuchElementException();
         }
-        return (T) array[index ++];
+        return array[index ++];
     }
 
     public void remove() {
