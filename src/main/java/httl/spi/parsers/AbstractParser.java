@@ -170,6 +170,8 @@ public abstract class AbstractParser implements Parser {
     protected static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
     
     protected static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
+
+    protected final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
     
     protected boolean isOutputStream;
 
@@ -684,26 +686,35 @@ public abstract class AbstractParser implements Parser {
             Expression expr = translator.translate(matcher.group(2), types, off);
             String code = expr.getCode();
             Class<?> returnType = expr.getReturnType();
+            boolean nofilter = "$!".equals(matcher.group(1));
             boolean direct = false;
-            if ("$!".equals(matcher.group(1))) {
+            if (nofilter) {
             	if (stream) {
             		direct = byte[].class.equals(returnType);
             	} else {
             		direct = String.class.equals(returnType);
             	}
             }
+            String pre = "";
             if (! direct) {
-            	code = "format(" + code + ")";
-                if (! "$!".equals(matcher.group(1))) {
-                    code = "filter(" + code + ")";
-                }
-                if (stream) {
-                    code = "serialize(" + code + ")";
+            	if (nofilter && stream && Object.class.equals(returnType)) {
+            		String var = "__obj" + TMP_VAR_SEQ.getAndIncrement();
+            		pre = "Object " + var + " = " + code + ";\n";
+            		// 如果是byte[]类型，防止先format()成String，再serialize()回byte[]，浪费转换性能。
+            		code = var + " instanceof byte[] ? (byte[]) " + var + " : serialize(format(" + var + "))";
+                } else {
+                	code = "format(" + code + ")";
+                    if (! nofilter) {
+                    	code = "filter(" + code + ")";
+                    }
+                    if (stream) {
+                    	code = "serialize(" + code + ")";
+                    }
                 }
             }
             String txt = message.substring(last, matcher.start());
             appendText(buf, txt, filter, textFields, textInits, seq, stream);
-            buf.append(");\n$output.write(" + code + ");\n$output.write(");
+            buf.append(");\n" + pre + "$output.write(" + code + ");\n$output.write(");
             last = matcher.end();
         }
         String txt;
