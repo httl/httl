@@ -50,7 +50,7 @@ public class ServletResource extends InputStreamResource {
     }
 
     @Override
-    protected File getFile() {
+    public File getFile() {
     	return new File(servletContext.getRealPath(path));
     }
 

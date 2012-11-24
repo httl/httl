@@ -109,7 +109,7 @@ public abstract class AbstractCompiler implements Compiler {
 	            return doCompile(className, code);
 	        }
     	} catch (Throwable t) {
-        	if (logger.isErrorEnabled()) {
+        	if (logger != null && logger.isErrorEnabled()) {
         		logger.error("Failed to compile class, cause: " + t.getMessage() + ", class: " + className + ", code: \n================================\n" + code + "\n================================\n", t);
         	}
         	if (t instanceof ParseException) {

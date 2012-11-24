@@ -119,11 +119,7 @@ public class WebEngine {
 
 	public static Engine getEngine() {
 		if (ENGINE == null) {
-			ServletContext servletContext = ServletLoader.getServletContext();
-			if (servletContext == null) {
-				throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>" + ServletLoader.class.getName() + "</listener-class></listener> in your /WEB-INF/web.xml");
-			}
-			init(servletContext);
+			init(ServletLoader.getAndCheckServletContext());
 		}
 		return ENGINE;
 	}

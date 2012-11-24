@@ -106,7 +106,7 @@ public abstract class InputStreamResource extends AbstractResource {
         return super.getLength();
     }
 
-    protected File getFile() {
+    public File getFile() {
     	URL url = getUrl();
         if (url != null) {
             if (FILE_PROTOCOL.equals(url.getProtocol())) {

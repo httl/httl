@@ -46,7 +46,7 @@ public class FileResource extends InputStreamResource {
     }
 
     @Override
-    protected File getFile() {
+    public File getFile() {
         return file;
     }
 

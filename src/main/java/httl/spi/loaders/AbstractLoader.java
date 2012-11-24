@@ -19,7 +19,9 @@ package httl.spi.loaders;
 import httl.Engine;
 import httl.Resource;
 import httl.spi.Loader;
+import httl.spi.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -42,11 +44,31 @@ public abstract class AbstractLoader implements Loader {
     
     private String[] suffixes;
 
+    private Logger logger;
+
+	private boolean reloadable;
+
+	private boolean first = true;
+
 	/**
 	 * httl.properties: engine=httl.spi.engines.DefaultEngine
 	 */
     public void setEngine(Engine engine) {
 		this.engine = engine;
+	}
+
+	/**
+	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
+	 */
+    public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
+    /**
+	 * httl.properties: reloadable=true
+	 */
+	public void setReloadable(boolean reloadable) {
+		this.reloadable = reloadable;
 	}
 
     /**
@@ -127,7 +149,31 @@ public abstract class AbstractLoader implements Loader {
         if (encoding == null || encoding.length() == 0) {
             encoding = this.encoding;
         }
-        return doLoad(name, encoding, toPath(name));
+        String path = toPath(name);
+        Resource resource = doLoad(name, encoding, path);
+        if (first) {
+        	first = false;
+        	if (reloadable && resource instanceof InputStreamResource 
+        			&& logger != null && logger.isInfoEnabled()) {
+	        	File file = ((InputStreamResource) resource).getFile();
+	    		if (file != null && file.exists()) {
+	    			path = path.replace('\\', '/');
+		    		String abs = file.getAbsolutePath().replace('\\', '/');
+		    		if (abs.endsWith(path)) {
+		    			abs = abs.substring(0, abs.length() - path.length());
+		    		} else {
+			    		int i = abs.lastIndexOf('/');
+			        	if (i > 0) {
+			        		abs = abs.substring(0, i);
+			        	} else {
+			        		abs = "/";
+			        	}
+		    		}
+		        	logger.info("Reloadable form httl template directroy: " + abs);
+	    		}
+        	}
+        }
+        return resource;
     }
 
     protected abstract Resource doLoad(String name, String encoding, String path) throws IOException;

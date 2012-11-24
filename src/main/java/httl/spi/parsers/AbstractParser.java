@@ -543,7 +543,7 @@ public abstract class AbstractParser implements Parser {
                     + "}\n"
                     + "\n"
                     + "}\n";
-            if (logger.isDebugEnabled()) {
+            if (logger != null && logger.isDebugEnabled()) {
             	logger.debug("\n================================\n" + resource.getName() + "\n================================\n" + sorceCode + "\n================================\n");
             }
             return compiler.compile(sorceCode);

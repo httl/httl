@@ -265,11 +265,15 @@ public class DefaultEngine extends Engine {
                     try {
                         getTemplate(name);
                     } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
+                    	if (logger != null && logger.isErrorEnabled()) {
+                    		logger.error(e.getMessage(), e);
+                    	}
                     }
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+            	if (logger != null && logger.isErrorEnabled()) {
+            		logger.error(e.getMessage(), e);
+            	}
             }
         }
     }
