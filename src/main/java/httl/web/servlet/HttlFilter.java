@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 public class HttlFilter implements Filter {
 
 	public void init(FilterConfig config) throws ServletException {
-		WebEngine.getWebEngine().setServletContext(config.getServletContext());
+		WebEngine.init(config.getServletContext());
 	}
 	
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -50,7 +50,7 @@ public class HttlFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		chain.doFilter(request, response);
 		try {
-			WebEngine.getWebEngine().getWebTemplate(request).render(request, response);
+			WebEngine.render(request, response);
         } catch (ParseException e) {
             throw new ServletException(e.getMessage(), e);
         }

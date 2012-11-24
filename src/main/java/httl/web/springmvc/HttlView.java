@@ -37,12 +37,12 @@ public class HttlView extends AbstractTemplateView {
 	protected void renderMergedTemplateModel(Map<String, Object> model,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		WebEngine.getWebEngine().getWebTemplate(getUrl()).render(request, response, model);
+		WebEngine.render(request, response, getUrl(), model);
 	}
 
 	@Override
 	public boolean checkResource(Locale locale) throws Exception {
-		return WebEngine.getWebEngine().hasResource(getUrl());
+		return WebEngine.getEngine().hasResource(getUrl());
 	}
 
 }

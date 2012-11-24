@@ -595,6 +595,22 @@ public class DefaultMethod {
         return format(value, numberFormat);
     }
 
+    public String toString(char[] value) {
+    	return value == null ? null : new String(value);
+    }
+
+    public String toString(byte[] value) {
+    	return value == null ? null : new String(value);
+    }
+
+    public char[] toChars(String value) {
+    	return value == null ? null : value.toCharArray();
+    }
+
+    public byte[] toBytes(String value) {
+    	return value == null ? null : value.getBytes();
+    }
+
     public static String format(byte value, String format) {
         return format(Byte.valueOf(value), format);
     }

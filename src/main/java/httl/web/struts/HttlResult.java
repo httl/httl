@@ -44,7 +44,7 @@ public class HttlResult extends StrutsResultSupport {
         HttpServletResponse response = ServletActionContext.getResponse();
         ValueStack stack = ActionContext.getContext().getValueStack();
 		ValueStackMap map = new ValueStackMap(stack);
-		WebEngine.getWebEngine().getWebTemplate(location).render(request, response, map);
+		WebEngine.render(request, response, location, map);
 	}
 
 }

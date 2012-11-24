@@ -56,14 +56,14 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
 
     public List<String> doList(String directory, String[] suffixes) throws IOException {
     	if (SERVLET_CONTEXT == null) {
-			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>httl.spi.loaders.ServletLoader</listener-class></listener> in your /WEB-INF/web.xml");
+			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>" + ServletLoader.class.getName() + "</listener-class></listener> in your /WEB-INF/web.xml");
 		}
         return UrlUtils.listUrl(SERVLET_CONTEXT.getResource(directory), suffixes);
     }
 
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
     	if (SERVLET_CONTEXT == null) {
-			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>httl.spi.loaders.ServletLoader</listener-class></listener> in your /WEB-INF/web.xml");
+			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>" + ServletLoader.class.getName() + "</listener-class></listener> in your /WEB-INF/web.xml");
 		}
 		return new ServletResource(getEngine(), name, encoding, path, SERVLET_CONTEXT);
 	}
