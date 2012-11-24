@@ -61,7 +61,7 @@ public abstract class InputStreamResource extends AbstractResource {
 
     public long getLastModified() {
     	File file = getFile();
-        if (file != null) {
+        if (file != null && file.exists()) {
             return file.lastModified();
         }
         URL url = getUrl();

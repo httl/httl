@@ -18,13 +18,11 @@ package httl.spi.loaders;
 
 import httl.Engine;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.servlet.ServletContext;
-
 
 /**
  * ServletResource. (SPI, Prototype, ThreadSafe)
@@ -52,12 +50,8 @@ public class ServletResource extends InputStreamResource {
     }
 
     @Override
-    protected URL getUrl() {
-    	try {
-			return servletContext.getResource(path);
-		} catch (MalformedURLException e) {
-			return null;
-		}
+    protected File getFile() {
+    	return new File(servletContext.getRealPath(path));
     }
 
 }

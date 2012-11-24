@@ -31,8 +31,8 @@ import java.util.List;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ClasspathLoader extends AbstractLoader {
-    
-    public List<String> doList(String directory, String[] suffixes) throws IOException {
+
+	public List<String> doList(String directory, String[] suffixes) throws IOException {
         return UrlUtils.listUrl(Thread.currentThread().getContextClassLoader().getResource(directory), suffixes);
     }
     

@@ -34,7 +34,7 @@ public class ClasspathResource extends InputStreamResource {
     private static final long serialVersionUID = 2499229996487593996L;
     
     private final String path;
-
+    
     public ClasspathResource(Engine engine, String name, String encoding, String path) {
         super(engine, name, encoding);
         this.path = (path.startsWith("/") ? path.substring(1) : path);

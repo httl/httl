@@ -21,12 +21,11 @@ import httl.Template;
 import httl.test.model.Book;
 import httl.test.model.User;
 import httl.test.util.DiscardOutputStream;
-import httl.test.util.DiscardWriter;
 import httl.util.ClassUtils;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.io.Writer;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,10 +48,10 @@ public class ProfileTest extends TestCase {
 
     @Test
     public void testTemplate() throws Exception {
-    	boolean profile = "true".equals(System.getProperty("profile"));
+    	/*boolean profile = "true".equals(System.getProperty("profile"));
     	if (! profile) {
     		return;
-    	}
+    	}*/
         boolean stream = "true".equals(System.getProperty("stream"));
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         format.setTimeZone(TimeZone.getTimeZone("+0"));
@@ -86,7 +85,7 @@ public class ProfileTest extends TestCase {
         context.put("books", books);
         context.put("emptybooks", new Book[0]);
         OutputStream outputStream = new DiscardOutputStream();
-        Writer writer = new DiscardWriter();;
+        StringWriter writer = new StringWriter();
         for(;;) {
         	Engine engine = Engine.getEngine("httl-profile.properties");
         	String dir = engine.getProperty("template.directory");
@@ -97,9 +96,9 @@ public class ProfileTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "block.httl".equals(file.getName())) {
+	            if (! "block.httl".equals(file.getName())) {
 	                continue;
-	            }*/
+	            }
 	            //System.out.println(file.getName());
 	            Template template = engine.getTemplate("/templates/" + file.getName());
 	            try {
@@ -107,6 +106,7 @@ public class ProfileTest extends TestCase {
 	            		template.render(context, outputStream);
 	            	else
 	            		template.render(context, writer);
+	            	System.out.println(writer.toString());
 	            } catch (Exception e) {
 	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
 	            }
