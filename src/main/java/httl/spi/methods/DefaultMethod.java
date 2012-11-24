@@ -21,6 +21,7 @@ import httl.Engine;
 import httl.Expression;
 import httl.Resource;
 import httl.Template;
+import httl.spi.Formatter;
 import httl.spi.Resolver;
 import httl.spi.methods.cycles.ArrayCycle;
 import httl.spi.methods.cycles.BooleanArrayCycle;
@@ -46,6 +47,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -73,13 +75,17 @@ public class DefaultMethod {
     
     private Resolver resolver;
 
-    private TimeZone timeZone;
+    private Formatter<Object> formatter;
+
+	private TimeZone timeZone;
 
     private String dateFormat;
 
     private String numberFormat;
 
     private String outputEncoding;
+
+    private Charset outputCharset;
 
 	private String[] importPackages;
 	
@@ -99,6 +105,13 @@ public class DefaultMethod {
 	 */
 	public void setI18nBasename(String i18nBasename) {
 		this.i18nBasename = i18nBasename;
+	}
+
+	/**
+	 * httl.properties: formatter=httl.spi.formatters.DateFormatter
+	 */
+    public void setFormatter(Formatter<Object> formatter) {
+		this.formatter = formatter;
 	}
 
 	/**
@@ -141,6 +154,7 @@ public class DefaultMethod {
 	 */
     public void setOutputEncoding(String outputEncoding) {
 		this.outputEncoding = outputEncoding;
+		this.outputCharset = Charset.forName(outputEncoding);
 	}
 
     /**
@@ -595,20 +609,25 @@ public class DefaultMethod {
         return format(value, numberFormat);
     }
 
-    public String toString(char[] value) {
-    	return value == null ? null : new String(value);
-    }
-
     public String toString(byte[] value) {
-    	return value == null ? null : new String(value);
+    	return value == null ? null : (outputCharset == null 
+    			? new String(value) : new String(value, outputCharset));
     }
 
-    public char[] toChars(String value) {
-    	return value == null ? null : value.toCharArray();
-    }
-
-    public byte[] toBytes(String value) {
-    	return value == null ? null : value.getBytes();
+    public String toString(Object value) {
+    	if (value == null)
+            return null;
+    	if (value instanceof String)
+            return (String) value;
+    	if (value instanceof Number)
+    		return toString((Number) value);
+    	if (value instanceof Date)
+    		return toString((Date) value);
+    	if (value instanceof byte[])
+    		return toString((byte[]) value);
+        if (formatter != null)
+            return formatter.format(value);
+    	return StringUtils.toString(value);
     }
 
     public static String format(byte value, String format) {
