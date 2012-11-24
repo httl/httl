@@ -35,6 +35,7 @@ import httl.spi.methods.cycles.LongArrayCycle;
 import httl.spi.methods.cycles.ShortArrayCycle;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
+import httl.util.IOUtils;
 import httl.util.LocaleUtils;
 import httl.util.MD5;
 import httl.util.NumberUtils;
@@ -43,6 +44,7 @@ import httl.util.UrlUtils;
 import httl.util.WrappedMap;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
@@ -309,12 +311,17 @@ public class DefaultMethod {
     	return LocaleUtils.getLocale(name);
     }
 
-    public String read(String name) throws IOException, ParseException {
+    public Object read(String name) throws IOException, ParseException {
         return read(name, null);
     }
 
-    public String read(String name, String encoding) throws IOException {
-        return load(name, encoding).getSource();
+    public Object read(String name, String encoding) throws IOException {
+        Resource resource = load(name, encoding);
+        if (Context.getContext().getOutput() instanceof OutputStream) {
+        	return IOUtils.readToBytes(resource.getInputStream());
+        } else {
+        	return IOUtils.readToString(resource.getReader());
+        }
     }
 
     public Object evaluate(String expr) throws ParseException {

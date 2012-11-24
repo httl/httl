@@ -17,6 +17,7 @@
 package httl.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 
 /**
@@ -25,6 +26,24 @@ import java.io.Reader;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class IOUtils {
+
+    public static byte[] readToBytes(InputStream in) throws IOException {
+    	try {
+	        UnsafeByteArrayOutputStream out = new UnsafeByteArrayOutputStream();
+	        try {
+		        byte[] buf = new byte[8192];
+		        int len = 0;
+		        while ((len = in.read(buf)) != -1) {
+		        	out.write(buf, 0, len);
+		        }
+		        return out.toByteArray();
+	        } finally {
+	        	out.close();
+	        }
+    	} finally {
+    		in.close();
+    	}
+    }
 
     public static String readToString(Reader reader) throws IOException {
     	try {
