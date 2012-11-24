@@ -49,11 +49,15 @@ public class JarResource extends InputStreamResource {
 	}
 
 	public long getLastModified() {
+		return file.lastModified();
+	}
+
+	public long getLength() {
 		try {
 			JarFile jarFile = new JarFile(file);
-			return jarFile.getEntry(getName()).getTime();
-		} catch (Throwable e) {
-			return super.getLastModified();
+			return jarFile.getEntry(getName()).getSize();
+		} catch (IOException e) {
+			return super.getLength();
 		}
 	}
 

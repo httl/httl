@@ -20,6 +20,8 @@ import httl.Engine;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.ServletContext;
 
@@ -47,6 +49,15 @@ public class ServletResource extends InputStreamResource {
 
     public InputStream getInputStream() throws IOException {
     	return servletContext.getResourceAsStream(path);
+    }
+
+    @Override
+    protected URL getUrl() {
+    	try {
+			return servletContext.getResource(path);
+		} catch (MalformedURLException e) {
+			return null;
+		}
     }
 
 }

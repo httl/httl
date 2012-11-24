@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
 
-
 /**
  * ZipResource. (SPI, Prototype, ThreadSafe)
  * 
@@ -50,11 +49,15 @@ public class ZipResource extends InputStreamResource {
 	}
 
 	public long getLastModified() {
+		return file.lastModified();
+	}
+
+	public long getLength() {
 		try {
 			ZipFile zipFile = new ZipFile(file);
-			return zipFile.getEntry(getName()).getTime();
-		} catch (Throwable e) {
-			return super.getLastModified();
+			return zipFile.getEntry(getName()).getSize();
+		} catch (IOException e) {
+			return super.getLength();
 		}
 	}
 

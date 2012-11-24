@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
  * FileResource. (SPI, Prototype, ThreadSafe)
  * 
@@ -42,16 +41,13 @@ public class FileResource extends InputStreamResource {
         this.file = new File(path);
     }
 
-    public long getLastModified() {
-        return file.lastModified();
-    }
-
-    public long getLength() {
-        return file.length();
-    }
-
     public InputStream getInputStream() throws IOException {
         return new FileInputStream(this.file);
     }
-    
+
+    @Override
+    protected File getFile() {
+        return file;
+    }
+
 }
