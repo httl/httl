@@ -23,6 +23,7 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.util.ClassUtils;
 import httl.util.UnsafeByteArrayOutputStream;
+import httl.util.WriterOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +31,7 @@ import java.io.Writer;
 import java.util.Map;
 
 /**
- * OutputStream template. (SPI, Prototype, ThreadSafe)
+ * OutputStream Template. (SPI, Prototype, ThreadSafe)
  * 
  * @see httl.Engine#getTemplate(String)
  * 
@@ -45,15 +46,19 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     		Map<String, Template> importMacros){
         super(engine, filter, formatter, functions, importMacros);
     }
+    
+    public Class<?> getReturnType() {
+    	return byte[].class;
+    }
 
-    public String render(Map<String, Object> parameters) {
+    public Object evaluate(Map<String, Object> parameters) {
         UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
         try {
             render(parameters, output);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-        return toString(output);
+        return output.toByteArray();
     }
 
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
@@ -74,7 +79,7 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     }
 
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
-        writer.write(render(parameters));
+        render(parameters, new WriterOutputStream(writer));
     }
 
     protected abstract void doRender(Context context, Map<String, Object> parameters, OutputStream output) throws Exception;

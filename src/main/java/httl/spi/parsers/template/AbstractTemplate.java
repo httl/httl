@@ -24,20 +24,17 @@ import httl.spi.Formatter;
 import httl.spi.formatters.MultiFormatter;
 import httl.util.StringUtils;
 import httl.util.UnsafeByteArrayInputStream;
-import httl.util.UnsafeByteArrayOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * Abstract template. (SPI, Prototype, ThreadSafe)
@@ -215,41 +212,19 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     @Override
     public String toString() {
-        return render(Context.getContext().getParameters());
+        Object value = evaluate(Context.getContext().getParameters());
+        if (value instanceof byte[]) {
+        	return format((byte[]) value);
+        }
+        return (String) value;
     }
 
-    protected String toString(UnsafeByteArrayOutputStream output) {
-        if (outputEncoding != null && outputEncoding.length() > 0) {
-            try {
-                return new String(output.toByteArray(), outputEncoding);
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);
-            }
-        } else {
-            return new String(output.toByteArray());
-        }
-    }
-    
     protected String filter(String value) {
         if (filter != null)
             return filter.filter(value);
         return value;
     }
 
-    protected String format(Object value) {
-    	if (value == null)
-            return nullValue;
-        if (formatter != null)
-            return formatter.format(value);
-        return StringUtils.toString(value);
-    }
-    
-    protected String format(String value) {
-        if (value == null)
-            return nullValue;
-        return value;
-    }
-    
     protected String format(boolean value) {
         if (booleanFormatter != null)
             return booleanFormatter.format(value);
@@ -357,11 +332,23 @@ public abstract class AbstractTemplate implements Template, Serializable {
     protected String format(Number value) {
     	if (value == null)
             return nullValue;
+    	if (value instanceof Byte)
+            return format((Byte) value);
+    	if (value instanceof Short)
+            return format((Short) value);
+    	if (value instanceof Integer)
+            return format((Integer) value);
+    	if (value instanceof Long)
+            return format((Long) value);
+    	if (value instanceof Float)
+            return format((Float) value);
+    	if (value instanceof Double)
+            return format((Double) value);
         if (numberFormatter != null) 
             return numberFormatter.format(value);
         return value.toString();
     }
-    
+
     protected String format(Date value) {
     	if (value == null)
             return nullValue;
@@ -369,9 +356,47 @@ public abstract class AbstractTemplate implements Template, Serializable {
             return dateFormatter.format(value);
         return value.toString();
     }
-    
+
+    protected String format(byte[] value) {
+    	if (value == null)
+    		return nullValue;
+    	if (value.length == 0)
+    		return "";
+    	if (outputCharset == null)
+    		return new String(value);
+    	return new String(value, outputCharset);
+    }
+
+    protected String format(String value) {
+        if (value == null)
+            return nullValue;
+        return value;
+    }
+
+    protected String format(Object value) {
+    	if (value == null)
+            return nullValue;
+    	if (value instanceof String)
+            return (String) value;
+    	if (value instanceof Boolean)
+            return format((Boolean) value);
+    	if (value instanceof Character)
+            return format((Character) value);
+    	if (value instanceof Number)
+    		return format((Number) value);
+    	if (value instanceof Date)
+    		return format((Date) value);
+    	if (value instanceof byte[])
+    		return format((byte[]) value);
+        if (formatter != null)
+            return formatter.format(value);
+        return StringUtils.toString(value);
+    }
+
     protected byte[] serialize(String value) {
-    	if (value == null || value.length() == 0)
+    	if (value == null)
+    		return null;
+    	if (value.length() == 0)
     		return new byte[0];
     	if (outputCharset == null)
     		return value.getBytes();

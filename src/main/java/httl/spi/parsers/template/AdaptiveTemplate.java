@@ -16,6 +16,10 @@
  */
 package httl.spi.parsers.template;
 
+import httl.Context;
+import httl.Engine;
+import httl.Template;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,9 +27,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
-
-import httl.Engine;
-import httl.Template;
 
 /**
  * Adaptive Template. (SPI, Prototype, ThreadSafe)
@@ -67,7 +68,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 		return writerTemplate.getLength();
 	}
 
-	public String getSource() throws IOException {
+	public String getSource() {
 		return writerTemplate.getSource();
 	}
 
@@ -83,8 +84,20 @@ public class AdaptiveTemplate implements Template, Serializable {
 		return writerTemplate.getEngine();
 	}
 
-	public String render(Map<String, Object> parameters) {
-		return writerTemplate.render(parameters);
+    public Class<?> getReturnType() {
+    	if (Context.getContext().getOutput() instanceof OutputStream) {
+			return streamTemplate.getReturnType();
+		} else {
+			return writerTemplate.getReturnType();
+		}
+    }
+
+	public Object evaluate(Map<String, Object> parameters) {
+		if (Context.getContext().getOutput() instanceof OutputStream) {
+			return streamTemplate.evaluate(parameters);
+		} else {
+			return writerTemplate.evaluate(parameters);
+		}
 	}
 
 	public void render(Map<String, Object> parameters, OutputStream output)

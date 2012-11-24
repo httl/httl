@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Context. (API, ThreadLocal, ThreadSafe)
  * 
- * @see httl.Template#render(Map)
+ * @see httl.Template#evaluate(Map)
  * @see httl.Template#render(Map, java.io.Writer)
  * @see httl.Template#render(Map, java.io.OutputStream)
  * @see httl.spi.parsers.template.WriterTemplate#render(Map, java.io.Writer)

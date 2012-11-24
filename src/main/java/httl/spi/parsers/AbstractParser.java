@@ -464,9 +464,9 @@ public abstract class AbstractParser implements Parser {
         		textFields.append("private static final String $CODE = \"" + StringUtils.escapeString(methodCode) + "\";\n");
         	} else {
         		String sourceCodeId = StringCache.put(source);
-        		textFields.append("private static final String $SRC = " + StringCache.class.getName() +  ".get(\"" + sourceCodeId + "\");\n");
+        		textFields.append("private static final String $SRC = " + StringCache.class.getName() +  ".getAndRemove(\"" + sourceCodeId + "\");\n");
         		String methodCodeId = StringCache.put(methodCode);
-        		textFields.append("private static final String $CODE = " + StringCache.class.getName() +  ".get(\"" + methodCodeId + "\");\n");
+        		textFields.append("private static final String $CODE = " + StringCache.class.getName() +  ".getAndRemove(\"" + methodCodeId + "\");\n");
         	}
             
             String sorceCode = "package " + packageName + ";\n" 
@@ -512,7 +512,7 @@ public abstract class AbstractParser implements Parser {
     			    + "	return " + resource.getLength() + "L;\n"
     			    + "}\n"
                     + "\n"
-    			    + "public " + String.class.getSimpleName() + " getSource() throws " + IOException.class.getName() + " {\n"
+    			    + "public " + String.class.getSimpleName() + " getSource() {\n"
     			    + "	return $SRC;\n"
     			    + "}\n"
                     + "\n"
@@ -732,14 +732,14 @@ public abstract class AbstractParser implements Parser {
                 		textFields.append("private static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(StringUtils.toBytes(txt, outputEncoding)) + "};\n");
                 	} else {
                 		String txtId = ByteCache.put(StringUtils.toBytes(txt, outputEncoding));
-                		textFields.append("private static final byte[] " + var + " = " + ByteCache.class.getName() +  ".get(\"" + txtId + "\");\n");
+                		textFields.append("private static final byte[] " + var + " = " + ByteCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
                 	}
                 } else {
                 	if (textInClass) {
                 		textFields.append("private static final String " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
                 	} else {
                 		String txtId = StringCache.put(txt);
-                		textFields.append("private static final String " + var + " = " + StringCache.class.getName() +  ".get(\"" + txtId + "\");\n");
+                		textFields.append("private static final String " + var + " = " + StringCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
                 	}
                 }
                 buf.append(var);

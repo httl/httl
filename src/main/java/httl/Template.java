@@ -31,16 +31,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Template extends Resource {
-
-    /**
-     * Render the template as a string.
-     * 
-     * @see httl.Context#getParameters()
-     * @param parameters - render parameters
-     * @return render result
-     */
-    String render(Map<String, Object> parameters);
+public interface Template extends Resource, Expression {
 
     /**
      * Render the template to output stream.
@@ -63,13 +54,6 @@ public interface Template extends Resource {
     void render(Map<String, Object> parameters, Writer writer) throws IOException;
 
     /**
-     * Get the template parameter types. (Ordered)
-     * 
-     * @return parameter types
-     */
-    Map<String, Class<?>> getParameterTypes();
-
-    /**
      * Get the template return types.
      * 
      * @return return types
@@ -84,24 +68,10 @@ public interface Template extends Resource {
     Map<String, Template> getMacros();
 
     /**
-     * Get the template code.
-     * 
-     * @return code
-     */
-    String getCode();
-
-    /**
      * Get the template macro flag.
      * 
      * @return true - if this template is a macro.
      */
     boolean isMacro();
-
-    /**
-     * Get the macro template offset.
-     * 
-     * @return offset
-     */
-    int getOffset();
 
 }

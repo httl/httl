@@ -31,7 +31,7 @@ import java.io.Writer;
 import java.util.Map;
 
 /**
- * Writer template. (SPI, Prototype, ThreadSafe)
+ * Writer Template. (SPI, Prototype, ThreadSafe)
  * 
  * @see httl.Engine#getTemplate(String)
  * 
@@ -47,7 +47,11 @@ public abstract class WriterTemplate extends AbstractTemplate {
         super(engine, filter, formatter, functions, importMacros);
     }
 
-    public String render(Map<String, Object> parameters) {
+    public Class<?> getReturnType() {
+    	return String.class;
+    }
+
+    public Object evaluate(Map<String, Object> parameters) {
         UnsafeStringWriter output = new UnsafeStringWriter();
         try {
             render(parameters, output);

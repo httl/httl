@@ -16,7 +16,7 @@
  */
 package httl.spi.translators.expression;
 
-import httl.Template;
+import httl.Expression;
 import httl.spi.Translator;
 import httl.util.ClassUtils;
 import httl.util.StringUtils;
@@ -28,7 +28,6 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-
 
 /**
  * UnaryOperator
@@ -64,8 +63,8 @@ public final class UnaryOperator extends Operator {
         } else if (StringUtils.isFunction(getName())) {
             String name = getName().substring(1);
             Class<?> t = getParameterTypes().get(name);
-            if (t != null && Template.class.isAssignableFrom(t)) {
-                return String.class;
+            if (t != null && Expression.class.isAssignableFrom(t)) {
+                return Object.class;
             } else {
                 Class<?>[] types = parameter.getReturnTypes();
                 Collection<Class<?>> functions = getFunctions();
@@ -103,8 +102,8 @@ public final class UnaryOperator extends Operator {
         } else if (StringUtils.isFunction(getName())) {
             String name = getName().substring(1);
             Class<?> t = getParameterTypes().get(name);
-            if (t != null && Template.class.isAssignableFrom(t)) {
-                return name + ".render(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " ))";
+            if (t != null && Expression.class.isAssignableFrom(t)) {
+                return name + ".evaluate(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " ))";
             } else {
                 Class<?>[] types = parameter.getReturnTypes();
                 Collection<Class<?>> functions = getFunctions();

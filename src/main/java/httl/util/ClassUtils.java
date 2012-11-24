@@ -627,39 +627,192 @@ public class ClassUtils {
     }
 
     public static boolean[] subArray(boolean[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new boolean[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new boolean[0];
+        }
+        boolean[] sub = new boolean[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
 
     public static char[] subArray(char[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new char[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new char[0];
+        }
+        char[] sub = new char[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
 
     public static byte[] subArray(byte[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new byte[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new byte[0];
+        }
+        byte[] sub = new byte[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
 
     public static short[] subArray(short[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new short[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new short[0];
+        }
+        short[] sub = new short[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
 
     public static int[] subArray(int[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new int[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new int[0];
+        }
+        int[] sub = new int[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
 
     public static long[] subArray(long[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new long[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new long[0];
+        }
+        long[] sub = new long[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
 
     public static float[] subArray(float[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new float[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new float[0];
+        }
+        float[] sub = new float[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
 
     public static double[] subArray(double[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new double[0];
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new double[0];
+        }
+        double[] sub = new double[len];
+        for (int i = begin; i < end; i ++) {
+        	sub[i - begin] = array[i];
+        }
+        return sub;
     }
     
-    public static <T> T[] subArray(T[] array, IntegerSequence sequence) {
-        return subArray(array, array == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(array.length, sequence));
+    @SuppressWarnings("unchecked")
+	public static <T> T[] subArray(T[] array, IntegerSequence sequence) {
+    	if (array == null || array.length == 0) {
+            return array;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        T[] sub = (T[]) Array.newInstance(array.getClass().getComponentType(), len);
+        if (len > 0) {
+	        for (int i = begin; i < end; i ++) {
+	        	sub[i - begin] = array[i];
+	        }
+        }
+        return sub;
     }
 
     public static boolean[] subArray(boolean[] array, int[] indexs) {
@@ -853,7 +1006,24 @@ public class ClassUtils {
     }
 
     public static <T> List<T> subList(List<T> list, IntegerSequence sequence) {
-    	return subList(list, list == null || sequence == null ? null : getIntegerSequenceBeginAndEnd(list.size(), sequence));
+    	if (list == null || list.size() == 0) {
+            return list;
+        }
+        if (sequence == null || sequence.size() == 0) {
+            return new ArrayList<T>(0);
+        }
+        int[] beginAndEnd = getIntegerSequenceBeginAndEnd(list.size(), sequence);
+        int begin = beginAndEnd[0];
+        int end = beginAndEnd[1];
+        int len = end - begin;
+        if (len == 0) {
+        	return new ArrayList<T>(0);
+        }
+        List<T> sub = new ArrayList<T>(0);
+        for (int i = begin; i < end; i ++) {
+        	sub.add(list.get(i));
+        }
+        return sub;
     }
 
     public static <T> List<T> subList(List<T> list, int[] indexs) {
@@ -896,7 +1066,11 @@ public class ClassUtils {
         if (end >= size) {
             end = size - 1;
         }
-        return new int[] {Math.min(begin, end), Math.max(begin, end) + 1};
+        if (begin < end) {
+        	return new int[] {begin, end + 1};
+        } else {
+        	return new int[] {end, begin + 1};
+        }
     }
     
     public static Map<String, Object> toMap(Collection<String> names, Object[] parameters) {

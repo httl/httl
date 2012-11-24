@@ -166,25 +166,25 @@ public class DefaultMethod {
         return UUID.randomUUID();
     }
 
-    public String include(String name) throws IOException, ParseException {
+    public Object include(String name) throws IOException, ParseException {
         return include(name, null, null);
     }
 
-    public String include(String name, String encoding) throws IOException, ParseException {
+    public Object include(String name, String encoding) throws IOException, ParseException {
     	return include(name, encoding, null);
     }
 
-    public String include(String name, Map<String, Object> parameters) throws IOException, ParseException {
+    public Object include(String name, Map<String, Object> parameters) throws IOException, ParseException {
     	return include(name, null, parameters);
     }
 
-    public String include(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+    public Object include(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
         Template template = parse(name, encoding);
         Map<String, Object> map = Context.getContext().getParameters();
         if (parameters != null) {
         	map = new WrappedMap<String, Object>(map, parameters);
         }
-        return template.render(map);
+        return template.evaluate(map);
     }
 
     public String locale(String name) {
@@ -314,7 +314,7 @@ public class DefaultMethod {
         }
         String name = template.getName() + "$" + MD5.getMD5(source);
         engine.addResource(name, source);
-        return engine.getTemplate(name).render(Context.getContext().getParameters());
+        return engine.getTemplate(name).evaluate(Context.getContext().getParameters());
     }
 
     public Template parse(String name) throws IOException, ParseException {
