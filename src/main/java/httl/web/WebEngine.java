@@ -17,12 +17,12 @@
 package httl.web;
 
 import httl.Engine;
+import httl.Expression;
+import httl.Resource;
 import httl.Template;
 import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.RequestResolver;
-import httl.util.WrappedMap;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -31,70 +31,84 @@ import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-public class WebEngine {
+public class WebEngine extends Engine {
 
     private static final String CONFIG_KEY = "httl.properties";
 
     private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
 
-    private static final String OUTPUT_STREAM = "output.stream";
-
     private static final String TEMPLATE_SUFFIX = "template.suffix";
+    
+    private static final WebEngine WEB_ENGINE = new WebEngine();
+    
+    private ServletContext servletContext;
 
-	private static volatile Engine ENGINE;
-	
-	private static volatile boolean IS_OUTPUT_STREAM;
-	
-	public static void init() throws IOException {
-		init(null);
+	private Engine engine;
+
+	private WebEngine() {}
+
+	private void init() {
+		setServletContext(ServletLoader.getServletContext());
 	}
 
-	public static void init(ServletContext servletContext) throws IOException {
-		if (ENGINE == null) {
+	public ServletContext getServletContext() {
+		return servletContext;
+	}
+
+	public void setServletContext(ServletContext servletContext) {
+		if (servletContext == null) {
+			return;
+		}
+		if (engine == null) {
 			synchronized (WebEngine.class) {
-				if (ENGINE == null) {
-					if (servletContext != null) {
+				if (engine == null) {
+					this.servletContext = servletContext;
+					if (ServletLoader.getServletContext() == null) {
 						ServletLoader.setServletContext(servletContext);
-					} else {
-						servletContext = ServletLoader.getServletContext();
 					}
-					String config = servletContext == null ? null : servletContext.getInitParameter(CONFIG_KEY);
+					String config = servletContext.getInitParameter(CONFIG_KEY);
 			        if (config != null && config.length() > 0) {
 			            if (config.startsWith("/")) {
 			                Properties properties = new Properties();
-			                InputStream in = servletContext == null ? null : servletContext.getResourceAsStream(config);
+			                InputStream in = servletContext.getResourceAsStream(config);
 			                if (in == null) {
-			                	throw new FileNotFoundException("Not found httl config " + config + " in wepapp.");
+			                	throw new IllegalStateException("Not found httl config " + config + " in wepapp.");
 			                }
-			                properties.load(in);
+			                try {
+								properties.load(in);
+							} catch (IOException e) {
+								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp.");
+							}
 			                addProperties(properties);
-			                ENGINE = Engine.getEngine(config, properties);
+			                engine = Engine.getEngine(config, properties);
 			            } else {
 			            	Properties properties = new Properties();
 			        		addProperties(properties);
-			            	ENGINE = Engine.getEngine(config);
+			            	engine = Engine.getEngine(config);
 			            }
 			        } else {
-			        	InputStream in = servletContext == null ? null : servletContext.getResourceAsStream(WEBINF_CONFIG);
+			        	InputStream in = servletContext.getResourceAsStream(WEBINF_CONFIG);
 			        	if (in != null) {
 			        		Properties properties = new Properties();
-			        		properties.load(in);
+			        		try {
+			        			properties.load(in);
+			        		} catch (IOException e) {
+								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp.");
+							}
 			        		addProperties(properties);
-			        		ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
+			        		engine = Engine.getEngine(WEBINF_CONFIG, properties);
 			        	} else {
 			        		Properties properties = new Properties();
 			        		addProperties(properties);
-			        		ENGINE = Engine.getEngine(properties);
+			        		engine = Engine.getEngine(properties);
 			        	}
 			        }
-			        IS_OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM, false);
 				}
 			}
 		}
 	}
-	
+
 	private static void addProperties(Properties properties) {
 		if (! properties.containsKey("loader") 
         		&& ! properties.containsKey("loaders")
@@ -108,17 +122,12 @@ public class WebEngine {
         }
 	}
 
-	public static Template getTemplate(String path) throws IOException, ParseException {
-		init();
-		return ENGINE == null ? null : ENGINE.getTemplate(path);
+	public static WebEngine getWebEngine() {
+		WEB_ENGINE.init();
+		return WEB_ENGINE;
 	}
 
-	public static Template getTemplate(String path, String encoding) throws IOException, ParseException {
-		init();
-		return ENGINE == null ? null : ENGINE.getTemplate(path, encoding);
-	}
-
-	public static void render(HttpServletRequest request, HttpServletResponse response) throws IOException, ParseException {
+	public WebTemplate getWebTemplate(HttpServletRequest request) throws IOException, ParseException {
 		String path = request.getPathInfo();
         if (path == null || path.length() == 0) {
         	path = request.getServletPath();
@@ -132,53 +141,54 @@ public class WebEngine {
         	}
         }
         if (path == null || path.length() == 0) {
-        	response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        	return;
+        	path = "/index";
         }
-        Engine engine = ENGINE;
         if (engine == null) {
-        	init(request.getSession().getServletContext());
+        	setServletContext(request.getSession().getServletContext());
         }
         String suffix = engine.getProperty(TEMPLATE_SUFFIX);
         if (suffix != null && suffix.length() > 0 && ! path.endsWith(suffix)) {
         	path += suffix;
         }
-		render(request, response, path, null);
+        return getWebTemplate(path);
 	}
 
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path) throws IOException, ParseException {
-		render(request, response, path, null);
+	public WebTemplate getWebTemplate(String path) throws IOException, ParseException {
+		return getWebTemplate(path, null);
 	}
 
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> model) throws IOException, ParseException {
-		init(request.getSession().getServletContext());
-		Map<String, Object> parameters = new ParameterMap(request);
-		if (model != null) {
-			parameters = new WrappedMap<String, Object>(parameters, model);
-		}
-		WebContext.setWebContext(request, response);
-		boolean unresolved = RequestResolver.getServletRequest() == null;
-		if (unresolved) {
-			RequestResolver.setServletRequest(request);
-			RequestResolver.setServletResponse(response);
-		}
-		try {
-			Template template = ENGINE.getTemplate(path);
-			if (IS_OUTPUT_STREAM) {
-				template.render(parameters, response.getOutputStream());
-			} else {
-				template.render(parameters, response.getWriter());
-			}
-			response.flushBuffer();
-		} catch (FileNotFoundException e) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} finally {
-			WebContext.removeWebContext();
-			if (unresolved) {
-				RequestResolver.removeServletRequest();
-				RequestResolver.removeServletResponse();
-			}
-		}
+	public WebTemplate getWebTemplate(String path, String encoding) throws IOException, ParseException {
+		return new WebTemplate(engine.getTemplate(path, encoding));
+	}
+
+	@Override
+	public Template getTemplate(String name, String encoding) throws IOException, ParseException {
+		return getWebTemplate(name, encoding);
+	}
+
+	@Override
+	public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
+		return engine.getExpression(source, parameterTypes);
+	}
+
+	@Override
+	public Resource getResource(String name, String encoding) throws IOException {
+		return engine.getResource(name, encoding);
+	}
+
+	@Override
+	public void addResource(String name, String source) {
+		engine.addResource(name, source);
+	}
+
+	@Override
+	public void removeResource(String name) {
+		engine.removeResource(name);
+	}
+
+	@Override
+	public boolean hasResource(String name) {
+		return engine.hasResource(name);
 	}
 
 }

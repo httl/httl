@@ -38,18 +38,19 @@ import javax.servlet.http.HttpServletResponse;
 public class HttlFilter implements Filter {
 
 	public void init(FilterConfig config) throws ServletException {
-		try {
-			WebEngine.init(config.getServletContext());
-		} catch (IOException e) {
-			throw new ServletException(e.getMessage(), e);
-		}
+		WebEngine.getWebEngine().setServletContext(config.getServletContext());
+	}
+	
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
 	}
 
-	public void doFilter(ServletRequest request, ServletResponse response,
+	public void doFilter(HttpServletRequest request, HttpServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		chain.doFilter(request, response);
 		try {
-			WebEngine.render((HttpServletRequest) request, (HttpServletResponse) response);
+			WebEngine.getWebEngine().getWebTemplate(request).render(request, response);
         } catch (ParseException e) {
             throw new ServletException(e.getMessage(), e);
         }

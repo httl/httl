@@ -37,11 +37,7 @@ public class HttlServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        try {
-        	WebEngine.init(getServletContext());
-		} catch (IOException e) {
-			throw new ServletException(e.getMessage(), e);
-		}
+    	WebEngine.getWebEngine().setServletContext(getServletContext());
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -52,7 +48,7 @@ public class HttlServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-        	WebEngine.render(request, response);
+        	WebEngine.getWebEngine().getWebTemplate(request).render(request, response);
         } catch (ParseException e) {
             throw new ServletException(e.getMessage(), e);
         }

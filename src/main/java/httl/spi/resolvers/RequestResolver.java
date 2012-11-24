@@ -24,7 +24,6 @@ import java.util.Locale;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -32,20 +31,10 @@ import javax.servlet.http.HttpServletRequest;
 
 public class RequestResolver implements Resolver, Filter {
 
-    private static ServletContext SERVLET_CONTEXT;
-
     private static ThreadLocal<ServletRequest> REQUEST_LOCAL = new ThreadLocal<ServletRequest>();
-    
+
     private static ThreadLocal<ServletResponse> RESPONSE_LOCAL = new ThreadLocal<ServletResponse>();
 
-    public static ServletContext getServletContext() {
-        return SERVLET_CONTEXT;
-    }
-
-    public static void setServletContext(ServletContext servletContext) {
-        SERVLET_CONTEXT = servletContext;
-    }
-    
     public static ServletRequest getServletRequest() {
     	return REQUEST_LOCAL.get();
     }

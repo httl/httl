@@ -81,6 +81,14 @@ public final class BinaryOperator extends Operator {
         }
         throw new IllegalStateException("No such sequence from \"" + begin + "\" to \"" + end + "\".");
     }
+    
+    private String getNotNullCode(String leftCode, String code) throws ParseException {
+    	if (leftParameter instanceof Constant) {
+        	return code;
+        }
+    	Class<?> type = getReturnType();
+    	return "(" + leftCode + " == null ? (" + type.getCanonicalName() + ")" + ClassUtils.getInitCode(type) + " : " + code + ")";
+    }
 
     public String getCode() throws ParseException {
         Class<?> leftType = leftParameter.getReturnType();
@@ -104,7 +112,7 @@ public final class BinaryOperator extends Operator {
                 if (leftType.isPrimitive()) {
                     return leftType.getCanonicalName() + ".class";
                 } else {
-                    return leftCode + ".getClass()";
+                    return getNotNullCode(leftCode, leftCode + ".getClass()");
                 }
             }
             if (Map.Entry.class.isAssignableFrom(leftType)
@@ -114,9 +122,9 @@ public final class BinaryOperator extends Operator {
 	            	Class<?> keyType = types.get(var + ":0"); // Map<K,V>第一个泛型
 	            	Class<?> valueType = types.get(var + ":1"); // Map<K,V>第二个泛型
 	                if ("key".equals(name) && keyType != null) {
-	            		return "((" + keyType.getCanonicalName() + ")" + leftCode + ".getKey(" + rightCode + "))";
+	            		return getNotNullCode(leftCode, "((" + keyType.getCanonicalName() + ")" + leftCode + ".getKey(" + rightCode + "))");
 	            	} else if ("value".equals(name) && valueType != null) {
-	            		return "((" + valueType.getCanonicalName() + ")" + leftCode + ".getValue(" + rightCode + "))";
+	            		return getNotNullCode(leftCode, "((" + valueType.getCanonicalName() + ")" + leftCode + ".getValue(" + rightCode + "))");
 	            	}
             	}
             }
@@ -128,7 +136,7 @@ public final class BinaryOperator extends Operator {
             	if (var != null) {
 	                Class<?> type = types.get(var + ":1"); // Map<K,V>第二个泛型 
 	                if (type != null) {
-	                    return "((" + type.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))";
+	                    return getNotNullCode(leftCode, "((" + type.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
 	                }
             	}
             }
@@ -139,7 +147,7 @@ public final class BinaryOperator extends Operator {
             	if (var != null) {
 	                Class<?> type = types.get(var + ":0"); // List<T>第一个泛型
 	                if (type != null) {
-	                	return "((" + type.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))";
+	                	return getNotNullCode(leftCode, "((" + type.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
 	                }
             	}
             }
@@ -170,18 +178,17 @@ public final class BinaryOperator extends Operator {
                     }
                 }
             }
-            Class<?> type = getReturnType();
-            return "(" + leftCode + " == null ? (" + type.getCanonicalName() + ")" + ClassUtils.getInitCode(type) + " : " + getMethodName(leftType, name, rightTypes, leftCode, rightCode) + ")";
+            return getNotNullCode(leftCode, getMethodName(leftType, name, rightTypes, leftCode, rightCode));
         } else if (name.equals("[")) {
             if (Map.class.isAssignableFrom(leftType)) {
                 String var = getGenericVariableName(leftParameter);
                 if (var != null) {
 	                Class<?> t = types.get(var + ":1"); // Map<K,V>第二个泛型 
 	                if (t != null) {
-	                    return "((" + t.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))";
+	                    return getNotNullCode(leftCode, "((" + t.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
 	                }
                 }
-                return leftCode + ".get(" + rightCode + ")";
+                return getNotNullCode(leftCode, leftCode + ".get(" + rightCode + ")");
             }
             Class<?> rightType = rightParameter.getReturnType();
             if (List.class.isAssignableFrom(leftType)) {
@@ -192,10 +199,10 @@ public final class BinaryOperator extends Operator {
                         String var = ((Variable)leftParameter).getName();
                         Class<?> t = types.get(var + ":0"); // List<T>第一个泛型
                         if (t != null) {
-                            return "((" + t.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))";
+                            return getNotNullCode(leftCode, "((" + t.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
                         }
                     }
-                    return leftCode + ".get(" + rightCode + ")";
+                    return getNotNullCode(leftCode, leftCode + ".get(" + rightCode + ")");
                 } else {
                     throw new ParseException("The \"[]\" index type: " + rightType + " must be int!", getOffset());
                 }
@@ -235,10 +242,10 @@ public final class BinaryOperator extends Operator {
             }
         } else if("==".equals(name) && ! "null".equals(leftCode) && ! "null".equals(rightCode)
                 && ! leftType.isPrimitive() && ! rightParameter.getReturnType().isPrimitive()) {
-            return leftCode + ".equals(" + rightCode + ")";
+            return getNotNullCode(leftCode, leftCode + ".equals(" + rightCode + ")");
         } else if("!=".equals(name) && ! "null".equals(leftCode) && ! "null".equals(rightCode)
                 && ! leftType.isPrimitive() && ! rightParameter.getReturnType().isPrimitive()) {
-            return "(! " + leftCode + ".equals(" + rightCode + "))";
+            return getNotNullCode(leftCode, "(! " + leftCode + ".equals(" + rightCode + "))");
         } else if("&&".equals(name) || "||".equals(name)) {
             if (rightParameter instanceof Operator
                     && ((Operator) rightParameter).getPriority() < getPriority()) {
@@ -275,13 +282,13 @@ public final class BinaryOperator extends Operator {
             }
             if (leftType != null && Comparable.class.isAssignableFrom(leftType)) {
                 if (">".equals(name)) {
-                    return leftCode + ".compareTo(" + rightCode + ") > 0";
+                    return getNotNullCode(leftCode, leftCode + ".compareTo(" + rightCode + ") > 0");
                 } else if (">=".equals(name)) {
-                    return leftCode + ".compareTo(" + rightCode + ") >= 0";
+                    return getNotNullCode(leftCode, leftCode + ".compareTo(" + rightCode + ") >= 0");
                 } else if ("<".equals(name)) {
-                    return leftCode + ".compareTo(" + rightCode + ") < 0";
+                    return getNotNullCode(leftCode, leftCode + ".compareTo(" + rightCode + ") < 0");
                 } else if ("<=".equals(name)) {
-                    return leftCode + ".compareTo(" + rightCode + ") <= 0";
+                    return getNotNullCode(leftCode, leftCode + ".compareTo(" + rightCode + ") <= 0");
                 }
             }
             if ("+".equals(name)) {

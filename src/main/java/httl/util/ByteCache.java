@@ -32,7 +32,7 @@ public class ByteCache {
 		return id;
 	}
 
-	public static byte[] get(String id) {
+	public static byte[] getAndRemove(String id) {
 		return cache.remove(id);
 	}
 

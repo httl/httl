@@ -18,7 +18,6 @@ package httl.util;
 
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -552,17 +551,17 @@ public class StringUtils {
             } else if (type == char.class) {
                 code = "(" + code + ") != \'\\0\'";
             } else if (type == String.class) {
-                code = "(" + code + ").length() > 0";
+                code = "(" + code + ")  != null && (" + code + ").length() > 0";
             } else if (type.isArray()) {
-                code = "(" + code + ").length > 0";
+                code = "(" + code + ") != null && (" + code + ").length > 0";
             } else if (Collection.class.isAssignableFrom(type)) {
-                code = "(" + code + ").size() > 0";
+                code = "(" + code + ") != null && (" + code + ").size() > 0";
             } else if (Map.class.isAssignableFrom(type)) {
-                code = "(" + code + ").size() > 0";
+                code = "(" + code + ") != null && (" + code + ").size() > 0";
             } else {
                 String method = ClassUtils.getSizeMethod(type);
                 if (method != null && method.length() > 0) {
-                    code = "(" + code + ")." + method + " > 0";
+                    code = "(" + code + ") != null && (" + code + ")." + method + " > 0";
                 } else {
                     code = "(" + code + ") != null";
                 }
@@ -657,14 +656,20 @@ public class StringUtils {
     }
     
     public static String splitCamelName(String name, String split) {
-    	StringBuilder buf = new StringBuilder();
-    	for (int i = 0; i < name.length(); i ++) {
+    	return splitCamelName(name, split, false);
+    }
+    
+    public static String splitCamelName(String name, String split, boolean upper) {
+    	if (name == null || name.length() == 0) {
+    		return name;
+    	}
+    	StringBuilder buf = new StringBuilder(name.length() * 2);
+    	buf.append(upper ? Character.toUpperCase(name.charAt(0)) : Character.toLowerCase(name.charAt(0)));
+    	for (int i = 1; i < name.length(); i ++) {
     		char c = name.charAt(i);
     		if (c >= 'A' && c <= 'Z') {
-    			if (buf.length() > 0) {
-    				buf.append(split);
-    			}
-    			buf.append(Character.toLowerCase(c));
+    			buf.append(split);
+    			buf.append(upper ? c : Character.toLowerCase(c));
     		} else {
     			buf.append(c);
     		}

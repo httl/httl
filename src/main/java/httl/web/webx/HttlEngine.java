@@ -60,25 +60,22 @@ public class HttlEngine implements TemplateEngine {
 	public String[] getDefaultExtensions() {
 		return new String[] { "httl" };
 	}
+	
+	private String getTemplatePath(String templateName) {
+		if (path != null && path.length() > 0) {
+			return path + templateName;
+		}
+		return templateName;
+	}
 
 	public boolean exists(String templateName) {
-		try {
-			if (path != null && path.length() > 0) {
-				templateName = path + templateName;
-			}
-			return WebEngine.getTemplate(templateName) != null;
-		} catch (Exception e) {
-			return true;
-		}
+		return WebEngine.getWebEngine().hasResource(getTemplatePath(templateName));
 	}
 
 	public String getText(String templateName, TemplateContext context)
 			throws TemplateException, IOException {
 		try {
-			if (path != null && path.length() > 0) {
-				templateName = path + templateName;
-			}
-			return WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context));
+			return WebEngine.getWebEngine().getWebTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context));
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}
@@ -87,10 +84,7 @@ public class HttlEngine implements TemplateEngine {
 	public void writeTo(String templateName, TemplateContext context,
 			OutputStream ostream) throws TemplateException, IOException {
 		try {
-			if (path != null && path.length() > 0) {
-				templateName = path + templateName;
-			}
-			WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context), ostream);
+			WebEngine.getWebEngine().getWebTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), ostream);
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}
@@ -99,10 +93,7 @@ public class HttlEngine implements TemplateEngine {
 	public void writeTo(String templateName, TemplateContext context,
 			Writer writer) throws TemplateException, IOException {
 		try {
-			if (path != null && path.length() > 0) {
-				templateName = path + templateName;
-			}
-			WebEngine.getTemplate(templateName, templateEncoding).render(new ContextMap(context), writer);
+			WebEngine.getWebEngine().getWebTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), writer);
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}

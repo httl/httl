@@ -32,7 +32,7 @@ public class StringCache {
 		return id;
 	}
 
-	public static String get(String id) {
+	public static String getAndRemove(String id) {
 		return cache.remove(id);
 	}
 

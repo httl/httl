@@ -41,7 +41,7 @@ public class HttlTemplateEngine extends BaseTemplateEngine {
         ServletContext servletContext = (ServletContext) actionContext.get(ServletActionContext.SERVLET_CONTEXT);
 
         // prepare httl
-        WebEngine.init(servletContext);
+        WebEngine.getWebEngine().setServletContext(servletContext);
 
         // get the list of templates we can use
         List<Template> templates = templateContext.getTemplate().getPossibleTemplates(this);
@@ -54,7 +54,7 @@ public class HttlTemplateEngine extends BaseTemplateEngine {
             templateName = getFinalTemplateName(t);
             try {
                 // try to load, and if it works, stop at the first one
-                template = WebEngine.getTemplate(templateName);
+                template = WebEngine.getWebEngine().getTemplate(templateName);
                 break;
             } catch (IOException e) {
                 if (exception == null) {

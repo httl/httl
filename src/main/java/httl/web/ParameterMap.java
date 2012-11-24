@@ -16,6 +16,9 @@
  */
 package httl.web;
 
+import httl.util.ClassUtils;
+import httl.util.StringUtils;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,12 +48,6 @@ public class ParameterMap implements Map<String, Object> {
     private static final String COOKIE_PREFIX = "cookie.";
     
     private static final String APPLICATION_PREFIX = "application.";
-
-    private static final String METHOD_KEY = REQUEST_PREFIX + "method";
-
-    private static final String REMOTE_HOST_KEY = REQUEST_PREFIX + "remoteHost";
-    
-    private static final String USER_PRINCIPAL_KEY = REQUEST_PREFIX + "userPrincipal";
 
     private final HttpServletRequest request;
     
@@ -101,46 +98,85 @@ public class ParameterMap implements Map<String, Object> {
         if (k == null || k.length() == 0) {
             return null;
         }
-        if (METHOD_KEY.equals(k)) {
-            return request.getMethod();
-        } else if (REMOTE_HOST_KEY.equals(k)) {
-            return request.getRemoteHost();
-        } else if (USER_PRINCIPAL_KEY.equals(k)) {
-            return request.getUserPrincipal();
-        } else if (k.startsWith(CONTEXT_PREFIX)) {
+        if (k.startsWith(CONTEXT_PREFIX)) {
             return context.get(k.substring(CONTEXT_PREFIX.length()));
+        } else if (k.startsWith(REQUEST_PREFIX)) {
+        	String property = k.substring(REQUEST_PREFIX.length());
+        	Object value = ClassUtils.getProperty(request, property);
+        	if (value != null) {
+        		return value;
+        	}
+            return request.getAttribute(property);
         } else if (k.startsWith(PARAMETER_PREFIX)) {
             return getParameterValue(k.substring(PARAMETER_PREFIX.length()));
         } else if (k.startsWith(HEADER_PREFIX)) {
-            return request.getHeader(k.substring(HEADER_PREFIX.length()));
-        } else if (k.startsWith(REQUEST_PREFIX)) {
-            return request.getAttribute(k.substring(REQUEST_PREFIX.length()));
+        	String property = k.substring(HEADER_PREFIX.length());
+        	String value = request.getHeader(property);
+        	if (value != null) {
+        		return value;
+        	}
+            return request.getHeader(StringUtils.splitCamelName(property, "-", true));
         } else if (k.startsWith(SESSION_PREFIX)) {
-            return request.getSession().getAttribute(k.substring(SESSION_PREFIX.length()));
+        	String property = k.substring(SESSION_PREFIX.length());
+        	Object value = ClassUtils.getProperty(request.getSession(), property);
+        	if (value != null) {
+        		return value;
+        	}
+            return request.getSession().getAttribute(property);
         } else if (k.startsWith(COOKIE_PREFIX)) {
             return getCookieValue(k.substring(COOKIE_PREFIX.length()));
         } else if (k.startsWith(APPLICATION_PREFIX)) {
-            return request.getSession().getServletContext().getAttribute(k.substring(APPLICATION_PREFIX.length()));
+        	String property = k.substring(APPLICATION_PREFIX.length());
+        	Object value = ClassUtils.getProperty(request.getSession().getServletContext(), property);
+        	if (value != null) {
+        		return value;
+        	}
+            return request.getSession().getServletContext().getAttribute(property);
         } else {
-            Object value = context.get(k);
-            if (value == null) {
-                value = getParameterValue(k);
-                if (value == null) {
-                	value = request.getHeader(k);
-                    if (value == null) {
-	                    value = request.getAttribute(k);
-	                    if (value == null) {
-	                        value = request.getSession().getAttribute(k);
-	                        if (value == null) {
-	                            value = getCookieValue(k);
-	                            if (value == null) {
-	                                value = request.getSession().getServletContext().getAttribute(k);
-	                            }
-	                        }
-	                    }
-                    }
-                }
-            }
+			Object value = context.get(k);
+			if (value != null) {
+        		return value;
+        	}
+			value = ClassUtils.getProperty(request, k);
+			if (value != null) {
+        		return value;
+        	}
+			value = request.getAttribute(k);
+			if (value != null) {
+        		return value;
+        	}
+			value = getParameterValue(k);
+			if (value != null) {
+        		return value;
+        	}
+			value = request.getHeader(k);
+			if (value != null) {
+        		return value;
+        	}
+			value = request.getHeader(StringUtils.splitCamelName(k, "-", true));
+			if (value != null) {
+        		return value;
+        	}
+			value = ClassUtils.getProperty(request.getSession(), k);
+			if (value != null) {
+        		return value;
+        	}
+			value = request.getSession().getAttribute(k);
+			if (value != null) {
+        		return value;
+        	}
+			value = getCookieValue(k);
+			if (value != null) {
+        		return value;
+        	}
+			value = ClassUtils.getProperty(request.getSession().getServletContext(), k);
+			if (value != null) {
+        		return value;
+        	}
+			value = request.getSession().getServletContext().getAttribute(k);
+			if (value != null) {
+        		return value;
+        	}
             return value;
         }
     }

@@ -59,7 +59,9 @@ public class ClassUtils {
 
     public static final String JAVA_EXTENSION = ".java";
     
-    public static final ConcurrentMap<String, Class<?>> CLASS_CACHE = new ConcurrentHashMap<String, Class<?>>();
+    private static final ConcurrentMap<String, Class<?>> CLASS_CACHE = new ConcurrentHashMap<String, Class<?>>();
+
+    private static final ConcurrentMap<Class<?>, Map<String, Method>> GETTER_CACHE = new ConcurrentHashMap<Class<?>, Map<String, Method>>();
 
     public static Object newInstance(String name) {
         try {
@@ -289,6 +291,46 @@ public class ClassUtils {
         return getSize(object) > 0;
     }
     
+    public static Method getGetter(Object bean, String property) {
+    	Map<String, Method> cache = GETTER_CACHE.get(bean.getClass());
+    	if (cache == null) {
+    		cache = new ConcurrentHashMap<String, Method>();
+    		for (Method method : bean.getClass().getMethods()) {
+    			if (Modifier.isPublic(method.getModifiers()) 
+    					&& ! Modifier.isStatic(method.getModifiers()) 
+    					&& ! void.class.equals(method.getReturnType())
+    					&& method.getParameterTypes().length == 0) {
+    				String name = method.getName();
+    				if (name.length() > 3 && name.startsWith("get")) {
+    					cache.put(name.substring(3, 4).toLowerCase() + name.substring(4), method);
+    				} else if (name.length() > 2 && name.startsWith("is")) {
+    					cache.put(name.substring(2, 3).toLowerCase() + name.substring(3), method);
+    				}
+    			}
+    		}
+    		Map<String, Method> old = GETTER_CACHE.putIfAbsent(bean.getClass(), cache);
+    		if (old != null) {
+    			cache = old;
+    		}
+    	}
+    	return cache.get(property);
+    }
+
+    public static Object getProperty(Object bean, String property) {
+    	if (bean == null || property == null || property.length() == 0) {
+    		return null;
+    	}
+		Method getter = getGetter(bean, property);
+		if (getter != null) {
+			try {
+				return getter.invoke(bean, new Object[0]);
+			} catch (Exception e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+    	return null;
+    }
+
     public static int getSize(Object object) {
         if (object == null) {
             return 0;
