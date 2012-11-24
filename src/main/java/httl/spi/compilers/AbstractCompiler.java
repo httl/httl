@@ -43,6 +43,8 @@ public abstract class AbstractCompiler implements Compiler {
     private File compileDirectory;
     
     private Logger logger;
+    
+    private volatile boolean first;
 
     public void setLogger(Logger logger) {
 		this.logger = logger;
@@ -77,6 +79,12 @@ public abstract class AbstractCompiler implements Compiler {
                 out.flush();
             } finally {
                 out.close();
+            }
+            if (first) {
+            	first = false;
+            	if (logger != null && logger.isInfoEnabled()) {
+            		logger.info("Compile the httl template classes to directory " + compileDirectory);
+            	}
             }
         }
     }

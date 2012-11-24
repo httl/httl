@@ -48,7 +48,7 @@ public abstract class AbstractLoader implements Loader {
 
 	private boolean reloadable;
 
-	private boolean first = true;
+	private volatile boolean first = true;
 
 	/**
 	 * httl.properties: engine=httl.spi.engines.DefaultEngine
