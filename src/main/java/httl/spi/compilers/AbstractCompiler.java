@@ -44,7 +44,7 @@ public abstract class AbstractCompiler implements Compiler {
     
     private Logger logger;
     
-    private volatile boolean first;
+    private volatile boolean first = true;
 
     public void setLogger(Logger logger) {
 		this.logger = logger;
