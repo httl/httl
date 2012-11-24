@@ -149,15 +149,14 @@ public abstract class AbstractLoader implements Loader {
         if (encoding == null || encoding.length() == 0) {
             encoding = this.encoding;
         }
-        String path = toPath(name);
-        Resource resource = doLoad(name, encoding, path);
+        Resource resource = doLoad(name, encoding, toPath(name));
         if (first) {
         	first = false;
         	if (reloadable && resource instanceof InputStreamResource 
         			&& logger != null && logger.isInfoEnabled()) {
 	        	File file = ((InputStreamResource) resource).getFile();
 	    		if (file != null && file.exists()) {
-	    			path = path.replace('\\', '/');
+	    			String path = name.replace('\\', '/');
 		    		String abs = file.getAbsolutePath().replace('\\', '/');
 		    		if (abs.endsWith(path)) {
 		    			abs = abs.substring(0, abs.length() - path.length());
@@ -169,7 +168,7 @@ public abstract class AbstractLoader implements Loader {
 			        		abs = "/";
 			        	}
 		    		}
-		        	logger.info("Reloadable form httl template directroy: " + abs);
+		        	logger.info("The httl template directory reloadable by " + getClass().getSimpleName() + ": " + abs);
 	    		}
         	}
         }
