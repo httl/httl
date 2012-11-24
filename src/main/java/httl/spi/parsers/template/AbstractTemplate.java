@@ -388,6 +388,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
     		return format((Date) value);
     	if (value instanceof byte[])
     		return format((byte[]) value);
+    	if (value instanceof char[])
+    		return new String((char[]) value);
         if (formatter != null)
             return formatter.format(value);
         return StringUtils.toString(value);
