@@ -35,7 +35,7 @@ import java.util.List;
 public class UrlLoader extends AbstractLoader {
     
     public List<String> doList(String directory, String[] suffixes) throws IOException {
-        return UrlUtils.listUrl(new URL(directory), getSuffixes());
+        return UrlUtils.listUrl(new URL(directory), suffixes);
     }
     
     protected Resource doLoad(String name, String encoding, String path) throws IOException {

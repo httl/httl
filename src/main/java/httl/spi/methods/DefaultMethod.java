@@ -22,6 +22,7 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Formatter;
+import httl.spi.Logger;
 import httl.spi.Resolver;
 import httl.spi.methods.cycles.ArrayCycle;
 import httl.spi.methods.cycles.BooleanArrayCycle;
@@ -35,6 +36,7 @@ import httl.spi.methods.cycles.LongArrayCycle;
 import httl.spi.methods.cycles.ShortArrayCycle;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
+import httl.util.EncodingProperties;
 import httl.util.IOUtils;
 import httl.util.LocaleUtils;
 import httl.util.MD5;
@@ -58,11 +60,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Random;
-import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * DefaultMethod. (SPI, Singleton, ThreadSafe)
@@ -74,10 +76,12 @@ public class DefaultMethod {
     private static final Random RANDOM = new Random();
 
     private Engine engine;
-    
-    private Resolver resolver;
 
-    private Formatter<Object> formatter;
+	private Resolver resolver;
+
+	private Logger logger;
+
+	private Formatter<Object> formatter;
 
 	private TimeZone timeZone;
 
@@ -90,23 +94,36 @@ public class DefaultMethod {
     private Charset outputCharset;
 
 	private String[] importPackages;
-	
+
 	private String i18nBasename;
 	
 	private String i18nFormat;
+
+	private String i18nEncoding;
+
+	/**
+	 * httl.properties: i18n.encoding=UTF-8
+	 */
+	public void setI18nEncoding(String i18nEncoding) {
+		this.i18nEncoding = i18nEncoding;
+	}
+
+	/**
+	 * httl.properties: i18n.basename=messages
+	 */
+	public void setI18nBasename(String i18nBasename) {
+		this.i18nBasename = i18nBasename;
+	}
 
 	/**
 	 * httl.properties: i18n.format=string
 	 */
 	public void setI18nFormat(String i18nFormat) {
+		if (! "string".equals(i18nFormat)
+				&& ! "message".equals(i18nFormat)) {
+			throw new IllegalArgumentException("Unsupported i18n.format=" + i18nFormat + ", only supported \"string\" or \"message\" format.");
+		}
 		this.i18nFormat = i18nFormat;
-	}
-
-	/**
-	 * httl.properties: i18n.basename=messsages
-	 */
-	public void setI18nBasename(String i18nBasename) {
-		this.i18nBasename = i18nBasename;
 	}
 
 	/**
@@ -121,6 +138,13 @@ public class DefaultMethod {
 	 */
     public void setResolver(Resolver resolver) {
 		this.resolver = resolver;
+	}
+
+    /**
+	 * httl.properties: resolver=httl.spi.loggers.Log4jLogger
+	 */
+    public void setLogger(Logger logger) {
+		this.logger = logger;
 	}
 
     /**
@@ -256,6 +280,10 @@ public class DefaultMethod {
     	return i18n(key, null, new Object[] {arg0, arg1, arg2});
     }
 
+    public String i18n(String key, Object arg0, Object arg1, Object arg2, Object arg3) {
+    	return i18n(key, null, new Object[] {arg0, arg1, arg2, arg3});
+    }
+
     public String i18n(String key, Object[] args) {
     	return i18n(key, null, args);
     }
@@ -276,35 +304,74 @@ public class DefaultMethod {
     	return i18n(key, locale, new Object[] {arg0, arg1, arg2});
     }
 
-    public String i18n(String key, Locale locale, Object[] args) {
-    	if (i18nBasename != null) {
-    		if (locale == null) {
-    			locale = toLocale(getLocale());
-    		}
-    		ResourceBundle resourceBundle;
-    		if (locale == null) {
-    			resourceBundle = ResourceBundle.getBundle(i18nBasename);
-    		} else {
-    			resourceBundle = ResourceBundle.getBundle(i18nBasename, locale);
-    		}
-    		try {
-    			String value = resourceBundle.getString(key);
-    			if (value != null && value.length() > 0) {
-        			if (args != null && args.length > 0) {
-        				if ("string".equals(i18nFormat)) {
-        					return String.format(value, args);
-        				} else {
-        					return MessageFormat.format(value, args);
-        				}
-        			} else {
-        				return value;
-        			}
-        		}
-    		} catch (MissingResourceException e) {
-    			return key;
-    		}
+    public String i18n(String key, Locale locale, Object arg0, Object arg1, Object arg2, Object arg3) {
+    	return i18n(key, locale, new Object[] {arg0, arg1, arg2, arg3});
+    }
+
+    private final ConcurrentMap<String, EncodingProperties> i18nCache = new ConcurrentHashMap<String, EncodingProperties>();
+
+    private String findI18nByLocale(String locale, String key) {
+    	String file = i18nBasename + locale + ".properties";
+    	EncodingProperties properties = i18nCache.get(file);
+		if (properties == null && engine.hasResource(file)) {
+			properties = new EncodingProperties();
+			EncodingProperties old = i18nCache.putIfAbsent(file, properties);
+			if (old != null) {
+				properties = old;
+			} else {
+				try {
+					properties.load(engine.getResource(file).getInputStream(), 
+							i18nEncoding == null || i18nEncoding.length() == 0 ? "UTF-8" : i18nEncoding);
+				} catch (IOException e) {
+					if (logger != null && logger.isErrorEnabled()) {
+						logger.error("Failed to load httl i18n message file " + file + ", cause: " + e.getMessage(), e);
+					}
+				}
+			}
+		}
+		if (properties != null) {
+			String value = properties.getProperty(key);
+			if (value != null && value.length() > 0) {
+				return value;
+			}
+		}
+    	if (locale.length() > 0) {
+	    	int i = locale.lastIndexOf('_');
+			if (i >= 0) {
+				return findI18nByLocale(locale.substring(0, i), key);
+			}
     	}
-    	return key;
+		return null;
+    }
+
+    public String i18n(String key, Locale locale, Object[] args) {
+    	if (i18nBasename == null) {
+    		return key;
+    	}
+    	String localeStr;
+		if (locale != null) {
+			localeStr = "_" + locale.toString();
+		} else {
+			localeStr = getLocale();
+			if (localeStr == null) {
+				localeStr = "";
+			} else {
+				localeStr = "_" + localeStr;
+			}
+		}
+		String value = findI18nByLocale(localeStr, key);
+		if (value != null && value.length() > 0) {
+			if (args != null && args.length > 0) {
+				if ("string".equals(i18nFormat)) {
+					return String.format(value, args);
+				} else {
+					return MessageFormat.format(value, args);
+				}
+			} else {
+				return value;
+			}
+		}
+		return key;
     }
     
     public static Locale toLocale(String name) {

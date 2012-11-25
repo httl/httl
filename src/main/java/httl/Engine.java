@@ -54,7 +54,7 @@ public abstract class Engine {
      * @return template engine
      */
     public static Engine getEngine() {
-        return getEngine(HTTL_PROPERTIES, null);
+        return getEngine(HTTL_PROPERTIES, new Properties());
     }
 
     /**

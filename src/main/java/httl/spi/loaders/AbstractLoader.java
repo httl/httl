@@ -42,7 +42,7 @@ public abstract class AbstractLoader implements Loader {
     
     private String directory;
     
-    private String[] suffixes;
+    private String suffix;
 
     private Logger logger;
 
@@ -93,8 +93,8 @@ public abstract class AbstractLoader implements Loader {
     /**
 	 * httl.properties: template.suffix=.httl
 	 */
-    public void setTemplateSuffix(String[] suffix) {
-    	this.suffixes = suffix;
+    public void setTemplateSuffix(String suffix) {
+    	this.suffix = suffix;
     }
 
 	protected Engine getEngine() {
@@ -113,12 +113,17 @@ public abstract class AbstractLoader implements Loader {
         return directory;
     }
 
-    protected String[] getSuffixes() {
-        return suffixes;
+    protected String getSuffix() {
+        return suffix;
     }
 
     protected String toPath(String name) {
-    	return directory == null ? name : directory + name;
+        if (suffix == null || suffix.length() == 0
+        		|| name.endsWith(suffix)) {
+        	return directory == null ? name : directory + name;
+        } else {
+        	return name;
+        }
     }
 
     public List<String> list() throws IOException {
@@ -126,11 +131,7 @@ public abstract class AbstractLoader implements Loader {
         if (directory == null || directory.length() == 0) {
             return new ArrayList<String>(0);
         }
-        String[] suffixes = getSuffixes();
-        if (suffixes == null || suffixes.length == 0) {
-            return new ArrayList<String>(0);
-        }
-        List<String> list = doList(directory, suffixes);
+        List<String> list = doList(directory, new String[] { suffix == null ? "" : suffix });
         if (list == null) {
             list = new ArrayList<String>(0);
         }
@@ -160,10 +161,10 @@ public abstract class AbstractLoader implements Loader {
         			&& resource instanceof InputStreamResource) {
 	        	File file = ((InputStreamResource) resource).getFile();
 	    		if (file != null && file.exists()) {
-	    			String path = name.replace('\\', '/');
+	    			String uri = name.replace('\\', '/');
 		    		String abs = file.getAbsolutePath().replace('\\', '/');
-		    		if (abs.endsWith(path)) {
-		    			abs = abs.substring(0, abs.length() - path.length());
+		    		if (abs.endsWith(uri)) {
+		    			abs = abs.substring(0, abs.length() - uri.length());
 		    		} else {
 			    		int i = abs.lastIndexOf('/');
 			        	if (i > 0) {
