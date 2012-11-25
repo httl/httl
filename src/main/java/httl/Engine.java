@@ -50,7 +50,7 @@ public abstract class Engine {
     private String name;
 
     // The engine configuration properties
-    private final Properties properties = new Properties();
+    private Properties properties;
 
 	/**
      * Get template engine singleton.
@@ -109,7 +109,7 @@ public abstract class Engine {
                     Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
                     engine = BeanFactory.createBean(Engine.class, properties); // slowly
                     engine.name = configPath;
-                    engine.properties.putAll(properties);
+                    engine.properties = properties;
                     reference.set(engine);
                 }
             }
