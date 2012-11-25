@@ -36,6 +36,7 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -62,6 +63,31 @@ public class DefaultEngine extends Engine {
     private boolean reloadable;
     
     private boolean precompiled;
+
+    // The engine configuration name
+    private String name;
+
+    // The engine configuration properties
+    private Properties properties;
+    
+    /**
+     * Get config path
+     */
+    public String getName() {
+		return name;
+	}
+
+    /**
+     * Get config value.
+     * 
+     * @see #getEngine()
+     * @param key - config key
+     * @return config value
+     */
+	public String getProperty(String key) {
+        String value = properties == null ? null : properties.getProperty(key);
+        return value == null ? null : value.trim();
+    }
 
     /**
      * Get template.
@@ -259,10 +285,11 @@ public class DefaultEngine extends Engine {
      * init the engine.
      */
     public void init() {
-    	if (logger != null && logger.isInfoEnabled()) {
-    		String realPath = ConfigUtils.getRealPath(getName());
+    	if (logger != null && logger.isInfoEnabled()
+    			&& name != null && name.length() > 0) {
+    		String realPath = ConfigUtils.getRealPath(name);
             if (realPath != null && realPath.length() > 0) {
-            	logger.info("Load httl configuration from " + realPath);
+            	logger.info("Load httl config from " + realPath + " in " + (name.startsWith("/") ? "filesystem" : "classpath") + ".");
             }
     	}
     	if (precompiled) {
@@ -285,6 +312,20 @@ public class DefaultEngine extends Engine {
         }
     }
 
+    /**
+	 * httl.properties name
+	 */
+    public void setName(String name) {
+    	this.name = name;
+    }
+
+    /**
+	 * httl.properties
+	 */
+    public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+    
     /**
 	 * httl.properties: reloadable=true
 	 */

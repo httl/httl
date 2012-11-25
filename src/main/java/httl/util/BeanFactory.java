@@ -62,7 +62,7 @@ public class BeanFactory {
     	return instance;
     }
 
-    private static void injectInstance(Object object, Properties properties, Map<String, Object> instances, List<Object> inits) {
+    private static void injectInstance(Object object, Properties properties, String parent, Map<String, Object> instances, List<Object> inits) {
 		try {
 			if (! inits.contains(object)) {
 				inits.add(object);
@@ -75,22 +75,33 @@ public class BeanFactory {
 						&& !Modifier.isStatic(method.getModifiers())
 						&& method.getParameterTypes().length == 1) {
 					Class<?> parameterType = method.getParameterTypes()[0];
-					String key = StringUtils.splitCamelName(name.substring(3), ".");
-					String value = properties.getProperty(key);
-					if (value != null && value.length() > 0) {
-						Object obj;
-						if (parameterType.isArray()) {
-							Class<?> componentType = parameterType.getComponentType();
-							String[] values = COMMA_SPLIT_PATTERN.split(value);
-							Object[] objs = (Object[]) Array.newInstance(componentType, values.length);
-							for (int i = 0; i < values.length; i++) {
-								objs[i] = parseValue(key, values[i], componentType, properties, instances, inits);
-							}
-							obj = objs;
-						} else {
-							obj = parseValue(key, value, parameterType, properties, instances, inits);
+					if (Properties.class.equals(parameterType)
+							&& Properties.class.getSimpleName().equals(name.substring(3))) {
+						method.invoke(object, new Object[] { properties });
+					} else {
+						String key = StringUtils.splitCamelName(name.substring(3), ".");
+						String value = null;
+						if (parent != null && parent.length() > 0) {
+							value = properties.getProperty(parent + "." + key);
 						}
-						method.invoke(object, new Object[] { obj });
+						if (value == null || value.length() == 0) {
+							value = properties.getProperty(key);
+						}
+						if (value != null && value.length() > 0) {
+							Object obj;
+							if (parameterType.isArray()) {
+								Class<?> componentType = parameterType.getComponentType();
+								String[] values = COMMA_SPLIT_PATTERN.split(value);
+								Object[] objs = (Object[]) Array.newInstance(componentType, values.length);
+								for (int i = 0; i < values.length; i++) {
+									objs[i] = parseValue(key, values[i], componentType, properties, instances, inits);
+								}
+								obj = objs;
+							} else {
+								obj = parseValue(key, value, parameterType, properties, instances, inits);
+							}
+							method.invoke(object, new Object[] { obj });
+						}
 					}
 				}
 			}
@@ -135,7 +146,7 @@ public class BeanFactory {
 	            	}
             	}
             	instances.put(index, instance);
-            	injectInstance(instance, properties, instances, inits);
+            	injectInstance(instance, properties, key, instances, inits);
             }
             return (T) instance;
         } catch (Exception e) {

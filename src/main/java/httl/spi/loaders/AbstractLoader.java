@@ -101,6 +101,10 @@ public abstract class AbstractLoader implements Loader {
 		return engine;
 	}
 
+	protected Logger getLogger() {
+		return logger;
+	}
+
     protected String getEncoding() {
         return encoding;
     }
@@ -168,7 +172,7 @@ public abstract class AbstractLoader implements Loader {
 			        		abs = "/";
 			        	}
 		    		}
-		        	logger.info("Load httl template from" + (reloadable ? " reloadable" : "") + " directory " + abs + " by " + getClass().getSimpleName());
+		        	logger.info("Load httl template from" + (reloadable ? " reloadable" : "") + " directory " + abs + " by " + getClass().getSimpleName() + ".");
 	    		}
         	}
         }

@@ -110,6 +110,9 @@ public final class ConfigUtils {
 	}
     
     public static String getRealPath(String path) {
+    	if (path == null || path.length() == 0) {
+    		return null;
+    	}
     	if (path.startsWith("/") || path.startsWith("./") || path.startsWith("../") 
 				|| WINDOWS_FILE_PATTERN.matcher(path).matches()) {
 			File file = new File(path);

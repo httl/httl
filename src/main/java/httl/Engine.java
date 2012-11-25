@@ -18,6 +18,7 @@ package httl;
 
 import httl.util.BeanFactory;
 import httl.util.ConfigUtils;
+import httl.util.StringUtils;
 import httl.util.VolatileReference;
 
 import java.io.IOException;
@@ -47,12 +48,6 @@ public abstract class Engine {
 
     // The engine singletons cache
     private static final ConcurrentMap<String, VolatileReference<Engine>> ENGINES = new ConcurrentHashMap<String, VolatileReference<Engine>>();
-
-    // The engine configuration name
-    private String name;
-
-    // The engine configuration properties
-    private Properties properties;
 
     /**
      * Get template engine singleton.
@@ -109,9 +104,8 @@ public abstract class Engine {
                 engine = reference.get();
                 if (engine == null) { // double check
                     Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
+                    properties.setProperty(StringUtils.splitCamelName(Engine.class.getSimpleName(), ".") + ".name", configPath);
                     engine = BeanFactory.createBean(Engine.class, properties); // slowly
-                    engine.name = configPath;
-                    engine.properties = properties;
                     reference.set(engine);
                 }
             }
@@ -125,9 +119,7 @@ public abstract class Engine {
      * 
      * @return config name
      */
-    public String getName() {
-        return name;
-    }
+    public abstract String getName();
 
     /**
      * Get config value.
@@ -136,10 +128,7 @@ public abstract class Engine {
      * @param key - config key
      * @return config value
      */
-    public String getProperty(String key) {
-        String value = properties.getProperty(key);
-        return value == null ? null : value.trim();
-    }
+    public abstract String getProperty(String key);
 
     /**
      * Get config value.
