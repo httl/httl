@@ -18,7 +18,6 @@ package httl;
 
 import httl.util.BeanFactory;
 import httl.util.ConfigUtils;
-import httl.util.StringUtils;
 import httl.util.VolatileReference;
 
 import java.io.IOException;
