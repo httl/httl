@@ -43,7 +43,8 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
 
     public static ServletContext getAndCheckServletContext() {
     	if (SERVLET_CONTEXT == null) {
-			throw new IllegalStateException("servletContext == null. Please add config <listener><listener-class>" + ServletLoader.class.getName() + "</listener-class></listener> in your /WEB-INF/web.xml");
+			throw new IllegalStateException("servletContext == null. Please add config in your /WEB-INF/web.xml: " +
+					"\n<listener>\n\t<listener-class>" + ServletLoader.class.getName() + "</listener-class>\n</listener>\n");
 		}
     	return SERVLET_CONTEXT;
     }

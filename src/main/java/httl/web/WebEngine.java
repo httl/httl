@@ -152,7 +152,11 @@ public class WebEngine {
 		if (ENGINE == null) {
 			init(request.getSession().getServletContext());
 		}
-		Map<String, Object> parameters = new ParameterMap(request);
+		boolean unresolved = RequestResolver.getRequest() == null;
+		if (unresolved) {
+			RequestResolver.setRequest(request);
+		}
+		Map<String, Object> parameters = RequestResolver.getAndCheckPrarameters();
 		if (model != null) {
 			parameters = new WrappedMap<String, Object>(parameters, model);
 		}
@@ -177,11 +181,6 @@ public class WebEngine {
 	        	path += suffix;
 	        }
 		}
-		boolean unresolved = RequestResolver.getServletRequest() == null;
-		if (unresolved) {
-			RequestResolver.setServletRequest(request);
-			RequestResolver.setServletResponse(response);
-		}
 		try {
 			Template template = ENGINE.getTemplate(path);
 			if (output == null) {
@@ -199,11 +198,10 @@ public class WebEngine {
 			}
 			response.flushBuffer();
 		} catch (FileNotFoundException e) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
 		} finally {
 			if (unresolved) {
-				RequestResolver.removeServletRequest();
-				RequestResolver.removeServletResponse();
+				RequestResolver.removeRequest();
 			}
 		}
 	}
