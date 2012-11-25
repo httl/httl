@@ -34,13 +34,13 @@ public class ShowTest {
         for (int i = 0; i < cases.length; i ++) {
         	Case c = cases[i % cases.length];
             String name = c.getClass().getSimpleName().replace("Case", "");
-        	System.out.println("========" + name.toLowerCase() + "========");
-            Counter counter = new Counter();
+        	Counter counter = new Counter();
             StringWriter writer = new StringWriter();
             c.count(counter, 1, "books", new HashMap<String, Object>(context), writer, new DiscardWriter());
+            System.out.println("========" + name.toLowerCase() + "========");
             System.out.println(writer.getBuffer().toString());
+            System.out.println("================");
         }
-        System.out.println("=============");
     }
     
     public static void main(String[] args) throws Exception {

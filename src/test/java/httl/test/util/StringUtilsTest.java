@@ -44,6 +44,18 @@ public class StringUtilsTest {
 	}
 
 	@Test
+	public void testTrimBlankLine() {
+		Assert.assertEquals("12345678", StringUtils.trimBlankLine("12345678"));
+		Assert.assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f ")));
+		Assert.assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\n\t\r\b\f ")));
+		Assert.assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n")));
+		Assert.assertEquals(StringUtils.escapeString("\t\n"), StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n\t\n")));
+		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));
+		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f ")));
+		Assert.assertEquals(StringUtils.escapeString("\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\n\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t ")));
+	}
+
+	@Test
 	public void testClearBlankLine() {
 		Assert.assertEquals("12345678", StringUtils.clearBlankLine("12345678"));
 		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));

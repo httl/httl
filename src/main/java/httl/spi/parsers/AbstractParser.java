@@ -181,6 +181,8 @@ public abstract class AbstractParser implements Parser {
 
 	protected boolean textInClass;
 	
+	protected boolean removeDirectiveBlank;
+	
 	protected String outputEncoding;
 	
 	protected Logger logger;
@@ -274,6 +276,13 @@ public abstract class AbstractParser implements Parser {
      */
 	public void setTextInClass(boolean textInClass) {
 		this.textInClass = textInClass;
+	}
+
+	/**
+     * httl.properties: remove.directive.blank=true
+     */
+	public void setRemoveDirectiveBlank(boolean removeDirectiveBlank) {
+		this.removeDirectiveBlank = removeDirectiveBlank;
 	}
 
     /**
@@ -663,7 +672,7 @@ public abstract class AbstractParser implements Parser {
                 if (text != null && text.trim().length() > 0) {
                     throw new ParseException("Found invaild text \"" + text.trim() + "\" before " + next + " directive!", offset);
                 }
-                matcher.appendReplacement(buf, "" + next);
+                matcher.appendReplacement(buf, next);
             } else {
                 matcher.appendReplacement(buf, Matcher.quoteReplacement("$output.write(" + filterExpression(text, filter, translator, textFields, textInits, types, offset, seq, stream) + ");\n" + next));
             }
@@ -679,6 +688,12 @@ public abstract class AbstractParser implements Parser {
     protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, StringBuilder textInits, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream) throws ParseException {
         if (message == null || message.length() == 0) {
             return "";
+        }
+        if (removeDirectiveBlank) {
+        	message = StringUtils.trimBlankLine(message);
+        	if (message == null || message.length() == 0) {
+                return "";
+            }
         }
         StringBuffer buf = new StringBuffer();
         Matcher matcher = EXPRESSION_PATTERN.matcher(message);

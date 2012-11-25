@@ -53,12 +53,6 @@ public class CommentParser extends AbstractParser {
     protected String doParse(Resource resource, boolean stream, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
                              Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
-        return parseComment(resource, stream, source, translator, parameters, parameterTypes, variables, types, returnTypes, macros);
-    }
-    
-    public String parseComment(Resource resource, boolean stream, String source, Translator translator, List<String> parameters,
-                                List<Class<?>> parameterTypes, Set<String> variables, 
-                                Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
         LinkedStack<String> nameStack = new LinkedStack<String>();
         LinkedStack<String> valueStack = new LinkedStack<String>();
         StringBuffer macro = null;

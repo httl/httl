@@ -488,6 +488,59 @@ public class StringUtils {
         return value;
     }
 
+    public static String trimBlankLine(String value) {
+    	if (value == null || value.length() == 0) {
+            return value;
+        }
+    	int len = value.length();
+    	int len1 = len - 1;
+    	int start = 0;
+    	loop: for (int i = 0; i < len; i ++) {
+    		char ch = value.charAt(i);
+    		switch (ch) {
+	    		case ' ':
+				case '\t':
+				case '\r':
+				case '\b':
+				case '\f':
+					if (i < len1) {
+						continue;
+					}
+				case '\n':
+					start = i + 1;
+				default:
+					break loop;
+			}
+    	}
+    	int end = len;
+    	loop: for (int i = len1; i > start; i --) {
+    		char ch = value.charAt(i);
+    		switch (ch) {
+	    		case ' ':
+				case '\t':
+				case '\r':
+				case '\b':
+				case '\f':
+					if (i == start + 1) {
+						end = start;
+						break loop;
+					}
+					continue;
+				case '\n':
+					end = i + 1;
+				default:
+					break loop;
+			}
+    	}
+    	if (start > 0 || end < len) {
+    		if (start == end) {
+    			return "";
+    		}
+    		return value.substring(start, end);
+    	}
+        return value;
+    }
+
     public static String clearBlankLine(String value) {
     	if (value == null || value.length() == 0) {
             return value;

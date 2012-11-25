@@ -1,4 +1,5 @@
-<html><!--#var(User user, Book[] books)-->
+<!--#var(User user, Book[] books)-->
+<html>
 <body>
 ${user.name}/${user.role}<br/>
 <!--#if(user.role == "admin")-->
