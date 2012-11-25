@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,14 +82,18 @@ public final class ConfigUtils {
 			try {
     			if (path.startsWith("/") || path.startsWith("./") || path.startsWith("../") 
     					|| WINDOWS_FILE_PATTERN.matcher(path).matches()) {
-    				in = new FileInputStream(new File(path));
+    				File file = new File(path);
+    				if (file.exists()) {
+    					in = new FileInputStream(file);
+    				}
     			} else {
     				in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
     			}
-    			if (in == null) {
-    			    throw new FileNotFoundException("Not found file " + path);
+    			if (in != null) {
+    				properties.load(in);
+    			} else if (required) {
+    				throw new FileNotFoundException("Not found httl config file " + path);
     			}
-    			properties.load(in);
     			return properties;
 			} finally {
 			    if (in != null) {
@@ -103,6 +108,22 @@ public final class ConfigUtils {
 		    }
 		}
 	}
+    
+    public static String getRealPath(String path) {
+    	if (path.startsWith("/") || path.startsWith("./") || path.startsWith("../") 
+				|| WINDOWS_FILE_PATTERN.matcher(path).matches()) {
+			File file = new File(path);
+			if (file.exists()) {
+				return file.getAbsolutePath();
+			}
+		} else {
+			URL url = Thread.currentThread().getContextClassLoader().getResource(path);
+			if (url != null) {
+				return url.getFile();
+			}
+		}
+    	return null;
+    }
 
     public static Document getDocument(String dataSource) throws Exception {
         return getDocument(new ByteArrayInputStream(dataSource.getBytes()));
@@ -123,11 +144,14 @@ public final class ConfigUtils {
 
     public static Properties mergeProperties(Object... configs) {
     	List<Properties> list = new ArrayList<Properties>();
-    	for (Object config : configs) {
+    	int last = configs.length - 1;
+    	for (int i = 0; i <= last; i ++) {
+    		Object config = configs[i];
     		if (config != null) {
     			Properties properties;
     			if (config instanceof String) {
-    				properties = loadProperties((String) config);
+    				boolean required = (i == last || configs[i + 1] == null);
+    				properties = loadProperties((String) config, required);
     			} else {
     				properties = (Properties) config;
     			}

@@ -46,10 +46,13 @@ public abstract class Engine {
     // The engine singletons cache
     private static final ConcurrentMap<String, VolatileReference<Engine>> ENGINES = new ConcurrentHashMap<String, VolatileReference<Engine>>();
 
+    // The engine configuration name
+    private String name;
+
     // The engine configuration properties
     private final Properties properties = new Properties();
 
-    /**
+	/**
      * Get template engine singleton.
      * 
      * @return template engine
@@ -105,6 +108,7 @@ public abstract class Engine {
                 if (engine == null) { // double check
                     Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
                     engine = BeanFactory.createBean(Engine.class, properties); // slowly
+                    engine.name = configPath;
                     engine.properties.putAll(properties);
                     reference.set(engine);
                 }
@@ -113,6 +117,15 @@ public abstract class Engine {
         assert(engine != null);
         return engine;
     }
+
+    /**
+     * Get the engine config name.
+     * 
+     * @return config name
+     */
+    public String getName() {
+		return name;
+	}
 
     /**
      * Get config value.

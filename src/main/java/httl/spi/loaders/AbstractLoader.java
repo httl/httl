@@ -152,8 +152,8 @@ public abstract class AbstractLoader implements Loader {
         Resource resource = doLoad(name, encoding, toPath(name));
         if (first) {
         	first = false;
-        	if (reloadable && resource instanceof InputStreamResource 
-        			&& logger != null && logger.isInfoEnabled()) {
+        	if (logger != null && logger.isInfoEnabled()
+        			&& resource instanceof InputStreamResource) {
 	        	File file = ((InputStreamResource) resource).getFile();
 	    		if (file != null && file.exists()) {
 	    			String path = name.replace('\\', '/');
@@ -168,7 +168,7 @@ public abstract class AbstractLoader implements Loader {
 			        		abs = "/";
 			        	}
 		    		}
-		        	logger.info("The httl template directory reloadable by " + getClass().getSimpleName() + ": " + abs);
+		        	logger.info("Load httl template from" + (reloadable ? " reloadable" : "") + " directory " + abs + " by " + getClass().getSimpleName());
 	    		}
         	}
         }

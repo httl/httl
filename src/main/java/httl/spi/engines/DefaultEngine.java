@@ -26,6 +26,7 @@ import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
 import httl.util.ClassUtils;
+import httl.util.ConfigUtils;
 import httl.util.StringUtils;
 import httl.util.VolatileReference;
 
@@ -258,6 +259,12 @@ public class DefaultEngine extends Engine {
      * init the engine.
      */
     public void init() {
+    	if (logger != null && logger.isInfoEnabled()) {
+    		String realPath = ConfigUtils.getRealPath(getName());
+            if (realPath != null && realPath.length() > 0) {
+            	logger.info("Load httl configuration from " + realPath);
+            }
+    	}
     	if (precompiled) {
             try {
                 List<String> list = loader.list();

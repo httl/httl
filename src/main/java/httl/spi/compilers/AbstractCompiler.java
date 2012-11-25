@@ -83,7 +83,7 @@ public abstract class AbstractCompiler implements Compiler {
             if (first) {
             	first = false;
             	if (logger != null && logger.isInfoEnabled()) {
-            		logger.info("Compile the httl template classes to directory " + compileDirectory);
+            		logger.info("Compile httl template classes to directory " + compileDirectory.getAbsolutePath());
             	}
             }
         }
