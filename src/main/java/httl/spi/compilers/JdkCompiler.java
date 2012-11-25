@@ -121,7 +121,7 @@ public class JdkCompiler extends AbstractCompiler {
         Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, 
                                           null, Arrays.asList(new JavaFileObject[]{javaFileObject})).call();
         if (result == null || ! result.booleanValue()) {
-            throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector);
+            throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector.getDiagnostics());
         }
         return classLoader.loadClass(name);
     }
