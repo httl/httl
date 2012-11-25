@@ -324,8 +324,30 @@ public class DefaultMethod {
         }
     }
 
+    public Object evaluate(Object source) throws IOException, ParseException {
+    	if (source instanceof byte[]) {
+    		return evaluate((byte[]) source);
+    	}
+    	return evaluate((String) source);
+    }
+
+    public Object evaluate(byte[] source) throws IOException, ParseException {
+    	return evaluate(outputCharset == null ? new String(source) : new String(source, outputCharset));
+    }
+
     public Object evaluate(String expr) throws ParseException {
         return translate(expr).evaluate(Context.getContext().getParameters());
+    }
+
+    public Object render(Object source) throws IOException, ParseException {
+    	if (source instanceof byte[]) {
+    		return render((byte[]) source);
+    	}
+    	return render((String) source);
+    }
+
+    public Object render(byte[] source) throws IOException, ParseException {
+    	return render(outputCharset == null ? new String(source) : new String(source, outputCharset));
     }
 
     public Object render(String source) throws IOException, ParseException {
