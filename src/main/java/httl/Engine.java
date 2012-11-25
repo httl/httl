@@ -39,8 +39,10 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class Engine {
 
+    // Built-in configuration name
     private static final String HTTL_DEFAULT_PROPERTIES = "httl-default.properties";
 
+    // User default configuration name
     private static final String HTTL_PROPERTIES = "httl.properties";
 
     // The engine singletons cache
@@ -52,7 +54,7 @@ public abstract class Engine {
     // The engine configuration properties
     private Properties properties;
 
-	/**
+    /**
      * Get template engine singleton.
      * 
      * @return template engine
@@ -124,8 +126,8 @@ public abstract class Engine {
      * @return config name
      */
     public String getName() {
-		return name;
-	}
+        return name;
+    }
 
     /**
      * Get config value.
