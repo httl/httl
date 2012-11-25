@@ -417,16 +417,18 @@ public abstract class AbstractParser implements Parser {
             }
             StringBuilder declare = new StringBuilder();
             for (String var : variables) {
-                Class<?> type = types.get(var);
-                String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
-                String typeName;
-                if (pkgName != null && ("java.lang".equals(pkgName) 
-                        || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
-                    typeName = type.getSimpleName();
-                } else {
-                    typeName = type.getCanonicalName();
-                }
-                declare.append(typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
+            	if (! parameters.contains(var)) {
+	                Class<?> type = types.get(var);
+	                String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
+	                String typeName;
+	                if (pkgName != null && ("java.lang".equals(pkgName) 
+	                        || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
+	                    typeName = type.getSimpleName();
+	                } else {
+	                    typeName = type.getCanonicalName();
+	                }
+	                declare.append(typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
+            	}
             }
             StringBuilder funtionFileds = new StringBuilder();
             StringBuilder functionInits = new StringBuilder();

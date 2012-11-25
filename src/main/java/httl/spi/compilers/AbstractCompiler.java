@@ -46,6 +46,9 @@ public abstract class AbstractCompiler implements Compiler {
     
     private volatile boolean first = true;
 
+    /**
+	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
+	 */
     public void setLogger(Logger logger) {
 		this.logger = logger;
 	}

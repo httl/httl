@@ -69,7 +69,7 @@ public class JdkCompiler extends AbstractCompiler {
     
     private final JavaFileManagerImpl javaFileManager;
 
-    private volatile List<String> options;
+    private final List<String> options = new ArrayList<String>();
 
     public JdkCompiler(){
         if (compiler == null) {
@@ -104,9 +104,17 @@ public class JdkCompiler extends AbstractCompiler {
     public void setJavaVersion(String version) {
         if (version != null && version.length() > 0
         		&& ! version.equals(ClassUtils.getJavaVersion())) {
-            options = new ArrayList<String>();
             options.add("-target");
             options.add(version);
+        }
+    }
+
+    /**
+	 * httl.properties: lint.unchecked=true
+	 */
+    public void setLintUnchecked(boolean unchecked) {
+    	if (unchecked) {
+            options.add("-Xlint:unchecked");
         }
     }
 

@@ -35,12 +35,24 @@ public class AdaptiveCompiler implements Compiler {
 
     private Logger logger;
 
+    /**
+	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
+	 */
     public void setLogger(Logger logger) {
 		this.logger = logger;
 		if (compiler instanceof AbstractCompiler) {
 			((AbstractCompiler) compiler).setLogger(logger);
 		}
 	}
+
+    /**
+	 * httl.properties: lint.unchecked=true
+	 */
+    public void setLintUnchecked(boolean unchecked) {
+    	if (compiler instanceof JdkCompiler) {
+    		((JdkCompiler) compiler).setLintUnchecked(unchecked);
+        }
+    }
 
     /**
 	 * httl.properties: java.version=1.7
