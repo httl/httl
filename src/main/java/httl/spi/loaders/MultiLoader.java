@@ -75,7 +75,8 @@ public class MultiLoader implements Loader {
     	if (loaders.length == 1) {
     		return loaders[0].exists(name);
     	}
-        for (Loader loader : loaders) {
+    	for (int i = loaders.length - 1; i >= 0; i --) {
+    		Loader loader = loaders[i];
         	try {
 	        	if (loader.exists(name)) {
 	            	return true;
