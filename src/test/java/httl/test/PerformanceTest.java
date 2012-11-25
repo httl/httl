@@ -26,10 +26,10 @@ public class PerformanceTest {
     @Test
     public void testPerformance() throws Exception {
     	int count = getProperty("count", 10000);
-        int list = getProperty("list", 100);
+        int loop = getProperty("loop", 100);
         Random random = new Random();
-        Book[] books = new Book[list];
-        for (int i = 0; i < list; i ++) {
+        Book[] books = new Book[loop];
+        for (int i = 0; i < loop; i ++) {
             books[i] = new Book(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), new Date(), random.nextInt(100) + 10, random.nextInt(60) + 30);
         }
         Map<String, Object> context = new HashMap<String, Object>();
@@ -37,9 +37,12 @@ public class PerformanceTest {
         context.put("books", books);
         Case[] cases = new Case[] { new BeetlCase(), new Smarty4jCase(), new FreemarkerCase(), new VelocityCase(), new HttlCase(), new JavaCase() };
         System.out.println("=======test environment========");
-        System.out.println("os: " + System.getProperty("os.name") + " " + System.getProperty("os.version")  + ", cpu: " + Runtime.getRuntime().availableProcessors() 
-        		+ ", jvm: " + System.getProperty("java.version") + ", memory: " + Runtime.getRuntime().totalMemory()
-        		+ ", count: " + count + ", size: " + list);
+        System.out.println("os: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " "+ System.getProperty("os.arch")
+        		+ ", cpu: " + Runtime.getRuntime().availableProcessors() + " cores, jvm: " + System.getProperty("java.vm.name") + " " + System.getProperty("java.version") + ", \nmemory: max: " + Runtime.getRuntime().maxMemory() 
+        		+ ", total: " + Runtime.getRuntime().totalMemory() + ", free: " + Runtime.getRuntime().freeMemory() 
+        		+ ", use: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+        System.out.println("=======test parameters========");
+        System.out.println("count: " + count + ", loop: " + loop);
         for (int i = 0; i < cases.length; i ++) {
         	Case c = cases[i];
         	String name = c.getClass().getSimpleName().replace("Case", "");
