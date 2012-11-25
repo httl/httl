@@ -37,6 +37,10 @@ public class BeanFactory {
 
     private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
     
+    public static String getPropertyKey(Class<?> beanClass, String property) {
+    	return StringUtils.splitCamelName(beanClass.getSimpleName(), ".") + "." + property;
+    }
+    
     public static <T> T createBean(Class<T> beanClass, Properties properties) {
     	Map<String, Object> instances = new HashMap<String, Object>();
     	List<Object> inits = new ArrayList<Object>();

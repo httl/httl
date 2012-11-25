@@ -104,7 +104,7 @@ public abstract class Engine {
                 engine = reference.get();
                 if (engine == null) { // double check
                     Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
-                    properties.setProperty(StringUtils.splitCamelName(Engine.class.getSimpleName(), ".") + ".name", configPath);
+                    properties.setProperty(BeanFactory.getPropertyKey(Engine.class, "name"), configPath);
                     engine = BeanFactory.createBean(Engine.class, properties); // slowly
                     reference.set(engine);
                 }
