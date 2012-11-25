@@ -526,7 +526,7 @@ public abstract class AbstractParser implements Parser {
                     + toTypeCode(parameters, parameterTypes)
                     + "}\n"
                     + "\n"
-                    + "public " + Map.class.getName() + " getReturnTypes() {\n"
+                    + "public " + Map.class.getName() + " getContextTypes() {\n"
                     + toTypeCode(returnTypes)
                     + "}\n"
                     + "\n"
