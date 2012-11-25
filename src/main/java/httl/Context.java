@@ -48,7 +48,7 @@ public final class Context {
     // The current output.
     private final Object output;
 
-	// The current context parameters.
+    // The current context parameters.
     private Map<String, Object> contextParameters;
 
     private Context(Context parent, Template template, Map<String, Object> parameters, Object output) {
@@ -98,8 +98,8 @@ public final class Context {
      * @return current output
      */
     public Object getOutput() {
-		return output;
-	}
+        return output;
+    }
 
     /**
      * Get the current context from thread local.
