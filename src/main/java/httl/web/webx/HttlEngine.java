@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.alibaba.citrus.service.template.TemplateContext;
 import com.alibaba.citrus.service.template.TemplateEngine;
 import com.alibaba.citrus.service.template.TemplateException;
+import com.alibaba.citrus.turbine.TurbineRunData;
 
 /**
  * HttlTemplateEngine. (Integration, Singleton, ThreadSafe)
@@ -86,9 +87,10 @@ public class HttlEngine implements TemplateEngine {
 	public void writeTo(String templateName, TemplateContext context,
 			OutputStream ostream) throws TemplateException, IOException {
 		try {
-			HttpServletRequest request = (HttpServletRequest) context.get("request");
-			HttpServletResponse response = (HttpServletResponse) context.get("response");
-			if (request != null && response != null) {
+			TurbineRunData rundata = (TurbineRunData) context.get("rundata");
+			if (rundata != null) {
+				HttpServletRequest request = rundata.getRequest();
+				HttpServletResponse response = rundata.getResponse();
 				WebEngine.render(request, response, getTemplatePath(templateName), new ContextMap(context), ostream);
 			} else {
 				WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), ostream);
@@ -101,9 +103,10 @@ public class HttlEngine implements TemplateEngine {
 	public void writeTo(String templateName, TemplateContext context,
 			Writer writer) throws TemplateException, IOException {
 		try {
-			HttpServletRequest request = (HttpServletRequest) context.get("request");
-			HttpServletResponse response = (HttpServletResponse) context.get("response");
-			if (request != null && response != null) {
+			TurbineRunData rundata = (TurbineRunData) context.get("rundata");
+			if (rundata != null) {
+				HttpServletRequest request = rundata.getRequest();
+				HttpServletResponse response = rundata.getResponse();
 				WebEngine.render(request, response, getTemplatePath(templateName), new ContextMap(context), writer);
 			} else {
 				WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), writer);
