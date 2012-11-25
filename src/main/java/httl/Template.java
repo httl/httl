@@ -54,11 +54,11 @@ public interface Template extends Resource, Expression {
     void render(Map<String, Object> parameters, Writer writer) throws IOException;
 
     /**
-     * Get the template return types.
+     * Get the template set to context types.
      * 
      * @return return types
      */
-    Map<String, Class<?>> getReturnTypes();
+    Map<String, Class<?>> getContextTypes();
 
     /**
      * Get the macro templates.
