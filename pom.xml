@@ -189,12 +189,8 @@
 							<value>${count}</value>
 						</property>
 						<property>
-							<name>size</name>
-							<value>${size}</value>
-						</property>
-						<property>
-							<name>stream</name>
-							<value>${stream}</value>
+							<name>loop</name>
+							<value>${loop}</value>
 						</property>
 					</systemProperties>
 				</configuration>
