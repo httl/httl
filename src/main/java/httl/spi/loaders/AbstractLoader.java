@@ -86,6 +86,9 @@ public abstract class AbstractLoader implements Loader {
 	 */
     public void setTemplateDirectory(String directory) {
     	if (directory != null && directory.length() > 0) {
+    		if (directory.endsWith("/")) {
+    			directory = directory.substring(0, directory.length() - 1);
+    		}
             this.directory = directory;
         }
     }
@@ -118,9 +121,13 @@ public abstract class AbstractLoader implements Loader {
     }
 
     protected String toPath(String name) {
+    	if (name == null || name.length() == 0) {
+    		throw new IllegalArgumentException("resource name == null");
+    	}
         if (suffix == null || suffix.length() == 0
         		|| name.endsWith(suffix)) {
-        	return directory == null ? name : directory + name;
+        	return directory == null ? name : 
+        		name.charAt(0) == '/' ? directory + name : directory + "/" + name;
         } else {
         	return name;
         }

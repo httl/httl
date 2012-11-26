@@ -292,6 +292,12 @@ public class DefaultEngine extends Engine {
             	logger.info("Load httl config from " + realPath + " in " + (name.startsWith("/") ? "filesystem" : "classpath") + ".");
             }
     	}
+    }
+    
+    /**
+     * On inited.
+     */
+    public void inited() {
     	if (precompiled) {
             try {
                 List<String> list = loader.list();
