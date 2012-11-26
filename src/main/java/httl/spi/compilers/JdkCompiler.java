@@ -289,7 +289,7 @@ public class JdkCompiler extends AbstractCompiler {
 
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             List<URL> urlList = new ArrayList<URL>();
-            Enumeration<URL> e = contextClassLoader.getResources("com");
+            Enumeration<URL> e = contextClassLoader.getResources("httl");
             while (e.hasMoreElements()) {
                 urlList.add(e.nextElement());
             }
