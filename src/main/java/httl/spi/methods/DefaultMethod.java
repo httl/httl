@@ -100,6 +100,15 @@ public class DefaultMethod {
 	private String i18nFormat;
 
 	private String i18nEncoding;
+	
+	private boolean reloadable;
+
+	/**
+	 * httl.properties: reloadable=true
+	 */
+	public void setReloadable(boolean reloadable) {
+		this.reloadable = reloadable;
+	}
 
 	/**
 	 * httl.properties: i18n.encoding=UTF-8
@@ -313,19 +322,23 @@ public class DefaultMethod {
     private String findI18nByLocale(String locale, String key) {
     	String file = i18nBasename + locale + ".properties";
     	EncodingProperties properties = i18nCache.get(file);
-		if (properties == null && engine.hasResource(file)) {
-			properties = new EncodingProperties();
-			EncodingProperties old = i18nCache.putIfAbsent(file, properties);
-			if (old != null) {
-				properties = old;
-			} else {
-				try {
-					properties.load(engine.getResource(file).getInputStream(), 
-							i18nEncoding == null || i18nEncoding.length() == 0 ? "UTF-8" : i18nEncoding);
-				} catch (IOException e) {
-					if (logger != null && logger.isErrorEnabled()) {
-						logger.error("Failed to load httl i18n message file " + file + ", cause: " + e.getMessage(), e);
-					}
+		if ((properties == null || reloadable) && engine.hasResource(file)) {
+			if (properties == null) {
+				properties = new EncodingProperties();
+				EncodingProperties old = i18nCache.putIfAbsent(file, properties);
+				if (old != null) {
+					properties = old;
+				}
+			}
+			try {
+				Resource resource = engine.getResource(file);
+				if (properties.getLastModified() < resource.getLastModified()) {
+					String encoding = (i18nEncoding == null || i18nEncoding.length() == 0 ? "UTF-8" : i18nEncoding);
+					properties.load(resource.getInputStream(), encoding, resource.getLastModified());
+				}
+			} catch (IOException e) {
+				if (logger != null && logger.isErrorEnabled()) {
+					logger.error("Failed to load httl i18n message file " + file + ", cause: " + e.getMessage(), e);
 				}
 			}
 		}

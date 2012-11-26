@@ -10,9 +10,22 @@ import java.util.Properties;
 public class EncodingProperties extends Properties {
 
 	private static final long serialVersionUID = 1L;
-
+	
+	private long lastModified = Long.MIN_VALUE;
+	
+	public long getLastModified() {
+		return lastModified;
+	}
+	
 	public synchronized void load(InputStream inStream, String encoding)
 			throws IOException {
+		load(inStream, encoding, -1);
+	}
+
+	public synchronized void load(InputStream inStream, String encoding, long lastModified)
+			throws IOException {
+		this.lastModified = lastModified;
+		
 		char[] convtBuf = new char[1024];
 		LineReader lr = new LineReader(inStream, encoding);
 
