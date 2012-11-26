@@ -49,7 +49,12 @@ public class HttlEngine implements TemplateEngine {
 	private String templateEncoding;
 
 	public void setPath(String path) {
-		this.path = path;
+		if (path != null && path.length() > 0) {
+			if (path.endsWith("/")) {
+				path = path.substring(0, path.length() - 1);
+			}
+			this.path = path;
+		}
 	}
 
 	public void setTemplateEncoding(String templateEncoding) {
@@ -67,11 +72,9 @@ public class HttlEngine implements TemplateEngine {
 		return new String[] { "httl" };
 	}
 	
-	private String getTemplatePath(String templateName) {
-		if (path != null && path.length() > 0) {
-			return path + templateName;
-		}
-		return templateName;
+	private String getTemplatePath(String name) {
+		return path == null ? name :
+			name.charAt(0) == '/' ? path + name : path + "/" + name;
 	}
 
 	public boolean exists(String templateName) {
