@@ -111,7 +111,7 @@ public class ProfileTest extends TestCase {
 	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
 	            }
 	            synchronized (ProfileTest.class) {
-	            	ProfileTest.class.wait(50);
+	            	ProfileTest.class.wait(10);
 				}
 	        }
         }
