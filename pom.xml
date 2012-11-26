@@ -192,6 +192,10 @@
 							<name>loop</name>
 							<value>${loop}</value>
 						</property>
+						<property>
+							<name>profile</name>
+							<value>${profile}</value>
+						</property>
 					</systemProperties>
 				</configuration>
 			</plugin>
