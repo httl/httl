@@ -423,7 +423,9 @@ public class DefaultMethod {
             throw new IllegalArgumentException("display context template == null");
         }
         String name = template.getName() + "$" + MD5.getMD5(source);
-        engine.addResource(name, source);
+        if (! engine.hasResource(name)) {
+        	engine.addResource(name, source);
+        }
         return engine.getTemplate(name).evaluate(Context.getContext().getParameters());
     }
 

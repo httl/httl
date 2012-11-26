@@ -96,11 +96,11 @@ public class CollectionUtils {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T[] merge(T[] c1, Collection<T> c2) {
-		return merge(c1, (T[])c2.toArray(new Object[0]));
+		return merge(c1, c2 == null ? null : (T[]) c2.toArray(new Object[0]));
 	}
 
 	public static <T> T[] merge(Collection<T> c1, T[] c2) {
-		return merge(c2, Arrays.asList(c2));
+		return merge(c2, c2 == null ? null : Arrays.asList(c2));
 	}
 
 	public static boolean[] merge(boolean[] c1, boolean[] c2) {

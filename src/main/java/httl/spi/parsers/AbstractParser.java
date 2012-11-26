@@ -46,7 +46,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -482,6 +481,9 @@ public abstract class AbstractParser implements Parser {
         		textFields.append("private static final String $CODE = " + StringCache.class.getName() +  ".getAndRemove(\"" + methodCodeId + "\");\n");
         	}
             
+            textFields.append("private static final Map $PTS = " + toTypeCode(parameters, parameterTypes) + ";\n");
+            textFields.append("private static final Map $CTS = " + toTypeCode(returnTypes) + ";\n");
+            
             String sorceCode = "package " + packageName + ";\n" 
                     + "\n"
                     + imports.toString()
@@ -534,15 +536,15 @@ public abstract class AbstractParser implements Parser {
                     + "}\n"
                     + "\n"
                     + "public " + Map.class.getName() + " getParameterTypes() {\n"
-                    + toTypeCode(parameters, parameterTypes)
+                    + "	return $PTS;\n"
                     + "}\n"
                     + "\n"
                     + "public " + Map.class.getName() + " getContextTypes() {\n"
-                    + toTypeCode(returnTypes)
+                    + "	return $CTS;\n"
                     + "}\n"
                     + "\n"
                     + "public " + Map.class.getName() + " getMacroTypes() {\n"
-                    + toTypeCode(macros)
+                    + "	return " + toTypeCode(macros) + ";\n"
                     + "}\n"
                     + "\n"
                     + "public boolean isMacro() {\n"
@@ -564,16 +566,48 @@ public abstract class AbstractParser implements Parser {
     }
 
     protected String toTypeCode(Map<String, Class<?>> types) {
-    	StringBuilder buf = new StringBuilder("	" + Map.class.getName() + " types = " + "new " + HashMap.class.getName() + "();\n");
-    	for (Map.Entry<String, Class<?>> entry : types.entrySet()) {
-    		buf.append("	types.put(\"" + entry.getKey() + "\", " + entry.getValue().getName() + ".class);\n");
+    	StringBuilder keyBuf = new StringBuilder();
+    	StringBuilder valueBuf = new StringBuilder();
+    	if (types == null || types.size() == 0) {
+    		keyBuf.append("new String[0]");
+    		valueBuf.append("new Class[0]");
+    	} else {
+    		keyBuf.append("new String[] {");
+    		valueBuf.append("new Class[] {");
+    		boolean first = true;
+	    	for (Map.Entry<String, Class<?>> entry : types.entrySet()) {
+	    		if (first) {
+                    first = false;
+                } else {
+                	keyBuf.append(", ");
+                	valueBuf.append(", ");
+                }
+	    		keyBuf.append("\"");
+	    		keyBuf.append(StringUtils.escapeString(entry.getKey()));
+	    		keyBuf.append("\"");
+	    		
+	    		valueBuf.append(entry.getValue().getCanonicalName());
+	    		valueBuf.append(".class");;
+	    	}
+	    	keyBuf.append("}");
+        	valueBuf.append("}");
     	}
-    	buf.append("	return " + Collections.class.getName() + ".unmodifiableMap(types);\n");
+    	StringBuilder buf = new StringBuilder();
+        buf.append("new ");
+        buf.append(OrderedMap.class.getName());
+        buf.append("(");
+        buf.append(keyBuf);
+        buf.append(", ");
+        buf.append(valueBuf);
+        buf.append(")");
     	return buf.toString();
     }
     
     protected String toTypeCode(List<String> names, List<Class<?>> types) {
-        StringBuilder buf = new StringBuilder("	return new " + OrderedMap.class.getName() + "(");
+        StringBuilder buf = new StringBuilder();
+        buf.append("new ");
+        buf.append(OrderedMap.class.getName());
+        buf.append("(");
         if (names == null || names.size() == 0) {
             buf.append("new String[0]");
         } else {
@@ -595,7 +629,7 @@ public abstract class AbstractParser implements Parser {
         if (names == null || names.size() == 0) {
             buf.append("new Class[0]");
         } else {
-            buf.append("new Class[] {\n");
+            buf.append("new Class[] {");
             boolean first = true;
             for (Class<?> cls : types) {
                 if (first) {
@@ -608,7 +642,7 @@ public abstract class AbstractParser implements Parser {
             }
             buf.append("}");
         }
-        buf.append(");\n");
+        buf.append(")");
         return buf.toString();
     }
 

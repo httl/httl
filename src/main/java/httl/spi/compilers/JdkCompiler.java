@@ -120,18 +120,22 @@ public class JdkCompiler extends AbstractCompiler {
 
     @Override
     public Class<?> doCompile(String name, String sourceCode) throws Throwable {
-        int i = name.lastIndexOf('.');
-        String packageName = i < 0 ? "" : name.substring(0, i);
-        String className = i < 0 ? name : name.substring(i + 1);
-        JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
-        javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, 
-                                        className + ClassUtils.JAVA_EXTENSION, javaFileObject);
-        Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, 
-                                          null, Arrays.asList(new JavaFileObject[]{javaFileObject})).call();
-        if (result == null || ! result.booleanValue()) {
-            throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector.getDiagnostics());
-        }
-        return classLoader.loadClass(name);
+    	try {
+    		return classLoader.findClass(name);
+    	} catch (ClassNotFoundException e) {
+    		int i = name.lastIndexOf('.');
+            String packageName = i < 0 ? "" : name.substring(0, i);
+            String className = i < 0 ? name : name.substring(i + 1);
+            JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
+            javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, 
+                                            className + ClassUtils.JAVA_EXTENSION, javaFileObject);
+            Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, 
+                                              null, Arrays.asList(new JavaFileObject[]{javaFileObject})).call();
+            if (result == null || ! result.booleanValue()) {
+                throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector.getDiagnostics());
+            }
+            return classLoader.loadClass(name);
+    	}
     }
     
     private final class ClassLoaderImpl extends ClassLoader {
