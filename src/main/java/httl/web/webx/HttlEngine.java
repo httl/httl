@@ -74,7 +74,7 @@ public class HttlEngine implements TemplateEngine {
 	
 	private String getTemplatePath(String name) {
 		return path == null ? name :
-			name.charAt(0) == '/' ? path + name : path + "/" + name;
+			name.startsWith("/") ? path + name : path + "/" + name;
 	}
 
 	public boolean exists(String templateName) {
