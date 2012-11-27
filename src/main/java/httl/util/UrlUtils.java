@@ -66,6 +66,68 @@ public class UrlUtils {
 			return templateName; // 根目录开头，不添加当前路径
 		return UrlUtils.getDirectoryName(relativeName) + templateName;
 	}
+	
+	public static String cleanName(String name) {
+		if (name == null || name.length() == 0) {
+			throw new IllegalArgumentException("name == null");
+		}
+		int len = name.length();
+		StringBuilder buf = null;
+		for (int i = 0; i < len; i ++) {
+			char ch = name.charAt(i);
+			if (ch == '\\') {
+				if (buf == null) {
+					buf = new StringBuilder(len);
+					buf.append(name.substring(0, i));
+				}
+				buf.append('/');
+			} else if (i == 0 && ch != '/') {
+				buf = new StringBuilder(len + 1);
+				buf.append('/');
+				buf.append(ch);
+			} else if (buf != null) {
+				buf.append(ch);
+			}
+		}
+		if (buf != null) {
+			return buf.toString();
+		}
+		return name;
+	}
+
+	public static String cleanDirectory(String name) {
+		if (name == null || name.length() == 0) {
+			throw new IllegalArgumentException("directory == null");
+		}
+		int last = name.length() - 1;
+		StringBuilder buf = null;
+		for (int i = 0; i <= last; i ++) {
+			char ch = name.charAt(i);
+			if (i == last && (ch == '/' || ch == '\\')) {
+				if (buf == null) {
+					return name.substring(0, last);
+				} else {
+					// ignore
+				}
+			} else if (ch == '\\') {
+				if (buf == null) {
+					buf = new StringBuilder(name.length());
+					buf.append(name.substring(0, i));
+				}
+				buf.append('/');
+			} else if (i == 0 && ch != '/') {
+				buf = new StringBuilder(name.length() + 1);
+				buf.append('/');
+				buf.append(ch);
+			} else if (buf != null) {
+				buf.append(ch);
+			}
+		}
+		if (buf != null) {
+			return buf.toString();
+		}
+		return name;
+	}
 
 	/**
 	 * 获取不包括文件名的路径

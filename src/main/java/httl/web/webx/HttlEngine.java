@@ -17,6 +17,7 @@
 package httl.web.webx;
 
 import httl.spi.loaders.ServletLoader;
+import httl.util.UrlUtils;
 import httl.web.WebEngine;
 
 import java.io.IOException;
@@ -50,10 +51,7 @@ public class HttlEngine implements TemplateEngine {
 
 	public void setPath(String path) {
 		if (path != null && path.length() > 0) {
-			if (path.endsWith("/")) {
-				path = path.substring(0, path.length() - 1);
-			}
-			this.path = path;
+			this.path = UrlUtils.cleanDirectory(path);
 		}
 	}
 
@@ -73,8 +71,15 @@ public class HttlEngine implements TemplateEngine {
 	}
 	
 	private String getTemplatePath(String name) {
-		return path == null ? name :
-			name.startsWith("/") ? path + name : path + "/" + name;
+		if (name == null || name.length() == 0) {
+    		throw new IllegalArgumentException("template name == null");
+    	}
+		name = UrlUtils.cleanName(name);
+		if (path == null) {
+			return name;
+		} else {
+			return path + name;
+		}
 	}
 
 	public boolean exists(String templateName) {

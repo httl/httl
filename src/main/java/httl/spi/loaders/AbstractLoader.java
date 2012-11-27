@@ -20,6 +20,7 @@ import httl.Engine;
 import httl.Resource;
 import httl.spi.Loader;
 import httl.spi.Logger;
+import httl.util.UrlUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,10 +87,7 @@ public abstract class AbstractLoader implements Loader {
 	 */
     public void setTemplateDirectory(String directory) {
     	if (directory != null && directory.length() > 0) {
-    		if (directory.endsWith("/")) {
-    			directory = directory.substring(0, directory.length() - 1);
-    		}
-            this.directory = directory;
+            this.directory = UrlUtils.cleanDirectory(directory);
         }
     }
 
@@ -124,13 +122,12 @@ public abstract class AbstractLoader implements Loader {
     	if (name == null || name.length() == 0) {
     		throw new IllegalArgumentException("resource name == null");
     	}
-        if (suffix == null || suffix.length() == 0
-        		|| name.endsWith(suffix)) {
-        	return directory == null ? name : 
-        		name.charAt(0) == '/' ? directory + name : directory + "/" + name;
-        } else {
-        	return name;
-        }
+    	name = UrlUtils.cleanName(name);
+    	if (directory == null || (suffix != null && ! name.endsWith(suffix))) {
+			return name;
+		} else {
+			return directory + name;
+		}
     }
 
     public List<String> list() throws IOException {
@@ -139,10 +136,17 @@ public abstract class AbstractLoader implements Loader {
             return new ArrayList<String>(0);
         }
         List<String> list = doList(directory, new String[] { suffix == null ? "" : suffix });
-        if (list == null) {
-            list = new ArrayList<String>(0);
+        if (list == null || list.size() == 0) {
+            return new ArrayList<String>(0);
+        } else {
+        	List<String> result = new ArrayList<String>(list.size());
+        	for (String name : list) {
+        		if (name != null && name.length() > 0) {
+        			result.add(UrlUtils.cleanName(name));
+        		}
+        	}
+        	return result;
         }
-        return list;
     }
 
     protected abstract List<String> doList(String directory, String[] suffixes) throws IOException;

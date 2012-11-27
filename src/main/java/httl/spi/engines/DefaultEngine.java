@@ -28,6 +28,7 @@ import httl.spi.loaders.StringLoader;
 import httl.util.ClassUtils;
 import httl.util.ConfigUtils;
 import httl.util.StringUtils;
+import httl.util.UrlUtils;
 import httl.util.VolatileReference;
 
 import java.io.FileNotFoundException;
@@ -88,7 +89,7 @@ public class DefaultEngine extends Engine {
         String value = properties == null ? null : properties.getProperty(key);
         return value == null ? null : value.trim();
     }
-
+	
     /**
      * Get template.
      * 
@@ -101,9 +102,7 @@ public class DefaultEngine extends Engine {
      */
     @SuppressWarnings("unchecked")
 	public Template getTemplate(String name, String encoding) throws IOException, ParseException {
-		if (name == null || name.trim().length() == 0) {
-			throw new IllegalArgumentException("template name == null");
-		}
+		name = UrlUtils.cleanName(name);
 		Map<Object, Object> cache = this.templateCache; // safe copy reference
 		if (cache == null) {
 		    return parseTemplate(name, encoding);
@@ -149,9 +148,6 @@ public class DefaultEngine extends Engine {
 
     // Parse the template. (No cache)
     private Template parseTemplate(String name, String encoding) throws IOException, ParseException {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("template name == null");
-        }
         Resource resource = getResource(name, encoding);
         try {
             return parser.parse(resource);
@@ -189,6 +185,9 @@ public class DefaultEngine extends Engine {
      */
     @SuppressWarnings("unchecked")
 	public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
+    	if (source == null || source.length() == 0) {
+    		throw new IllegalArgumentException("expression source == null");
+    	}
     	Map<Object, Object> cache = this.expressionCache; // safe copy reference
 		if (cache == null) {
 		    return translator.translate(source, parameterTypes, 0);
@@ -237,6 +236,7 @@ public class DefaultEngine extends Engine {
      * @throws ParseException
      */
     public Resource getResource(String name, String encoding) throws IOException {
+    	name = UrlUtils.cleanName(name);
     	Resource resource;
     	if (stringLoader.exists(name)) {
     		resource = stringLoader.load(name, encoding);
@@ -257,6 +257,7 @@ public class DefaultEngine extends Engine {
      * @param source - template source
      */
 	public void addResource(String name, String source) {
+		name = UrlUtils.cleanName(name);
 		stringLoader.add(name, source);
 	}
 
@@ -267,6 +268,7 @@ public class DefaultEngine extends Engine {
      * @param name - template name
      */
 	public void removeResource(String name) {
+		name = UrlUtils.cleanName(name);
 		stringLoader.remove(name);
 	}
 
@@ -278,6 +280,7 @@ public class DefaultEngine extends Engine {
      * @return exists
      */
     public boolean hasResource(String name) {
+    	name = UrlUtils.cleanName(name);
     	return stringLoader.exists(name) || loader.exists(name);
     }
 
