@@ -24,7 +24,6 @@ import org.lilystudio.smarty4j.Context;
 import org.lilystudio.smarty4j.Engine;
 import org.lilystudio.smarty4j.Template;
 
-
 /**
  * Smarty4jCase
  * 
@@ -33,20 +32,21 @@ import org.lilystudio.smarty4j.Template;
 public class Smarty4jCase implements Case {
 
     public void count(Counter counter, int times, String name, Map<String, Object> map, Writer writer, Writer discardWriter) throws Exception {
-        Context context = new Context();
+        String path = "/" + name + ".st";
+    	Context context = new Context();
         context.putAll(map);
         counter.beginning();
         Engine engine = new Engine();
         File file = new File(Thread.currentThread().getContextClassLoader().getResource("performance/books.st").getFile());
-        String path = file.getParentFile().getAbsolutePath();
-        engine.setTemplatePath(path);
+        String directory = file.getParentFile().getAbsolutePath();
+        engine.setTemplatePath(directory);
         counter.initialized();
-        Template template = engine.getTemplate("/" + name + ".st");
+        Template template = engine.getTemplate(path);
         counter.compiled();
         template.merge(context, writer);
         counter.executed();
 		for (int i = times; i >= 0; i--) {
-			template.merge(context, discardWriter);
+			engine.getTemplate(path).merge(context, discardWriter);
 		}
         counter.finished();
     }

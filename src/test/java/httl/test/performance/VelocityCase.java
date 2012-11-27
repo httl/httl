@@ -26,7 +26,6 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
-
 /**
  * VelocityCase
  * 
@@ -35,7 +34,8 @@ import org.apache.velocity.app.VelocityEngine;
 public class VelocityCase implements Case {
     
     public void count(Counter counter, int times, String name, Map<String, Object> map, Writer writer, Writer discardWriter) throws Exception {
-        VelocityContext context = new VelocityContext();
+        String path = "performance/" + name + ".vm";
+    	VelocityContext context = new VelocityContext();
         context.put("date", new DateTool());
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             context.put(entry.getKey(), entry.getValue());
@@ -48,12 +48,12 @@ public class VelocityCase implements Case {
         // properties.put("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute");
         VelocityEngine engine = new VelocityEngine(properties);
         counter.initialized();
-        Template tempalte = engine.getTemplate("performance/" + name + ".vm");
+        Template tempalte = engine.getTemplate(path);
         counter.compiled();
         tempalte.merge(context, writer);
         counter.executed();
         for (int i = times; i >= 0; i --) {
-            tempalte.merge(context, discardWriter);
+        	engine.getTemplate(path).merge(context, discardWriter);
         }
         counter.finished();
     }

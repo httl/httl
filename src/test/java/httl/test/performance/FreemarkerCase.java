@@ -31,16 +31,17 @@ import freemarker.template.Template;
 public class FreemarkerCase implements Case {
 
     public void count(Counter counter, int times, String name, Map<String, Object> context, Writer writer, Writer discardWriter) throws Exception {
-        counter.beginning();
+        String path = "performance/" + name + ".ftl";
+    	counter.beginning();
         Configuration configuration = new Configuration();
         configuration.setTemplateLoader(new ClassTemplateLoader(FreemarkerCase.class, "/"));
         counter.initialized();
-        Template template = configuration.getTemplate("performance/" + name + ".ftl");
+        Template template = configuration.getTemplate(path);
         counter.compiled();
         template.process(context, writer);
         counter.executed();
         for (int i = times; i >= 0; i --) {
-            template.process(context, discardWriter);
+        	configuration.getTemplate(path).process(context, discardWriter);
         }
         counter.finished();
     }

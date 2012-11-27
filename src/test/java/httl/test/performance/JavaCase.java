@@ -19,7 +19,6 @@ package httl.test.performance;
 import java.io.Writer;
 import java.util.Map;
 
-
 /**
  * JavaCase
  * 
