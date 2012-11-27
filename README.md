@@ -16,12 +16,6 @@ Compile:
 mvn install -Dmaven.test.skip
 ```
 
-Test:
-
-```bash
-mvn test -Dtest=httl.test.PerformanceTest
-```
-
 Eclipse:
 
 ```bash
