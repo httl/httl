@@ -26,10 +26,10 @@ public class PerformanceTest {
     @Test
     public void testPerformance() throws Exception {
     	int count = getProperty("count", 10000);
-        int loop = getProperty("loop", 100);
+        int list = getProperty("list", 100);
         Random random = new Random();
-        Book[] books = new Book[loop];
-        for (int i = 0; i < loop; i ++) {
+        Book[] books = new Book[list];
+        for (int i = 0; i < list; i ++) {
             books[i] = new Book(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), new Date(), random.nextInt(100) + 10, random.nextInt(60) + 30);
         }
         Map<String, Object> context = new HashMap<String, Object>();
@@ -42,7 +42,7 @@ public class PerformanceTest {
         		+ ", total: " + Runtime.getRuntime().totalMemory() + ", free: " + Runtime.getRuntime().freeMemory() 
         		+ ", use: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
         System.out.println("=======test parameters========");
-        System.out.println("count: " + count + ", loop: " + loop);
+        System.out.println("count: " + count + ", list: " + list);
         for (int i = 0; i < cases.length; i ++) {
         	Case c = cases[i];
         	String name = c.getClass().getSimpleName().replace("Case", "");
