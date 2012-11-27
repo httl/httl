@@ -56,7 +56,7 @@ public interface Template extends Resource, Expression {
     /**
      * Get the template set to context types.
      * 
-     * @return return types
+     * @return context types
      */
     Map<String, Class<?>> getContextTypes();
 
