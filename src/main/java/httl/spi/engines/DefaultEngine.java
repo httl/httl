@@ -89,90 +89,6 @@ public class DefaultEngine extends Engine {
         String value = properties == null ? null : properties.getProperty(key);
         return value == null ? null : value.trim();
     }
-	
-    /**
-     * Get template.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @param encoding - template encoding
-     * @return template instance
-     * @throws IOException - If an I/O error occurs
-     * @throws ParseException - If the template cannot be parsed
-     */
-    @SuppressWarnings("unchecked")
-	public Template getTemplate(String name, String encoding) throws IOException, ParseException {
-		name = UrlUtils.cleanName(name);
-		Map<Object, Object> cache = this.templateCache; // safe copy reference
-		if (cache == null) {
-		    return parseTemplate(name, encoding);
-		}
-		long lastModified;
-        if (reloadable) {
-        	lastModified = getResource(name, encoding).getLastModified();
-        } else {
-        	lastModified = Long.MIN_VALUE;
-        }
-        VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(name);
-        if (reference == null) {
-        	if (cache instanceof ConcurrentMap) {
-        		reference = new VolatileReference<Template>(); // quickly
-        		VolatileReference<Template> old = (VolatileReference<Template>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(name, reference);
-        		if (old != null) { // duplicate
-        			reference = old;
-        		}
-        	} else {
-	        	synchronized (cache) { // cache lock
-	        		reference = (VolatileReference<Template>) cache.get(name);
-	                if (reference == null) { // double check
-	                	reference = new VolatileReference<Template>(); // quickly
-	                	cache.put(name, reference);
-	                }
-				}
-        	}
-        }
-        assert(reference != null);
-        Template template = (Template) reference.get();
-		if (template == null || template.getLastModified() < lastModified) {
-			synchronized (reference) { // reference lock
-				template = (Template) reference.get();
-				if (template == null || template.getLastModified() < lastModified) { // double check
-					template = parseTemplate(name, encoding); // slowly
-					reference.set(template);
-				}
-			}
-		}
-		assert(template != null);
-		return template;
-	}
-
-    // Parse the template. (No cache)
-    private Template parseTemplate(String name, String encoding) throws IOException, ParseException {
-        Resource resource = getResource(name, encoding);
-        try {
-            return parser.parse(resource);
-        } catch (ParseException e) {
-            int offset = e.getErrorOffset();
-            if (offset < 0) {
-                offset = 0;
-            }
-            String location = null;
-            if (offset > 0) {
-                try {
-                    Reader reader = resource.getReader();
-                    try {
-                        location = StringUtils.getLocationMessage(reader, offset);
-                    } finally {
-                        reader.close();
-                    }
-                } catch (Throwable t) {
-                }
-            }
-            throw new ParseException("Failed to parse template " + name + ", cause: " + e.getMessage()  + ". occur to offset: " + offset + 
-                                     (location == null || location.length() == 0 ? "" : ", " + location) 
-                                     + ", stack: " + ClassUtils.toString(e), offset);
-        }
-    }
 
     /**
      * Get expression.
@@ -225,6 +141,94 @@ public class DefaultEngine extends Engine {
 		return expression;
     }
 
+    /**
+     * Get template.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param encoding - template encoding
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
+     */
+    @SuppressWarnings("unchecked")
+	public Template getTemplate(String name, String encoding) throws IOException, ParseException {
+		name = UrlUtils.cleanName(name);
+		Map<Object, Object> cache = this.templateCache; // safe copy reference
+		if (cache == null) {
+		    return parseTemplate(name, encoding, null);
+		}
+		Resource resource = null;
+		long lastModified;
+        if (reloadable) {
+        	resource = loadResource(name, encoding);
+        	lastModified = resource.getLastModified();
+        } else {
+        	lastModified = Long.MIN_VALUE;
+        }
+        VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(name);
+        if (reference == null) {
+        	if (cache instanceof ConcurrentMap) {
+        		reference = new VolatileReference<Template>(); // quickly
+        		VolatileReference<Template> old = (VolatileReference<Template>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(name, reference);
+        		if (old != null) { // duplicate
+        			reference = old;
+        		}
+        	} else {
+	        	synchronized (cache) { // cache lock
+	        		reference = (VolatileReference<Template>) cache.get(name);
+	                if (reference == null) { // double check
+	                	reference = new VolatileReference<Template>(); // quickly
+	                	cache.put(name, reference);
+	                }
+				}
+        	}
+        }
+        assert(reference != null);
+        Template template = (Template) reference.get();
+		if (template == null || template.getLastModified() < lastModified) {
+			synchronized (reference) { // reference lock
+				template = (Template) reference.get();
+				if (template == null || template.getLastModified() < lastModified) { // double check
+					template = parseTemplate(name, encoding, resource); // slowly
+					reference.set(template);
+				}
+			}
+		}
+		assert(template != null);
+		return template;
+	}
+
+    // Parse the template. (No cache)
+    private Template parseTemplate(String name, String encoding, Resource resource) throws IOException, ParseException {
+    	if (resource == null) {
+    		resource = loadResource(name, encoding);
+    	}
+        try {
+            return parser.parse(resource);
+        } catch (ParseException e) {
+            int offset = e.getErrorOffset();
+            if (offset < 0) {
+                offset = 0;
+            }
+            String location = null;
+            if (offset > 0) {
+                try {
+                    Reader reader = resource.getReader();
+                    try {
+                        location = StringUtils.getLocationMessage(reader, offset);
+                    } finally {
+                        reader.close();
+                    }
+                } catch (Throwable t) {
+                }
+            }
+            throw new ParseException("Failed to parse template " + name + ", cause: " + e.getMessage()  + ". occur to offset: " + offset + 
+                                     (location == null || location.length() == 0 ? "" : ", " + location) 
+                                     + ", stack: " + ClassUtils.toString(e), offset);
+        }
+    }
+
 	/**
      * Get template resource.
      * 
@@ -237,6 +241,11 @@ public class DefaultEngine extends Engine {
      */
     public Resource getResource(String name, String encoding) throws IOException {
     	name = UrlUtils.cleanName(name);
+    	return loadResource(name, encoding);
+    }
+
+    // Load the resource. (No clean)
+    private Resource loadResource(String name, String encoding) throws IOException {
     	Resource resource;
     	if (stringLoader.exists(name)) {
     		resource = stringLoader.load(name, encoding);

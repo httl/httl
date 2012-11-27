@@ -122,7 +122,6 @@ public abstract class AbstractLoader implements Loader {
     	if (name == null || name.length() == 0) {
     		throw new IllegalArgumentException("resource name == null");
     	}
-    	name = UrlUtils.cleanName(name);
     	if (directory == null || (suffix != null && ! name.endsWith(suffix))) {
 			return name;
 		} else {
