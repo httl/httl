@@ -96,30 +96,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-			<version>1.7</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.18</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.lilystudio.smarty4j</groupId>
-			<artifactId>smarty4j</artifactId>
-			<version>1.0.0-jdk5</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bee.tl</groupId>
-			<artifactId>beetl</artifactId>
-			<version>1.2M1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
@@ -184,14 +160,6 @@
 					<forkMode>once</forkMode>
 					<argLine>-server -Xms128m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=256m</argLine>
 					<systemProperties>
-						<property>
-							<name>count</name>
-							<value>${count}</value>
-						</property>
-						<property>
-							<name>list</name>
-							<value>${list}</value>
-						</property>
 						<property>
 							<name>profile</name>
 							<value>${profile}</value>
