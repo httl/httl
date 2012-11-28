@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Loader. (SPI, Singleton, ThreadSafe)
+ * Resource Loader. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  * 

@@ -19,14 +19,14 @@ package httl.spi;
 import java.text.ParseException;
 
 /**
- * Compiler. (SPI, Singleton, ThreadSafe)
+ * Java Compiler. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.parsers.AbstractParser#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Compiler {
-    
+
     /**
      * Compile java source code.
      * 
@@ -34,5 +34,5 @@ public interface Compiler {
      * @return Compiled class
      */
     Class<?> compile(String code) throws ParseException;
-    
+
 }
