@@ -45,6 +45,10 @@ import httl.util.StringUtils;
 import httl.util.UrlUtils;
 import httl.util.WrappedMap;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -55,19 +59,25 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.alibaba.fastjson.JSON;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * DefaultMethod. (SPI, Singleton, ThreadSafe)
@@ -914,12 +924,219 @@ public class DefaultMethod {
 		}
 		return JSON.toJSONString(object);
 	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T parseXstream(String xml) {
+		if (xml == null) {
+			return null;
+		}
+		return (T) new XStream(new DomDriver()).fromXML(xml);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T parseXstream(String xml, Class<T> cls) {
+		if (xml == null) {
+			return null;
+		}
+		if (cls == null) {
+			return (T) new XStream(new DomDriver()).fromXML(xml);
+		}
+		try {
+			return (T) new XStream(new DomDriver()).fromXML(xml, cls.newInstance());
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+	public static String toXstream(Object object) {
+		return new XStream(new DomDriver()).toXML(object);
+	}
+
+	public static Object parseXbean(String xml) {
+		if (xml == null) {
+			return null;
+		}
+		ByteArrayInputStream bi = new ByteArrayInputStream(xml.getBytes());
+        XMLDecoder xd = new XMLDecoder(bi);
+        return xd.readObject();
+	}
 	
-	public static <K, V> TreeMap<K, V> sort(Map<K, V> map) {
+	public static String toXbean(Object object) {
+		if (object == null) {
+			return null;
+		}
+		ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        XMLEncoder xe = new XMLEncoder(bo);
+        try {
+            xe.writeObject(object);
+            xe.flush();
+        } finally {
+            xe.close();
+        }
+        return new String(bo.toByteArray());
+	}
+	
+	public static <K, V> Map<K, V> sort(Map<K, V> map) {
 		if (map == null) {
 			return null;
 		}
 		return new TreeMap<K, V>(map);
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> List<T> sort(List<T> list) {
+		if (list == null) {
+			return null;
+		}
+		list = new ArrayList<T>(list);
+		Collections.sort((List) list);
+		return list;
+	}
+
+	public static <T> Set<T> sort(Set<T> set) {
+		if (set == null) {
+			return null;
+		}
+		return new TreeSet<T>(set);
+	}
+	
+	public static <T> Collection<T> sort(Collection<T> set) {
+		if (set == null) {
+			return null;
+		}
+		return new TreeSet<T>(set);
+	}
+
+	public static <T> T[] sort(T[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static char[] sort(char[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static byte[] sort(byte[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static short[] sort(short[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static int[] sort(int[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static long[] sort(long[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static float[] sort(float[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static double[] sort(double[] array) {
+		if (array == null) {
+			return null;
+		}
+		array = Arrays.copyOf(array, array.length);
+		Arrays.sort(array);
+		return array;
+	}
+
+	public static String toUnderlineName(String name) {
+		if (name == null || name.length() == 0) {
+    		return name;
+    	}
+    	StringBuilder buf = new StringBuilder(name.length() * 2);
+    	buf.append(Character.toLowerCase(name.charAt(0)));
+    	for (int i = 1; i < name.length(); i ++) {
+    		char c = name.charAt(i);
+    		if (c >= 'A' && c <= 'Z') {
+    			buf.append('_');
+    			buf.append(Character.toLowerCase(c));
+    		} else {
+    			buf.append(c);
+    		}
+    	}
+    	return buf.toString();
+	}
+
+    public static String toCamelName(String name) {
+    	if (name == null || name.length() == 0) {
+    		return name;
+    	}
+    	StringBuilder buf = new StringBuilder(name.length());
+    	boolean upper = false;
+    	for (int i = 0; i < name.length(); i ++) {
+    		char c = name.charAt(i);
+    		if (c == '_') {
+    			upper = true;
+    		} else {
+    			if (upper) {
+    				upper = false;
+    				c = Character.toUpperCase(c);
+    			}
+    			buf.append(c);
+    		}
+    	}
+    	return buf.toString();
+    }
+
+    public static String toCapitalName(String name) {
+    	if (name == null || name.length() == 0) {
+    		return name;
+    	}
+    	StringBuilder buf = new StringBuilder(name.length());
+    	boolean upper = true;
+    	for (int i = 0; i < name.length(); i ++) {
+    		char c = name.charAt(i);
+    		if (c == '_') {
+    			upper = true;
+    		} else {
+    			if (upper) {
+    				upper = false;
+    				c = Character.toUpperCase(c);
+    			}
+    			buf.append(c);
+    		}
+    	}
+    	return buf.toString();
+    }
 
 }
