@@ -396,7 +396,7 @@ public abstract class AbstractParser implements Parser {
             types.put(foreachStatus, ForeachStatus.class);
             for (String macro : importMacroTemplates.keySet()) {
             	types.put(macro, Template.class);
-            	statusInit.append(Template.class.getName() + " " + macro + " = getImportMacros().get(\"" + macro + "\");");
+            	statusInit.append(Template.class.getName() + " " + macro + " = getImportMacros().get(\"" + macro + "\");\n");
             }
             statusInit.append(ForeachStatus.class.getName() + " " + foreachStatus + " = null;\n");
             List<String> parameters = new ArrayList<String>();
@@ -809,7 +809,7 @@ public abstract class AbstractParser implements Parser {
         }
     }
     
-    protected String getStatementEndCode(String name, String value) throws ParseException {
+    protected String getStatementEndCode(String name) throws ParseException {
         if (ifName.equals(name) || elseifName.equals(name) || elseName.equals(name)) {
             return "}\n"; // 插入结束指令
         } else if (foreachName.equals(name)) {
@@ -902,7 +902,7 @@ public abstract class AbstractParser implements Parser {
             	if (valueType != null) {
             		types.put(var + ":1", valueType);
             	}
-                code = "(" + code + ").entrySet()";
+                code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
             }
             buf.append(getForeachCode(type, clazz, var, code));
         } else if (breakifName.equals(name)) {

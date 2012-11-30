@@ -21,6 +21,8 @@ import httl.Template;
 import httl.spi.parsers.template.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.User;
+import httl.test.util.DiscardOutputStream;
+import httl.test.util.DiscardWriter;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
 import httl.util.UnsafeByteArrayOutputStream;
@@ -106,7 +108,7 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "include.httl".equals(file.getName())) {
+	            /*if (! "attribute_comment_macro.httl".equals(file.getName())) {
 	                continue;
 	            }*/
 	            System.out.println(file.getName());
@@ -131,6 +133,39 @@ public class TemplateTest extends TestCase {
 	            }
 	            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
 	            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
+	        }
+        }
+        // null parameters check
+        context = null;
+        for (String config : configs) {
+	        System.out.println("========" + config + " (null parameters)========");
+        	Engine engine = Engine.getEngine(config);
+        	String dir = engine.getProperty("template.directory");
+        	if (dir.length() > 0) {
+        		dir += "/";
+        	}
+	        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
+	        super.assertTrue(directory.isDirectory());
+	        File[] files = directory.listFiles();
+	        for (int i = 0, n = files.length; i < n; i ++) {
+	            File file = files[i];
+	            System.out.println(file.getName());
+	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName());
+	            if (url == null) {
+	                throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName());
+	            }
+	            File result = new File(url.getFile());
+	            if (! result.exists()) {
+	                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
+	            }
+	            Template template = engine.getTemplate("/templates/" + file.getName());
+	            super.assertEquals(AdaptiveTemplate.class, template.getClass());
+	            try {
+	            	template.render(context, new DiscardWriter());
+	            	template.render(context, new DiscardOutputStream());
+	            } catch (Exception e) {
+	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
+	            }
 	        }
         }
     }

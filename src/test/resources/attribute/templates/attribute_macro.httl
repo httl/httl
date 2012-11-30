@@ -1,0 +1,12 @@
+11111111111
+<span macro="xxx(String aaa)">
+BEGIN
+${aaa}
+END
+</span>
+22222222222
+<span set="aaa = 'AAA'"></span>
+$!{xxx(aaa)}
+33333333333
+<span set="aaa = 'BBB'"></span>
+$!{xxx(aaa)}

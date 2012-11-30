@@ -28,6 +28,7 @@ import httl.util.WriterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -64,6 +65,8 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
+        if (parameters == null)
+    		parameters = new HashMap<String, Object>();
         Context context = Context.pushContext(this, parameters, output);
         try {
             doRender(context, parameters, output);

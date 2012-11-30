@@ -62,9 +62,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * DefaultMethod. (SPI, Singleton, ThreadSafe)
@@ -865,6 +868,9 @@ public class DefaultMethod {
     }
 
 	public static String[] split(String value, char separator) {
+		if (value == null || value.length() == 0) {
+			return new String[0];
+		}
 		List<String> list = new ArrayList<String>();
 		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < value.length(); i ++) {
@@ -882,6 +888,38 @@ public class DefaultMethod {
 			list.add(buf.toString());
 		}
 		return list.toArray(new String[list.size()]);
+	}
+
+	public static Map<String, Object> parseJson(String json) {
+		if (json == null) {
+			return null;
+		}
+		return JSON.parseObject(json);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T parseJson(String json, Class<T> cls) {
+		if (json == null) {
+			return null;
+		}
+		if (cls == null) {
+			return (T) JSON.parseObject(json);
+		}
+		return JSON.parseObject(json, cls);
+	}
+
+	public static String toJson(Object object) {
+		if (object == null) {
+			return null;
+		}
+		return JSON.toJSONString(object);
+	}
+	
+	public static <K, V> TreeMap<K, V> sort(Map<K, V> map) {
+		if (map == null) {
+			return null;
+		}
+		return new TreeMap<K, V>(map);
 	}
 
 }

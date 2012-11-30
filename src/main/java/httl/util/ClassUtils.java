@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -1111,10 +1112,10 @@ public class ClassUtils {
     	return map;
     }
     
-    public static void add(Object left, Object right) {
-    	
+    public static <K, V> Set<Map.Entry<K, V>> entrySet(Map<K, V> map) {
+    	return map == null ? null : map.entrySet();
     }
-    
+
     private ClassUtils() {}
 
 }

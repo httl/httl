@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -68,6 +69,8 @@ public abstract class WriterTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
     	if (writer == null) 
          	throw new IllegalArgumentException("writer == null");
+    	if (parameters == null)
+    		parameters = new HashMap<String, Object>();
     	Context context = Context.pushContext(this, parameters, writer);
         try {
             doRender(context, parameters, writer);

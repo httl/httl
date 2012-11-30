@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  */
 public class CommentParser extends AbstractParser {
     
-    protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--#([a-z:]+)(.*?)-->", Pattern.DOTALL);
+    protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--#([a-z:]+)[(]?(.*?)[)]?-->", Pattern.DOTALL);
     
     protected Pattern getPattern() {
         return STATEMENT_PATTERN;
@@ -63,19 +63,11 @@ public class CommentParser extends AbstractParser {
         while (matcher.find()) {
             String name = matcher.group(1);
             String value = matcher.group(2);
-            value = value == null ? null : value.trim();
-            int offset = matcher.end(1);
-            if (value != null && value.length() > 0) {
-                offset = matcher.start(2) + value.indexOf('(') + 1;
-                value = value.trim();
-                if (value.length() > 0) {
-                    if (value.length() < 2 || ! value.startsWith("(") || ! value.endsWith(")")) {
-                        throw new ParseException("Invalied statement " + matcher.group(), matcher.start());
-                    }
-                    value = value.substring(1, value.length() - 1);
-                }
+            int offset;
+            if (value == null) {
+            	offset = matcher.end(1);
             } else {
-                offset = matcher.end(1);
+            	offset = matcher.start(2);
             }
             if (endName.equals(name)) {
                 String startName = nameStack.pop();
@@ -126,7 +118,7 @@ public class CommentParser extends AbstractParser {
                     matcher.appendReplacement(buf, "");
                     buf.append(LEFT);
                     buf.append(matcher.group().length());
-                    String code = getStatementEndCode(startName, startValue);
+                    String code = getStatementEndCode(startName);
                     buf.append(code);
                     buf.append(RIGHT);
                 }

@@ -210,7 +210,7 @@ public final class BinaryOperator extends Operator {
                 if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
                     return ClassUtils.class.getName() + ".subArray(" + leftCode + ", " + rightCode + ")";
                 } else if (int.class.equals(rightType)) {
-                    return leftCode + "[" + rightCode + "]";
+                    return getNotNullCode(leftCode, leftCode + "[" + rightCode + "]");
                 } else {
                     throw new ParseException("The \"[]\" index type: " + rightType + " must be int!", getOffset());
                 }
