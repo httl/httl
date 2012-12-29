@@ -37,7 +37,7 @@ public class ClasspathResource extends InputStreamResource {
     
     public ClasspathResource(Engine engine, String name, String encoding, String path) {
         super(engine, name, encoding);
-        this.path = (path.startsWith("/") ? path.substring(1) : path);
+        this.path = path;
     }
 
     public InputStream getInputStream() throws IOException {

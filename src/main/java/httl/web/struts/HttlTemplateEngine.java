@@ -41,7 +41,7 @@ public class HttlTemplateEngine extends BaseTemplateEngine {
         ServletContext servletContext = (ServletContext) actionContext.get(ServletActionContext.SERVLET_CONTEXT);
 
         // prepare httl
-        WebEngine.init(servletContext);
+        WebEngine.setServletContext(servletContext);
 
         // get the list of templates we can use
         List<Template> templates = templateContext.getTemplate().getPossibleTemplates(this);

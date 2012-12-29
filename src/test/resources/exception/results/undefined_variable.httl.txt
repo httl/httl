@@ -1,0 +1,3 @@
+Undefined variable "user".
+Please add variable type definition <!--#var(Xxx user)--> in your tempalte.
+occur to offset: 6, line: 2, column: 3, char: u,

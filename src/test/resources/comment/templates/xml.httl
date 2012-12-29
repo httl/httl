@@ -1,0 +1,3 @@
+<!--#var(User user)-->
+$!{user.toXml}
+${user.toXml.parseXml.to("httl.test.model.User").name}

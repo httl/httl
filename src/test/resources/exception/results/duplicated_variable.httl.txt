@@ -1,0 +1,2 @@
+Defined duplicate variable httl.test.model.User user.
+occur to offset: 32, line: 2, column: 10, char: U,

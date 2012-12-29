@@ -82,7 +82,9 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     }
 
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
-        render(parameters, new WriterOutputStream(writer));
+    	OutputStream output = new WriterOutputStream(writer);
+        render(parameters, output);
+        output.flush();
     }
 
     protected abstract void doRender(Context context, Map<String, Object> parameters, OutputStream output) throws Exception;

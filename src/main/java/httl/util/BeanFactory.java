@@ -42,11 +42,12 @@ public class BeanFactory {
     }
     
     public static <T> T createBean(Class<T> beanClass, Properties properties) {
+    	Map<String, Object> caches = new HashMap<String, Object>();
     	Map<String, Object> instances = new HashMap<String, Object>();
     	List<Object> inits = new ArrayList<Object>();
     	String key = StringUtils.splitCamelName(beanClass.getSimpleName(), ".");
     	String value = properties.getProperty(key);
-    	T instance = getInstance(key, value, beanClass, properties, instances, inits);
+    	T instance = getInstance(key, value, beanClass, properties, caches, instances, inits);
     	try {
     		for (int i = inits.size() - 1; i >= 0; i --) { // reverse init order.
     			try {
@@ -66,7 +67,7 @@ public class BeanFactory {
     	return instance;
     }
 
-    private static void injectInstance(Object object, Properties properties, String parent, Map<String, Object> instances, List<Object> inits) {
+    private static void injectInstance(Object object, Properties properties, String parent, Map<String, Object> caches, Map<String, Object> instances, List<Object> inits) {
 		try {
 			if (! inits.contains(object)) {
 				inits.add(object);
@@ -82,6 +83,9 @@ public class BeanFactory {
 					if (Properties.class.equals(parameterType)
 							&& Properties.class.getSimpleName().equals(name.substring(3))) {
 						method.invoke(object, new Object[] { properties });
+					} else if (Map.class.equals(parameterType)
+								&& "Instances".equals(name.substring(3))) {
+						method.invoke(object, new Object[] { instances });
 					} else {
 						String key = StringUtils.splitCamelName(name.substring(3), ".");
 						String value = null;
@@ -98,11 +102,11 @@ public class BeanFactory {
 								String[] values = COMMA_SPLIT_PATTERN.split(value);
 								Object[] objs = (Object[]) Array.newInstance(componentType, values.length);
 								for (int i = 0; i < values.length; i++) {
-									objs[i] = parseValue(key, values[i], componentType, properties, instances, inits);
+									objs[i] = parseValue(key, values[i], componentType, properties, caches, instances, inits);
 								}
 								obj = objs;
 							} else {
-								obj = parseValue(key, value, parameterType, properties, instances, inits);
+								obj = parseValue(key, value, parameterType, properties, caches, instances, inits);
 							}
 							method.invoke(object, new Object[] { obj });
 						}
@@ -123,7 +127,7 @@ public class BeanFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T getInstance(String key, String value, Class<T> type, Properties properties, Map<String, Object> instances, List<Object> inits) {
+    private static <T> T getInstance(String key, String value, Class<T> type, Properties properties, Map<String, Object> caches, Map<String, Object> instances, List<Object> inits) {
         if (value == null || value.length() == 0 || "null".equals(value)) {
             return null;
         }
@@ -133,7 +137,7 @@ public class BeanFactory {
         }
         try {
         	String index = key + "=" + value;
-            Object instance = instances.get(index);
+            Object instance = caches.get(index);
             if (instance == null) {
             	try {
 	            	Constructor<?> constructor = cls.getConstructor(new Class<?>[0]);
@@ -149,16 +153,17 @@ public class BeanFactory {
 	            		throw new NoSuchMethodException("No such public empty constructor in " + cls.getName());
 	            	}
             	}
-            	instances.put(index, instance);
-            	injectInstance(instance, properties, key, instances, inits);
+            	caches.put(index, instance);
+            	injectInstance(instance, properties, key, caches, instances, inits);
             }
+            instances.put(key, instance);
             return (T) instance;
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
-    private static Object parseValue(String key, String value, Class<?> parameterType, Properties properties, Map<String, Object> instances, List<Object> inits) {
+    private static Object parseValue(String key, String value, Class<?> parameterType, Properties properties, Map<String, Object> caches, Map<String, Object> instances, List<Object> inits) {
         if (parameterType == String.class) {
             return value;
         } else if (parameterType == char.class) {
@@ -180,7 +185,7 @@ public class BeanFactory {
         } else if (parameterType == Class.class) {
             return ClassUtils.forName(value);
         } else {
-            return getInstance(key, value, parameterType, properties, instances, inits);
+            return getInstance(key, value, parameterType, properties, caches, instances, inits);
         }
     }
 

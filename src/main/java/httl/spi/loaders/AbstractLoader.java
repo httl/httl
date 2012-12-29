@@ -39,13 +39,13 @@ public abstract class AbstractLoader implements Loader {
 	
 	private Engine engine;
 
+	private Logger logger;
+    
 	private String encoding;
-    
-    private String directory;
-    
-    private String suffix;
 
-    private Logger logger;
+    private String directory;
+
+    private String suffix;
 
 	private boolean reloadable;
 
@@ -66,6 +66,22 @@ public abstract class AbstractLoader implements Loader {
 	}
 
     /**
+	 * httl.properties: template.directory=/META-INF/templates
+	 */
+    public void setTemplateDirectory(String directory) {
+    	if (directory != null && directory.length() > 0) {
+            this.directory = UrlUtils.cleanDirectory(directory);
+        }
+    }
+
+    /**
+	 * httl.properties: template.suffix=.httl
+	 */
+    public void setTemplateSuffix(String suffix) {
+    	this.suffix = suffix;
+    }
+
+    /**
 	 * httl.properties: reloadable=true
 	 */
 	public void setReloadable(boolean reloadable) {
@@ -80,22 +96,6 @@ public abstract class AbstractLoader implements Loader {
             Charset.forName(encoding);
             this.encoding = encoding;
         }
-    }
-
-    /**
-	 * httl.properties: template.directory=/META-INF/templates
-	 */
-    public void setTemplateDirectory(String directory) {
-    	if (directory != null && directory.length() > 0) {
-            this.directory = UrlUtils.cleanDirectory(directory);
-        }
-    }
-
-    /**
-	 * httl.properties: template.suffix=.httl
-	 */
-    public void setTemplateSuffix(String suffix) {
-    	this.suffix = suffix;
     }
 
 	protected Engine getEngine() {
@@ -183,13 +183,13 @@ public abstract class AbstractLoader implements Loader {
 			        		abs = "/";
 			        	}
 		    		}
-		        	logger.info("Load httl template from" + (reloadable ? " reloadable" : "") + " directory " + abs + " by " + getClass().getSimpleName() + ".");
+		        	logger.info("Load httl template from" + (reloadable ? " RELOADABLE" : "") + " directory " + abs + " by " + getClass().getSimpleName() + ".");
 	    		}
         	}
         }
         return resource;
     }
-
+    
     protected abstract Resource doLoad(String name, String encoding, String path) throws IOException;
 
 }

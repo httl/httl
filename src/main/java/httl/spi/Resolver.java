@@ -29,6 +29,6 @@ public interface Resolver {
 	 * @param key - property key
 	 * @return property value
 	 */
-	String getProperty(String key);
+	Object get(String key);
 
 }

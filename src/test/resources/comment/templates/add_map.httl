@@ -1,0 +1,15 @@
+<!--#var(Map<String, Book> bookmap, Map<String, Book> bookmap2)-->
+<table>
+  <!--#foreach(bookentry in bookmap + bookmap2)-->
+  <tr>
+    <td>${foreach.count}</td>
+    <td>${bookentry.key}</td>
+    <td>${bookentry.value.author}</td>
+    <td>${bookentry.value.publisher}</td>
+    <td>${bookentry.value.publication}</td>
+    <td>${bookentry.value.price}</td>
+    <td>${bookentry.value.discount}%</td>
+    <td>${bookentry.value.price * bookentry.value.discount / 100}</td>
+  </tr>
+  <!--#end-->
+</table>

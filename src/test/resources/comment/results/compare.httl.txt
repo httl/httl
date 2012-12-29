@@ -1,0 +1,19 @@
+
+false
+true
+false
+true
+true
+true
+true
+false
+true
+75
+true
+false
+2008-07-29 00:00:00
+false
+false
+true
+false
+false

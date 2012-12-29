@@ -37,7 +37,7 @@ public class HttlServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-    	WebEngine.init(getServletContext());
+    	WebEngine.setServletContext(getServletContext());
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)

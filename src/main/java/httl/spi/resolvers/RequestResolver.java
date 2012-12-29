@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class RequestResolver implements Resolver, Filter {
 
-    private static ThreadLocal<RequestMap> LOCAL = new ThreadLocal<RequestMap>();
+    private static final ThreadLocal<RequestMap> LOCAL = new ThreadLocal<RequestMap>();
 
 	public static void setRequest(HttpServletRequest request) {
 		if (request != null) {
@@ -65,13 +65,10 @@ public class RequestResolver implements Resolver, Filter {
 		return parameters;
 	}
 
-	public String getProperty(String key) {
+	public Object get(String key) {
 		Map<String, Object> parameters = getPrarameters();
 		if (parameters != null) {
-			Object value = parameters.get(key);
-			if (value != null) {
-				return String.valueOf(value);
-			}
+			return parameters.get(key);
 		}
 		return null;
 	}

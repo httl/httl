@@ -134,14 +134,7 @@ public class AttributeParser extends AbstractParser {
                             if (cls != null && ! cls.equals(Template.class)) {
                                 throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macro.getBegin());
                             }
-                            variables.add(var);
                             types.put(var, Template.class);
-                            StringBuilder buf = new StringBuilder();
-                            buf.append(LEFT);
-                            buf.append(element.getEnd() - macro.getBegin());
-                            buf.append(var + " = getMacros().get(\"" + var + "\");\n");
-                            buf.append(RIGHT);
-                            document.insert(macro.getBegin(), buf.toString()); // 插入块指令
                             commentMacro = null;
                             document.remove(element); // 移除注释元素
                             continue;
@@ -242,14 +235,7 @@ public class AttributeParser extends AbstractParser {
                 if (cls != null && ! cls.equals(Template.class)) {
                     throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macro.getBegin());
                 }
-                variables.add(var);
                 types.put(var, Template.class);
-                StringBuilder buf = new StringBuilder();
-                buf.append(LEFT);
-                buf.append(element.length());
-                buf.append(var + " = getMacros().get(\"" + var + "\");\n");
-                buf.append(RIGHT);
-                document.insert(element.getBegin(), buf.toString()); // 插入块指令
                 document.remove(element); // 移除宏
                 continue;
             }

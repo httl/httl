@@ -16,11 +16,12 @@
  */
 package httl.spi.translators.expression;
 
+import httl.Context;
 import httl.Engine;
 import httl.Expression;
 import httl.spi.Compiler;
 import httl.util.ClassUtils;
-import httl.util.MD5;
+import httl.util.Digest;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -91,6 +92,12 @@ public class ExpressionImpl implements Expression, Serializable {
 			}
     	}
         return evaluator.evaluate(parameters);
+    }
+    
+    @Override
+    public String toString() {
+    	Object value = evaluate(Context.getContext().getParameters());
+    	return value == null ? null : value.toString();
     }
     
     private Class<?> newEvaluatorClass(String className) {
@@ -167,7 +174,7 @@ public class ExpressionImpl implements Expression, Serializable {
 
     private Evaluator newEvaluator() {
     	if (md5 == null) {
-    		md5 = MD5.getMD5(source);
+    		md5 = Digest.getMD5(source);
     	}
     	String className = (Evaluator.class.getSimpleName() + "_" + md5);
     	Class<?> cls;

@@ -1,0 +1,16 @@
+<!--#set(xxx = "abc")-->
+${xxx}
+<!--#set(yyy = 1 + 2 * 3)-->
+${yyy + 9}
+<!--#set(yyy = 18 + 2)-->
+${yyy}
+protected 
+private 
+public 
+extends 
+implements
+ protected 
+ private 
+ public 
+ extends 
+ implements 

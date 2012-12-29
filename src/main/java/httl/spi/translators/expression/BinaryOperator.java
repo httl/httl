@@ -17,7 +17,6 @@
 package httl.spi.translators.expression;
 
 import httl.spi.Translator;
-import httl.spi.methods.DefaultMethod;
 import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
 import httl.spi.sequences.StringSequence;
@@ -246,7 +245,9 @@ public final class BinaryOperator extends Operator {
         } else if("!=".equals(name) && ! "null".equals(leftCode) && ! "null".equals(rightCode)
                 && ! leftType.isPrimitive() && ! rightParameter.getReturnType().isPrimitive()) {
             return getNotNullCode(leftCode, "(! " + leftCode + ".equals(" + rightCode + "))");
-        } else if("&&".equals(name) || "||".equals(name)) {
+        } else if("||".equals(name) && ! boolean.class.equals(leftType)) {
+        	return "(" + ClassUtils.class.getName() + ".isTrue(" + leftCode + ") ? (" + leftCode + ") : (" + rightCode + "))";
+        } else if("&&".equals(name) && ! boolean.class.equals(leftType)) {
             if (rightParameter instanceof Operator
                     && ((Operator) rightParameter).getPriority() < getPriority()) {
                 rightCode = "(" + rightCode + ")";
@@ -261,11 +262,6 @@ public final class BinaryOperator extends Operator {
             }
             leftCode = StringUtils.getConditionCode(leftType, leftCode);
             return leftCode + " " + name + " " + rightCode;
-        } else if("|".equals(name) 
-                && ! leftType.isPrimitive()
-                && ! Number.class.isAssignableFrom(leftType)
-                && ! Boolean.class.isAssignableFrom(leftType)) {
-            return "(" + ClassUtils.class.getName() + ".isNotEmpty(" + leftParameter.getCode() + ") ? (" + leftCode + ") : (" + rightCode + "))";
         } else if (":".equals(name) 
                 && ! (leftParameter instanceof BinaryOperator 
                         && "?".equals(((BinaryOperator)leftParameter).getName()))) {
@@ -310,10 +306,10 @@ public final class BinaryOperator extends Operator {
 	            	String typeName = type.getCanonicalName();
 	        		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
 	            	if (! (leftType.isPrimitive() && leftType != boolean.class)) {
-	            		leftCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + leftCode + ")";
+	            		leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
 	            	}
 	            	if (! (rightType.isPrimitive() && leftType != boolean.class)) {
-	            		rightCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + rightCode + ")";
+	            		rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
 	            	}
             	}
             } else if ("－".equals(name) || "＊".equals(name) || "／".equals(name) || "%".equals(name)) {
@@ -329,10 +325,10 @@ public final class BinaryOperator extends Operator {
             	String typeName = type.getCanonicalName();
         		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
             	if (! (leftType.isPrimitive() && leftType != boolean.class)) {
-            		leftCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + leftCode + ")";
+            		leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
             	}
             	if (! (rightType.isPrimitive() && leftType != boolean.class)) {
-            		rightCode = DefaultMethod.class.getName() + ".to" + typeName + "(" + rightCode + ")";
+            		rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
             	}
             }
             if (rightParameter instanceof Operator
@@ -349,8 +345,8 @@ public final class BinaryOperator extends Operator {
                 || "<".equals(name)|| "<=".equals(name)
                 || "gt".equals(name) || "ge".equals(name)
                 || "lt".equals(name) || "le".equals(name)
-                || "==".equals(name)|| "!=".equals(name)
-                || "&&".equals(name)|| "||".equals(name)) {
+                || "==".equals(name) || "!=".equals(name)
+                || "&&".equals(name)) {
             return boolean.class;
         }
         Map<String, Class<?>> types = getParameterTypes();

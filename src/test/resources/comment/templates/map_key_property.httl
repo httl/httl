@@ -1,0 +1,15 @@
+<!--#var(Map<String, Book> bookmap)-->
+${bookmap["size"]}
+${bookmap.size}
+${bookmap["length"]}
+${bookmap.length}
+${bookmap["entrySet"]}
+${bookmap.entrySet.size}
+${bookmap["xxx"]}
+${bookmap.xxx}
+${bookmap.EffectiveJava.title}
+${bookmap["EffectiveJava"].title}
+${bookmap.get("EffectiveJava").title}
+${bookmap.EffectiveJava.price + 1}
+${bookmap["EffectiveJava"].price + 1}
+${bookmap.get("EffectiveJava").price + 1}

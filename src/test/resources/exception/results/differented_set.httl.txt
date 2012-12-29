@@ -1,0 +1,2 @@
+set different type value to variable age, conflict types: java.lang.String, int.
+occur to offset: 41, line: 2, column: 11, char: n,

@@ -40,8 +40,8 @@ public abstract class AbstractResource implements Resource, Serializable {
     
     private final String encoding;
 
-    private final long lastModified;
-    
+	private final long lastModified;
+
     public AbstractResource(Engine engine, String name, String encoding) {
     	this(engine, name, encoding, -1);
     }
@@ -78,6 +78,15 @@ public abstract class AbstractResource implements Resource, Serializable {
 			return IOUtils.readToString(getReader());
 		} catch (IOException e) {
 			throw new IllegalStateException(e.getMessage(), e);
+		}
+    }
+    
+    @Override
+    public String toString() {
+    	try {
+			return IOUtils.readToString(getReader());
+		} catch (IOException e) {
+			return super.toString();
 		}
     }
 

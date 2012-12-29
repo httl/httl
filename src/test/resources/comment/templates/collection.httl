@@ -1,0 +1,11 @@
+<!--#var(List<Book> booklist)-->
+${booklist.size}
+${booklist[0].title}
+${"ok" + booklist[0].title}
+${booklist[0].title + "," + booklist[1].title}
+${booklist[0].publication.year}
+${booklist.toArray.length}
+${booklist.toArray("Book").class.name}
+${booklist[[0,2]][1].to("Book").title}
+${booklist[0..2][1].to("Book").title}
+${booklist[1..2][0].to("Book").title}

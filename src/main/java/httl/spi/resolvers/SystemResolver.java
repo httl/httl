@@ -20,8 +20,12 @@ import httl.spi.Resolver;
 
 public class SystemResolver implements Resolver {
 
-	public String getProperty(String key) {
-		return System.getProperty(key);
+	public Object get(String key) {
+		String value = System.getProperty(key);
+		if (value != null) {
+			return value;
+		}
+		return System.getenv(key);
 	}
 
 }

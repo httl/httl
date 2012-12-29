@@ -16,14 +16,11 @@
  */
 package httl.spi.loaders;
 
-import httl.Engine;
 import httl.Resource;
 import httl.spi.Loader;
-import httl.spi.Logger;
 import httl.util.UrlUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -63,22 +60,6 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
 
     public void contextDestroyed(ServletContextEvent sce) {
         SERVLET_CONTEXT = null;
-    }
-    
-    public void init() {
-    	Logger logger = getLogger();
-    	Engine engine = getEngine();
-    	if (logger != null && logger.isInfoEnabled()
-    			&& engine != null && SERVLET_CONTEXT != null) {
-    		String name = engine.getName();
-    		try {
-				if (name != null && name.startsWith("/")
-						&& SERVLET_CONTEXT.getResource(name) != null) {
-					logger.info("Load httl config form " + SERVLET_CONTEXT.getRealPath(name) + " in webapp.");
-				}
-			} catch (MalformedURLException e) {
-			}
-    	}
     }
 
     public List<String> doList(String directory, String[] suffixes) throws IOException {

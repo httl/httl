@@ -1,0 +1,2 @@
+Defined different type to variable user, conflict types: httl.test.model.User, httl.test.model.Book.
+occur to offset: 32, line: 2, column: 10, char: B,

@@ -1,0 +1,6 @@
+<!--#macro(hello(String name))-->
+Hello, ${name}!
+<!--#end-->
+<!--#macro(welcome(String name))-->
+Welcome to hangzhou, ${name}!
+<!--#end-->

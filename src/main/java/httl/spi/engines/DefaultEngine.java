@@ -60,7 +60,7 @@ public class DefaultEngine extends Engine {
     private Map<Object, Object> templateCache;
 
     private Map<Object, Object> expressionCache;
-
+    
     private boolean reloadable;
     
     private boolean precompiled;
@@ -70,8 +70,11 @@ public class DefaultEngine extends Engine {
 
     // The engine configuration properties
     private Properties properties;
-    
-    /**
+
+	// The engine configuration instances
+    private Map<String, Object> instances;
+
+	/**
      * Get config path
      */
     public String getName() {
@@ -88,6 +91,18 @@ public class DefaultEngine extends Engine {
 	public String getProperty(String key) {
         String value = properties == null ? null : properties.getProperty(key);
         return value == null ? null : value.trim();
+    }
+
+    /**
+     * Get config instance.
+     * 
+     * @see #getEngine()
+     * @param key - config key
+     * @return config value
+     */
+	@SuppressWarnings("unchecked")
+	public <T> T getProperty(String key, Class<T> cls) {
+        return instances == null ? null : (T) instances.get(key);
     }
 
     /**
@@ -208,22 +223,20 @@ public class DefaultEngine extends Engine {
             return parser.parse(resource);
         } catch (ParseException e) {
             int offset = e.getErrorOffset();
-            if (offset < 0) {
-                offset = 0;
+            if (offset <= 0) {
+                throw e;
             }
             String location = null;
-            if (offset > 0) {
+            try {
+                Reader reader = resource.getReader();
                 try {
-                    Reader reader = resource.getReader();
-                    try {
-                        location = StringUtils.getLocationMessage(reader, offset);
-                    } finally {
-                        reader.close();
-                    }
-                } catch (Throwable t) {
+                    location = StringUtils.getLocationMessage(reader, offset);
+                } finally {
+                    reader.close();
                 }
+            } catch (Throwable t) {
             }
-            throw new ParseException("Failed to parse template " + name + ", cause: " + e.getMessage()  + ". occur to offset: " + offset + 
+            throw new ParseException(e.getMessage()  + ". occur to offset: " + offset + 
                                      (location == null || location.length() == 0 ? "" : ", " + location) 
                                      + ", stack: " + ClassUtils.toString(e), offset);
         }
@@ -343,7 +356,14 @@ public class DefaultEngine extends Engine {
     public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
-    
+
+    /**
+	 * httl.properties
+	 */
+    public void setInstances(Map<String, Object> instances) {
+		this.instances = instances;
+	}
+
     /**
 	 * httl.properties: reloadable=true
 	 */

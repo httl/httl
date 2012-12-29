@@ -26,17 +26,17 @@ public class MultiResolver implements Resolver {
 		this.resolvers = resolvers;
 	}
 
-	public String getProperty(String key) {
+	public Object get(String key) {
 		if (resolvers == null || resolvers.length == 0) {
 			return null;
 		}
 		if (resolvers.length == 1) {
-			return resolvers[0].getProperty(key);
+			return resolvers[0].get(key);
 		}
 		for (int i = resolvers.length - 1; i >= 0; i --) {
 			Resolver resolver = resolvers[i];
-			String value = resolver.getProperty(key);
-			if (value != null && value.length() > 0) {
+			Object value = resolver.get(key);
+			if (value != null) {
 				return value;
 			}
 		}

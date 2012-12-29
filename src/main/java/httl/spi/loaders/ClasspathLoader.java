@@ -33,15 +33,19 @@ import java.util.List;
 public class ClasspathLoader extends AbstractLoader {
 
 	public List<String> doList(String directory, String[] suffixes) throws IOException {
-        return UrlUtils.listUrl(Thread.currentThread().getContextClassLoader().getResource(directory), suffixes);
+        return UrlUtils.listUrl(Thread.currentThread().getContextClassLoader().getResource(cleanPath(directory)), suffixes);
     }
     
     protected Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new ClasspathResource(getEngine(), name, encoding, path);
+		return new ClasspathResource(getEngine(), name, encoding, cleanPath(path));
 	}
 
 	public boolean doExists(String name, String path) throws Exception {
-		return Thread.currentThread().getContextClassLoader().getResource(path) != null;
+		return Thread.currentThread().getContextClassLoader().getResource(cleanPath(path)) != null;
+	}
+	
+	private String cleanPath(String path) {
+		return path.startsWith("/") ? path.substring(1) : path;
 	}
 
 }

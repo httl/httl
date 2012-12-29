@@ -30,7 +30,11 @@ public class EngineResolver implements Resolver {
 		this.engine = engine;
 	}
 
-	public String getProperty(String key) {
+	public Object get(String key) {
+		Object value = engine.getProperty(key, (Class<?>) null);
+		if (value != null) {
+			return value;
+		}
 		return engine.getProperty(key);
 	}
 

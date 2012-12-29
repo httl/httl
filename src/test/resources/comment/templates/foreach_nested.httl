@@ -1,0 +1,9 @@
+<!--#var(List<Book> booklist)-->
+<!--#foreach(book in booklist)-->
+--${foreach.index}
+==${book.title}
+<!--#foreach(i in 5..7)--> 
+----${foreach.index}
+====${i}
+<!--#end-->
+<!--#end-->

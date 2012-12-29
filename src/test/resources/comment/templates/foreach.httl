@@ -1,0 +1,15 @@
+<!--#var(Book[] books)-->
+<table>
+  <!--#foreach(book in books)-->
+  <tr>
+    <td>${foreach.count}</td>
+    <td>${book.title}</td>
+    <td>${book.author}</td>
+    <td>${book.publisher}</td>
+    <td>${book.publication}</td>
+    <td>${book.price}</td>
+    <td>${book.discount}%</td>
+    <td>${book.price * book.discount / 100}</td>
+  </tr>
+  <!--#end-->
+</table>

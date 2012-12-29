@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -117,9 +119,20 @@ public class AdaptiveTemplate implements Template, Serializable {
 	public Map<String, Class<?>> getContextTypes() {
 		return writerTemplate.getContextTypes();
 	}
+	
+	private Map<String, Template> macros;
 
 	public Map<String, Template> getMacros() {
-		return writerTemplate.getMacros();
+		if (macros == null) { // allow duplicate on concurrent
+			Map<String, Template> map = new HashMap<String, Template>();
+			Map<String, Template> writerMacros = writerTemplate.getMacros();
+			Map<String, Template> streamMacros = streamTemplate.getMacros();
+			for (Map.Entry<String, Template> entry : writerMacros.entrySet()) {
+				map.put(entry.getKey(), new AdaptiveTemplate(entry.getValue(), streamMacros.get(entry.getKey())));
+			}
+			macros = Collections.unmodifiableMap(map);
+		}
+		return macros;
 	}
 
 	public String getCode() {
@@ -132,6 +145,11 @@ public class AdaptiveTemplate implements Template, Serializable {
 
 	public boolean isMacro() {
 		return writerTemplate.isMacro();
+	}
+
+	@Override
+	public String toString() {
+		return writerTemplate.toString();
 	}
 
 }

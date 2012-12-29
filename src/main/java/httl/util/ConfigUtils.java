@@ -182,6 +182,8 @@ public final class ConfigUtils {
                 String v = result.getProperty(k);
                 if (v != null && v.length() > 0) {
                 	result.setProperty(k, v + COMMA + value);
+                } else {
+                	result.setProperty(k, value);
                 }
     		}
     	}

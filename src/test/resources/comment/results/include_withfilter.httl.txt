@@ -1,0 +1,119 @@
+
+&lt;table&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;1&lt;/td&gt;
+    &lt;td&gt;Practical API Design&lt;/td&gt;
+    &lt;td&gt;Jaroslav Tulach&lt;/td&gt;
+    &lt;td&gt;Apress&lt;/td&gt;
+    &lt;td&gt;2008-07-29 00:00:00&lt;/td&gt;
+    &lt;td&gt;75&lt;/td&gt;
+    &lt;td&gt;85%&lt;/td&gt;
+    &lt;td&gt;63&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;2&lt;/td&gt;
+    &lt;td&gt;Effective Java&lt;/td&gt;
+    &lt;td&gt;Joshua Bloch&lt;/td&gt;
+    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
+    &lt;td&gt;2008-05-28 00:00:00&lt;/td&gt;
+    &lt;td&gt;55&lt;/td&gt;
+    &lt;td&gt;70%&lt;/td&gt;
+    &lt;td&gt;38&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;3&lt;/td&gt;
+    &lt;td&gt;Java Concurrency in Practice&lt;/td&gt;
+    &lt;td&gt;Doug Lea&lt;/td&gt;
+    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
+    &lt;td&gt;2006-05-19 00:00:00&lt;/td&gt;
+    &lt;td&gt;60&lt;/td&gt;
+    &lt;td&gt;60%&lt;/td&gt;
+    &lt;td&gt;36&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;4&lt;/td&gt;
+    &lt;td&gt;Java Programming Language&lt;/td&gt;
+    &lt;td&gt;James Gosling&lt;/td&gt;
+    &lt;td&gt;Prentice Hall&lt;/td&gt;
+    &lt;td&gt;2005-08-27 00:00:00&lt;/td&gt;
+    &lt;td&gt;65&lt;/td&gt;
+    &lt;td&gt;75%&lt;/td&gt;
+    &lt;td&gt;48&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;5&lt;/td&gt;
+    &lt;td&gt;Domain-Driven Design&lt;/td&gt;
+    &lt;td&gt;Eric Evans&lt;/td&gt;
+    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
+    &lt;td&gt;2003-08-30 00:00:00&lt;/td&gt;
+    &lt;td&gt;70&lt;/td&gt;
+    &lt;td&gt;80%&lt;/td&gt;
+    &lt;td&gt;56&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;6&lt;/td&gt;
+    &lt;td&gt;Agile Project Management with Scrum&lt;/td&gt;
+    &lt;td&gt;Ken Schwaber&lt;/td&gt;
+    &lt;td&gt;Microsoft Press&lt;/td&gt;
+    &lt;td&gt;2004-03-10 00:00:00&lt;/td&gt;
+    &lt;td&gt;40&lt;/td&gt;
+    &lt;td&gt;80%&lt;/td&gt;
+    &lt;td&gt;32&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;7&lt;/td&gt;
+    &lt;td&gt;J2EE Development without EJB&lt;/td&gt;
+    &lt;td&gt;Rod Johnson&lt;/td&gt;
+    &lt;td&gt;Wrox&lt;/td&gt;
+    &lt;td&gt;2011-09-17 00:00:00&lt;/td&gt;
+    &lt;td&gt;40&lt;/td&gt;
+    &lt;td&gt;70%&lt;/td&gt;
+    &lt;td&gt;28&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;8&lt;/td&gt;
+    &lt;td&gt;Design Patterns&lt;/td&gt;
+    &lt;td&gt;Erich Gamma&lt;/td&gt;
+    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
+    &lt;td&gt;1994-11-10 00:00:00&lt;/td&gt;
+    &lt;td&gt;60&lt;/td&gt;
+    &lt;td&gt;80%&lt;/td&gt;
+    &lt;td&gt;48&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;9&lt;/td&gt;
+    &lt;td&gt;Agile Software Development, Principles, Patterns, and Practices&lt;/td&gt;
+    &lt;td&gt; Robert C. Martin&lt;/td&gt;
+    &lt;td&gt;Prentice Hall&lt;/td&gt;
+    &lt;td&gt;2002-10-25 00:00:00&lt;/td&gt;
+    &lt;td&gt;80&lt;/td&gt;
+    &lt;td&gt;75%&lt;/td&gt;
+    &lt;td&gt;60&lt;/td&gt;
+  &lt;/tr&gt;
+  
+  &lt;tr&gt;
+    &lt;td&gt;10&lt;/td&gt;
+    &lt;td&gt;Design by Contract, by Example&lt;/td&gt;
+    &lt;td&gt;Richard Mitchell&lt;/td&gt;
+    &lt;td&gt;Addison-Wesley Publishing Company&lt;/td&gt;
+    &lt;td&gt;2001-10-22 00:00:00&lt;/td&gt;
+    &lt;td&gt;50&lt;/td&gt;
+    &lt;td&gt;85%&lt;/td&gt;
+    &lt;td&gt;42&lt;/td&gt;
+  &lt;/tr&gt;
+  
+&lt;/table&gt;
+
+
+&lt;div&gt;
+VVV
+&lt;/div&gt;

@@ -1,0 +1,18 @@
+<!--#var(Book[] books, Book[] emptybooks)-->
+<!--#set(xx = true)-->
+<!--#set(yy = false)-->
+<!--#set(allow = false)-->
+${true && false}
+${false && (books[0] == books[1])}
+${allow && true}
+${! allow && true}
+${true && ! allow}
+${false && xx && yy}
+${true || xx || yy}
+${false ? "aa" : "bb"}
+${allow ? "aa2" : "bb2"}
+${allow ? "aa3" : books[0].title}
+${! books}
+${! emptybooks}
+${books && emptybooks}
+${(books || emptybooks).length}

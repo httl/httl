@@ -1,0 +1,7 @@
+
+<httl.test.model.User>
+  <name>liangfei</name>
+  <role>admin</role>
+  <isLogin>Y</isLogin>
+</httl.test.model.User>
+liangfei

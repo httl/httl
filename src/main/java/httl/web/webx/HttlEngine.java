@@ -16,7 +16,6 @@
  */
 package httl.web.webx;
 
-import httl.spi.loaders.ServletLoader;
 import httl.util.UrlUtils;
 import httl.web.WebEngine;
 
@@ -83,7 +82,7 @@ public class HttlEngine implements TemplateEngine {
 	}
 
 	public boolean exists(String templateName) {
-		if (ServletLoader.getServletContext() == null) {
+		if (WebEngine.getServletContext() == null) {
 			return templateName.endsWith(".httl");
 		}
 		return WebEngine.getEngine().hasResource(getTemplatePath(templateName));

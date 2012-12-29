@@ -79,7 +79,7 @@ public final class UnaryOperator extends Operator {
                         }
                     }
                 }
-                throw new ParseException("No such macro \"" + name + "\" or static method \"" + name + "\" with parameters " + Arrays.toString(types) + " in functions!", getOffset());
+                throw new ParseException("No such macro \"" + name + "\" or import method \"" + name + "\" with parameters " + Arrays.toString(types), getOffset());
             }
         } else if (getName().equals("[")) {
             Class<?>[] types = parameter.getReturnTypes();
@@ -89,12 +89,15 @@ public final class UnaryOperator extends Operator {
                 Object array = Array.newInstance(types[0], 0);
                 return array.getClass();
             }
+        } else if (getName().equals("!")) {
+        	return boolean.class;
         } else {
             return parameter.getReturnType();
         }
     }
 
     public String getCode() throws ParseException {
+    	Class<?>[] types = parameter.getReturnTypes();
         if (getName().startsWith("new ")) {
             return getName() + "(" + parameter.getCode() + ")";
         } else if (StringUtils.isTyped(getName())) {
@@ -105,7 +108,6 @@ public final class UnaryOperator extends Operator {
             if (t != null && Expression.class.isAssignableFrom(t)) {
                 return name + ".evaluate(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " ))";
             } else {
-                Class<?>[] types = parameter.getReturnTypes();
                 Collection<Class<?>> functions = getFunctions();
                 if (functions != null && functions.size() > 0) {
                     for (Class<?> function : functions) {
@@ -122,15 +124,16 @@ public final class UnaryOperator extends Operator {
                         }
                     }
                 }
-                throw new ParseException("No such macro \"" + name + "\" or static method \"" + name + "\" with parameters " + Arrays.toString(types) + " in functions!", getOffset());
+                throw new ParseException("No such macro \"" + name + "\" or import method \"" + name + "\" with parameters " + Arrays.toString(types), getOffset());
             }
         } else if (getName().equals("[")) {
-            Class<?>[] types = parameter.getReturnTypes();
             if (Map.Entry.class.isAssignableFrom(types[0])) {
                 return ClassUtils.class.getName() + ".toMap(new " + Map.Entry.class.getCanonicalName() + "[] {" + parameter.getCode() + "})";
             } else {
                 return "new " + types[0].getCanonicalName() + "[] {" + parameter.getCode() + "}";
             }
+        } else if (getName().equals("!") && ! boolean.class.equals(types[0])) {
+            return "! (" + StringUtils.getConditionCode(types[0], parameter.getCode()) + ")";
         } else {
             if (parameter instanceof Operator
                     && ((Operator) parameter).getPriority() < getPriority()) {

@@ -17,7 +17,6 @@
 package httl.util;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
@@ -26,7 +25,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -35,7 +33,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * UrlUtils. (Tool, Prototype, ThreadUnsafe)
+ *  (Tool, Prototype, ThreadUnsafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -47,24 +45,46 @@ public class UrlUtils {
 
 	public static final char PATH_SEPARATOR_CHAR = '/';
 
+	public static final char PATH_PARENT_CHAR = '.';
+
 	public static final char WINDOWS_PATH_SEPARATOR_CHAR = '\\';
 
 	/**
 	 * 关联路径
 	 * 
-	 * @param templateName
+	 * @param name
 	 * @param relativeName
 	 * @return
 	 * @throws MalformedURLException
 	 */
-	public static String relativeUrl(String templateName, String relativeName) throws MalformedURLException {
-		if (templateName == null || templateName.length() == 0 
+	public static String relativeUrl(String name , String relativeName) throws MalformedURLException {
+		if (name == null || name.length() == 0 
 				|| relativeName == null || relativeName.length() == 0)
-			return templateName;
-		if (templateName.charAt(0) == UrlUtils.PATH_SEPARATOR_CHAR
-				|| templateName.charAt(0) == UrlUtils.WINDOWS_PATH_SEPARATOR_CHAR)
-			return templateName; // 根目录开头，不添加当前路径
-		return UrlUtils.getDirectoryName(relativeName) + templateName;
+			return name;
+		if (name.charAt(0) == PATH_SEPARATOR_CHAR
+				|| name.charAt(0) == WINDOWS_PATH_SEPARATOR_CHAR)
+			return name; // 根目录开头，不添加当前路径
+		int parent = getParentLevel(name); // 双点号开头，表示上级目录
+		if (parent > 0) {
+			name = name.substring(parent * 3);
+		}
+		return getParentDirectory(relativeName, parent) + name;
+	}
+	
+	public static int getParentLevel(String name) {
+		int max = name.length() - 3;
+		int n = 0;
+		for (int i = 0; i < max; i += 3) {
+			if (name.charAt(i) == PATH_PARENT_CHAR
+					&& name.charAt(i + 1) == PATH_PARENT_CHAR
+					&& (name.charAt(i + 2) == PATH_SEPARATOR_CHAR
+						|| name.charAt(i + 2) == WINDOWS_PATH_SEPARATOR_CHAR)) {
+				n ++;
+			} else {
+				break;
+			}
+		}
+		return n;
 	}
 	
 	public static String cleanName(String name) {
@@ -135,12 +155,18 @@ public class UrlUtils {
 	 * @param url 路径
 	 * @return 去掉文件名的路径
 	 */
-	public static String getDirectoryName(String url) {
+	public static String getParentDirectory(String url, int parent) {
 		if (url != null) {
-			url = url.replace(WINDOWS_PATH_SEPARATOR_CHAR, PATH_SEPARATOR_CHAR);
-			int idx = url.lastIndexOf(PATH_SEPARATOR_CHAR);
-			if (idx >= 0)
-				return url.substring(0, idx + 1);
+			for (int i = url.length() - 1; i >= 0; i --) {
+				char ch = url.charAt(i);
+				if (ch == PATH_SEPARATOR_CHAR
+						|| ch == WINDOWS_PATH_SEPARATOR_CHAR) {
+					parent --;
+					if (parent < 0) {
+						return url.substring(0, i + 1);
+					}
+				}
+			}
 		}
 		return PATH_SEPARATOR;
 	}
@@ -158,29 +184,50 @@ public class UrlUtils {
         }
     }
     
-    public static List<String> listFile(File file, final String[] suffixes) throws IOException {
-        if (suffixes == null || suffixes.length == 0) {
-            return Arrays.asList(file.list());
-        } else {
-            return Arrays.asList(file.list(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    for (String suffix : suffixes) {
-                        if (name.endsWith(suffix)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            }));
+    public static List<String> listFile(File dirFile, final String[] suffixes) throws IOException {
+    	List<String> list = new ArrayList<String>();
+    	addListFile(list, "/", dirFile, suffixes);
+    	return list;
+    }
+    
+    private static void addListFile(List<String> list, String dir, File dirFile, final String[] suffixes) throws IOException {
+    	for (File file : dirFile.listFiles()) {
+    		if (file.isHidden() || ! file.canRead()) {
+    			continue;
+    		}
+    		if (file.isDirectory()) {
+    			addListFile(list, dir + file.getName() + "/", file, suffixes);
+    		} else if (isMatch(file.getName(), suffixes)) {
+    			list.add(dir + file.getName());
+    		}
+    	}
+    }
+    
+    private static boolean isMatch(String name, String[] suffixes) {
+    	if (suffixes == null || suffixes.length == 0) {
+    		return true;
+    	}
+    	for (String suffix : suffixes) {
+            if (name.endsWith(suffix)) {
+                return true;
+            }
         }
+        return false;
     }
     
     public static List<String> listZip(ZipFile zipFile, String[] suffixes) throws IOException {
         List<String> result = new ArrayList<String>();
         for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();) {
             ZipEntry entry = (ZipEntry) entries.nextElement();
-            String entryPath = entry.getName();
-            result.add(entryPath);
+            if (! entry.isDirectory()) {
+	            String name = entry.getName();
+	            if (isMatch(name, suffixes)) {
+	            	if (! name.startsWith("/")) {
+	            		name = "/" + name;
+	            	}
+	            	result.add(name);
+	            }
+            }
         }
         return result;
     }
@@ -189,12 +236,19 @@ public class UrlUtils {
         List<String> result = new ArrayList<String>();
         for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
             JarEntry entry = (JarEntry) entries.nextElement();
-            String entryPath = entry.getName();
-            result.add(entryPath);
+            if (! entry.isDirectory()) {
+	            String name = entry.getName();
+	            if (isMatch(name, suffixes)) {
+	            	if (! name.startsWith("/")) {
+	            		name = "/" + name;
+	            	}
+	            	result.add(name);
+	            }
+            }
         }
         return result;
     }
-    
+
     private static List<String> listJarUrl(URL rootDirUrl, String[] suffixes) throws IOException {
         URLConnection con = rootDirUrl.openConnection();
         JarFile jarFile = null;

@@ -1,0 +1,2 @@
+set different type value to variable user, conflict types: httl.test.model.User, java.lang.String.
+occur to offset: 46, line: 3, column: 11, char: t,

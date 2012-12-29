@@ -18,11 +18,11 @@ package httl.web;
 
 import httl.Engine;
 import httl.Template;
+import httl.spi.Logger;
 import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.RequestResolver;
 import httl.util.WrappedMap;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,7 +51,11 @@ public class WebEngine {
 
 	private WebEngine() {}
 
-	public static void init(ServletContext servletContext) {
+	public static ServletContext getServletContext() {
+		return ServletLoader.getServletContext();
+	}
+
+	public static void setServletContext(ServletContext servletContext) {
 		if (servletContext == null) {
 			return;
 		}
@@ -81,6 +85,7 @@ public class WebEngine {
 			        		addProperties(properties);
 			            	ENGINE = Engine.getEngine(config, properties);
 			            }
+			            logConfigPath(ENGINE, servletContext, config);
 			        } else {
 			        	InputStream in = servletContext.getResourceAsStream(WEBINF_CONFIG);
 			        	if (in != null) {
@@ -92,6 +97,7 @@ public class WebEngine {
 							}
 			        		addProperties(properties);
 			        		ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
+			        		logConfigPath(ENGINE, servletContext, WEBINF_CONFIG);
 			        	} else {
 			        		Properties properties = new Properties();
 			        		addProperties(properties);
@@ -101,6 +107,23 @@ public class WebEngine {
 			        OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
 				}
 			}
+		}
+	}
+	
+	private static void logConfigPath(Engine engine, ServletContext servletContext, String path) {
+		if (engine != null && servletContext != null && path != null) {
+			Logger logger = engine.getProperty("logger", Logger.class);
+	    	if (logger != null && logger.isInfoEnabled()) {
+	    		String name = engine.getName();
+	    		try {
+					if (name != null && name.startsWith("/")
+							&& servletContext.getResource(name) != null) {
+						logger.info("Load httl config form " + servletContext.getRealPath(name) + " in webapp.");
+					}
+				} catch (IOException e) {
+					// ignore
+				}
+	    	}
 		}
 	}
 
@@ -119,7 +142,7 @@ public class WebEngine {
 
 	public static Engine getEngine() {
 		if (ENGINE == null) {
-			init(ServletLoader.getAndCheckServletContext());
+			setServletContext(ServletLoader.getAndCheckServletContext());
 		}
 		return ENGINE;
 	}
@@ -150,7 +173,7 @@ public class WebEngine {
 
 	private static void doRender(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> model, Object output) throws IOException, ParseException {
 		if (ENGINE == null) {
-			init(request.getSession().getServletContext());
+			setServletContext(request.getSession().getServletContext());
 		}
 		boolean unresolved = RequestResolver.getRequest() == null;
 		if (unresolved) {
@@ -197,8 +220,6 @@ public class WebEngine {
 				}
 			}
 			response.flushBuffer();
-		} catch (FileNotFoundException e) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
 		} finally {
 			if (unresolved) {
 				RequestResolver.removeRequest();

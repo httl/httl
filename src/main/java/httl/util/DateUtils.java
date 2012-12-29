@@ -83,6 +83,9 @@ public class DateUtils {
     }
 
     public static String format(Date value, String format, TimeZone timeZone) {
+    	if (value == null) {
+    		return null;
+    	}
         return getDateFormat(format, timeZone).format(value);
     }
 

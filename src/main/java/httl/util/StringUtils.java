@@ -605,6 +605,8 @@ public class StringUtils {
                 code = "(" + code + ") != \'\\0\'";
             } else if (type == String.class) {
                 code = "(" + code + ")  != null && (" + code + ").length() > 0";
+            } else if (type == Boolean.class) {
+                code = "(" + code + ")  != null && (" + code + ").booleanValue()";
             } else if (type.isArray()) {
                 code = "(" + code + ") != null && (" + code + ").length > 0";
             } else if (Collection.class.isAssignableFrom(type)) {

@@ -287,9 +287,45 @@ public class ClassUtils {
     public static Object unboxed(Object v) {
         return v;
     }
+
+    public static boolean isTrue(boolean object) {
+    	return object;
+    }
+
+    public static boolean isTrue(char object) {
+    	return object != '\0';
+    }
+
+    public static boolean isTrue(byte object) {
+    	return object != (byte) 0;
+    }
+
+    public static boolean isTrue(short object) {
+    	return object != (short) 0;
+    }
+
+    public static boolean isTrue(int object) {
+    	return object != 0;
+    }
+
+    public static boolean isTrue(long object) {
+    	return object != 0l;
+    }
+
+    public static boolean isTrue(float object) {
+    	return object != 0f;
+    }
+
+    public static boolean isTrue(double object) {
+    	return object != 0d;
+    }
+    
+    public static boolean isTrue(Object object) {
+    	return getSize(object) != 0;
+    }
     
     public static boolean isNotEmpty(Object object) {
-        return getSize(object) > 0;
+        return isTrue(object);
     }
     
     public static Method getGetter(Object bean, String property) {
@@ -321,15 +357,18 @@ public class ClassUtils {
     	if (bean == null || property == null || property.length() == 0) {
     		return null;
     	}
-		Method getter = getGetter(bean, property);
-		if (getter != null) {
-			try {
+    	try {
+			Method getter = getGetter(bean, property);
+			if (getter != null) {
+				if (! getter.isAccessible()) {
+					getter.setAccessible(true);
+				}
 				return getter.invoke(bean, new Object[0]);
-			} catch (Exception e) {
-				throw new RuntimeException(e.getMessage(), e);
 			}
+			return null;
+    	} catch (Exception e) {
+			return null;
 		}
-    	return null;
     }
 
     public static int getSize(Object object) {
@@ -625,6 +664,105 @@ public class ClassUtils {
             }
         }
         return map;
+    }
+
+    public static boolean toBoolean(Object value) {
+    	if (value instanceof Boolean) {
+    		return (Boolean) value;
+    	}
+        return value == null ? false : toBoolean(String.valueOf(value));
+    }
+
+    public static char toChar(Object value) {
+    	if (value instanceof Character) {
+    		return (Character) value;
+    	}
+        return value == null ? '\0' : toChar(String.valueOf(value));
+    }
+
+    public static byte toByte(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).byteValue();
+    	}
+        return value == null ? 0 : toByte(String.valueOf(value));
+    }
+
+    public static short toShort(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).shortValue();
+    	}
+        return value == null ? 0 : toShort(String.valueOf(value));
+    }
+
+    public static int toInt(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).intValue();
+    	}
+        return value == null ? 0 : toInt(String.valueOf(value));
+    }
+
+    public static long toLong(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).longValue();
+    	}
+        return value == null ? 0 : toLong(String.valueOf(value));
+    }
+
+    public static float toFloat(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).floatValue();
+    	}
+        return value == null ? 0 : toFloat(String.valueOf(value));
+    }
+
+    public static double toDouble(Object value) {
+    	if (value instanceof Number) {
+    		return ((Number) value).doubleValue();
+    	}
+        return value == null ? 0 : toDouble(String.valueOf(value));
+    }
+
+    public static Class<?> toClass(Object value) {
+    	if (value instanceof Class) {
+    		return (Class<?>) value;
+    	}
+        return value == null ? null : toClass(String.valueOf(value));
+    }
+
+    public static boolean toBoolean(String value) {
+        return value == null || value.length() == 0 ? false : Boolean.parseBoolean(value);
+    }
+
+    public static char toChar(String value) {
+        return value == null || value.length() == 0 ? '\0' : value.charAt(0);
+    }
+
+    public static byte toByte(String value) {
+        return value == null || value.length() == 0 ? 0 : Byte.parseByte(value);
+    }
+
+    public static short toShort(String value) {
+        return value == null || value.length() == 0 ? 0 : Short.parseShort(value);
+    }
+
+    public static int toInt(String value) {
+        return value == null || value.length() == 0 ? 0 : Integer.parseInt(value);
+    }
+
+    public static long toLong(String value) {
+        return value == null || value.length() == 0 ? 0 : Long.parseLong(value);
+    }
+
+    public static float toFloat(String value) {
+        return value == null || value.length() == 0 ? 0 : Float.parseFloat(value);
+    }
+
+    public static double toDouble(String value) {
+        return value == null || value.length() == 0 ? 0 : Double.parseDouble(value);
+    }
+
+    public static Class<?> toClass(String value) {
+        return value == null || value.length() == 0 ? null : ClassUtils.forName(value);
     }
 
     public static boolean[] subArray(boolean[] array, IntegerSequence sequence) {

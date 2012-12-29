@@ -17,7 +17,7 @@
 package httl.spi;
 
 /**
- * Logger. (SPI, Singleton, ThreadSafe)
+ * Output Logger. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

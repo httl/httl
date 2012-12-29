@@ -130,6 +130,16 @@ public abstract class Engine {
     public abstract String getProperty(String key);
 
     /**
+     * Get config boolean value.
+     * 
+     * @see #getEngine()
+     * @param key - config key
+     * @param defaultValue - default boolean value
+     * @return config boolean value
+     */
+    public abstract <T> T getProperty(String key, Class<T> cls);
+
+    /**
      * Get config value.
      * 
      * @see #getEngine()

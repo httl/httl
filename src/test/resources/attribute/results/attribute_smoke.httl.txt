@@ -1,0 +1,27 @@
+<html>
+  <body>
+    <table>
+      <tr>
+        <td>Practical API Design</td>
+      </tr><tr>
+        <td>Effective Java</td>
+      </tr><tr>
+        <td>Java Concurrency in Practice</td>
+      </tr><tr>
+        <td>Java Programming Language</td>
+      </tr><tr>
+        <td>Domain-Driven Design</td>
+      </tr><tr>
+        <td>Agile Project Management with Scrum</td>
+      </tr><tr>
+        <td>J2EE Development without EJB</td>
+      </tr><tr>
+        <td>Design Patterns</td>
+      </tr><tr>
+        <td>Agile Software Development, Principles, Patterns, and Practices</td>
+      </tr><tr>
+        <td>Design by Contract, by Example</td>
+      </tr>
+    </table>
+  </body>
+</html>
