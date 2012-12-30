@@ -22,13 +22,13 @@ import httl.Resource;
 import httl.Template;
 import httl.spi.Logger;
 import httl.spi.Resolver;
-import httl.util.ConcurrentLinkedHashMap;
 import httl.util.EncodingProperties;
 import httl.util.LocaleUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -195,7 +195,7 @@ public class MessageMethod {
 		return key;
     }
 
-    private final ConcurrentMap<String, EncodingProperties> messageCache = new ConcurrentLinkedHashMap<String, EncodingProperties>(1000);
+    private final ConcurrentMap<String, EncodingProperties> messageCache = new ConcurrentHashMap<String, EncodingProperties>();
 
     private String findMessageByLocale(String key, Locale locale) {
     	String file = messageBasename + (locale == null ? "" : "_" + locale) + messageSuffix;

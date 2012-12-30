@@ -30,7 +30,6 @@ import java.util.AbstractMap;
 import java.util.AbstractQueue;
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -1444,21 +1443,76 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	}
 
 	/** An entry that allows updates to write through to the map. */
-	final class WriteThroughEntry extends SimpleEntry<K, V> {
+	final class WriteThroughEntry implements Entry<K, V> {
 		static final long serialVersionUID = 1;
 
+		private final K key;
+		
+		private V value;
+
 		WriteThroughEntry(Node node) {
-			super(node.key, node.getValue());
+			this.key = node.key;
+			this.value = node.getValue();
+		}
+		
+		public K getKey() {
+		    return key;
+		}
+
+		public V getValue() {
+		    return value;
 		}
 
 		public V setValue(V value) {
 			put(getKey(), value);
-			return super.setValue(value);
+			V oldValue = this.value;
+		    this.value = value;
+		    return oldValue;
 		}
 
-		Object writeReplace() {
-			return new SimpleEntry<K, V>(this);
+		private ConcurrentLinkedHashMap<K, V> getOuterType() {
+			return ConcurrentLinkedHashMap.this;
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((key == null) ? 0 : key.hashCode());
+			result = prime * result + ((value == null) ? 0 : value.hashCode());
+			return result;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			WriteThroughEntry other = (WriteThroughEntry) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (key == null) {
+				if (other.key != null)
+					return false;
+			} else if (!key.equals(other.key))
+				return false;
+			if (value == null) {
+				if (other.value != null)
+					return false;
+			} else if (!value.equals(other.value))
+				return false;
+			return true;
+		}
+
+		public String toString() {
+		    return key + "=" + value;
+		}
+
 	}
 
 	/** A weigher that enforces that the weight falls within a valid range. */
@@ -1750,7 +1804,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	}
 
 	static final class LinkedDeque<E extends Linked<E>> extends
-			AbstractCollection<E> implements Deque<E> {
+			AbstractCollection<E> implements Queue<E> {
 
 		// This class provides a doubly-linked list that is optimized for the
 		// virtual
