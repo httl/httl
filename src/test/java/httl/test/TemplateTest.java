@@ -137,6 +137,7 @@ public class TemplateTest extends TestCase {
 	            }
 	            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA);
 	            super.assertEquals(AdaptiveTemplate.class, template.getClass());
+	            super.assertEquals(Locale.CHINA, template.getLocale());
 	            String expected = IOUtils.readToString(new FileReader(result));
 	            UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 	            StringWriter actualWriter = new StringWriter();;

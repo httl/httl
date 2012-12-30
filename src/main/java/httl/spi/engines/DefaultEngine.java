@@ -156,6 +156,20 @@ public class DefaultEngine extends Engine {
 		assert(expression != null);
 		return expression;
     }
+    
+    private static String getTemplateCacheKey(String name, Locale locale, String encoding) {
+    	StringBuilder buf = new StringBuilder(name.length() + 20);
+    	buf.append(name);
+    	if (locale != null) {
+    		buf.append("_");
+    		buf.append(locale);
+    	}
+    	if (encoding != null) {
+    		buf.append("_");
+    		buf.append(encoding);
+    	}
+    	return buf.toString();
+    }
 
     /**
      * Get template.
@@ -182,20 +196,21 @@ public class DefaultEngine extends Engine {
         } else {
         	lastModified = Long.MIN_VALUE;
         }
-        VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(name);
+        String key = getTemplateCacheKey(name, locale, encoding);
+        VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(key);
         if (reference == null) {
         	if (cache instanceof ConcurrentMap) {
         		reference = new VolatileReference<Template>(); // quickly
-        		VolatileReference<Template> old = (VolatileReference<Template>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(name, reference);
+        		VolatileReference<Template> old = (VolatileReference<Template>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(key, reference);
         		if (old != null) { // duplicate
         			reference = old;
         		}
         	} else {
 	        	synchronized (cache) { // cache lock
-	        		reference = (VolatileReference<Template>) cache.get(name);
+	        		reference = (VolatileReference<Template>) cache.get(key);
 	                if (reference == null) { // double check
 	                	reference = new VolatileReference<Template>(); // quickly
-	                	cache.put(name, reference);
+	                	cache.put(key, reference);
 	                }
 				}
         	}
