@@ -218,4 +218,104 @@ public class CollectionUtils {
 		}
 	}
 
+	public static boolean[] copyOf(boolean[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		boolean[] cr = new boolean[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	public static char[] copyOf(char[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		char[] cr = new char[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	public static byte[] copyOf(byte[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		byte[] cr = new byte[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	public static short[] copyOf(short[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		short[] cr = new short[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	public static int[] copyOf(int[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		int[] cr = new int[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	public static long[] copyOf(long[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		long[] cr = new long[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	public static float[] copyOf(float[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		float[] cr = new float[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	public static double[] copyOf(double[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		double[] cr = new double[len];
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T[] copyOf(T[] cs, int len) {
+		if (cs == null) {
+			return null;
+		}
+		T[] cr = (T[]) Array.newInstance(cs.getClass().getComponentType(), len);
+		if (len > 0) {
+			System.arraycopy(cs, 0, cr, 0, len);
+		}
+		return cr;
+	}
+
 }

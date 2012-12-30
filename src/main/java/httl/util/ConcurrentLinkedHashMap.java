@@ -612,7 +612,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		}
 
 		public void run() {
-			weightedSize.lazySet(weightedSize.get() + weight);
+			weightedSize.set(weightedSize.get() + weight);
 
 			// ignore out-of-order write operations
 			if (node.get().isAlive()) {
@@ -655,7 +655,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		}
 
 		public void run() {
-			weightedSize.lazySet(weightedSize.get() + weightDifference);
+			weightedSize.set(weightedSize.get() + weightDifference);
 			super.run();
 			evict();
 		}
@@ -1280,7 +1280,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 				WeightedValue<V> current = get();
 				WeightedValue<V> dead = new WeightedValue<V>(current.value, 0);
 				if (compareAndSet(current, dead)) {
-					weightedSize.lazySet(weightedSize.get()
+					weightedSize.set(weightedSize.get()
 							- Math.abs(current.weight));
 					return;
 				}

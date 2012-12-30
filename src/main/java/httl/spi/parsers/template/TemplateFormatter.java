@@ -47,7 +47,7 @@ public class TemplateFormatter {
     private transient final String falseValue;
 
     private transient final Charset outputCharset;
-
+    
 	@SuppressWarnings("unchecked")
     public TemplateFormatter(Engine engine, Formatter<?> formatter) {
 		this.formatter = (Formatter<Object>) formatter;
@@ -266,7 +266,7 @@ public class TemplateFormatter {
     		return new byte[0];
     	if (outputCharset == null)
     		return value.getBytes();
-    	return value.getBytes(outputCharset);
+    	return StringUtils.toBytes(value, outputCharset);
     }
 
 }

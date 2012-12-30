@@ -26,6 +26,7 @@ import httl.spi.methods.cycles.IntArrayCycle;
 import httl.spi.methods.cycles.ListCycle;
 import httl.spi.methods.cycles.LongArrayCycle;
 import httl.spi.methods.cycles.ShortArrayCycle;
+import httl.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,7 +166,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
@@ -174,7 +175,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
@@ -183,7 +184,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
@@ -192,7 +193,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
@@ -201,7 +202,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
@@ -210,7 +211,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
@@ -219,7 +220,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
@@ -228,7 +229,7 @@ public class CollectionMethod {
 		if (array == null) {
 			return null;
 		}
-		array = Arrays.copyOf(array, array.length);
+		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
 	}
