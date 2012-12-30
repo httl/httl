@@ -45,10 +45,14 @@ public class WebEngine {
     private static final String TEMPLATE_SUFFIX = "template.suffix";
 
     private static final String OUTPUT_STREAM_KEY = "output.stream";
+    
+    private static final String LOCALIZED_KEY = "localized";
 
 	private static Engine ENGINE;
 
     private static boolean OUTPUT_STREAM;
+
+    private static boolean LOCALIZED;
 
 	private WebEngine() {}
 
@@ -106,6 +110,7 @@ public class WebEngine {
 			        	}
 			        }
 			        OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
+			        LOCALIZED = ENGINE.getProperty(LOCALIZED_KEY, false);
 				}
 			}
 		}
@@ -206,7 +211,7 @@ public class WebEngine {
 	        }
 		}
 		try {
-			Template template = ENGINE.getTemplate(path, request.getLocale());
+			Template template = LOCALIZED ? ENGINE.getTemplate(path, request.getLocale()) : ENGINE.getTemplate(path);
 			if (output == null) {
 				if (OUTPUT_STREAM) {
 					template.render(parameters, response.getOutputStream());

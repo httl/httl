@@ -179,10 +179,6 @@ public abstract class AbstractParser implements Parser {
 
     protected final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
 
-	private boolean templateLocalized;
-
-	private boolean messageLocalized;
-
     protected boolean isOutputStream;
 
     protected boolean isOutputWriter;
@@ -196,20 +192,6 @@ public abstract class AbstractParser implements Parser {
 	protected String outputEncoding;
 	
 	protected Logger logger;
-
-	/**
-	 * httl.properties: template.localized=true
-	 */
-	public void setTemplateLocalized(boolean templateLocalized) {
-		this.templateLocalized = templateLocalized;
-	}
-
-	/**
-	 * httl.properties: message.localized=true
-	 */
-	public void setMessageLocalized(boolean messageLocalized) {
-		this.messageLocalized = messageLocalized;
-	}
 
 	/**
 	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
@@ -424,7 +406,7 @@ public abstract class AbstractParser implements Parser {
     		buf.append("_");
     		buf.append(encoding);
     	}
-    	if (locale != null && (templateLocalized || messageLocalized)) {
+    	if (locale != null) {
     		buf.append("_");
     		buf.append(locale);
     	}
