@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class DefaultEngine extends Engine {
 
-    private final StringLoader stringLoader = new StringLoader();
+    private final StringLoader stringLoader;
 
     private Loader loader;
 
@@ -74,6 +74,10 @@ public class DefaultEngine extends Engine {
 
 	// The engine configuration instances
     private Map<String, Object> instances;
+    
+    public DefaultEngine() {
+    	this.stringLoader = new StringLoader(this);
+    }
 
 	/**
      * Get config path
@@ -294,9 +298,9 @@ public class DefaultEngine extends Engine {
      * @param name - template name
      * @param source - template source
      */
-	public void addResource(String name, String source) {
+	public void addResource(String name, Locale locale, String source) {
 		name = UrlUtils.cleanName(name);
-		stringLoader.add(name, source);
+		stringLoader.add(name, locale, source);
 	}
 
 	/**
@@ -305,9 +309,9 @@ public class DefaultEngine extends Engine {
      * @see #getEngine()
      * @param name - template name
      */
-	public void removeResource(String name) {
+	public void removeResource(String name, Locale locale) {
 		name = UrlUtils.cleanName(name);
-		stringLoader.remove(name);
+		stringLoader.remove(name, locale);
 	}
 
 	/**

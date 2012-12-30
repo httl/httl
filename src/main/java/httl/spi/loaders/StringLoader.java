@@ -16,8 +16,10 @@
  */
 package httl.spi.loaders;
 
+import httl.Engine;
 import httl.Resource;
 import httl.spi.Loader;
+import httl.util.LocaleUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,16 +37,39 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class StringLoader extends AbstractLoader {
+public class StringLoader implements Loader {
+	
+	private static final String STRING_ENCODING = "UTF-8";
     
     private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
     
-    public void add(String name, String source) {
-        templates.put(name, new StringResource(getEngine(), name, null, getEncoding(), System.currentTimeMillis(), source));
+    private Engine engine;
+    
+    public StringLoader() {
     }
 
+    public StringLoader(Engine engine) {
+    	this.engine = engine;
+    }
+    
+    public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
+
+	public void add(String name, String source) {
+        add(name, null, source);
+    }
+    
+    public void add(String name, Locale locale, String source) {
+        templates.put(getTemplateKey(name, locale), new StringResource(engine, name, locale, STRING_ENCODING, System.currentTimeMillis(), source));
+    }
+    
     public void remove(String name) {
-        templates.remove(name);
+    	remove(name, null);
+    }
+
+    public void remove(String name, Locale locale) {
+        templates.remove(getTemplateKey(name, locale));
     }
 
     public void clear() {
@@ -55,12 +80,8 @@ public class StringLoader extends AbstractLoader {
         return new ArrayList<String>(templates.keySet());
     }
 
-    protected List<String> doList(String directory, String suffix) throws IOException {
-        return new ArrayList<String>(templates.keySet());
-    }
-    
-    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
-    	StringResource resource = templates.get(path);
+	public Resource load(String name, Locale locale, String encoding) throws IOException {
+    	StringResource resource = templates.get(getTemplateKey(name, locale));
         if (resource == null) {
             throw new FileNotFoundException("Not found template " + name);
         }
@@ -68,11 +89,11 @@ public class StringLoader extends AbstractLoader {
     }
 
 	public boolean exists(String name, Locale locale) {
-        return templates.containsKey(name);
+        return templates.containsKey(getTemplateKey(name, locale));
     }
 
-	public boolean doExists(String name, Locale locale, String path) throws Exception {
-		return templates.containsKey(name);
-	}
-    
+    private String getTemplateKey(String name, Locale locale) {
+    	return LocaleUtils.appendLocale(name, locale);
+    }
+
 }

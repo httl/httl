@@ -48,9 +48,9 @@ public class DirectoryLocator implements Locator {
     }
 
 	public String root(String suffix) {
-		if (templateDirectory != null && templateSuffix != null && suffix.equals(templateSuffix)) {
+		if (templateDirectory != null && templateSuffix != null && templateSuffix.equals(suffix)) {
 			return templateDirectory;
-		} else if (messageDirectory != null && messageSuffix != null && suffix.equals(messageSuffix)) {
+		} else if (messageDirectory != null && messageSuffix != null && messageSuffix.equals(suffix)) {
 			return templateDirectory;
 		}
 		return null;

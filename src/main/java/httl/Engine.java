@@ -284,7 +284,19 @@ public abstract class Engine {
      * @param name - template name
      * @param source - template source
      */
-    public abstract void addResource(String name, String source);
+    public void addResource(String name, String source) {
+    	addResource(name, null, source);
+    }
+
+    /**
+     * Add literal template resource.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param locale - template locale
+     * @param source - template source
+     */
+    public abstract void addResource(String name, Locale locale, String source);
 
     /**
      * Remove literal template resource.
@@ -292,7 +304,18 @@ public abstract class Engine {
      * @see #getEngine()
      * @param name - template name
      */
-    public abstract void removeResource(String name);
+    public void removeResource(String name) {
+    	removeResource(name, null);
+    }
+
+    /**
+     * Remove literal template resource.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param locale - template locale
+     */
+    public abstract void removeResource(String name, Locale locale);
 
     /**
      * Get template.

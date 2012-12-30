@@ -37,6 +37,15 @@ public class LocaleUtils {
 		}
 	});
 	
+	public static String appendLocale(String name, Locale locale) {
+		if (locale == null) {
+			return name;
+		}
+		int i = name.lastIndexOf('.');
+    	return i < 0 ? name + "_" + locale.toString() :
+    		name.substring(0, i) + "_" + locale.toString() + name.substring(i);
+	}
+	
 	public static Locale getParentLocale(Locale locale) {
 		if (locale == null) {
 			return null;
