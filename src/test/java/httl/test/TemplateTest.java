@@ -99,7 +99,7 @@ public class TemplateTest extends TestCase {
         context.put("books2", books2);
         context.put("booklist2", Arrays.asList(books2));
         context.put("bookmap2", bookmap2);
-        String[] configs = new String[] { "httl.properties", "httl-javassist.properties", "httl-attribute.properties" };
+        String[] configs = new String[] { "httl.properties"/*, "httl-javassist.properties", "httl-attribute.properties"*/ };
         for (String config : configs) {
 	        System.out.println("========" + config + "========");
         	Engine engine = Engine.getEngine(config);
@@ -123,7 +123,7 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "message.httl".equals(file.getName())) {
+	            /*if (! "compile_expr.httl".equals(file.getName())) {
 	                continue;
 	            }*/
 	            System.out.println(file.getName());
@@ -147,7 +147,7 @@ public class TemplateTest extends TestCase {
 	            } catch (Exception e) {
 	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
 	            }
-	            super.assertEquals(file.getName(), expected.replace("\r\n", "\\r\\n\r\n").replace("\n", "\\n\n").replace("\t", "\\t\t"), actualWriter.getBuffer().toString().replace("\r\n", "\\r\\n\r\n").replace("\n", "\\n\n").replace("\t", "\\t\t"));
+	            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
 	            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
 	        }
         }

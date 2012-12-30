@@ -52,8 +52,6 @@ public class MessageMethod {
 	
 	private String messageSuffix;
 
-	private boolean messageLocalized;
-
 	private boolean reloadable;
 
     /**
@@ -82,13 +80,6 @@ public class MessageMethod {
 	 */
 	public void setMessageSuffix(String messageSuffix) {
 		this.messageSuffix = messageSuffix;
-	}
-
-	/**
-	 * httl.properties: message.localized=true
-	 */
-	public void setMessageLocalized(boolean messageLocalized) {
-		this.messageLocalized = messageLocalized;
 	}
 
 	/**
@@ -186,9 +177,7 @@ public class MessageMethod {
     	if (key == null || key.length() == 0 || messageBasename == null) {
     		return key;
     	}
-    	if (! messageLocalized) {
-    		locale = null;
-    	} else if (locale == null) {
+    	if (locale == null) {
     		locale = getLocale();
     	}
 		String value = findMessageByLocale(key, locale);
