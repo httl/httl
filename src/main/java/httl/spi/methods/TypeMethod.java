@@ -25,7 +25,6 @@ import httl.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;

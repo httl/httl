@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 /**
  * Deterministic Finite state Automata (DFA) Expression parser (Thread Safe)
  * 
- * @see httl.spi.translators.DfaTranslator
+ * @see httl.spi.translators.DefaultTranslator
  * 
  * @author Liang Fei (liangfei0201@gmail.com)
  */

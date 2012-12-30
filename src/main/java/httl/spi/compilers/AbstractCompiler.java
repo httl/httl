@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  * Abstract compiler. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.engines.DefaultEngine#setCompiler(Compiler)
+ * @see httl.spi.parsers.AbstractParser#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

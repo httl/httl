@@ -49,14 +49,6 @@ public class UrlUtils {
 
 	public static final char WINDOWS_PATH_SEPARATOR_CHAR = '\\';
 
-	/**
-	 * 关联路径
-	 * 
-	 * @param name
-	 * @param relativeName
-	 * @return
-	 * @throws MalformedURLException
-	 */
 	public static String relativeUrl(String name , String relativeName) throws MalformedURLException {
 		if (name == null || name.length() == 0 
 				|| relativeName == null || relativeName.length() == 0)
@@ -149,12 +141,6 @@ public class UrlUtils {
 		return name;
 	}
 
-	/**
-	 * 获取不包括文件名的路径
-	 *
-	 * @param url 路径
-	 * @return 去掉文件名的路径
-	 */
 	public static String getParentDirectory(String url, int parent) {
 		if (url != null) {
 			for (int i = url.length() - 1; i >= 0; i --) {

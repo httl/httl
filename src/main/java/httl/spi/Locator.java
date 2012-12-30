@@ -21,7 +21,7 @@ import java.util.Locale;
 /**
  * Resource Locator. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractLoader#setLocator(Locator)
+ * @see httl.spi.loaders.AbstractLoader#setLocator(Locator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

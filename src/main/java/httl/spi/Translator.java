@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Expression Translator. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTranslator(translator)
+ * @see httl.spi.parsers.AbstractParser#setTranslator(Translator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

@@ -28,7 +28,7 @@ import java.util.ListIterator;
 /**
  * StringSequence.
  * 
- * @see httl.Engine#addSequence(List)
+ * @see httl.spi.translators.DefaultTranslator#setSequences(String[])
  *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

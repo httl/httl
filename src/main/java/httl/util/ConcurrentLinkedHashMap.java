@@ -55,10 +55,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * page replacement algorithm that is used to evict an entry when the map has
  * exceeded its capacity. Unlike the <tt>Java Collections Framework</tt>, this
  * map does not have a publicly visible constructor and instances are created
- * through a {@link Builder}.
+ * through a Builder.
  * <p>
  * An entry is evicted from the map when the <tt>weighted capacity</tt> exceeds
- * its <tt>maximum weighted capacity</tt> threshold. A {@link EntryWeigher}
+ * its <tt>maximum weighted capacity</tt> threshold. A EntryWeigher
  * determines how many units of capacity that an entry consumes. The default
  * weigher assigns each value a weight of <tt>1</tt> to bound the map by the
  * total number of key-value pairs. A map that holds collections may choose to
@@ -67,7 +67,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * modifies its weight requires that an update operation is performed on the
  * map.
  * <p>
- * An {@link EvictionListener} may be supplied for notification when an entry is
+ * An EvictionListener may be supplied for notification when an entry is
  * evicted from the map. This listener is invoked on a caller's thread and will
  * not block other threads from operating on the map. An implementation should
  * be aware that the caller's thread will not expect long execution times or
