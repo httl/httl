@@ -18,12 +18,6 @@ package httl.util;
 
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -745,39 +739,5 @@ public class StringUtils {
 			return src.getBytes();
 		}
     }
-
-    public static byte[] toBytes(String src, Charset cs) {
-    	char[] ca = src.toCharArray();
-    	CharsetEncoder ce = cs.newEncoder();
-    	int en = scale(ca.length, ce.maxBytesPerChar());
-    	byte[] ba = new byte[en];
-    	ByteBuffer bb = ByteBuffer.wrap(ba);
-    	CharBuffer cb = CharBuffer.wrap(ca);
-		try {
-			CoderResult cr = ce.encode(cb, bb, true);
-			if (!cr.isUnderflow())
-				cr.throwException();
-			cr = ce.flush(bb);
-			if (!cr.isUnderflow())
-				cr.throwException();
-		} catch (CharacterCodingException x) {
-			throw new Error(x);
-		}
-		return safeTrim(ba, bb.position(), cs);
-    }
-
-    private static int scale(int len, float expansionFactor) {
-    	return (int) (len * (double)expansionFactor);
-    }
-
-	private static byte[] safeTrim(byte[] ba, int len, Charset cs) {
-		if (len == ba.length) {
-			return ba;
-		} else {
-			byte[] br = new byte[len];
-			System.arraycopy(ba, 0, br, 0, len);
-			return br;
-		}
-	}
 
 }

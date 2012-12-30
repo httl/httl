@@ -23,6 +23,7 @@ import httl.util.LocaleUtils;
 import httl.util.NumberUtils;
 import httl.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -45,7 +46,7 @@ public class TypeMethod {
 
     private String numberFormat;
 
-    private Charset outputCharset;
+    private String outputEncoding;
 
 	private String[] importPackages;
 
@@ -81,7 +82,7 @@ public class TypeMethod {
 	 * httl.properties: output.encoding=UTF-8
 	 */
     public void setOutputEncoding(String outputEncoding) {
-		this.outputCharset = Charset.forName(outputEncoding);
+		this.outputEncoding = outputEncoding;
 	}
 
     /**
@@ -272,8 +273,12 @@ public class TypeMethod {
     }
 
     public String toString(byte[] value) {
-    	return value == null ? null : (outputCharset == null 
-    			? new String(value) : new String(value, outputCharset));
+    	try {
+			return value == null ? null : (outputEncoding == null 
+					? new String(value) : new String(value, outputEncoding));
+		} catch (UnsupportedEncodingException e) {
+			return new String(value);
+		}
     }
 
     public String toString(Object value) {

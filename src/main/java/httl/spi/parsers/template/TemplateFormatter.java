@@ -5,7 +5,7 @@ import httl.spi.Formatter;
 import httl.spi.formatters.MultiFormatter;
 import httl.util.StringUtils;
 
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 public class TemplateFormatter {
@@ -46,7 +46,7 @@ public class TemplateFormatter {
 
     private transient final String falseValue;
 
-    private transient final Charset outputCharset;
+    private transient final String outputEncoding;
     
 	@SuppressWarnings("unchecked")
     public TemplateFormatter(Engine engine, Formatter<?> formatter) {
@@ -78,8 +78,7 @@ public class TemplateFormatter {
 		this.nullValue = engine.getProperty(NULL_VALUE, "");
 		this.trueValue = engine.getProperty(TRUE_VALUE, "true");
 		this.falseValue = engine.getProperty(FALSE_VALUE, "false");
-		String outputEncoding = engine.getProperty(OUTPUT_ENCODING);
-		this.outputCharset = outputEncoding == null || outputEncoding.length() == 0 ? null : Charset.forName(outputEncoding);
+		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -228,9 +227,13 @@ public class TemplateFormatter {
     		return nullValue;
     	if (value.length == 0)
     		return "";
-    	if (outputCharset == null)
+    	if (outputEncoding == null)
     		return new String(value);
-    	return new String(value, outputCharset);
+    	try {
+			return new String(value, outputEncoding);
+		} catch (UnsupportedEncodingException e) {
+			return new String(value);
+		}
     }
 
     public String format(String value) {
@@ -264,9 +267,13 @@ public class TemplateFormatter {
     		return null;
     	if (value.length() == 0)
     		return new byte[0];
-    	if (outputCharset == null)
+    	if (outputEncoding == null)
     		return value.getBytes();
-    	return StringUtils.toBytes(value, outputCharset);
+    	try {
+			return value.getBytes(outputEncoding);
+		} catch (UnsupportedEncodingException e) {
+			return value.getBytes();
+		}
     }
 
 }
