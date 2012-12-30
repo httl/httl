@@ -20,6 +20,7 @@ import httl.Resource;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Resource Loader. (SPI, Singleton, ThreadSafe)
@@ -31,27 +32,30 @@ import java.util.List;
 public interface Loader {
 
     /**
-     * list names.
+     * list template names.
+     * @param suffix TODO
      * 
-     * @return names.
+     * @return template names.
      */
-    List<String> list() throws IOException;
+    List<String> list(String suffix) throws IOException;
 
     /**
-     * exists resource.
-     * 
-     * @param name
-     * @return exists
-     */
-    boolean exists(String name);
-
-    /**
-     * Load template resource.
+     * is exists template resource.
      * 
      * @param name - template name
+     * @param locale - template locale
+     * @return exists
+     */
+    boolean exists(String name, Locale locale);
+
+    /**
+     * load template resource.
+     * 
+     * @param name - template name
+     * @param locale - template locale
      * @param encoding - template encoding
      * @return template resource
      */
-    Resource load(String name, String encoding) throws IOException;
+    Resource load(String name, Locale locale, String encoding) throws IOException;
 
 }

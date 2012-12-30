@@ -21,12 +21,13 @@ import httl.Engine;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.jar.JarFile;
 
 /**
  * JarResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.JarLoader#load(String, String)
+ * @see httl.spi.loaders.JarLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -36,8 +37,8 @@ public class JarResource extends InputStreamResource {
 
 	private final File file;
 
-	public JarResource(Engine engine, String name, String encoding, File file) {
-		super(engine, name, encoding);
+	public JarResource(Engine engine, String name, Locale locale, String encoding, File file) {
+		super(engine, name, locale, encoding);
 		this.file = file;
 	}
 

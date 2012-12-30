@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * UrlLoader. (SPI, Singleton, ThreadSafe)
@@ -34,15 +35,15 @@ import java.util.List;
  */
 public class UrlLoader extends AbstractLoader {
     
-    public List<String> doList(String directory, String[] suffixes) throws IOException {
-        return UrlUtils.listUrl(new URL(directory), suffixes);
+    public List<String> doList(String directory, String suffix) throws IOException {
+        return UrlUtils.listUrl(new URL(directory), suffix);
     }
     
-    protected Resource doLoad(String name, String encoding, String path) throws IOException {
-        return new UrlResource(getEngine(), name, encoding, path);
+    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+        return new UrlResource(getEngine(), name, locale, encoding, path);
     }
 
-	public boolean doExists(String name, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws Exception {
 		InputStream in = new URL(path).openStream();
 		try {
 			return in != null;

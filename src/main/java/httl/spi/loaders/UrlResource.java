@@ -21,11 +21,12 @@ import httl.Engine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * UrlResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.UrlLoader#load(String, String)
+ * @see httl.spi.loaders.UrlLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -35,8 +36,8 @@ public class UrlResource extends InputStreamResource {
 
     private final URL url;
     
-    public UrlResource(Engine engine, String name, String encoding, String path) throws IOException {
-        super(engine, name, encoding);
+    public UrlResource(Engine engine, String name, Locale locale, String encoding, String path) throws IOException {
+        super(engine, name, locale, encoding);
         this.url = new URL(path);
     }
 

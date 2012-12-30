@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 
 import httl.Engine;
@@ -26,6 +27,10 @@ public class ResourceTemplate implements Template {
 
 	public String getEncoding() {
 		return resource.getEncoding();
+	}
+
+	public Locale getLocale() {
+		return resource.getLocale();
 	}
 
 	public long getLastModified() {

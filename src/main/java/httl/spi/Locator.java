@@ -14,37 +14,33 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.loaders;
+package httl.spi;
 
-import httl.Resource;
-import httl.spi.Loader;
-import httl.util.UrlUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 /**
- * FileLoader. (SPI, Singleton, ThreadSafe)
+ * Resource Locator. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
+ * @see httl.spi.parsers.AbstractLoader#setLocator(Locator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class FileLoader extends AbstractLoader {
+public interface Locator {
 
-    public List<String> doList(String directory, String suffix) throws IOException {
-        File file = new File(directory);
-        return UrlUtils.listFile(file, suffix);
-    }
-    
-    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
-        return new FileResource(getEngine(), name, locale, encoding, path);
-    }
+	/**
+	 * relocate root.
+	 * 
+	 * @param suffix resource suffix
+	 * @return relocated root
+	 */
+	String root(String suffix);
 
-	public boolean doExists(String name, Locale locale, String path) throws Exception {
-		return new File(path).exists();
-	}
+	/**
+	 * relocate path.
+	 * 
+	 * @param path origin name
+	 * @return relocated name
+	 */
+	String relocate(String name, Locale locale);
 
 }

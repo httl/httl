@@ -23,11 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Locale;
 
 /**
  * StringResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.StringLoader#load(String, String)
+ * @see httl.spi.loaders.StringLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -37,13 +38,13 @@ public class StringResource extends AbstractResource {
     
     private final String source;
     
-    public StringResource(Engine engine, String name, String encoding, String source) {
-        super(engine, name, encoding);
+    public StringResource(Engine engine, String name, Locale locale, String encoding, String source) {
+        super(engine, name, locale, encoding);
         this.source = source;
     }
     
-    public StringResource(Engine engine, String name, String encoding, long lastModified, String source) {
-        super(engine, name, encoding, lastModified);
+    public StringResource(Engine engine, String name, Locale locale, String encoding, long lastModified, String source) {
+        super(engine, name, locale, encoding, lastModified);
         this.source = source;
     }
 

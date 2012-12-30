@@ -21,12 +21,13 @@ import httl.Engine;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.zip.ZipFile;
 
 /**
  * ZipResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.ZipLoader#load(String, String)
+ * @see httl.spi.loaders.ZipLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -36,8 +37,8 @@ public class ZipResource extends InputStreamResource {
 
 	private final File file;
 
-	public ZipResource(Engine engine, String name, String encoding, File file) {
-		super(engine, name, encoding);
+	public ZipResource(Engine engine, String name, Locale locale, String encoding, File file) {
+		super(engine, name, locale, encoding);
 		this.file = file;
 	}
 

@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * InputStreamResource. (SPI, Prototype, ThreadSafe)
@@ -45,8 +46,8 @@ public abstract class InputStreamResource extends AbstractResource {
 
     private static final String JAR_FILE_SEPARATOR = "!/";
     
-    public InputStreamResource(Engine engine, String name, String encoding){
-        super(engine, name, encoding);
+    public InputStreamResource(Engine engine, String name, Locale locale, String encoding){
+        super(engine, name, locale, encoding);
     }
 
     public Reader getReader() throws IOException {

@@ -22,6 +22,7 @@ import httl.util.UrlUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -62,15 +63,15 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
         SERVLET_CONTEXT = null;
     }
 
-    public List<String> doList(String directory, String[] suffixes) throws IOException {
-        return UrlUtils.listUrl(getAndCheckServletContext().getResource(directory), suffixes);
+    public List<String> doList(String directory, String suffix) throws IOException {
+        return UrlUtils.listUrl(getAndCheckServletContext().getResource(directory), suffix);
     }
 
-    protected Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new ServletResource(getEngine(), name, encoding, path, getAndCheckServletContext());
+    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+		return new ServletResource(getEngine(), name, locale, encoding, path, getAndCheckServletContext());
 	}
 
-	public boolean doExists(String name, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws Exception {
 		return SERVLET_CONTEXT != null && SERVLET_CONTEXT.getResource(path) != null;
 	}
 

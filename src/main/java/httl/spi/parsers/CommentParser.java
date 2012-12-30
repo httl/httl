@@ -97,7 +97,7 @@ public class CommentParser extends AbstractParser {
                         if (param != null && param.length() > 0) {
                             es = getDiretive(varName, param) + es;
                         }
-                        macros.put(var, parseClass(new StringResource(engine, key, resource.getEncoding(), resource.getLastModified(), es), stream, macroParameterStart));
+                        macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), stream, macroParameterStart));
                         Class<?> cls = types.get(var);
                         if (cls != null && ! cls.equals(Template.class)) {
                             throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macroParameterStart);

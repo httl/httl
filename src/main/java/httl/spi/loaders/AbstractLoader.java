@@ -19,7 +19,9 @@ package httl.spi.loaders;
 import httl.Engine;
 import httl.Resource;
 import httl.spi.Loader;
+import httl.spi.Locator;
 import httl.spi.Logger;
+import httl.util.LocaleUtils;
 import httl.util.UrlUtils;
 
 import java.io.File;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * AbstractLoader. (SPI, Singleton, ThreadSafe)
@@ -40,12 +43,10 @@ public abstract class AbstractLoader implements Loader {
 	private Engine engine;
 
 	private Logger logger;
+	
+	private Locator locator;
     
 	private String encoding;
-
-    private String directory;
-
-    private String suffix;
 
 	private boolean reloadable;
 
@@ -66,20 +67,11 @@ public abstract class AbstractLoader implements Loader {
 	}
 
     /**
-	 * httl.properties: template.directory=/META-INF/templates
+	 * httl.properties: locators=httl.spi.locators.TemplateLocator
 	 */
-    public void setTemplateDirectory(String directory) {
-    	if (directory != null && directory.length() > 0) {
-            this.directory = UrlUtils.cleanDirectory(directory);
-        }
-    }
-
-    /**
-	 * httl.properties: template.suffix=.httl
-	 */
-    public void setTemplateSuffix(String suffix) {
-    	this.suffix = suffix;
-    }
+	public void setLocator(Locator locator) {
+		this.locator = locator;
+	}
 
     /**
 	 * httl.properties: reloadable=true
@@ -110,31 +102,16 @@ public abstract class AbstractLoader implements Loader {
         return encoding;
     }
 
-    protected String getDirectory() {
-        return directory;
+    protected String toPath(String name, Locale locale) {
+    	return locator == null ? name : locator.relocate(name, locale);
     }
 
-    protected String getSuffix() {
-        return suffix;
-    }
-
-    protected String toPath(String name) {
-    	if (name == null || name.length() == 0) {
-    		throw new IllegalArgumentException("resource name == null");
-    	}
-    	if (directory == null || (suffix != null && ! name.endsWith(suffix))) {
-			return name;
-		} else {
-			return directory + name;
-		}
-    }
-
-    public List<String> list() throws IOException {
-        String directory = getDirectory();
+    public List<String> list(String suffix) throws IOException {
+        String directory = locator.root(suffix);
         if (directory == null || directory.length() == 0) {
-            return new ArrayList<String>(0);
+        	directory = "/";
         }
-        List<String> list = doList(directory, new String[] { suffix == null ? "" : suffix });
+        List<String> list = doList(directory, suffix);
         if (list == null || list.size() == 0) {
             return new ArrayList<String>(0);
         } else {
@@ -148,30 +125,48 @@ public abstract class AbstractLoader implements Loader {
         }
     }
 
-    protected abstract List<String> doList(String directory, String[] suffixes) throws IOException;
+	public boolean exists(String name, Locale locale) {
+		Locale cur = locale;
+        while (cur != null) {
+        	if (_exists(name, locale, toPath(name, cur))) {
+        		return true;
+        	}
+        	cur = LocaleUtils.getParentLocale(cur);
+        }
+        return _exists(name, locale, toPath(name, null));
+	}
 
-	public boolean exists(String name) {
+	private boolean _exists(String name, Locale locale, String path) {
 		try {
-			return doExists(name, toPath(name));
+			return doExists(name, locale, path);
 		} catch (Exception e) {
 			return false;
 		}
 	}
 
-	public abstract boolean doExists(String name, String path) throws Exception;
-
-    public Resource load(String name, String encoding) throws IOException {
+    public Resource load(String name, Locale locale, String encoding) throws IOException {
         if (encoding == null || encoding.length() == 0) {
             encoding = this.encoding;
         }
-        Resource resource = doLoad(name, encoding, toPath(name));
-        if (first) {
+        Locale cur = locale;
+        String path = toPath(name, cur);
+        while (cur != null && ! _exists(name, locale, path)) {
+        	cur = LocaleUtils.getParentLocale(cur);
+        	path = toPath(name, cur);
+        }
+        Resource resource = doLoad(name, locale, encoding, path);
+        logResourceDirectory(resource);
+        return resource;
+    }
+    
+    private void logResourceDirectory(Resource resource) {
+    	if (first) {
         	first = false;
         	if (logger != null && logger.isInfoEnabled()
         			&& resource instanceof InputStreamResource) {
 	        	File file = ((InputStreamResource) resource).getFile();
 	    		if (file != null && file.exists()) {
-	    			String uri = name.replace('\\', '/');
+	    			String uri = resource.getName().replace('\\', '/');
 		    		String abs = file.getAbsolutePath().replace('\\', '/');
 		    		if (abs.endsWith(uri)) {
 		    			abs = abs.substring(0, abs.length() - uri.length());
@@ -187,9 +182,12 @@ public abstract class AbstractLoader implements Loader {
 	    		}
         	}
         }
-        return resource;
     }
-    
-    protected abstract Resource doLoad(String name, String encoding, String path) throws IOException;
+
+    protected abstract List<String> doList(String directory, String suffix) throws IOException;
+
+	protected abstract boolean doExists(String name, Locale locale, String path) throws Exception;
+
+    protected abstract Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException;
 
 }

@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
@@ -167,16 +168,16 @@ public class DefaultEngine extends Engine {
      * @throws ParseException - If the template cannot be parsed
      */
     @SuppressWarnings("unchecked")
-	public Template getTemplate(String name, String encoding) throws IOException, ParseException {
+	public Template getTemplate(String name, Locale locale, String encoding) throws IOException, ParseException {
 		name = UrlUtils.cleanName(name);
 		Map<Object, Object> cache = this.templateCache; // safe copy reference
 		if (cache == null) {
-		    return parseTemplate(name, encoding, null);
+		    return parseTemplate(name, locale, encoding, null);
 		}
 		Resource resource = null;
 		long lastModified;
         if (reloadable) {
-        	resource = loadResource(name, encoding);
+        	resource = loadResource(name, locale, encoding);
         	lastModified = resource.getLastModified();
         } else {
         	lastModified = Long.MIN_VALUE;
@@ -205,7 +206,7 @@ public class DefaultEngine extends Engine {
 			synchronized (reference) { // reference lock
 				template = (Template) reference.get();
 				if (template == null || template.getLastModified() < lastModified) { // double check
-					template = parseTemplate(name, encoding, resource); // slowly
+					template = parseTemplate(name, locale, encoding, resource); // slowly
 					reference.set(template);
 				}
 			}
@@ -215,9 +216,9 @@ public class DefaultEngine extends Engine {
 	}
 
     // Parse the template. (No cache)
-    private Template parseTemplate(String name, String encoding, Resource resource) throws IOException, ParseException {
+    private Template parseTemplate(String name, Locale locale, String encoding, Resource resource) throws IOException, ParseException {
     	if (resource == null) {
-    		resource = loadResource(name, encoding);
+    		resource = loadResource(name, locale, encoding);
     	}
         try {
             return parser.parse(resource);
@@ -247,23 +248,23 @@ public class DefaultEngine extends Engine {
      * 
      * @see #getEngine()
      * @param name - template name
-     * @param encoding - template encoding
+	 * @param encoding - template encoding
      * @return template resource
      * @throws IOException - If an I/O error occurs
      * @throws ParseException
      */
-    public Resource getResource(String name, String encoding) throws IOException {
+    public Resource getResource(String name, Locale locale, String encoding) throws IOException {
     	name = UrlUtils.cleanName(name);
-    	return loadResource(name, encoding);
+    	return loadResource(name, locale, encoding);
     }
 
     // Load the resource. (No clean)
-    private Resource loadResource(String name, String encoding) throws IOException {
+    private Resource loadResource(String name, Locale locale, String encoding) throws IOException {
     	Resource resource;
-    	if (stringLoader.exists(name)) {
-    		resource = stringLoader.load(name, encoding);
+    	if (stringLoader.exists(name, locale)) {
+    		resource = stringLoader.load(name, locale, encoding);
     	} else {
-    		resource = loader.load(name, encoding);
+    		resource = loader.load(name, locale, encoding);
     	}
     	if (resource == null) {
     		throw new FileNotFoundException("Not found resource " + name);
@@ -301,9 +302,9 @@ public class DefaultEngine extends Engine {
      * @param name - template name
      * @return exists
      */
-    public boolean hasResource(String name) {
+    public boolean hasResource(String name, Locale locale) {
     	name = UrlUtils.cleanName(name);
-    	return stringLoader.exists(name) || loader.exists(name);
+    	return stringLoader.exists(name, locale) || loader.exists(name, locale);
     }
 
     /**
@@ -318,14 +319,23 @@ public class DefaultEngine extends Engine {
             }
     	}
     }
-    
+
+    private String templateSuffix;
+
+    /**
+	 * httl.properties: template.suffix=.httl
+	 */
+    public void setTemplateSuffix(String suffix) {
+    	this.templateSuffix = suffix;
+    }
+
     /**
      * On inited.
      */
     public void inited() {
     	if (precompiled) {
             try {
-                List<String> list = loader.list();
+                List<String> list = loader.list(templateSuffix);
                 for (String name : list) {
                     try {
                         getTemplate(name);

@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,7 +40,7 @@ public class StringLoader extends AbstractLoader {
     private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
     
     public void add(String name, String source) {
-        templates.put(name, new StringResource(getEngine(), name, getEncoding(), System.currentTimeMillis(), source));
+        templates.put(name, new StringResource(getEngine(), name, null, getEncoding(), System.currentTimeMillis(), source));
     }
 
     public void remove(String name) {
@@ -50,15 +51,15 @@ public class StringLoader extends AbstractLoader {
         templates.clear();
     }
 
-    public List<String> list() throws IOException {
+    public List<String> list(String suffix) throws IOException {
         return new ArrayList<String>(templates.keySet());
     }
 
-    protected List<String> doList(String directory, String[] suffixes) throws IOException {
+    protected List<String> doList(String directory, String suffix) throws IOException {
         return new ArrayList<String>(templates.keySet());
     }
     
-    protected Resource doLoad(String name, String encoding, String path) throws IOException {
+    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
     	StringResource resource = templates.get(path);
         if (resource == null) {
             throw new FileNotFoundException("Not found template " + name);
@@ -66,11 +67,11 @@ public class StringLoader extends AbstractLoader {
         return resource;
     }
 
-	public boolean exists(String name) {
+	public boolean exists(String name, Locale locale) {
         return templates.containsKey(name);
     }
 
-	public boolean doExists(String name, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws Exception {
 		return templates.containsKey(name);
 	}
     

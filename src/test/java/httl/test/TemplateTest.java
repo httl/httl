@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -103,7 +104,8 @@ public class TemplateTest extends TestCase {
 	        System.out.println("========" + config + "========");
         	Engine engine = Engine.getEngine(config);
         	Loader loader = engine.getProperty("loader", Loader.class);
-        	List<String> list = loader.list();
+        	String suffix = engine.getProperty("template.suffix");
+        	List<String> list = loader.list(suffix);
         	assertTrue(list.size() > 0);
         	String dir = engine.getProperty("template.directory");
         	if (dir == null) {
@@ -121,9 +123,9 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            //if (! "compile_expr.httl".equals(file.getName())) {
-	            //    continue;
-	            //}
+	            /*if (! "message.httl".equals(file.getName())) {
+	                continue;
+	            }*/
 	            System.out.println(file.getName());
 	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
 	            if (url == null) {
@@ -133,7 +135,7 @@ public class TemplateTest extends TestCase {
 	            if (! result.exists()) {
 	                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
 	            }
-	            Template template = engine.getTemplate("/templates/" + file.getName());
+	            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA);
 	            super.assertEquals(AdaptiveTemplate.class, template.getClass());
 	            String expected = IOUtils.readToString(new FileReader(result));
 	            UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();

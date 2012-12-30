@@ -22,11 +22,12 @@ import httl.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * AbstractResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.AbstractLoader#load(String, String)
+ * @see httl.spi.loaders.AbstractLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -40,16 +41,19 @@ public abstract class AbstractResource implements Resource, Serializable {
     
     private final String encoding;
 
+    private final Locale locale;
+
 	private final long lastModified;
 
-    public AbstractResource(Engine engine, String name, String encoding) {
-    	this(engine, name, encoding, -1);
+    public AbstractResource(Engine engine, String name, Locale locale, String encoding) {
+    	this(engine, name, locale, encoding, -1);
     }
 
-    public AbstractResource(Engine engine, String name, String encoding, long lastModified) {
+    public AbstractResource(Engine engine, String name, Locale locale, String encoding, long lastModified) {
         this.engine = engine;
         this.name = name;
         this.encoding = encoding;
+        this.locale = locale;
         this.lastModified = lastModified;
     }
 
@@ -64,6 +68,10 @@ public abstract class AbstractResource implements Resource, Serializable {
     public String getEncoding() {
         return encoding;
     }
+
+	public Locale getLocale() {
+		return locale;
+	}
 
     public long getLastModified() {
         return lastModified;

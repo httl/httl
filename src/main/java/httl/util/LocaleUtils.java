@@ -36,6 +36,18 @@ public class LocaleUtils {
 			return size() > LOCALE_CACHE_SIZE;
 		}
 	});
+	
+	public static Locale getParentLocale(Locale locale) {
+		if (locale == null) {
+			return null;
+		}
+		String name = locale.toString();
+		int i = name.lastIndexOf('_');
+		if (i > 0) {
+			return getLocale(name.substring(0, i));
+		}
+		return null;
+	}
 
 	public static Locale getLocale(String name) {
 		if (name == null || name.length() == 0) {

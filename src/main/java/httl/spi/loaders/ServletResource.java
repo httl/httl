@@ -21,13 +21,14 @@ import httl.Engine;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
 /**
  * ServletResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.ServletLoader#load(String, String)
+ * @see httl.spi.loaders.ServletLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -39,8 +40,8 @@ public class ServletResource extends InputStreamResource {
     
     private final transient ServletContext servletContext;
 
-    public ServletResource(Engine engine, String name, String encoding, String path, ServletContext servletContext) {
-        super(engine, name, encoding);
+    public ServletResource(Engine engine, String name, Locale locale, String encoding, String path, ServletContext servletContext) {
+        super(engine, name, locale, encoding);
         this.path = path;
         this.servletContext = servletContext;
     }

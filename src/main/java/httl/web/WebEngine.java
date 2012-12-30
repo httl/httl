@@ -23,6 +23,7 @@ import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.RequestResolver;
 import httl.util.WrappedMap;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -205,7 +206,7 @@ public class WebEngine {
 	        }
 		}
 		try {
-			Template template = ENGINE.getTemplate(path);
+			Template template = ENGINE.getTemplate(path, request.getLocale());
 			if (output == null) {
 				if (OUTPUT_STREAM) {
 					template.render(parameters, response.getOutputStream());
@@ -220,6 +221,8 @@ public class WebEngine {
 				}
 			}
 			response.flushBuffer();
+		} catch (FileNotFoundException e) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
 		} finally {
 			if (unresolved) {
 				RequestResolver.removeRequest();

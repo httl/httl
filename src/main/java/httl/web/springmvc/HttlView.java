@@ -42,7 +42,7 @@ public class HttlView extends AbstractTemplateView {
 
 	@Override
 	public boolean checkResource(Locale locale) throws Exception {
-		return WebEngine.getEngine().hasResource(getUrl());
+		return WebEngine.getEngine().hasResource(getUrl(), locale);
 	}
 
 }

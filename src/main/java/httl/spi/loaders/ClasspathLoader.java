@@ -22,6 +22,7 @@ import httl.util.UrlUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * ClasspathLoader. (SPI, Singleton, ThreadSafe)
@@ -32,15 +33,15 @@ import java.util.List;
  */
 public class ClasspathLoader extends AbstractLoader {
 
-	public List<String> doList(String directory, String[] suffixes) throws IOException {
-        return UrlUtils.listUrl(Thread.currentThread().getContextClassLoader().getResource(cleanPath(directory)), suffixes);
+	public List<String> doList(String directory, String suffix) throws IOException {
+        return UrlUtils.listUrl(Thread.currentThread().getContextClassLoader().getResource(cleanPath(directory)), suffix);
     }
     
-    protected Resource doLoad(String name, String encoding, String path) throws IOException {
-		return new ClasspathResource(getEngine(), name, encoding, cleanPath(path));
+    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+		return new ClasspathResource(getEngine(), name, encoding, cleanPath(path), locale);
 	}
 
-	public boolean doExists(String name, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws Exception {
 		return Thread.currentThread().getContextClassLoader().getResource(cleanPath(path)) != null;
 	}
 	

@@ -22,6 +22,7 @@ import httl.util.VolatileReference;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -211,7 +212,7 @@ public abstract class Engine {
      * @throws ParseException
      */
     public Resource getResource(String name) throws IOException {
-        return getResource(name, null);
+        return getResource(name, null, null);
     }
 
     /**
@@ -224,7 +225,57 @@ public abstract class Engine {
      * @throws IOException - If an I/O error occurs
      * @throws ParseException
      */
-    public abstract Resource getResource(String name, String encoding) throws IOException;
+    public Resource getResource(String name, String encoding) throws IOException {
+        return getResource(name, null, encoding);
+    }
+
+    /**
+     * Get template resource.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param locale - template locale
+     * @return template resource
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException
+     */
+    public Resource getResource(String name, Locale locale) throws IOException {
+        return getResource(name, locale, null);
+    }
+
+    /**
+     * Get template resource.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param locale - template locale
+     * @param encoding - template encoding
+     * @return template resource
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException
+     */
+    public abstract Resource getResource(String name, Locale locale, String encoding) throws IOException;
+
+    /**
+     * Tests whether the resource denoted by this abstract pathname exists.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @return exists
+     */
+    public boolean hasResource(String name) {
+    	return hasResource(name, null);
+    }
+
+    /**
+     * Tests whether the resource denoted by this abstract pathname exists.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param locale - template locale
+     * @return exists
+     */
+    public abstract boolean hasResource(String name, Locale locale);
 
     /**
      * Add literal template resource.
@@ -244,15 +295,6 @@ public abstract class Engine {
     public abstract void removeResource(String name);
 
     /**
-     * Tests whether the resource denoted by this abstract pathname exists.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @return exists
-     */
-    public abstract boolean hasResource(String name);
-
-    /**
      * Get template.
      * 
      * @see #getEngine()
@@ -262,7 +304,7 @@ public abstract class Engine {
      * @throws ParseException - If the template cannot be parsed
      */
     public Template getTemplate(String name) throws IOException, ParseException {
-        return getTemplate(name, null);
+        return getTemplate(name, null, null);
     }
 
     /**
@@ -275,6 +317,35 @@ public abstract class Engine {
      * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed
      */
-    public abstract Template getTemplate(String name, String encoding) throws IOException, ParseException;
+    public Template getTemplate(String name, String encoding) throws IOException, ParseException {
+        return getTemplate(name, null, encoding);
+    }
+
+    /**
+     * Get template.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param locale - template locale
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
+     */
+    public Template getTemplate(String name, Locale locale) throws IOException, ParseException {
+        return getTemplate(name, locale, null);
+    }
+
+    /**
+     * Get template.
+     * 
+     * @see #getEngine()
+     * @param name - template name
+     * @param locale - template locale
+     * @param encoding - template encoding
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
+     */
+    public abstract Template getTemplate(String name, Locale locale, String encoding) throws IOException, ParseException;
 
 }

@@ -21,11 +21,12 @@ import httl.Engine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * ClasspathResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.ClasspathLoader#load(String, String)
+ * @see httl.spi.loaders.ClasspathLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -35,8 +36,8 @@ public class ClasspathResource extends InputStreamResource {
     
     private final String path;
     
-    public ClasspathResource(Engine engine, String name, String encoding, String path) {
-        super(engine, name, encoding);
+    public ClasspathResource(Engine engine, String name, String encoding, String path, Locale locale) {
+        super(engine, name, locale, encoding);
         this.path = path;
     }
 

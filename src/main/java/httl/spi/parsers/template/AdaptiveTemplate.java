@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -60,6 +61,10 @@ public class AdaptiveTemplate implements Template, Serializable {
 
 	public String getEncoding() {
 		return writerTemplate.getEncoding();
+	}
+
+	public Locale getLocale() {
+		return writerTemplate.getLocale();
 	}
 
 	public long getLastModified() {

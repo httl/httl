@@ -19,13 +19,14 @@ package httl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Locale;
 
 /**
  * Resource. (API, Prototype, ThreadSafe)
  * 
  * @see httl.Engine#getResource(String)
  * @see httl.Engine#getResource(String, String)
- * @see httl.spi.Loader#load(String, String)
+ * @see httl.spi.Loader#load(String, Locale, String)
  * @see httl.spi.Parser#parse(Resource)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
@@ -45,6 +46,13 @@ public interface Resource {
      * @return encoding
      */
     String getEncoding();
+
+    /**
+     * Get the the template locale.
+     * 
+     * @return locale
+     */
+    Locale getLocale();
 
     /**
      * Get the the template last modified time.

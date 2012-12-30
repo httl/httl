@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * MultiLoader. (SPI, Singleton, ThreadSafe)
@@ -39,14 +40,14 @@ public class MultiLoader implements Loader {
 		this.loaders = loaders;
 	}
 
-    public Resource load(String name, String encoding) throws IOException {
+    public Resource load(String name, Locale locale, String encoding) throws IOException {
     	if (loaders.length == 1) {
-    		return loaders[0].load(name, encoding);
+    		return loaders[0].load(name, locale, encoding);
     	}
         for (Loader loader : loaders) {
             try {
-            	if (loader.exists(name)) {
-            		return loader.load(name, encoding);
+            	if (loader.exists(name, locale)) {
+            		return loader.load(name, locale, encoding);
             	}
             } catch (Exception e) {
             }
@@ -54,14 +55,14 @@ public class MultiLoader implements Loader {
         throw new FileNotFoundException("No such template file: " + name);
     }
 
-    public List<String> list() throws IOException {
+    public List<String> list(String suffix) throws IOException {
     	if (loaders.length == 1) {
-    		return loaders[0].list();
+    		return loaders[0].list(suffix);
     	}
         List<String> all = new ArrayList<String>();
         for (Loader loader : loaders) {
             try {
-                List<String> list = loader.list();
+                List<String> list = loader.list(suffix);
                 if (list != null && list.size() > 0) {
                     all.addAll(list);
                 }
@@ -71,14 +72,14 @@ public class MultiLoader implements Loader {
         return all;
     }
 
-	public boolean exists(String name) {
+	public boolean exists(String name, Locale locale) {
     	if (loaders.length == 1) {
-    		return loaders[0].exists(name);
+    		return loaders[0].exists(name, locale);
     	}
     	for (int i = loaders.length - 1; i >= 0; i --) {
     		Loader loader = loaders[i];
         	try {
-	        	if (loader.exists(name)) {
+	        	if (loader.exists(name, locale)) {
 	            	return true;
 	            }
         	} catch (Exception e) {

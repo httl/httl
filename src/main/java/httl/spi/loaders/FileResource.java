@@ -22,11 +22,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 /**
  * FileResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.FileLoader#load(String, String)
+ * @see httl.spi.loaders.FileLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -36,8 +37,8 @@ public class FileResource extends InputStreamResource {
     
     private final File file;
     
-    public FileResource(Engine engine, String name, String encoding, String path) {
-        super(engine, name, encoding);
+    public FileResource(Engine engine, String name, Locale locale, String encoding, String path) {
+        super(engine, name, locale, encoding);
         this.file = new File(path);
     }
 

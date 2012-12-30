@@ -16,16 +16,19 @@
  */
 package httl.spi.methods;
 
+import httl.Context;
 import httl.Engine;
 import httl.Resource;
+import httl.Template;
 import httl.spi.Logger;
 import httl.spi.Resolver;
+import httl.util.ConcurrentLinkedHashMap;
 import httl.util.EncodingProperties;
+import httl.util.LocaleUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -48,6 +51,8 @@ public class MessageMethod {
 	private String messageEncoding;
 	
 	private String messageSuffix;
+
+	private boolean messageLocalized;
 
 	private boolean reloadable;
 
@@ -77,6 +82,13 @@ public class MessageMethod {
 	 */
 	public void setMessageSuffix(String messageSuffix) {
 		this.messageSuffix = messageSuffix;
+	}
+
+	/**
+	 * httl.properties: message.localized=true
+	 */
+	public void setMessageLocalized(boolean messageLocalized) {
+		this.messageLocalized = messageLocalized;
 	}
 
 	/**
@@ -111,9 +123,19 @@ public class MessageMethod {
 		this.logger = logger;
 	}
 
-	private String getLocale() {
-		Object value = resolver.get("locale");
-		return value == null ? null : value.toString();
+	private Locale getLocale() {
+		Template template = Context.getContext().getTemplate();
+		if (template != null && template.getLocale() != null) {
+			return template.getLocale();
+		}
+		Object locale = resolver.get("locale");
+		if (locale instanceof Locale) {
+			return (Locale) locale;
+		}
+		if (locale instanceof String) {
+			return LocaleUtils.getLocale((String) locale);
+		}
+		return null;
 	}
 
     public String message(String key) {
@@ -164,18 +186,12 @@ public class MessageMethod {
     	if (key == null || key.length() == 0 || messageBasename == null) {
     		return key;
     	}
-    	String localeStr;
-		if (locale != null) {
-			localeStr = "_" + locale.toString();
-		} else {
-			localeStr = getLocale();
-			if (localeStr == null) {
-				localeStr = "";
-			} else {
-				localeStr = "_" + localeStr;
-			}
-		}
-		String value = findMessageByLocale(localeStr, key);
+    	if (! messageLocalized) {
+    		locale = null;
+    	} else if (locale == null) {
+    		locale = getLocale();
+    	}
+		String value = findMessageByLocale(key, locale);
 		if (value != null && value.length() > 0) {
 			if (args != null && args.length > 0) {
 				if ("string".equals(messageFormat)) {
@@ -190,10 +206,10 @@ public class MessageMethod {
 		return key;
     }
 
-    private final ConcurrentMap<String, EncodingProperties> messageCache = new ConcurrentHashMap<String, EncodingProperties>();
+    private final ConcurrentMap<String, EncodingProperties> messageCache = new ConcurrentLinkedHashMap<String, EncodingProperties>(1000);
 
-    private String findMessageByLocale(String locale, String key) {
-    	String file = messageBasename + locale + messageSuffix;
+    private String findMessageByLocale(String key, Locale locale) {
+    	String file = messageBasename + (locale == null ? "" : "_" + locale) + messageSuffix;
     	EncodingProperties properties = messageCache.get(file);
 		if ((properties == null || reloadable) && engine.hasResource(file)) {
 			if (properties == null) {
@@ -211,7 +227,7 @@ public class MessageMethod {
 				}
 			} catch (IOException e) {
 				if (logger != null && logger.isErrorEnabled()) {
-					logger.error("Failed to load httl message message file " + file + ", cause: " + e.getMessage(), e);
+					logger.error("Failed to load httl message file " + file + " with locale " + locale + ", cause: " + e.getMessage(), e);
 				}
 			}
 		}
@@ -221,11 +237,8 @@ public class MessageMethod {
 				return value;
 			}
 		}
-    	if (locale.length() > 0) {
-	    	int i = locale.lastIndexOf('_');
-			if (i >= 0) {
-				return findMessageByLocale(locale.substring(0, i), key);
-			}
+    	if (locale != null) {
+    		return findMessageByLocale(key, LocaleUtils.getParentLocale(locale));
     	}
 		return null;
     }

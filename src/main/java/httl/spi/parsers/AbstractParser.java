@@ -38,6 +38,7 @@ import httl.spi.translators.expression.ExpressionImpl;
 import httl.util.ByteCache;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
+import httl.util.LocaleUtils;
 import httl.util.OrderedMap;
 import httl.util.StringCache;
 import httl.util.StringUtils;
@@ -55,6 +56,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -176,7 +178,11 @@ public abstract class AbstractParser implements Parser {
     protected static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
 
     protected final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
-    
+
+	private boolean templateLocalized;
+
+	private boolean messageLocalized;
+
     protected boolean isOutputStream;
 
     protected boolean isOutputWriter;
@@ -190,6 +196,20 @@ public abstract class AbstractParser implements Parser {
 	protected String outputEncoding;
 	
 	protected Logger logger;
+
+	/**
+	 * httl.properties: template.localized=true
+	 */
+	public void setTemplateLocalized(boolean templateLocalized) {
+		this.templateLocalized = templateLocalized;
+	}
+
+	/**
+	 * httl.properties: message.localized=true
+	 */
+	public void setMessageLocalized(boolean messageLocalized) {
+		this.messageLocalized = messageLocalized;
+	}
 
 	/**
 	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
@@ -393,8 +413,32 @@ public abstract class AbstractParser implements Parser {
 		}
     }
     
+    private String getTemplateClassName(Resource resource, boolean stream) {
+    	String name = resource.getName();
+    	String encoding = resource.getEncoding();
+    	Locale locale = resource.getLocale();
+    	long lastModified = resource.getLastModified();
+    	StringBuilder buf = new StringBuilder(name.length() + 40);
+    	buf.append(name);
+    	if (encoding != null) {
+    		buf.append("_");
+    		buf.append(encoding);
+    	}
+    	if (locale != null && (templateLocalized || messageLocalized)) {
+    		buf.append("_");
+    		buf.append(locale);
+    	}
+    	if (lastModified > 0) {
+    		buf.append("_");
+    		buf.append(lastModified);
+    	}
+    	buf.append(stream ? "_stream" : "_writer");
+    	return TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(buf.toString()).replaceAll("_");
+    }
+    
     protected Class<?> parseClass(Resource resource, boolean stream, int offset) throws IOException, ParseException {
-        String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified() + "_" + (stream ? "stream" : "writer")).replaceAll("_");
+    	//String name = TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(resource.getName() + "_" + resource.getEncoding() + "_" + resource.getLastModified() + "_" + (stream ? "stream" : "writer")).replaceAll("_");
+        String name = getTemplateClassName(resource, stream);
         try {
             return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
@@ -535,7 +579,11 @@ public abstract class AbstractParser implements Parser {
     				+ "}\n"
                     + "\n"
     			    + "public " + String.class.getSimpleName() + " getEncoding() {\n"
-    			    + "	return \"" + resource.getEncoding() + "\";\n"
+    			    + "	return " + (resource.getEncoding() == null ? "null" : "\"" + resource.getEncoding() + "\"") + ";\n"
+    			    + "}\n"
+                    + "\n"
+    			    + "public " + Locale.class.getName() + " getLocale() {\n"
+    			    + "	return " + (resource.getLocale() == null ? "null" : LocaleUtils.class.getName() + ".getLocale(\"" + resource.getLocale() + "\")") + ";\n"
     			    + "}\n"
                     + "\n"
     			    + "public long getLastModified() {\n"

@@ -21,7 +21,6 @@ import httl.Engine;
 import httl.Expression;
 import httl.Resource;
 import httl.Template;
-import httl.spi.Resolver;
 import httl.util.Digest;
 import httl.util.IOUtils;
 import httl.util.UrlUtils;
@@ -40,62 +39,11 @@ public class FileMethod {
 
     private Engine engine;
 
-	private Resolver resolver;
-
     /**
      * httl.properties: engine=httl.spi.engines.DefaultEngine
      */
     public void setEngine(Engine engine) {
         this.engine = engine;
-    }
-
-	/**
-	 * httl.properties: resolver=httl.spi.resolvers.EngineResolver
-	 */
-    public void setResolver(Resolver resolver) {
-		this.resolver = resolver;
-	}
-
-    private String getLocale() {
-		Object value = resolver.get("locale");
-		return value == null ? null : value.toString();
-	}
-
-    public String locale(String name) {
-    	return locale(name, getLocale());
-    }
-
-    public String locale(String name, Locale locale) {
-    	return locale(name, locale == null ? getLocale() : locale.toString());
-    }
-
-    public String locale(String name, String locale) {
-    	if (name != null && name.length() > 0
-    			&& locale != null && locale.length() > 0) {
-    		int i = name.lastIndexOf('.');
-    		String prefix;
-    		String suffix;
-    		if (i > 0) {
-    			prefix = name.substring(0, i);
-    			suffix = name.substring(i);
-    		} else {
-    			prefix = name;
-    			suffix = "";
-    		}
-	    	for (;;) {
-	    		String path = prefix + "_" + locale + suffix;
-	        	if (engine.hasResource(path)) {
-	        		return path;
-	        	}
-	        	int j = locale.lastIndexOf('_');
-	        	if (j > 0) {
-	        		locale = locale.substring(0, j);
-	        	} else {
-	        		break;
-	        	}
-	    	}
-    	}
-        return name;
     }
 
     public Expression evaluate(Object source) throws IOException, ParseException {
@@ -159,10 +107,18 @@ public class FileMethod {
     }
 
     public Template include(String name) throws IOException, ParseException {
-        return include(name, (String) null);
+        return include(name, (Locale) null, (String) null);
+    }
+    
+    public Template include(String name, String encoding) throws IOException, ParseException {
+    	return include(name, (Locale) null, encoding);
     }
 
-    public Template include(String name, String encoding) throws IOException, ParseException {
+    public Template include(String name, Locale locale) throws IOException, ParseException {
+    	return include(name, locale, (String) null);
+    }
+
+    public Template include(String name, Locale locale, String encoding) throws IOException, ParseException {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("include template name == null");
         }
@@ -178,8 +134,11 @@ public class FileMethod {
                 encoding = template.getEncoding();
             }
             name = UrlUtils.relativeUrl(name, template.getName());
+            if (locale == null) {
+            	locale = template.getLocale();
+            }
         }
-        template = engine.getTemplate(name, encoding);
+        template = engine.getTemplate(name, locale, encoding);
         if (macro != null && macro.length() > 0) {
 			return template.getMacros().get(macro);
 		}
@@ -187,22 +146,38 @@ public class FileMethod {
     }
 
     public Template include(String name, Map<String, Object> parameters) throws IOException, ParseException {
-    	return include(name, null, parameters);
+    	return include(name, null, null, parameters);
     }
     
     public Template include(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+    	return include(name, null, encoding, parameters);
+    }
+    
+    public Template include(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
+    	return include(name, locale, null, parameters);
+    }
+    
+    public Template include(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
     	if (parameters != null) {
     		Map<String, Object> contextParameters = Context.getContext().getParameters();
     		contextParameters.putAll(parameters);
     	}
-    	return include(name, encoding);
+    	return include(name, locale, encoding);
     }
 
     public Resource read(String name) throws IOException, ParseException {
-        return read(name, null);
+        return read(name, null, null);
     }
 
     public Resource read(String name, String encoding) throws IOException {
+    	return read(name, null, encoding);
+    }
+
+    public Resource read(String name, Locale locale) throws IOException {
+    	return read(name, locale, null);
+    }
+
+    public Resource read(String name, Locale locale, String encoding) throws IOException {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException("display template name == null");
         }
@@ -212,8 +187,11 @@ public class FileMethod {
                 encoding = template.getEncoding();
             }
             name = UrlUtils.relativeUrl(name, template.getName());
+            if (locale == null) {
+            	locale = template.getLocale();
+            }
         }
-        return engine.getResource(name, encoding);
+        return engine.getResource(name, locale, encoding);
     }
 
 }

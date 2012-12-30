@@ -176,52 +176,47 @@ public class UrlUtils {
     /** URL prefix for loading from the file system: "file:" */
     public static final String FILE_URL_PREFIX = "file:";
     
-    public static List<String> listUrl(URL rootDirUrl, String[] suffixes) throws IOException {
+    public static List<String> listUrl(URL rootDirUrl, String suffix) throws IOException {
         if ("file".equals(rootDirUrl.getProtocol())) {
-            return listFile(new File(rootDirUrl.getFile()), suffixes);
+            return listFile(new File(rootDirUrl.getFile()), suffix);
         } else {
-            return listJarUrl(rootDirUrl, suffixes);
+            return listJarUrl(rootDirUrl, suffix);
         }
     }
     
-    public static List<String> listFile(File dirFile, final String[] suffixes) throws IOException {
+    public static List<String> listFile(File dirFile, final String suffix) throws IOException {
     	List<String> list = new ArrayList<String>();
-    	addListFile(list, "/", dirFile, suffixes);
+    	addListFile(list, "/", dirFile, suffix);
     	return list;
     }
     
-    private static void addListFile(List<String> list, String dir, File dirFile, final String[] suffixes) throws IOException {
+    private static void addListFile(List<String> list, String dir, File dirFile, final String suffix) throws IOException {
     	for (File file : dirFile.listFiles()) {
     		if (file.isHidden() || ! file.canRead()) {
     			continue;
     		}
     		if (file.isDirectory()) {
-    			addListFile(list, dir + file.getName() + "/", file, suffixes);
-    		} else if (isMatch(file.getName(), suffixes)) {
+    			addListFile(list, dir + file.getName() + "/", file, suffix);
+    		} else if (isMatch(file.getName(), suffix)) {
     			list.add(dir + file.getName());
     		}
     	}
     }
     
-    private static boolean isMatch(String name, String[] suffixes) {
-    	if (suffixes == null || suffixes.length == 0) {
+    private static boolean isMatch(String name, String suffix) {
+    	if (suffix == null || suffix.length() == 0) {
     		return true;
     	}
-    	for (String suffix : suffixes) {
-            if (name.endsWith(suffix)) {
-                return true;
-            }
-        }
-        return false;
+        return name.endsWith(suffix);
     }
     
-    public static List<String> listZip(ZipFile zipFile, String[] suffixes) throws IOException {
+    public static List<String> listZip(ZipFile zipFile, String suffix) throws IOException {
         List<String> result = new ArrayList<String>();
         for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();) {
             ZipEntry entry = (ZipEntry) entries.nextElement();
             if (! entry.isDirectory()) {
 	            String name = entry.getName();
-	            if (isMatch(name, suffixes)) {
+	            if (isMatch(name, suffix)) {
 	            	if (! name.startsWith("/")) {
 	            		name = "/" + name;
 	            	}
@@ -232,13 +227,13 @@ public class UrlUtils {
         return result;
     }
     
-    public static List<String> listJar(JarFile jarFile, String[] suffixes) throws IOException {
+    public static List<String> listJar(JarFile jarFile, String suffix) throws IOException {
         List<String> result = new ArrayList<String>();
         for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
             JarEntry entry = (JarEntry) entries.nextElement();
             if (! entry.isDirectory()) {
 	            String name = entry.getName();
-	            if (isMatch(name, suffixes)) {
+	            if (isMatch(name, suffix)) {
 	            	if (! name.startsWith("/")) {
 	            		name = "/" + name;
 	            	}
@@ -249,7 +244,7 @@ public class UrlUtils {
         return result;
     }
 
-    private static List<String> listJarUrl(URL rootDirUrl, String[] suffixes) throws IOException {
+    private static List<String> listJarUrl(URL rootDirUrl, String suffix) throws IOException {
         URLConnection con = rootDirUrl.openConnection();
         JarFile jarFile = null;
         String jarFileUrl = null;
@@ -294,10 +289,8 @@ public class UrlUtils {
                 String entryPath = entry.getName();
                 if (entryPath.startsWith(rootEntryPath)) {
                     String relativePath = entryPath.substring(rootEntryPath.length());
-                    for (String suffix : suffixes) {
-                        if (relativePath.endsWith(suffix)) {
-                            result.add(relativePath);
-                        }
+                    if (relativePath.endsWith(suffix)) {
+                        result.add(relativePath);
                     }
                 }
             }
