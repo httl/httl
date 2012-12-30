@@ -33,11 +33,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * DfaTranslator. (SPI, Singleton, ThreadSafe)
+ * DefaultTranslator. (SPI, Singleton, ThreadSafe)
  * 
  * Deterministic Finite state Automata (DFA)
  * 
- * @see httl.spi.parsers.AbstractParser#setTranslator(translator)
+ * @see httl.spi.parsers.AbstractParser#setTranslator(Translator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

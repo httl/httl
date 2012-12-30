@@ -38,7 +38,7 @@ public interface Locator {
 	/**
 	 * relocate path.
 	 * 
-	 * @param path origin name
+	 * @param name origin name
 	 * @return relocated name
 	 */
 	String relocate(String name, Locale locale);
