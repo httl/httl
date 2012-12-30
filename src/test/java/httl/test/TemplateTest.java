@@ -121,9 +121,9 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "message.httl".equals(file.getName())) {
-	                continue;
-	            }*/
+	            //if (! "compile_expr.httl".equals(file.getName())) {
+	            //    continue;
+	            //}
 	            System.out.println(file.getName());
 	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
 	            if (url == null) {
@@ -144,7 +144,7 @@ public class TemplateTest extends TestCase {
 	            } catch (Exception e) {
 	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
 	            }
-	            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
+	            super.assertEquals(file.getName(), expected.replace("\r\n", "\\r\\n\r\n").replace("\n", "\\n\n").replace("\t", "\\t\t"), actualWriter.getBuffer().toString().replace("\r\n", "\\r\\n\r\n").replace("\n", "\\n\n").replace("\t", "\\t\t"));
 	            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
 	        }
         }

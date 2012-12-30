@@ -60,7 +60,7 @@ public class JavassistCompiler extends AbstractCompiler {
     }
 
     @Override
-    public Class<?> doCompile(String name, String source) throws Throwable {
+    protected Class<?> doCompile(String name, String source) throws Exception {
     	try {
 	    	return pool.get(name).toClass();
     	} catch (NotFoundException e) {

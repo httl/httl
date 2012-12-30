@@ -1,0 +1,41 @@
+3
+ABC
+用户
+书籍
+English
+&lt;!--#var(Book[] books)--&gt;
+&lt;table&gt;
+  &lt;!--#foreach(book in books)--&gt;
+  &lt;tr&gt;
+    &lt;td&gt;${foreach.count}&lt;/td&gt;
+    &lt;td&gt;${book.title}&lt;/td&gt;
+    &lt;td&gt;${book.author}&lt;/td&gt;
+    &lt;td&gt;${book.publisher}&lt;/td&gt;
+    &lt;td&gt;${book.publication}&lt;/td&gt;
+    &lt;td&gt;${book.price}&lt;/td&gt;
+    &lt;td&gt;${book.discount}%&lt;/td&gt;
+    &lt;td&gt;${book.price * book.discount / 100}&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;!--#end--&gt;
+&lt;/table&gt;
+====
+3
+ABC
+用户
+书籍
+English
+<!--#var(Book[] books)-->
+<table>
+  <!--#foreach(book in books)-->
+  <tr>
+    <td>${foreach.count}</td>
+    <td>${book.title}</td>
+    <td>${book.author}</td>
+    <td>${book.publisher}</td>
+    <td>${book.publication}</td>
+    <td>${book.price}</td>
+    <td>${book.discount}%</td>
+    <td>${book.price * book.discount / 100}</td>
+  </tr>
+  <!--#end-->
+</table>

@@ -21,7 +21,6 @@ import httl.Engine;
 import httl.Template;
 import httl.spi.Filter;
 import httl.spi.Formatter;
-import httl.util.ClassUtils;
 import httl.util.UnsafeStringWriter;
 
 import java.io.IOException;
@@ -79,7 +78,7 @@ public abstract class WriterTemplate extends AbstractTemplate {
         } catch (IOException e) {
             throw (IOException) e;
         } catch (Exception e) {
-            throw new IllegalStateException(ClassUtils.toString(e), e);
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
         	Context.popContext();
         }

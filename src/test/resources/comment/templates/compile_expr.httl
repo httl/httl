@@ -1,0 +1,13 @@
+#{1 + 2}
+#{"abc".toUpperCase}
+#{message("user")}
+#{"book".message}
+#{"onlyen".message}
+#{read("foreach.httl")}
+====
+#!{1 + 2}
+#!{"abc".toUpperCase}
+#!{message("user")}
+#!{"book".message}
+#!{"onlyen".message}
+#!{read("foreach.httl")}

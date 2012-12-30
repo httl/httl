@@ -91,7 +91,13 @@ public class ExpressionImpl implements Expression, Serializable {
     			}
 			}
     	}
-        return evaluator.evaluate(parameters);
+    	try {
+    		return evaluator.evaluate(parameters);
+    	} catch (RuntimeException e) {
+    		throw e;
+    	} catch (Exception e) {
+    		throw new RuntimeException(e.getMessage(), e);
+    	}
     }
     
     @Override
@@ -160,7 +166,7 @@ public class ExpressionImpl implements Expression, Serializable {
                 + "public " + className + "(Map functions) {\n"
                 + functionInits
                 + "}\n"
-                + "public " + Object.class.getSimpleName() + " evaluate(" + Map.class.getName() + " parameters) {\n"
+                + "public " + Object.class.getSimpleName() + " evaluate(" + Map.class.getName() + " parameters) throws Exception {\n"
                 + declare.toString()
                 + "return " + ClassUtils.class.getName() + ".boxed(" + getCode() + ");\n"
                 + "}\n"
@@ -177,14 +183,8 @@ public class ExpressionImpl implements Expression, Serializable {
     		md5 = Digest.getMD5(source);
     	}
     	String className = (Evaluator.class.getSimpleName() + "_" + md5);
-    	Class<?> cls;
-    	try {
-    		cls = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
-    	} catch (ClassNotFoundException e) {
-    		cls = newEvaluatorClass(className);
-    	}
         try {
-            return (Evaluator) cls.getConstructor(Map.class).newInstance(functions);
+            return (Evaluator) newEvaluatorClass(className).getConstructor(Map.class).newInstance(functions);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create expression instance. class: " + className + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
         }

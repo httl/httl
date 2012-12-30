@@ -71,6 +71,8 @@ public class JdkCompiler extends AbstractCompiler {
 
     private final List<String> options = new ArrayList<String>();
 
+    private final List<String> lintOptions = new ArrayList<String>();
+
     public JdkCompiler(){
         if (compiler == null) {
         	throw new IllegalStateException("Can not get system java compiler. Please add jdk tools.jar to your classpath.");
@@ -96,6 +98,7 @@ public class JdkCompiler extends AbstractCompiler {
             }
         });
         javaFileManager = new JavaFileManagerImpl(manager, classLoader);
+        lintOptions.add("-Xlint:unchecked");
     }
 
     /**
@@ -106,6 +109,8 @@ public class JdkCompiler extends AbstractCompiler {
         		&& ! version.equals(ClassUtils.getJavaVersion())) {
             options.add("-target");
             options.add(version);
+            lintOptions.add("-target");
+            lintOptions.add(version);
         }
     }
 
@@ -117,9 +122,24 @@ public class JdkCompiler extends AbstractCompiler {
             options.add("-Xlint:unchecked");
         }
     }
-
+    
     @Override
-    public Class<?> doCompile(String name, String sourceCode) throws Throwable {
+    protected Class<?> doCompile(String name, String sourceCode) throws Exception {
+    	try {
+    		return doCompile(name, sourceCode, options);
+    	} catch (Exception e) {
+    		if (e.getMessage().contains("-Xlint:unchecked")) {
+    			try {
+    				return doCompile(name, sourceCode, lintOptions);
+    			} catch (Exception e2) {
+    				throw e2;
+    			}
+    		}
+    		throw e;
+    	}
+    }
+
+    private Class<?> doCompile(String name, String sourceCode, List<String> options) throws Exception {
     	try {
     		return classLoader.findClass(name);
     	} catch (ClassNotFoundException e) {

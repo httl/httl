@@ -19,11 +19,14 @@ package httl.spi.compilers;
 import httl.spi.Compiler;
 import httl.spi.Logger;
 import httl.util.ClassUtils;
+import httl.util.VolatileReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +42,9 @@ public abstract class AbstractCompiler implements Compiler {
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([_a-zA-Z][_a-zA-Z0-9\\.]*);");
     
     private static final Pattern CLASS_PATTERN = Pattern.compile("class\\s+([_a-zA-Z][_a-zA-Z0-9]*)\\s+");
-    
+
+	private static final Map<String, VolatileReference<Class<?>>> CLASS_CACHE = new ConcurrentHashMap<String, VolatileReference<Class<?>>>();
+
     private File compileDirectory;
     
     private Logger logger;
@@ -96,6 +101,9 @@ public abstract class AbstractCompiler implements Compiler {
     	String className = null;
     	try {
 	        code = code.trim();
+	        if (! code.endsWith("}")) {
+                throw new ParseException("The java code not endsWith \"}\"", code.length() - 1);
+            }
 	        Matcher matcher = PACKAGE_PATTERN.matcher(code);
 	        String pkg;
 	        if (matcher.find()) {
@@ -104,21 +112,34 @@ public abstract class AbstractCompiler implements Compiler {
 	            pkg = "";
 	        }
 	        matcher = CLASS_PATTERN.matcher(code);
-	        String cls;
+	        String classSimpleName;
 	        if (matcher.find()) {
-	            cls = matcher.group(1);
+	        	classSimpleName = matcher.group(1);
 	        } else {
 	            throw new ParseException("No such class name in java code.", 0);
 	        }
-	        className = pkg != null && pkg.length() > 0 ? pkg + "." + cls : cls;
-	        try {
-	            return Class.forName(className, true, Thread.currentThread().getContextClassLoader());
-	        } catch (ClassNotFoundException e) {
-	            if (! code.endsWith("}")) {
-	                throw new ParseException("The java code not endsWith \"}\"", code.length() - 1);
-	            }
-	            return doCompile(className, code);
-	        }
+	        className = pkg != null && pkg.length() > 0 ? pkg + "." + classSimpleName : classSimpleName;
+	        VolatileReference<Class<?>> ref = CLASS_CACHE.get(className);
+	    	if (ref == null) {
+		    	synchronized (CLASS_CACHE) {
+		    		ref = CLASS_CACHE.get(className);
+		        	if (ref == null) {
+		        		ref = new VolatileReference<Class<?>>();
+		        		CLASS_CACHE.put(className, ref);
+		        	}
+				}
+	    	}
+	    	Class<?> cls = ref.get();
+	    	if (cls == null) {
+	    		synchronized(ref) {
+	    			cls = ref.get();
+	    			if (cls == null) {
+	    				cls = doCompile(className, code);
+	    				ref.set(cls);
+	    			}
+	    		}
+	    	}
+	    	return cls;
     	} catch (Throwable t) {
         	if (logger != null && logger.isErrorEnabled()) {
         		logger.error("Failed to compile class, cause: " + t.getMessage() + ", class: " + className + ", code: \n================================\n" + code + "\n================================\n", t);
@@ -130,6 +151,6 @@ public abstract class AbstractCompiler implements Compiler {
         }
     }
     
-    protected abstract Class<?> doCompile(String name, String source) throws Throwable;
+    protected abstract Class<?> doCompile(String name, String source) throws Exception;
 
 }

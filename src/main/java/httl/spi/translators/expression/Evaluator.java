@@ -25,6 +25,6 @@ import java.util.Map;
  */
 public interface Evaluator {
 
-	Object evaluate(Map<String, Object> parameters);
+	Object evaluate(Map<String, Object> parameters) throws Exception;
 
 }
