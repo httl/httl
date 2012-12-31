@@ -98,7 +98,7 @@ public final class Context implements Map<String, Object> {
     // The current output.
     private final Object output;
 
-    // The current store.
+    // The current storage.
     private Map<String, Object> storage;
 
     private Context(Context parent, Template template, Map<String, Object> parameters, Object output) {
