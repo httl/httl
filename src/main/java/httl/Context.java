@@ -99,7 +99,7 @@ public final class Context extends DelegateMap<String, Object> {
     // The template key
     private static final String TEMPLATE_KEY = "template";
 
-    // The template key
+    // The parameters key
     private static final String PARAMETERS_KEY = "parameters";
 
     // The output key
