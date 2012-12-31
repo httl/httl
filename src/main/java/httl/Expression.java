@@ -32,7 +32,6 @@ public interface Expression {
     /**
      * Evaluate the expression.
      * 
-     * @param parameters - evaluate parameters
      * @return evaluate result
      */
     Object evaluate();

@@ -37,21 +37,10 @@ public interface Template extends Resource, Expression {
      * Render the template to output stream.
      * 
      * @see httl.Context#getOutput()
-     * @param parameters - render parameters
      * @param output - output stream
      * @throws IOException - If an I/O error occurs
      */
     void render(OutputStream output) throws IOException;
-
-    /**
-     * Render the template to writer.
-     * 
-     * @see httl.Context#getOutput()
-     * @param parameters - render parameters
-     * @param writer - writer
-     * @throws IOException - If an I/O error occurs
-     */
-    void render(Writer writer) throws IOException;
 
     /**
      * Render the template to output stream.
@@ -63,6 +52,15 @@ public interface Template extends Resource, Expression {
      * @throws IOException - If an I/O error occurs
      */
     void render(Map<String, Object> parameters, OutputStream output) throws IOException;
+
+    /**
+     * Render the template to writer.
+     * 
+     * @see httl.Context#getOutput()
+     * @param writer - writer
+     * @throws IOException - If an I/O error occurs
+     */
+    void render(Writer writer) throws IOException;
 
     /**
      * Render the template to writer.
