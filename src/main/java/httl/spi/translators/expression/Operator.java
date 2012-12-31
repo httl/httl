@@ -21,9 +21,8 @@ import httl.spi.Translator;
 import java.util.Collection;
 import java.util.Map;
 
-
 /**
- * BranchNode
+ * Operator. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
