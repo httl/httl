@@ -19,7 +19,7 @@ package httl;
 import java.util.Map;
 
 /**
- * Expression. (API, Prototype, ThreadSafe)
+ * Expression. (API, Prototype, Immutable, ThreadSafe)
  * 
  * <pre>
  * Engine engine = Engine.getEngine();

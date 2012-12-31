@@ -21,7 +21,7 @@ import httl.Template;
 import httl.spi.Logger;
 import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.RequestResolver;
-import httl.util.WrappedMap;
+import httl.util.DelegateMap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -195,7 +195,7 @@ public class WebEngine {
 		}
 		Map<String, Object> parameters = RequestResolver.getAndCheckPrarameters();
 		if (model != null) {
-			parameters = new WrappedMap<String, Object>(parameters, model);
+			parameters = new DelegateMap<String, Object>(parameters, model);
 		}
 		if (path == null || path.length() == 0) {
 			path = request.getPathInfo();

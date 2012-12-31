@@ -22,7 +22,7 @@ import java.io.Reader;
 import java.util.Locale;
 
 /**
- * Resource. (API, Prototype, ThreadSafe)
+ * Resource. (API, Prototype, Immutable, ThreadSafe)
  * 
  * <pre>
  * Engine engine = Engine.getEngine();

@@ -16,15 +16,12 @@
  */
 package httl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import httl.util.DelegateMap;
+
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Context. (API, ThreadLocal, ThreadSafe)
+ * Context. (API, Prototype, ThreadLocal, ThreadSafe)
  * 
  * <pre>
  * Context context = Context.getContext();
@@ -38,9 +35,11 @@ import java.util.Set;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Context implements Map<String, Object> {
+public final class Context extends DelegateMap<String, Object> {
 
-    // The context thread local holder.
+	private static final long serialVersionUID = 1L;
+
+	// The context thread local holder.
     private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
     /**
@@ -115,10 +114,8 @@ public final class Context implements Map<String, Object> {
     // The current output.
     private final Object output;
 
-    // The current storage.
-    private Map<String, Object> storage;
-
     private Context(Context parent, Template template, Map<String, Object> parameters, Object output) {
+    	super(parent, parameters);
         this.parent = parent;
         this.template = template;
         this.parameters = parameters;
@@ -179,20 +176,9 @@ public final class Context implements Map<String, Object> {
     	return value;
     }
 
-    // java.util.Map
-	public Object get(Object key) {
-		if (storage != null) {
-			Object value = storage.get(key);
-			if (value != null) {
-				return value;
-			}
-		}
-		if (parameters != null) {
-			Object value = parameters.get(key);
-			if (value != null) {
-				return value;
-			}
-		}
+    // Get specific variable.
+    @Override
+	protected Object doGet(Object key) {
 		if (CONTEXT_KEY.equals(key)) {
 			return this;
 		}
@@ -205,188 +191,7 @@ public final class Context implements Map<String, Object> {
 		if (OUTPUT_KEY.equals(key)) {
 			return output;
 		}
-		return parent == null ? null : parent.get(key);
-	}
-
-	// java.util.Map
-	@SuppressWarnings("unchecked")
-	public Set<Map.Entry<String, Object>> entrySet() {
-		Set<Map.Entry<String, Object>> entrySet = null;
-		if (storage != null) {
-			if (parameters == null && parent == null) {
-				return storage.entrySet();
-			}
-			if (entrySet == null) {
-				entrySet = new HashSet<Map.Entry<String, Object>>();
-			}
-			entrySet.addAll(storage.entrySet());
-		}
-		if (parameters != null) {
-			if (storage == null && parent == null) {
-				return parameters.entrySet();
-			}
-			if (entrySet == null) {
-				entrySet = new HashSet<Map.Entry<String, Object>>();
-			}
-			entrySet.addAll(parameters.entrySet());
-		}
-		if (parent != null) {
-			if (parameters == null && storage == null) {
-				return parent.entrySet();
-			}
-			if (entrySet == null) {
-				entrySet = new HashSet<Map.Entry<String, Object>>();
-			}
-			entrySet.addAll(parent.entrySet());
-		}
-		return entrySet == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(entrySet);
-	}
-
-	// java.util.Map
-	@SuppressWarnings("unchecked")
-	public Set<String> keySet() {
-		Set<String> keySet = null;
-		if (storage != null) {
-			if (parameters == null && parent == null) {
-				return storage.keySet();
-			}
-			if (keySet == null) {
-				keySet = new HashSet<String>();
-			}
-			keySet.addAll(storage.keySet());
-		}
-		if (parameters != null) {
-			if (storage == null && parent == null) {
-				return parameters.keySet();
-			}
-			if (keySet == null) {
-				keySet = new HashSet<String>();
-			}
-			keySet.addAll(parameters.keySet());
-		}
-		if (parent != null) {
-			if (parameters == null && storage == null) {
-				return parent.keySet();
-			}
-			if (keySet == null) {
-				keySet = new HashSet<String>();
-			}
-			keySet.addAll(parent.keySet());
-		}
-		return keySet == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(keySet);
-	}
-
-	// java.util.Map
-	@SuppressWarnings("unchecked")
-	public Collection<Object> values() {
-		Collection<Object> values = null;
-		if (storage != null) {
-			if (parameters == null && parent == null) {
-				return storage.values();
-			}
-			if (values == null) {
-				values = new HashSet<Object>();
-			}
-			values.addAll(storage.values());
-		}
-		if (parameters != null) {
-			if (storage == null && parent == null) {
-				return parameters.values();
-			}
-			if (values == null) {
-				values = new HashSet<Object>();
-			}
-			values.addAll(parameters.values());
-		}
-		if (parent != null) {
-			if (parameters == null && storage == null) {
-				return parent.values();
-			}
-			if (values == null) {
-				values = new HashSet<Object>();
-			}
-			values.addAll(parent.values());
-		}
-		return values == null ? Collections.EMPTY_SET : Collections.unmodifiableCollection(values);
-	}
-
-	// java.util.Map
-	public int size() {
-		int size = 0;
-		if (storage != null) {
-			size += storage.size();
-		}
-		if (parameters != null) {
-			size += parameters.size();
-		}
-		if (parent != null) {
-			size += parent.size();
-		}
-		return size;
-	}
-
-	// java.util.Map
-	public boolean containsKey(Object key) {
-		if (storage != null && storage.containsKey(key)) {
-			return true;
-		}
-		if (parameters != null && parameters.containsKey(key)) {
-			return true;
-		}
-		return parent != null && parent.containsKey(key);
-	}
-
-	// java.util.Map
-	public boolean containsValue(Object value) {
-		if (storage != null && storage.containsValue(value)) {
-			return true;
-		}
-		if (parameters != null && parameters.containsValue(value)) {
-			return true;
-		}
-		return parent != null && parent.containsValue(value);
-	}
-
-	// java.util.Map
-	public boolean isEmpty() {
-		if (storage != null && ! storage.isEmpty()) {
-			return false;
-		}
-		if (parameters != null && ! parameters.isEmpty()) {
-			return false;
-		}
-		return parent == null || parent.isEmpty();
-	}
-
-	// java.util.Map
-	public Object put(String key, Object value) {
-		if (storage == null) { // safely in thread local
-            storage = new HashMap<String, Object>();
-        }
-		return storage.put(key, value);
-	}
-
-	// java.util.Map
-	public void putAll(Map<? extends String, ? extends Object> map) {
-		if (storage == null) { // safely in thread local
-            storage = new HashMap<String, Object>();
-        }
-		storage.putAll(map);
-	}
-
-	// java.util.Map
-	public Object remove(Object key) {
-		if (storage != null) {
-			return storage.remove(key);
-		}
 		return null;
-	}
-
-	// java.util.Map
-	public void clear() {
-		if (storage != null) {
-			storage.clear();
-		}
 	}
 
 }

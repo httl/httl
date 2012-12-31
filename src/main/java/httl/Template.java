@@ -22,7 +22,7 @@ import java.io.Writer;
 import java.util.Map;
 
 /**
- * Template. (API, Prototype, ThreadSafe)
+ * Template. (API, Prototype, Immutable, ThreadSafe)
  * 
  * <pre>
  * Engine engine = Engine.getEngine();
