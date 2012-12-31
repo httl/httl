@@ -35,6 +35,14 @@ public interface Expression {
      * @param parameters - evaluate parameters
      * @return evaluate result
      */
+    Object evaluate();
+
+    /**
+     * Evaluate the expression.
+     * 
+     * @param parameters - evaluate parameters
+     * @return evaluate result
+     */
     Object evaluate(Map<String, Object> parameters);
 
     /**

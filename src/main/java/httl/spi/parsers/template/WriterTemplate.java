@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -56,23 +55,23 @@ public abstract class WriterTemplate extends AbstractTemplate {
         try {
             render(parameters, output);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
         return output.toString();
     }
 
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
-        render(parameters, new OutputStreamWriter(output));
+    	Writer writer = new OutputStreamWriter(output);
+    	render(parameters, writer);
+    	writer.flush();
     }
 
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
     	if (writer == null) 
          	throw new IllegalArgumentException("writer == null");
-    	if (parameters == null)
-    		parameters = new HashMap<String, Object>();
     	Context context = Context.pushContext(this, parameters, writer);
         try {
-            doRender(context, parameters, writer);
+            doRender(context, writer);
         } catch (RuntimeException e) {
             throw (RuntimeException) e;
         } catch (IOException e) {
@@ -84,6 +83,6 @@ public abstract class WriterTemplate extends AbstractTemplate {
         }
     }
 
-    protected abstract void doRender(Context context, Map<String, Object> parameters, Writer output) throws Exception;
+    protected abstract void doRender(Context context, Writer output) throws Exception;
 
 }

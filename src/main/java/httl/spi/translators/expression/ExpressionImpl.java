@@ -82,6 +82,10 @@ public class ExpressionImpl implements Expression, Serializable {
     public Node getNode() {
 		return node;
 	}
+    
+    public Object evaluate() {
+    	return evaluate(Context.getContext());
+    }
 
     public Object evaluate(Map<String, Object> parameters) {
     	if (evaluator == null) {
@@ -102,7 +106,7 @@ public class ExpressionImpl implements Expression, Serializable {
     
     @Override
     public String toString() {
-    	Object value = evaluate(Context.getContext());
+    	Object value = evaluate();
     	return value == null ? null : value.toString();
     }
     

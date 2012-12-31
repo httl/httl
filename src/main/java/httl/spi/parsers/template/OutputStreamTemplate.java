@@ -21,14 +21,12 @@ import httl.Engine;
 import httl.Template;
 import httl.spi.Filter;
 import httl.spi.Formatter;
-import httl.util.ClassUtils;
 import httl.util.UnsafeByteArrayOutputStream;
 import httl.util.WriterOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -57,28 +55,9 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         try {
             render(parameters, output);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
         return output.toByteArray();
-    }
-
-    public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
-        if (output == null) 
-        	throw new IllegalArgumentException("output == null");
-        if (parameters == null)
-    		parameters = new HashMap<String, Object>();
-        Context context = Context.pushContext(this, parameters, output);
-        try {
-            doRender(context, parameters, output);
-        } catch (RuntimeException e) {
-            throw (RuntimeException) e;
-        } catch (IOException e) {
-            throw (IOException) e;
-        } catch (Exception e) {
-            throw new IllegalStateException(ClassUtils.toString(e), e);
-        } finally {
-        	Context.popContext();
-        }
     }
 
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
@@ -87,6 +66,23 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         output.flush();
     }
 
-    protected abstract void doRender(Context context, Map<String, Object> parameters, OutputStream output) throws Exception;
+    public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
+        if (output == null) 
+        	throw new IllegalArgumentException("output == null");
+        Context context = Context.pushContext(this, parameters, output);
+        try {
+            doRender(context, output);
+        } catch (RuntimeException e) {
+            throw (RuntimeException) e;
+        } catch (IOException e) {
+            throw (IOException) e;
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+        	Context.popContext();
+        }
+    }
+
+    protected abstract void doRender(Context context, OutputStream output) throws Exception;
 
 }

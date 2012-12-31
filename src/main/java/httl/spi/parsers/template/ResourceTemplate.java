@@ -88,12 +88,24 @@ public class ResourceTemplate implements Template {
 		return false;
 	}
 
+	public Object evaluate() {
+		throw new UnsupportedOperationException();
+	}
+
 	public Object evaluate(Map<String, Object> parameters) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void render(OutputStream output) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
 	public void render(Map<String, Object> parameters, OutputStream output)
 			throws IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public void render(Writer writer) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 

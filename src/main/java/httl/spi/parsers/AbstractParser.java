@@ -549,7 +549,7 @@ public abstract class AbstractParser implements Parser {
                     + macroInits
                     + "}\n"
                     + "\n"
-                    + "protected void doRender(" + Context.class.getName() + " $context, " + Map.class.getName() + " $parameters, " 
+                    + "protected void doRender(" + Context.class.getName() + " $context, " 
                     + (stream ? OutputStream.class.getName() : Writer.class.getName())
                     + " $output) throws " + Exception.class.getName() + " {\n" 
                     + methodCode
@@ -1130,7 +1130,7 @@ public abstract class AbstractParser implements Parser {
                 buf.append(var);
                 buf.append(" = (");
                 buf.append(type);
-                buf.append(") $parameters.get(\"");
+                buf.append(") $context.get(\"");
                 buf.append(var);
                 buf.append("\");\n");
             }

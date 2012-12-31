@@ -16,7 +16,6 @@
  */
 package httl.spi.parsers.template;
 
-import httl.Context;
 import httl.Engine;
 import httl.Template;
 import httl.spi.Filter;
@@ -25,9 +24,11 @@ import httl.util.UnsafeByteArrayInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +64,12 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.macros = initMacros(engine, filter, formatter, functions, importMacros);
 	}
 
+    protected String filter(String value) {
+        if (filter != null)
+            return filter.filter(value);
+        return value;
+    }
+
 	protected TemplateFormatter getFormatter() {
 		return formatter;
 	}
@@ -73,6 +80,18 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	public InputStream getInputStream() throws IOException {
 		return new UnsafeByteArrayInputStream(getSource().getBytes(getEncoding()));
+	}
+
+	public Object evaluate() {
+		return evaluate(null);
+	}
+
+	public void render(OutputStream output) throws IOException {
+		render(null, output);
+	}
+
+	public void render(Writer writer) throws IOException {
+		render(null, writer);
 	}
 
 	protected Map<String, Template> getImportMacros() {
@@ -135,17 +154,11 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     @Override
     public String toString() {
-    	Object value = evaluate(Context.getContext());
+    	Object value = evaluate();
         if (value instanceof byte[]) {
         	return formatter.format((byte[]) value);
         }
         return (String) value;
-    }
-
-    protected String filter(String value) {
-        if (filter != null)
-            return filter.filter(value);
-        return value;
     }
 
 }
