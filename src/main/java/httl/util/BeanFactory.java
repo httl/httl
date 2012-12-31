@@ -95,7 +95,8 @@ public class BeanFactory {
 						if (value == null || value.length() == 0) {
 							value = properties.getProperty(key);
 						}
-						if (value != null && value.length() > 0) {
+						if (value != null && value.trim().length() > 0) {
+							value = value.trim();
 							Object obj;
 							if (parameterType.isArray()) {
 								Class<?> componentType = parameterType.getComponentType();

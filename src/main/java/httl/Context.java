@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public final class Context implements Map<String, Object> {
 
-    // The thread local holder.
+    // The context thread local holder.
     private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
     /**
@@ -90,6 +90,18 @@ public final class Context implements Map<String, Object> {
     public static void removeContext() {
         LOCAL.remove();
     }
+
+    // The context key
+    private static final String CONTEXT_KEY = "context";
+
+    // The parent key
+    private static final String PARENT_KEY = "parent";
+
+    // The template key
+    private static final String TEMPLATE_KEY = "template";
+
+    // The output key
+    private static final String OUTPUT_KEY = "output";
 
     // The parent context.
     private final Context parent;
@@ -167,10 +179,19 @@ public final class Context implements Map<String, Object> {
 				return value;
 			}
 		}
-		if (parent != null) {
-			return parent.get(key);
+		if (CONTEXT_KEY.equals(key)) {
+			return this;
 		}
-		return null;
+		if (PARENT_KEY.equals(key)) {
+			return parent;
+		}
+		if (TEMPLATE_KEY.equals(key)) {
+			return template;
+		}
+		if (OUTPUT_KEY.equals(key)) {
+			return output;
+		}
+		return parent == null ? null : parent.get(key);
 	}
 
 	// java.util.Map

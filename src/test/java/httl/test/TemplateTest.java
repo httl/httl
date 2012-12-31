@@ -90,6 +90,7 @@ public class TemplateTest extends TestCase {
             bookmap2.put(book.getTitle().replaceAll("\\s+", ""), book);
         }
         Map<String, Object> context = new HashMap<String, Object>();
+        context.put("impvar", "abcxyz");
         context.put("user", user);
         context.put("books", books);
         context.put("booklist", Arrays.asList(books));
@@ -124,9 +125,9 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "set_parameters.httl".equals(file.getName())) {
-	                continue;
-	            }*/
+	            //if (! "import_var.httl".equals(file.getName())) {
+	            //    continue;
+	            //}
 	            System.out.println(file.getName());
 	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
 	            if (url == null) {

@@ -164,14 +164,18 @@ public abstract class AbstractParser implements Parser {
     protected Formatter<?> formatter;
 
     protected String[] importMacros;
-    
+   
     protected final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
 
 	protected String[] importPackages;
 
     protected Set<String> importPackageSet;
 
-    private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
+	protected String[] importVariables;
+
+	protected Map<String, Class<?>> importTypes;
+
+	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
     protected static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
     
@@ -325,15 +329,20 @@ public abstract class AbstractParser implements Parser {
     /**
      * httl.properties: import.packages=java.util
      */
-	public void setImportPackages(String packages) {
-		if (packages != null && packages.trim().length() > 0) {
-            importPackages = packages.trim().split("\\s*\\,\\s*");
-            importPackageSet = new HashSet<String>(Arrays.asList(importPackages));
-        }
+	public void setImportPackages(String[] importPackages) {
+        this.importPackages = importPackages;
+        this.importPackageSet = new HashSet<String>(Arrays.asList(importPackages));
+	}
+
+	/**
+     * httl.properties: import.variables=javax.servlet.http.HttpServletRequest request
+     */
+    public void setImportVariables(String[] importVariables) {
+		this.importVariables = importVariables;
 	}
 
     /**
-     * httl.properties: import.methods=httl.spi.methods.DefaultMethod
+     * httl.properties: import.methods=java.lang.Math
      */
     public void setImportMethods(Object[] importMethods) {
     	for (Object function : importMethods) {
@@ -344,9 +353,25 @@ public abstract class AbstractParser implements Parser {
     		}
     	}
     }
+    
+    /**
+     * init.
+     */
+    public void init() {
+    	if (importVariables != null && importVariables.length > 0) {
+	    	this.importTypes = new HashMap<String, Class<?>>();
+			for (String var : importVariables) {
+				int i = var.lastIndexOf(' ');
+				if (i < 0) {
+					throw new IllegalArgumentException("Illegal config import.variables");
+				}
+				this.importTypes.put(var.substring(i + 1), ClassUtils.forName(importPackages, var.substring(0, i)));
+			}
+    	}
+    }
 
     /**
-     * init the parser.
+     * inited.
      */
     public void inited() {
     	if (importMacros != null && importMacros.length > 0) {
@@ -425,6 +450,9 @@ public abstract class AbstractParser implements Parser {
         } catch (ClassNotFoundException e) {
         	Set<String> variables = new HashSet<String>();
         	Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+        	if (importTypes != null && importTypes.size() > 0) {
+        		types.putAll(importTypes);
+        	}
         	Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
         	StringBuilder statusInit = new StringBuilder();
         	types.put("this", Template.class);
@@ -466,6 +494,13 @@ public abstract class AbstractParser implements Parser {
             	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
             }
             StringBuilder declare = new StringBuilder();
+            if (importTypes != null && importTypes.size() > 0) {
+        		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
+        			String var = entry.getKey();
+        			String type = entry.getValue().getCanonicalName();
+        			declare.append("	" + type + " " + var + " = (" + type + ") $context.get(\"" + var + "\");\n");
+        		}
+        	}
             for (String var : variables) {
             	if (! parameters.contains(var)) {
 	                Class<?> type = types.get(var);
@@ -979,11 +1014,11 @@ public abstract class AbstractParser implements Parser {
             String[] tokens = value.substring(0, start).trim().split("\\s+");
             String type;
             String var;
-            String varName = code.trim();
+            String vName = code.trim();
             if (expression instanceof ExpressionImpl) {
             	String vn = ((ExpressionImpl) expression).getNode().getGenericVariableName();
             	if (vn != null) {
-            		varName = vn;
+            		vName = vn;
             	}
             }
             if (tokens.length == 1) {
@@ -993,8 +1028,8 @@ public abstract class AbstractParser implements Parser {
                 } else if (Map.class.isAssignableFrom(returnType)) {
                     type = Map.class.getName() + ".Entry";
                 } else if (Collection.class.isAssignableFrom(returnType)
-                        && types.get(varName + ":0") != null) {
-                    type = types.get(varName + ":0").getName();
+                        && types.get(vName + ":0") != null) {
+                    type = types.get(vName + ":0").getName();
                 } else {
                     type = Object.class.getSimpleName();
                 }
@@ -1008,11 +1043,11 @@ public abstract class AbstractParser implements Parser {
             Class<?> clazz = ClassUtils.forName(importPackages, type);
             types.put(var, clazz);
             if (Map.class.isAssignableFrom(returnType)) {
-            	Class<?> keyType = types.get(varName + ":0");
+            	Class<?> keyType = types.get(vName + ":0");
             	if (keyType != null) {
             		types.put(var + ":0", keyType);
             	}
-            	Class<?> valueType = types.get(varName + ":1");
+            	Class<?> valueType = types.get(vName + ":1");
             	if (valueType != null) {
             		types.put(var + ":1", valueType);
             	}
