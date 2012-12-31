@@ -37,6 +37,7 @@ public interface Template extends Resource, Expression {
      * Render the template to output stream.
      * 
      * @see httl.Context#getParameters()
+     * @see httl.Context#getOutput()
      * @param parameters - render parameters
      * @param output - output stream
      * @throws IOException - If an I/O error occurs
@@ -47,6 +48,7 @@ public interface Template extends Resource, Expression {
      * Render the template to writer.
      * 
      * @see httl.Context#getParameters()
+     * @see httl.Context#getOutput()
      * @param parameters - render parameters
      * @param writer - writer
      * @throws IOException - If an I/O error occurs

@@ -159,8 +159,7 @@ public class FileMethod {
     
     public Template include(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
     	if (parameters != null) {
-    		Map<String, Object> contextParameters = Context.getContext().getParameters();
-    		contextParameters.putAll(parameters);
+    		Context.getContext().putAll(parameters);
     	}
     	return include(name, locale, encoding);
     }

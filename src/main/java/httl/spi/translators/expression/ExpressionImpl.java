@@ -102,7 +102,7 @@ public class ExpressionImpl implements Expression, Serializable {
     
     @Override
     public String toString() {
-    	Object value = evaluate(Context.getContext().getParameters());
+    	Object value = evaluate(Context.getContext());
     	return value == null ? null : value.toString();
     }
     

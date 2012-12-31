@@ -798,7 +798,7 @@ public abstract class AbstractParser implements Parser {
 	            	buf.append("	");
 	            	buf.append("(");
 	            	buf.append(code);
-	            	buf.append(").render($context.getParameters(), $output);");
+	            	buf.append(").render($context, $output);");
 	            } else if (nofilter && Resource.class.isAssignableFrom(returnType)) {
 	            	buf.append("	");
 	            	buf.append(IOUtils.class.getName());
@@ -812,7 +812,7 @@ public abstract class AbstractParser implements Parser {
 	            	buf.append(", $output);\n");
 	            } else {
 	            	if (Expression.class.isAssignableFrom(returnType)) {
-	            		code = "(" + code + ").evaluate($context.getParameters())";
+	            		code = "(" + code + ").evaluate($context)";
 	            		returnType = Object.class;
 	            	} else if (Resource.class.isAssignableFrom(returnType)) {
 	            		code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
@@ -1074,7 +1074,7 @@ public abstract class AbstractParser implements Parser {
                 variables.add(var);
                 buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
                 if (":=".equals(oper)) {
-    	            buf.append("	($context.getParent() != null ? $context.getParent() : $context).getParameters().put(\"");
+    	            buf.append("	($context.getParent() != null ? $context.getParent() : $context).put(\"");
     	            buf.append(var);
     	            buf.append("\", ");
     	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");

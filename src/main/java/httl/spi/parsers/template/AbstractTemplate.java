@@ -135,7 +135,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     @Override
     public String toString() {
-    	Object value = evaluate(Context.getContext().getParameters());
+    	Object value = evaluate(Context.getContext());
         if (value instanceof byte[]) {
         	return formatter.format((byte[]) value);
         }

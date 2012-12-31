@@ -151,7 +151,7 @@ public class TemplateTest extends TestCase {
 	            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
 	            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
 	            if ("set_parameters.httl".equals(file.getName())) {
-	            	super.assertEquals(file.getName(), "abc", Context.getContext().getParameters().get("title"));
+	            	super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
 	            }
 	        }
         }
