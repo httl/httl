@@ -37,6 +37,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * WebEngine (Integration, Singleton, NotThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class WebEngine {
 
     private static final String CONFIG_KEY = "httl.properties";

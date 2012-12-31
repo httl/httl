@@ -33,6 +33,11 @@ import org.apache.struts2.components.template.TemplateRenderingContext;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.util.ValueStack;
 
+/**
+ * HttlTemplateEngine. (Integration, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class HttlTemplateEngine extends BaseTemplateEngine {
 
     public void renderTemplate(TemplateRenderingContext templateContext) throws Exception {

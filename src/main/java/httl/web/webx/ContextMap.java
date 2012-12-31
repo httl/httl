@@ -24,7 +24,7 @@ import java.util.Set;
 import com.alibaba.citrus.service.template.TemplateContext;
 
 /**
- * TemplateContextMap. (Integration, Prototype, ThreadSafe)
+ * ContextMap. (Integration, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

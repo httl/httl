@@ -21,7 +21,9 @@ import httl.spi.Logger;
 import java.io.Serializable;
 
 /**
- * SimpleLogger.
+ * SimpleLogger. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setLogger(Logger)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

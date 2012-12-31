@@ -19,7 +19,7 @@ package httl.spi.translators.expression;
 import java.text.ParseException;
 
 /**
- * Bracket
+ * Bracket. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

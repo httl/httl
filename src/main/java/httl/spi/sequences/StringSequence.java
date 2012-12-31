@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * StringSequence.
+ * StringSequence. (SPI, Prototype, ThreadSafe)
  * 
  * @see httl.spi.translators.DefaultTranslator#setSequences(String[])
  *

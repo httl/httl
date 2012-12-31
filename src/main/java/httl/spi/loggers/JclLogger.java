@@ -22,7 +22,9 @@ import org.apache.commons.logging.LogFactory;
 import httl.spi.Logger;
 
 /**
- * JclLogger
+ * JclLogger. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setLogger(Logger)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

@@ -17,7 +17,7 @@
 package httl.spi.translators.expression;
 
 /**
- * Token. (Tool, Prototype, ThreadUnsafe)
+ * Token. (Tool, Prototype, NotThreadsafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

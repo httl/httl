@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * BinaryOperator
+ * BinaryOperator. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

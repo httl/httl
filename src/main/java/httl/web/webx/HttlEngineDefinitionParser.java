@@ -35,6 +35,11 @@ import org.w3c.dom.Element;
 import com.alibaba.citrus.springext.support.parser.AbstractSingleBeanDefinitionParser;
 import com.alibaba.citrus.springext.util.DomUtil.ElementSelector;
 
+/**
+ * HttlEngineDefinitionParser. (Integration, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class HttlEngineDefinitionParser extends AbstractSingleBeanDefinitionParser<HttlEngine>  {
 
 	@Override

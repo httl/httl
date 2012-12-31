@@ -44,6 +44,8 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * DefaultEngine. (SPI, Singleton, ThreadSafe)
  * 
+ * @see httl.Engine#getEngine()
+ * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DefaultEngine extends Engine {

@@ -22,7 +22,9 @@ import java.io.Serializable;
 import java.util.logging.Level;
 
 /**
- * JdkLogger
+ * JdkLogger. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setLogger(Logger)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

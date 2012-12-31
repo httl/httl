@@ -16,14 +16,12 @@
  */
 package httl.spi.translators.expression;
 
-
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Map;
 
-
 /**
- * Node
+ * Node. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

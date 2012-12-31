@@ -18,9 +18,8 @@ package httl.spi.translators.expression;
 
 import java.text.ParseException;
 
-
 /**
- * Constant
+ * Constant. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

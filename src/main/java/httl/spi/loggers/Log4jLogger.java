@@ -24,7 +24,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
 /**
- * Log4jLogger
+ * Log4jLogger. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setLogger(Logger)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

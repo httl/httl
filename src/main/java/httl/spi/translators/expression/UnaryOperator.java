@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * UnaryOperator
+ * UnaryOperator. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

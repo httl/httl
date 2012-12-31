@@ -21,9 +21,8 @@ import httl.spi.Translator;
 import java.text.ParseException;
 import java.util.Map;
 
-
 /**
- * Variable
+ * Variable. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

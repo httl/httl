@@ -19,7 +19,7 @@ package httl.spi.translators.expression;
 import java.util.Map;
 
 /**
- * Evaluator
+ * Evaluator. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

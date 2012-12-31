@@ -36,7 +36,7 @@ import com.alibaba.citrus.service.template.TemplateException;
 import com.alibaba.citrus.turbine.TurbineRunData;
 
 /**
- * HttlTemplateEngine. (Integration, Singleton, ThreadSafe)
+ * HttlEngine. (Integration, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

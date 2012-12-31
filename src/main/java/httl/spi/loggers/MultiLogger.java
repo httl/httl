@@ -18,6 +18,13 @@ package httl.spi.loggers;
 
 import httl.spi.Logger;
 
+/**
+ * MultiLogger. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setLogger(Logger)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class MultiLogger implements Logger {
 
 	private Logger[] loggers;
