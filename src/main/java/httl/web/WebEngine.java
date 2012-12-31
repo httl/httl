@@ -183,7 +183,7 @@ public class WebEngine {
 		}
 		boolean unresolved = RequestResolver.getRequest() == null;
 		if (unresolved) {
-			RequestResolver.setRequest(request);
+			RequestResolver.set(request, response);
 		}
 		Map<String, Object> parameters = RequestResolver.getAndCheckPrarameters();
 		if (model != null) {
@@ -230,7 +230,7 @@ public class WebEngine {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
 		} finally {
 			if (unresolved) {
-				RequestResolver.removeRequest();
+				RequestResolver.remove();
 			}
 		}
 	}

@@ -28,26 +28,32 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class RequestResolver implements Resolver, Filter {
 
     private static final ThreadLocal<RequestMap> LOCAL = new ThreadLocal<RequestMap>();
 
-	public static void setRequest(HttpServletRequest request) {
+	public static void set(HttpServletRequest request, HttpServletResponse response) {
 		if (request != null) {
-			LOCAL.set(new RequestMap(request));
+			LOCAL.set(new RequestMap(request, response));
 		} else {
-			removeRequest();
+			remove();
 		}
 	}
 	
-	public static void removeRequest() {
+	public static void remove() {
 		LOCAL.remove();
 	}
 
     public static HttpServletRequest getRequest() {
     	RequestMap map = LOCAL.get();
     	return map == null ? null : map.getRequest();
+    }
+    
+    public static HttpServletResponse getResponse() {
+    	RequestMap map = LOCAL.get();
+    	return map == null ? null : map.getResponse();
     }
 
 	public static Map<String, Object> getPrarameters() {
@@ -81,11 +87,11 @@ public class RequestResolver implements Resolver, Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
-		setRequest((HttpServletRequest) request);
+		set((HttpServletRequest) request, (HttpServletResponse) response);
 		try {
 			chain.doFilter(request, response);
 		} finally {
-			removeRequest();
+			remove();
 		}
 	}
 

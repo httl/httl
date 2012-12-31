@@ -20,13 +20,15 @@ import httl.util.ClassUtils;
 import httl.util.StringUtils;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * RequestMap. (Integration, Prototype, ThreadSafe)
@@ -34,8 +36,14 @@ import javax.servlet.http.HttpServletRequest;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class RequestMap implements Map<String, Object> {
+
+    private static final String REQUEST_KEY = "request";
+
+    private static final String RESPONSE_KEY = "response";
     
-    private static final String CONTEXT_PREFIX = "context.";
+    private static final String SESSION_KEY = "session";
+    
+    private static final String APPLICATION_KEY = "application";
 
     private static final String PARAMETER_PREFIX = "parameter.";
 
@@ -50,61 +58,40 @@ public class RequestMap implements Map<String, Object> {
     private static final String APPLICATION_PREFIX = "application.";
 
     private final HttpServletRequest request;
+
+    private final HttpServletResponse response;
     
-	private final Map<String, Object> context;
-    
-    public RequestMap(HttpServletRequest request){
-        this(request, null);
-    }
-    
-    public RequestMap(HttpServletRequest request, Map<String, Object> context){
+    public RequestMap(HttpServletRequest request, HttpServletResponse response){
         this.request = request;
-        this.context = context == null ? new HashMap<String, Object>() : context;
+        this.response = response;
     }
 
     public HttpServletRequest getRequest() {
 		return request;
 	}
 
-    public int size() {
-        return 0;
-    }
-
-    public boolean isEmpty() {
-        return false;
-    }
-
-    public boolean containsValue(Object value) {
-        if (value == null) {
-            return false;
-        }
-        Set<String> keys = context.keySet();
-        if (keys != null && keys.size() > 0) {
-            for (String key : keys) {
-                if (value.equals(context.get(key))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean containsKey(Object key) {
-        String k = (String) key;
-        if (k == null || k.length() == 0) {
-            return false;
-        }
-        return context.containsKey(k) || request.getParameter(k) != null;
-    }
+    public HttpServletResponse getResponse() {
+		return response;
+	}
 
     public Object get(Object key) {
         String k = (String) key;
         if (k == null || k.length() == 0) {
             return null;
         }
-        if (k.startsWith(CONTEXT_PREFIX)) {
-            return context.get(k.substring(CONTEXT_PREFIX.length()));
-        } else if (k.startsWith(REQUEST_PREFIX)) {
+        if (REQUEST_KEY.equals(key)) {
+        	return request;
+        }
+        if (RESPONSE_KEY.equals(key)) {
+        	return response;
+        }
+        if (SESSION_KEY.equals(key)) {
+        	return request.getSession();
+        }
+        if (APPLICATION_KEY.equals(key)) {
+        	return request.getSession().getServletContext();
+        }
+        if (k.startsWith(REQUEST_PREFIX)) {
         	String property = k.substring(REQUEST_PREFIX.length());
         	Object value = ClassUtils.getProperty(request, property);
         	if (value != null) {
@@ -137,11 +124,7 @@ public class RequestMap implements Map<String, Object> {
         	}
             return request.getSession().getServletContext().getAttribute(property);
         } else {
-			Object value = context.get(k);
-			if (value != null) {
-        		return value;
-        	}
-			value = ClassUtils.getProperty(request, k);
+			Object value = ClassUtils.getProperty(request, k);
 			if (value != null) {
         		return value;
         	}
@@ -213,7 +196,7 @@ public class RequestMap implements Map<String, Object> {
             return null;
         }
         if (key.startsWith(REQUEST_PREFIX)) {
-            key = key.substring(APPLICATION_PREFIX.length());
+            key = key.substring(REQUEST_PREFIX.length());
             Object old = request.getAttribute(key);
             if (value == null) {
                 request.removeAttribute(key);
@@ -222,7 +205,7 @@ public class RequestMap implements Map<String, Object> {
             }
             return old;
         } else if (key.startsWith(SESSION_PREFIX)) {
-            key = key.substring(APPLICATION_PREFIX.length());
+            key = key.substring(SESSION_PREFIX.length());
             Object old = request.getSession().getAttribute(key);
             if (value == null) {
                 request.getSession().removeAttribute(key);
@@ -231,7 +214,7 @@ public class RequestMap implements Map<String, Object> {
             }
             return old;
         } else if (key.startsWith(COOKIE_PREFIX)) {
-            key = key.substring(APPLICATION_PREFIX.length());
+            key = key.substring(COOKIE_PREFIX.length());
             Object old = null;
             Cookie[] cookies = request.getCookies();
             if (cookies != null && cookies.length > 0) {
@@ -258,21 +241,14 @@ public class RequestMap implements Map<String, Object> {
             }
             return old;
         } else {
-            if (key.startsWith(APPLICATION_PREFIX)) {
-                key = key.substring(APPLICATION_PREFIX.length());
-            }
-            Object old = context.get(key);
+        	Object old = request.getAttribute(key);
             if (value == null) {
-                context.remove(key);
+                request.removeAttribute(key);
             } else {
-                context.put(key, value);
+                request.setAttribute(key, value);
             }
             return old;
         }
-    }
-
-    public Object remove(Object key) {
-        return put((String) key, null);
     }
 
     public void putAll(Map<? extends String, ? extends Object> map) {
@@ -283,39 +259,57 @@ public class RequestMap implements Map<String, Object> {
         }
     }
 
+    public Object remove(Object key) {
+        return put((String) key, null);
+    }
+
     public void clear() {
-        Set<String> keys = context.keySet();
-        if (keys != null && keys.size() > 0) {
-            for (String key : keys) {
-                context.remove(key);
-            }
-        }
     }
 
-    public Set<String> keySet() {
-        return context.keySet();
+    public int size() {
+        return keySet().size();
     }
 
-    public Collection<Object> values() {
-        Set<String> keys = context.keySet();
-        Set<Object> values = new HashSet<Object>();
-        if (keys != null && keys.size() > 0) {
-            for (String key : keys) {
-                values.add(context.get(key));
-            }
-        }
-        return values;
+    public boolean isEmpty() {
+        return size() > 0;
     }
 
-    public Set<Entry<String, Object>> entrySet() {
-        Set<String> keys = context.keySet();
-        Set<Entry<String, Object>> entries = new HashSet<Entry<String, Object>>();
-        if (keys != null && keys.size() > 0) {
-            for (String key : keys) {
-                entries.add(new ParameterEntry(key));
-            }
-        }
-        return entries;
+    public boolean containsKey(Object key) {
+        return get(key) != null;
+    }
+
+    public boolean containsValue(Object value) {
+        return values().contains(value);
+    }
+
+    @SuppressWarnings("unchecked")
+	public Set<String> keySet() {
+    	Set<String> keySet = new HashSet<String>();
+    	Enumeration<String> e = request.getAttributeNames();
+    	while (e.hasMoreElements()) {
+    		keySet.add(e.nextElement());
+    	}
+    	e = request.getParameterNames();
+    	while (e.hasMoreElements()) {
+    		keySet.add(e.nextElement());
+    	}
+        return Collections.unmodifiableSet(keySet);
+    }
+
+	public Collection<Object> values() {
+    	Collection<Object> values = new HashSet<Object>();
+    	for (String key : keySet()) {
+    		values.add(get(key));
+    	}
+        return Collections.unmodifiableCollection(values);
+    }
+
+	public Set<Entry<String, Object>> entrySet() {
+        Set<Entry<String, Object>> entrySet = new HashSet<Entry<String, Object>>();
+        for (String key : keySet()) {
+    		entrySet.add(new ParameterEntry(key));
+    	}
+        return entrySet;
     }
     
     private class ParameterEntry implements Entry<String, Object> {
