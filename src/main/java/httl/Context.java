@@ -17,6 +17,7 @@
 package httl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -163,99 +164,111 @@ public final class Context implements Map<String, Object> {
 			}
 		}
 		if (parent != null) {
-			Object value = parent.get(key);
-			if (value != null) {
-				return value;
-			}
+			return parent.get(key);
 		}
 		return null;
 	}
 
 	// java.util.Map
+	@SuppressWarnings("unchecked")
 	public Set<Map.Entry<String, Object>> entrySet() {
-		Set<Map.Entry<String, Object>> enrtySet = new HashSet<Map.Entry<String, Object>>();
+		Set<Map.Entry<String, Object>> entrySet = null;
 		if (storage != null) {
-			enrtySet.addAll(storage.entrySet());
+			if (parameters == null && parent == null) {
+				return storage.entrySet();
+			}
+			if (entrySet == null) {
+				entrySet = new HashSet<Map.Entry<String, Object>>();
+			}
+			entrySet.addAll(storage.entrySet());
 		}
 		if (parameters != null) {
-			enrtySet.addAll(parameters.entrySet());
+			if (storage == null && parent == null) {
+				return parameters.entrySet();
+			}
+			if (entrySet == null) {
+				entrySet = new HashSet<Map.Entry<String, Object>>();
+			}
+			entrySet.addAll(parameters.entrySet());
 		}
 		if (parent != null) {
-			enrtySet.addAll(parent.entrySet());
+			if (parameters == null && storage == null) {
+				return parent.entrySet();
+			}
+			if (entrySet == null) {
+				entrySet = new HashSet<Map.Entry<String, Object>>();
+			}
+			entrySet.addAll(parent.entrySet());
 		}
-		return enrtySet;
+		return entrySet == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(entrySet);
 	}
 
 	// java.util.Map
+	@SuppressWarnings("unchecked")
 	public Set<String> keySet() {
-		Set<String> keySet = new HashSet<String>();
+		Set<String> keySet = null;
 		if (storage != null) {
+			if (parameters == null && parent == null) {
+				return storage.keySet();
+			}
+			if (keySet == null) {
+				keySet = new HashSet<String>();
+			}
 			keySet.addAll(storage.keySet());
 		}
 		if (parameters != null) {
+			if (storage == null && parent == null) {
+				return parameters.keySet();
+			}
+			if (keySet == null) {
+				keySet = new HashSet<String>();
+			}
 			keySet.addAll(parameters.keySet());
 		}
 		if (parent != null) {
+			if (parameters == null && storage == null) {
+				return parent.keySet();
+			}
+			if (keySet == null) {
+				keySet = new HashSet<String>();
+			}
 			keySet.addAll(parent.keySet());
 		}
-		return keySet;
+		return keySet == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(keySet);
 	}
 
 	// java.util.Map
+	@SuppressWarnings("unchecked")
 	public Collection<Object> values() {
-		Collection<Object> values = new HashSet<Object>();
+		Collection<Object> values = null;
 		if (storage != null) {
+			if (parameters == null && parent == null) {
+				return storage.values();
+			}
+			if (values == null) {
+				values = new HashSet<Object>();
+			}
 			values.addAll(storage.values());
 		}
 		if (parameters != null) {
+			if (storage == null && parent == null) {
+				return parameters.values();
+			}
+			if (values == null) {
+				values = new HashSet<Object>();
+			}
 			values.addAll(parameters.values());
 		}
 		if (parent != null) {
+			if (parameters == null && storage == null) {
+				return parent.values();
+			}
+			if (values == null) {
+				values = new HashSet<Object>();
+			}
 			values.addAll(parent.values());
 		}
-		return values;
-	}
-
-	// java.util.Map
-	public boolean containsKey(Object key) {
-		if (storage != null && storage.containsKey(key)) {
-			return true;
-		}
-		if (parameters != null && parameters.containsKey(key)) {
-			return true;
-		}
-		if (parent != null && parent.containsKey(key)) {
-			return true;
-		}
-		return false;
-	}
-
-	// java.util.Map
-	public boolean containsValue(Object value) {
-		if (storage != null && storage.containsValue(value)) {
-			return true;
-		}
-		if (parameters != null && parameters.containsValue(value)) {
-			return true;
-		}
-		if (parent != null && parent.containsValue(value)) {
-			return true;
-		}
-		return false;
-	}
-
-	// java.util.Map
-	public boolean isEmpty() {
-		if (storage != null && ! storage.isEmpty()) {
-			return false;
-		}
-		if (parameters != null && ! parameters.isEmpty()) {
-			return false;
-		}
-		if (parent != null && ! parent.isEmpty()) {
-			return false;
-		}
-		return true;
+		return values == null ? Collections.EMPTY_SET : Collections.unmodifiableCollection(values);
 	}
 
 	// java.util.Map
@@ -271,6 +284,39 @@ public final class Context implements Map<String, Object> {
 			size += parent.size();
 		}
 		return size;
+	}
+
+	// java.util.Map
+	public boolean containsKey(Object key) {
+		if (storage != null && storage.containsKey(key)) {
+			return true;
+		}
+		if (parameters != null && parameters.containsKey(key)) {
+			return true;
+		}
+		return parent != null && parent.containsKey(key);
+	}
+
+	// java.util.Map
+	public boolean containsValue(Object value) {
+		if (storage != null && storage.containsValue(value)) {
+			return true;
+		}
+		if (parameters != null && parameters.containsValue(value)) {
+			return true;
+		}
+		return parent != null && parent.containsValue(value);
+	}
+
+	// java.util.Map
+	public boolean isEmpty() {
+		if (storage != null && ! storage.isEmpty()) {
+			return false;
+		}
+		if (parameters != null && ! parameters.isEmpty()) {
+			return false;
+		}
+		return parent == null || parent.isEmpty();
 	}
 
 	// java.util.Map
