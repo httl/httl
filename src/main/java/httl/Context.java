@@ -168,7 +168,7 @@ public final class Context extends DelegateMap<String, Object> {
      * @see #getContext()
      * @return parameter value
      */
-    public Object get(Object key, Object defaultValue) {
+    public Object get(String key, Object defaultValue) {
     	Object value = get(key);
     	if (value == null) {
     		return defaultValue;
