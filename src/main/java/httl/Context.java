@@ -183,7 +183,7 @@ public final class Context extends DelegateMap<String, Object> {
 		if (OUTPUT_KEY.equals(key)) {
 			return output;
 		}
-		return null;
+		return template.getMacros().get(key);
 	}
 
 }

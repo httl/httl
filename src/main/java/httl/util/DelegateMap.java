@@ -71,14 +71,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 	@SuppressWarnings("unchecked")
 	public Set<Map.Entry<K, V>> entrySet() {
 		Set<Map.Entry<K, V>> entrySet = null;
-		if (writable != null) {
-			if (current == null && parent == null) {
-				return writable.entrySet();
+		if (parent != null) {
+			if (current == null && writable == null) {
+				return parent.entrySet();
 			}
 			if (entrySet == null) {
 				entrySet = new HashSet<Map.Entry<K, V>>();
 			}
-			entrySet.addAll(writable.entrySet());
+			entrySet.addAll(parent.entrySet());
 		}
 		if (current != null) {
 			if (writable == null && parent == null) {
@@ -89,14 +89,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 			}
 			entrySet.addAll(current.entrySet());
 		}
-		if (parent != null) {
-			if (current == null && writable == null) {
-				return parent.entrySet();
+		if (writable != null) {
+			if (current == null && parent == null) {
+				return writable.entrySet();
 			}
 			if (entrySet == null) {
 				entrySet = new HashSet<Map.Entry<K, V>>();
 			}
-			entrySet.addAll(parent.entrySet());
+			entrySet.addAll(writable.entrySet());
 		}
 		return entrySet == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(entrySet);
 	}
@@ -104,14 +104,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 	@SuppressWarnings("unchecked")
 	public Set<K> keySet() {
 		Set<K> keySet = null;
-		if (writable != null) {
-			if (current == null && parent == null) {
-				return writable.keySet();
+		if (parent != null) {
+			if (current == null && writable == null) {
+				return parent.keySet();
 			}
 			if (keySet == null) {
 				keySet = new HashSet<K>();
 			}
-			keySet.addAll(writable.keySet());
+			keySet.addAll(parent.keySet());
 		}
 		if (current != null) {
 			if (writable == null && parent == null) {
@@ -122,14 +122,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 			}
 			keySet.addAll(current.keySet());
 		}
-		if (parent != null) {
-			if (current == null && writable == null) {
-				return parent.keySet();
+		if (writable != null) {
+			if (current == null && parent == null) {
+				return writable.keySet();
 			}
 			if (keySet == null) {
 				keySet = new HashSet<K>();
 			}
-			keySet.addAll(parent.keySet());
+			keySet.addAll(writable.keySet());
 		}
 		return keySet == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(keySet);
 	}
@@ -137,14 +137,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 	@SuppressWarnings("unchecked")
 	public Collection<V> values() {
 		Collection<V> values = null;
-		if (writable != null) {
-			if (current == null && parent == null) {
-				return writable.values();
+		if (parent != null) {
+			if (current == null && writable == null) {
+				return parent.values();
 			}
 			if (values == null) {
 				values = new HashSet<V>();
 			}
-			values.addAll(writable.values());
+			values.addAll(parent.values());
 		}
 		if (current != null) {
 			if (writable == null && parent == null) {
@@ -155,14 +155,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 			}
 			values.addAll(current.values());
 		}
-		if (parent != null) {
-			if (current == null && writable == null) {
-				return parent.values();
+		if (writable != null) {
+			if (current == null && parent == null) {
+				return writable.values();
 			}
 			if (values == null) {
 				values = new HashSet<V>();
 			}
-			values.addAll(parent.values());
+			values.addAll(writable.values());
 		}
 		return values == null ? Collections.EMPTY_SET : Collections.unmodifiableCollection(values);
 	}
