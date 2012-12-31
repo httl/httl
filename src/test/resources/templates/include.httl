@@ -1,3 +1,0 @@
-$!{include("foreach.httl")}
-<!--#set(aaa := "VVV")-->
-$!{include("macro.httl#xxx")}

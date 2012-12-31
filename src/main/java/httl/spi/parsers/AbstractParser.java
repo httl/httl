@@ -1074,7 +1074,7 @@ public abstract class AbstractParser implements Parser {
                 variables.add(var);
                 buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
                 if (":=".equals(oper)) {
-    	            buf.append("	$context.getParameters().put(\"");
+    	            buf.append("	($context.getParent() != null ? $context.getParent() : $context).getParameters().put(\"");
     	            buf.append(var);
     	            buf.append("\", ");
     	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");

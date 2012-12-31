@@ -16,6 +16,7 @@
  */
 package httl.test;
 
+import httl.Context;
 import httl.Engine;
 import httl.Template;
 import httl.spi.Loader;
@@ -99,7 +100,7 @@ public class TemplateTest extends TestCase {
         context.put("books2", books2);
         context.put("booklist2", Arrays.asList(books2));
         context.put("bookmap2", bookmap2);
-        String[] configs = new String[] { "httl.properties"/*, "httl-javassist.properties", "httl-attribute.properties"*/ };
+        String[] configs = new String[] { "httl.properties", "httl-javassist.properties", "httl-attribute.properties" };
         for (String config : configs) {
 	        System.out.println("========" + config + "========");
         	Engine engine = Engine.getEngine(config);
@@ -123,7 +124,7 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "compile_expr.httl".equals(file.getName())) {
+	            /*if (! "set_parameters.httl".equals(file.getName())) {
 	                continue;
 	            }*/
 	            System.out.println(file.getName());
@@ -149,6 +150,9 @@ public class TemplateTest extends TestCase {
 	            }
 	            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
 	            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
+	            if ("set_parameters.httl".equals(file.getName())) {
+	            	super.assertEquals(file.getName(), "abc", Context.getContext().getParameters().get("title"));
+	            }
 	        }
         }
         // parse exception

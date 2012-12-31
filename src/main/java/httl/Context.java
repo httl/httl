@@ -122,7 +122,7 @@ public final class Context {
      * @param parameters - current parameters
      */
     public static Context pushContext(Template template, Map<String, Object> parameters, Object output) {
-        Context context = new Context(LOCAL.get(), template, parameters, output);
+        Context context = new Context(getContext(), template, parameters, output);
         LOCAL.set(context);
         return context;
     }

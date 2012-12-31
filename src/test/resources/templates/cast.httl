@@ -1,6 +1,0 @@
-<!--#var(Object user)-->
-<!--#set(u1 = (User) user)-->
-${u1.name}
-----
-<!--#set(User u2 = user)-->
-${u2.name}
