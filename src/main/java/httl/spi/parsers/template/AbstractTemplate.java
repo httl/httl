@@ -16,6 +16,7 @@
  */
 package httl.spi.parsers.template;
 
+import httl.Context;
 import httl.Engine;
 import httl.Template;
 import httl.spi.Filter;
@@ -68,6 +69,14 @@ public abstract class AbstractTemplate implements Template, Serializable {
         if (filter != null)
             return filter.filter(value);
         return value;
+    }
+    
+	protected Template getMacro(Context context, String key, Template defaultValue) {
+    	Object value = context.get(key);
+    	if (value == null) {
+    		return defaultValue;
+    	}
+    	return (Template) value;
     }
 
 	protected TemplateFormatter getFormatter() {

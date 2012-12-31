@@ -470,7 +470,7 @@ public abstract class AbstractParser implements Parser {
             	types.put(macro, Template.class);
             	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
             	macroInits.append("	" + macro + " = getImportMacros().get(\"" + macro + "\");\n");
-            	declare.append("	" + Template.class.getName() + " " + macro + " = (" + Template.class.getName() + ") $context.get(\"" + macro + "\", this." + macro + ");\n");
+            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
             }
             List<String> parameters = new ArrayList<String>();
             List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
@@ -499,7 +499,7 @@ public abstract class AbstractParser implements Parser {
             	types.put(macro, Template.class);
             	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
             	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
-            	declare.append("	" + Template.class.getName() + " " + macro + " = (" + Template.class.getName() + ") $context.get(\"" + macro + "\", this." + macro + ");\n");
+            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
             }
             for (String var : variables) {
             	if (! parameters.contains(var)) {

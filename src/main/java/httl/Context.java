@@ -99,6 +99,9 @@ public final class Context extends DelegateMap<String, Object> {
     // The template key
     private static final String TEMPLATE_KEY = "template";
 
+    // The template key
+    private static final String PARAMETERS_KEY = "parameters";
+
     // The output key
     private static final String OUTPUT_KEY = "output";
 
@@ -161,22 +164,6 @@ public final class Context extends DelegateMap<String, Object> {
     public Object getOutput() {
         return output;
     }
-    
-    /**
-     * Get parameter value.
-     * 
-     * @see #getContext()
-     * @param key parameter key
-     * @param defaultValue parameter default value
-     * @return parameter value
-     */
-    public Object get(String key, Object defaultValue) {
-    	Object value = get(key);
-    	if (value == null) {
-    		return defaultValue;
-    	}
-    	return value;
-    }
 
     // Get specific variable.
     @Override
@@ -189,6 +176,9 @@ public final class Context extends DelegateMap<String, Object> {
 		}
 		if (TEMPLATE_KEY.equals(key)) {
 			return template;
+		}
+		if (PARAMETERS_KEY.equals(key)) {
+			return parameters;
 		}
 		if (OUTPUT_KEY.equals(key)) {
 			return output;
