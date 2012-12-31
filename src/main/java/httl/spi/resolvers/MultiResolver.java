@@ -18,6 +18,11 @@ package httl.spi.resolvers;
 
 import httl.spi.Resolver;
 
+/**
+ * MultiResolver. (SPI, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class MultiResolver implements Resolver {
 	
 	private Resolver[] resolvers;

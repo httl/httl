@@ -18,6 +18,11 @@ package httl.spi.resolvers;
 
 import httl.spi.Resolver;
 
+/**
+ * SystemResolver. (SPI, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class SystemResolver implements Resolver {
 
 	public Object get(String key) {

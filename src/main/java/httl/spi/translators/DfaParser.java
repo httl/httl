@@ -42,7 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Deterministic Finite state Automata (DFA) Expression parser (Thread Safe)
+ * Deterministic Finite state Automata (DFA) Expression Parser (ThreadSafe)
  * 
  * @see httl.spi.translators.DefaultTranslator
  * 

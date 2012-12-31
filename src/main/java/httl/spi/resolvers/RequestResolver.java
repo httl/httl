@@ -30,6 +30,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * RequestResolver. (SPI, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class RequestResolver implements Resolver, Filter {
 
     private static final ThreadLocal<RequestMap> LOCAL = new ThreadLocal<RequestMap>();

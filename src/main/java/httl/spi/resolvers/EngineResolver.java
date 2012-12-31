@@ -19,6 +19,11 @@ package httl.spi.resolvers;
 import httl.Engine;
 import httl.spi.Resolver;
 
+/**
+ * EngineResolver. (SPI, Singleton, ThreadSafe)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class EngineResolver implements Resolver {
 
 	private Engine engine;

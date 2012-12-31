@@ -35,8 +35,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * DefaultTranslator. (SPI, Singleton, ThreadSafe)
  * 
- * Deterministic Finite state Automata (DFA)
- * 
  * @see httl.spi.parsers.AbstractParser#setTranslator(Translator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
