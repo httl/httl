@@ -45,6 +45,24 @@ public class FileMethod {
     public void setEngine(Engine engine) {
         this.engine = engine;
     }
+    
+    public Template extend(String name) throws IOException, ParseException {
+    	return extend(name, null);
+    }
+
+    public Template extend(String name, Map<String, Object> parameters) throws IOException, ParseException {
+    	Context context = Context.getContext();
+    	Template template = context.getTemplate();
+        if (template == null) {
+            throw new IllegalArgumentException("extend context template == null");
+        }
+        Template extend = engine.getTemplate(name);
+        context.putAll(template.getMacros());
+        if (parameters != null) {
+        	 context.putAll(parameters);
+        }
+        return extend;
+    }
 
     public Expression evaluate(Object source) throws IOException, ParseException {
     	if (source instanceof byte[]) {

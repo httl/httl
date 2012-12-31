@@ -35,6 +35,7 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public class WebEngine {
 
@@ -143,6 +144,13 @@ public class WebEngine {
         		&& ! properties.containsKey("resolvers")
         		&& ! properties.containsKey("resolvers+")) {
         	properties.setProperty("resolvers+", RequestResolver.class.getName());
+        }
+        if (! properties.containsKey("import.variables") 
+        		&& ! properties.containsKey("import.variables")
+        		&& ! properties.containsKey("import.variables+")) {
+        	properties.setProperty("import.variables+", HttpServletRequest.class.getName() + " request,"
+        			+ HttpServletResponse.class.getName() + " response,"
+        			+ HttpSession.class.getName() + " session");
         }
 	}
 

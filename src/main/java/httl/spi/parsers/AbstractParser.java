@@ -448,10 +448,16 @@ public abstract class AbstractParser implements Parser {
         try {
             return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
-        	Set<String> variables = new HashSet<String>();
+        	StringBuilder declare = new StringBuilder();
+            Set<String> variables = new HashSet<String>();
         	Map<String, Class<?>> types = new HashMap<String, Class<?>>();
         	if (importTypes != null && importTypes.size() > 0) {
         		types.putAll(importTypes);
+        		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
+        			String var = entry.getKey();
+        			String type = entry.getValue().getCanonicalName();
+        			declare.append("	" + type + " " + var + " = (" + type + ") $context.get(\"" + var + "\");\n");
+        		}
         	}
         	Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
         	StringBuilder statusInit = new StringBuilder();
@@ -464,6 +470,7 @@ public abstract class AbstractParser implements Parser {
             	types.put(macro, Template.class);
             	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
             	macroInits.append("	" + macro + " = getImportMacros().get(\"" + macro + "\");\n");
+            	declare.append("	" + Template.class.getName() + " " + macro + " = (" + Template.class.getName() + ") $context.get(\"" + macro + "\", this." + macro + ");\n");
             }
             List<String> parameters = new ArrayList<String>();
             List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
@@ -492,15 +499,8 @@ public abstract class AbstractParser implements Parser {
             	types.put(macro, Template.class);
             	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
             	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
+            	declare.append("	" + Template.class.getName() + " " + macro + " = (" + Template.class.getName() + ") $context.get(\"" + macro + "\", this." + macro + ");\n");
             }
-            StringBuilder declare = new StringBuilder();
-            if (importTypes != null && importTypes.size() > 0) {
-        		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
-        			String var = entry.getKey();
-        			String type = entry.getValue().getCanonicalName();
-        			declare.append("	" + type + " " + var + " = (" + type + ") $context.get(\"" + var + "\");\n");
-        		}
-        	}
             for (String var : variables) {
             	if (! parameters.contains(var)) {
 	                Class<?> type = types.get(var);
@@ -833,7 +833,7 @@ public abstract class AbstractParser implements Parser {
 	            	buf.append("	");
 	            	buf.append("(");
 	            	buf.append(code);
-	            	buf.append(").render($context, $output);");
+	            	buf.append(").render($output);");
 	            } else if (nofilter && Resource.class.isAssignableFrom(returnType)) {
 	            	buf.append("	");
 	            	buf.append(IOUtils.class.getName());
@@ -847,7 +847,7 @@ public abstract class AbstractParser implements Parser {
 	            	buf.append(", $output);\n");
 	            } else {
 	            	if (Expression.class.isAssignableFrom(returnType)) {
-	            		code = "(" + code + ").evaluate($context)";
+	            		code = "(" + code + ").evaluate()";
 	            		returnType = Object.class;
 	            	} else if (Resource.class.isAssignableFrom(returnType)) {
 	            		code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";

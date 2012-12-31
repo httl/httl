@@ -164,6 +164,20 @@ public final class Context implements Map<String, Object> {
     public Object getOutput() {
         return output;
     }
+    
+    /**
+     * Get parameter value.
+     * 
+     * @see #getContext()
+     * @return parameter value
+     */
+    public Object get(Object key, Object defaultValue) {
+    	Object value = get(key);
+    	if (value == null) {
+    		return defaultValue;
+    	}
+    	return value;
+    }
 
     // java.util.Map
 	public Object get(Object key) {
