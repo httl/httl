@@ -24,6 +24,11 @@ import java.util.Map;
 /**
  * Template. (API, Prototype, ThreadSafe)
  * 
+ * <pre>
+ * Engine engine = Engine.getEngine();
+ * Template template = engine.getTemplate("/books.httl");
+ * </pre>
+ * 
  * @see httl.Engine#getTemplate(String)
  * @see httl.Engine#getTemplate(String, String)
  * @see httl.Context#getTemplate()
@@ -36,6 +41,13 @@ public interface Template extends Resource, Expression {
     /**
      * Render the template to output stream.
      * 
+     * <pre>
+     * OutputStream output = ...;
+     * Context context = Context.getContext();
+     * context.put("foo", foo);
+     * template.render(output);
+     * </pre>
+     * 
      * @see httl.Context#getOutput()
      * @param output - output stream
      * @throws IOException - If an I/O error occurs
@@ -44,6 +56,13 @@ public interface Template extends Resource, Expression {
 
     /**
      * Render the template to output stream.
+     * 
+     * <pre>
+     * OutputStream output = ...;
+     * Map&lt;String, Object&gt; parameters = new HashMap&lt;String, Object&gt;();
+     * parameters.put("foo", foo);
+     * template.render(parameters, output);
+     * </pre>
      * 
      * @see httl.Context#getParameters()
      * @see httl.Context#getOutput()
@@ -56,6 +75,13 @@ public interface Template extends Resource, Expression {
     /**
      * Render the template to writer.
      * 
+     * <pre>
+     * Writer writer = ...;
+     * Context context = Context.getContext();
+     * context.put("foo", foo);
+     * template.render(writer);
+     * </pre>
+     * 
      * @see httl.Context#getOutput()
      * @param writer - writer
      * @throws IOException - If an I/O error occurs
@@ -64,6 +90,13 @@ public interface Template extends Resource, Expression {
 
     /**
      * Render the template to writer.
+     * 
+     * <pre>
+     * Writer writer = ...;
+     * Map&lt;String, Object&gt; parameters = new HashMap&lt;String, Object&gt;();
+     * parameters.put("foo", foo);
+     * template.render(parameters, writer);
+     * </pre>
      * 
      * @see httl.Context#getParameters()
      * @see httl.Context#getOutput()

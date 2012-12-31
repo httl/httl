@@ -32,29 +32,29 @@ import java.util.Locale;
 public interface Loader {
 
     /**
-     * list template names.
-     * @param suffix TODO
+     * list resource names.
+     * @param suffix resource suffix
      * 
-     * @return template names.
+     * @return resource names.
      */
     List<String> list(String suffix) throws IOException;
 
     /**
-     * is exists template resource.
+     * is exists resource.
      * 
-     * @param name - template name
-     * @param locale - template locale
+     * @param name - resource name
+     * @param locale - resource locale
      * @return exists
      */
     boolean exists(String name, Locale locale);
 
     /**
-     * load template resource.
+     * load resource.
      * 
-     * @param name - template name
-     * @param locale - template locale
-     * @param encoding - template encoding
-     * @return template resource
+     * @param name - resource name
+     * @param locale - resource locale
+     * @param encoding - resource encoding
+     * @return resource
      */
     Resource load(String name, Locale locale, String encoding) throws IOException;
 

@@ -21,6 +21,11 @@ import java.util.Map;
 /**
  * Expression. (API, Prototype, ThreadSafe)
  * 
+ * <pre>
+ * Engine engine = Engine.getEngine();
+ * Expression expression = engine.getExpression("1 + 2");
+ * </pre>
+ * 
  * @see httl.Engine#getExpression(String)
  * @see httl.Engine#getExpression(String, Map)
  * @see httl.spi.Translator#translate(String, java.util.Map, int)

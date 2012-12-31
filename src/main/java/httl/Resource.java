@@ -24,6 +24,11 @@ import java.util.Locale;
 /**
  * Resource. (API, Prototype, ThreadSafe)
  * 
+ * <pre>
+ * Engine engine = Engine.getEngine();
+ * Resource resource = engine.getResource("/books.txt");
+ * </pre>
+ * 
  * @see httl.Engine#getResource(String)
  * @see httl.Engine#getResource(String, String)
  * @see httl.spi.Loader#load(String, Locale, String)
@@ -80,14 +85,14 @@ public interface Resource {
      * 
      * NOTE: Don't forget close the reader.
      * 
-     * <code>
+     * <pre>
      * Reader reader = resource.getReader();
      * try {
      *     // do something ...
      * } finally {
      *     reader.close();
      * }
-     * </code>
+     * </pre>
      * 
      * @return source reader
      * @throws IOException - If an I/O error occurs
@@ -99,14 +104,14 @@ public interface Resource {
      * 
      * NOTE: Don't forget close the input stream.
      * 
-     * <code>
+     * <pre>
      * InputStream input = resource.getInputStream();
      * try {
      *     // do something ...
      * } finally {
      *     input.close();
      * }
-     * </code>
+     * </pre>
      * 
      * @return source input stream
      * @throws IOException - If an I/O error occurs

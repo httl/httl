@@ -31,6 +31,10 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Engine. (API, Singleton, ThreadSafe)
  * 
+ * <pre>
+ * Engine engine = Engine.getEngine();
+ * </pre>
+ * 
  * @see httl.Template#getEngine()
  * @see httl.Resource#getEngine()
  * @see httl.Expression#getEngine()

@@ -26,6 +26,10 @@ import java.util.Set;
 /**
  * Context. (API, ThreadLocal, ThreadSafe)
  * 
+ * <pre>
+ * Context context = Context.getContext();
+ * </pre>
+ * 
  * @see httl.Template#evaluate(Map)
  * @see httl.Template#render(Map, java.io.Writer)
  * @see httl.Template#render(Map, java.io.OutputStream)
