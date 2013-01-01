@@ -47,12 +47,19 @@ public class FileMethod {
     }
     
     public Template extend(String name) throws IOException, ParseException {
-    	return extend(name, null);
+    	return extend(name, (Locale) null, (String) null);
     }
 
-    public Template extend(String name, Map<String, Object> parameters) throws IOException, ParseException {
-    	Context context = Context.getContext();
-    	Template template = context.getTemplate();
+    public Template extend(String name, String encoding) throws IOException, ParseException {
+    	return extend(name, (Locale) null, encoding);
+    }
+
+    public Template extend(String name, Locale locale) throws IOException, ParseException {
+    	return extend(name, locale, (String) null);
+    }
+
+    public Template extend(String name, Locale locale, String encoding) throws IOException, ParseException {
+    	Template template = Context.getContext().getTemplate();
         if (template == null) {
             throw new IllegalArgumentException("extend context template == null, extend: " + name);
         }
@@ -60,11 +67,27 @@ public class FileMethod {
         if (extend == template) {
         	throw new IllegalStateException("The template " + template.getName() + " can not be recursive extending the self template.");
         }
-        context.putAll(template.getMacros());
-        if (parameters != null) {
-        	 context.putAll(parameters);
-        }
+        Context.getContext().putAll(template.getMacros());
         return extend;
+    }
+
+    public Template extend(String name, Map<String, Object> parameters) throws IOException, ParseException {
+    	return extend(name, null, null, parameters);
+    }
+
+    public Template extend(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+    	return extend(name, null, encoding, parameters);
+    }
+
+    public Template extend(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
+    	return extend(name, locale, null, parameters);
+    }
+
+    public Template extend(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+        if (parameters != null) {
+        	Context.getContext().putAll(parameters);
+        }
+        return extend(name, locale, encoding);
     }
 
     public Expression evaluate(byte[] source) throws IOException, ParseException {
