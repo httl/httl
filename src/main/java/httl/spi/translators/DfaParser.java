@@ -398,7 +398,7 @@ public class DfaParser {
             		&& ! "gt".equals(msg) && ! "ge".equals(msg) 
             		&& ! "lt".equals(msg) && ! "le".equals(msg)) {
                 if (! parameterTypes.containsKey(msg)) {
-                    throw new ParseException("Undefined variable \"" + msg + "\". Please add variable type definition <!--#var(Xxx " + msg + ")--> in your tempalte.", getTokenOffset(token) + offset);
+                    throw new ParseException("Undefined variable \"" + msg + "\". Please add variable type definition <!--#var(Xxx " + msg + ")--> in your template.", getTokenOffset(token) + offset);
                 }
                 parameterStack.push(new Variable(translator, msg, getTokenOffset(token) + offset, parameterTypes, msg));
                 beforeOperator = false;

@@ -45,7 +45,7 @@ public class HttlEngineDefinitionParser extends AbstractSingleBeanDefinitionPars
 	@Override
 	protected void doParse(Element element, ParserContext parserContext,
 			BeanDefinitionBuilder builder) {
-		attributesToProperties(element, builder, "path", "tempalteEncoding");
+		attributesToProperties(element, builder, "path", "templateEncoding");
 		ElementSelector advancedProperties = and(sameNs(element), name("advanced-properties"));
 		for (Element subElement : subElements(element)) {
 			if (advancedProperties.accept(subElement)) {
