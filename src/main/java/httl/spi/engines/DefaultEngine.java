@@ -118,6 +118,7 @@ public class DefaultEngine extends Engine {
      * 
      * @see #getEngine()
      * @param key - config key
+     * @param cls - config value type
      * @return config value
      */
 	@SuppressWarnings("unchecked")
