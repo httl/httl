@@ -30,7 +30,7 @@ public interface Locator {
 	/**
 	 * relocate root.
 	 * 
-	 * @param suffix resource suffix
+	 * @param suffix - resource suffix
 	 * @return relocated root
 	 */
 	String root(String suffix);
@@ -38,7 +38,7 @@ public interface Locator {
 	/**
 	 * relocate path.
 	 * 
-	 * @param name origin name
+	 * @param name - origin name
 	 * @return relocated name
 	 */
 	String relocate(String name, Locale locale);

@@ -29,8 +29,8 @@ public interface Filter {
     /**
      * Filter the variable value.
      * 
-     * @param value - Original variable value
-     * @return Filtered variable value
+     * @param value - original variable value
+     * @return filtered variable value
      */
     String filter(String value);
 

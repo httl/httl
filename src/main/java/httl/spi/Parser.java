@@ -34,9 +34,9 @@ public interface Parser {
     /**
      * Parse the template.
      * 
-     * @param source - Template source.
-     * @return Java source code
+     * @param resource - template resource.
+     * @return template instance
      */
-    Template parse(Resource source) throws IOException, ParseException;
+    Template parse(Resource resource) throws IOException, ParseException;
 
 }

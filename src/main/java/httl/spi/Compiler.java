@@ -30,8 +30,8 @@ public interface Compiler {
     /**
      * Compile java source code.
      * 
-     * @param code Java source code
-     * @return Compiled class
+     * @param code - java source code
+     * @return compiled java class
      */
     Class<?> compile(String code) throws ParseException;
 

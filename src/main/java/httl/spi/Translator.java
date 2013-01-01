@@ -33,10 +33,10 @@ public interface Translator {
     /**
      * Translate the template expression to java expression.
      * 
-     * @param source - Template expression source
-     * @param parameterTypes Expression parameter types
-     * @param offset - Template expression offset
-     * @return Java expression
+     * @param source - expression source
+     * @param parameterTypes - expression parameter types
+     * @param offset - expression offset in template
+     * @return expression instance
      */
     Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException;
 

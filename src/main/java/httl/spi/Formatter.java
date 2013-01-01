@@ -28,7 +28,7 @@ public interface Formatter<T> {
     /**
      * Format the value to a string.
      * 
-     * @param value - variable value.
+     * @param value - object value.
      * @return string value
      */
     String format(T value);
