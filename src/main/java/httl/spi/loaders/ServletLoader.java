@@ -56,11 +56,11 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
     }
 
     public void contextInitialized(ServletContextEvent sce) {
-    	SERVLET_CONTEXT = sce.getServletContext();
+    	setServletContext(sce.getServletContext());
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
-        SERVLET_CONTEXT = null;
+    	setServletContext(null);
     }
 
     public List<String> doList(String directory, String suffix) throws IOException {
