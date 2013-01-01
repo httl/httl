@@ -40,12 +40,13 @@ import java.util.regex.Pattern;
  */
 public class CommentParser extends AbstractParser {
     
-    protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--#([a-z:]+)[(]?(.*?)[)]?-->", Pattern.DOTALL);
+    protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--#([a-z]+)\\(?(.*?)\\)?-->", Pattern.DOTALL);
     
     protected Pattern getPattern() {
         return STATEMENT_PATTERN;
     }
     
+    @Override
     protected String getDiretive(String name, String value) {
         return "<!--#" + name + "(" + value + ")-->";
     }
@@ -69,15 +70,15 @@ public class CommentParser extends AbstractParser {
             } else {
             	offset = matcher.start(2);
             }
-            if (endName.equals(name)) {
+            if (endDirective.equals(name)) {
                 String startName = nameStack.pop();
                 String startValue = valueStack.pop();
-                while(elseifName.equals(startName) || elseName.equals(startName)) {
+                while(elseifDirective.equals(startName) || elseDirective.equals(startName)) {
                     startName = nameStack.pop();
                     startValue = valueStack.pop();  
                 }
                 if (macro != null) {
-                    if (macroName.equals(startName)) {
+                    if (macroDirective.equals(startName)) {
                         int i = startValue.indexOf('(');
                         String var;
                         String param;
@@ -91,11 +92,26 @@ public class CommentParser extends AbstractParser {
                             var = startValue;
                             param = null;
                         }
+                        String out = null;
+                        String set = null;
+                        if (var.startsWith("$")) {
+                        	if (var.startsWith("$!")) {
+                        		out = var.substring(0, 2);
+                        		var = var.substring(2).trim();
+                        	} else {
+                        		out = var.substring(0, 1);
+                        		var = var.substring(1).trim();
+                        	}
+                        } else if (var.contains("=")) {
+                        	int l = var.indexOf("=");
+                    		set = var.substring(0, l + 1).trim();
+                    		var = var.substring(l + 1).trim();
+                        }
                         matcher.appendReplacement(macro, "");
                         String key = getMacroPath(resource.getName(), var);
                         String es = macro.toString();
                         if (param != null && param.length() > 0) {
-                            es = getDiretive(varName, param) + es;
+                            es = getDiretive(varDirective, param) + es;
                         }
                         macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), stream, macroParameterStart));
                         Class<?> cls = types.get(var);
@@ -105,6 +121,17 @@ public class CommentParser extends AbstractParser {
                         types.put(var, Template.class);
                         macro = null;
                         macroParameterStart = 0;
+                        buf.append(LEFT);
+                        buf.append(matcher.group().length());
+                        if (out != null && out.length() > 0) {
+                            String code = getExpressionCode(out, var, Template.class, stream);
+                            buf.append(code);
+                        } else if (set != null && set.length() > 0) {
+                            String setValue = set + " " + var + ".evaluate()";
+                            String code = getStatementCode(setDirective, setValue, matcher.start(1), offset, translator, variables, types, returnTypes, parameters, parameterTypes, true);
+                            buf.append(code);
+                        }
+                        buf.append(RIGHT);
                     } else {
                         matcher.appendReplacement(macro, "$0");
                     }
@@ -117,9 +144,9 @@ public class CommentParser extends AbstractParser {
                     buf.append(RIGHT);
                 }
             } else {
-                if (ifName.equals(name) || elseifName.equals(name) 
-                        || elseName.equals(name) || foreachName.equals(name)
-                        || macroName.equals(name)) {
+                if (ifDirective.equals(name) || elseifDirective.equals(name) 
+                        || elseDirective.equals(name) || foreachDirective.equals(name)
+                        || macroDirective.equals(name)) {
                     nameStack.push(name);
                     valueStack.push(value);
                 }
@@ -127,7 +154,7 @@ public class CommentParser extends AbstractParser {
                     matcher.appendReplacement(macro, "$0");
                 } else {
                     matcher.appendReplacement(buf, "");
-                    if (macroName.equals(name)) {
+                    if (macroDirective.equals(name)) {
                         if (value == null || value.trim().length() == 0) {
                             throw new ParseException("Macro name == null!", matcher.start(1));
                         }

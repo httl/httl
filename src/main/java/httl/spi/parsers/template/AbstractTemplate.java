@@ -73,7 +73,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
     
 	protected Template getMacro(Context context, String key, Template defaultValue) {
     	Object value = context.get(key);
-    	if (value == null) {
+    	if (! (value instanceof Template)) {
     		return defaultValue;
     	}
     	return (Template) value;
@@ -163,11 +163,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     @Override
     public String toString() {
-    	Object value = evaluate();
-        if (value instanceof byte[]) {
-        	return formatter.format((byte[]) value);
-        }
-        return (String) value;
+        return getName();
     }
 
 }

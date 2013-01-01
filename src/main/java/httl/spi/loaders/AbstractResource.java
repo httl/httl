@@ -91,11 +91,7 @@ public abstract class AbstractResource implements Resource, Serializable {
     
     @Override
     public String toString() {
-    	try {
-			return IOUtils.readToString(getReader());
-		} catch (IOException e) {
-			return super.toString();
-		}
+    	return getName();
     }
 
 }

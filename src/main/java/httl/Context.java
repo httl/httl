@@ -165,7 +165,8 @@ public final class Context extends DelegateMap<String, Object> {
         return output;
     }
 
-    // Get specific variable.
+    // Get the special variables after the user variables.
+    // Allows the user to override these special variables.
     @Override
 	protected Object doGet(Object key) {
 		if (CONTEXT_KEY.equals(key)) {
@@ -183,7 +184,7 @@ public final class Context extends DelegateMap<String, Object> {
 		if (OUTPUT_KEY.equals(key)) {
 			return output;
 		}
-		return template.getMacros().get(key);
+		return null;
 	}
 
 }

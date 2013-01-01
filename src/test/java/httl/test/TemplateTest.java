@@ -125,9 +125,9 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            //if (! "import_var.httl".equals(file.getName())) {
-	            //    continue;
-	            //}
+	            /*if (! "extend.httl".equals(file.getName())) {
+	                continue;
+	            }*/
 	            System.out.println(file.getName());
 	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
 	            if (url == null) {
@@ -147,7 +147,7 @@ public class TemplateTest extends TestCase {
 	            	template.render(context, actualWriter);
 	            	template.render(context, actualStream);
 	            } catch (Exception e) {
-	            	throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
+	            	throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
 	            }
 	            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
 	            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));

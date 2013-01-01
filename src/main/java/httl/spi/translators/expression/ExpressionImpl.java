@@ -106,8 +106,7 @@ public class ExpressionImpl implements Expression, Serializable {
     
     @Override
     public String toString() {
-    	Object value = evaluate();
-    	return value == null ? null : value.toString();
+    	return getSource();
     }
     
     private Class<?> newEvaluatorClass(String className) {

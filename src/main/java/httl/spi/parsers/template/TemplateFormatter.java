@@ -1,6 +1,9 @@
 package httl.spi.parsers.template;
 
 import httl.Engine;
+import httl.Expression;
+import httl.Resource;
+import httl.Template;
 import httl.spi.Formatter;
 import httl.spi.formatters.MultiFormatter;
 import httl.util.StringUtils;
@@ -242,6 +245,18 @@ public class TemplateFormatter {
         return value;
     }
 
+    public String format(Template e) {
+    	return format(e.evaluate());
+    }
+
+    public String format(Expression e) {
+    	return format(e.evaluate());
+    }
+
+    public String format(Resource e) {
+    	return e.getSource();
+    }
+
     public String format(Object value) {
     	if (value == null)
             return nullValue;
@@ -257,6 +272,12 @@ public class TemplateFormatter {
     		return format((Date) value);
     	if (value instanceof byte[])
     		return format((byte[]) value);
+    	if (value instanceof Template)
+    		return format((Template) value);
+    	if (value instanceof Expression)
+    		return format((Expression) value);
+    	if (value instanceof Resource)
+    		return format((Resource) value);
         if (formatter != null)
             return formatter.format(value);
         return StringUtils.toString(value);

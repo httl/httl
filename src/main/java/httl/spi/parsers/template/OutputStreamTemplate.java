@@ -69,6 +69,8 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
+        if (Context.getContext().getTemplate() == this)
+    		throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
         Context context = Context.pushContext(this, parameters, output);
         try {
             doRender(context, output);

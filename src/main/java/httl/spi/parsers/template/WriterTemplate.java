@@ -51,13 +51,13 @@ public abstract class WriterTemplate extends AbstractTemplate {
     }
 
     public Object evaluate(Map<String, Object> parameters) {
-        UnsafeStringWriter output = new UnsafeStringWriter();
+        UnsafeStringWriter writer = new UnsafeStringWriter();
         try {
-            render(parameters, output);
+            render(parameters, writer);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return output.toString();
+        return writer.toString();
     }
 
     public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
@@ -69,9 +69,11 @@ public abstract class WriterTemplate extends AbstractTemplate {
     public void render(Map<String, Object> parameters, Writer writer) throws IOException {
     	if (writer == null) 
          	throw new IllegalArgumentException("writer == null");
-    	Context context = Context.pushContext(this, parameters, writer);
-        try {
-            doRender(context, writer);
+    	if (Context.getContext().getTemplate() == this)
+    		throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
+        Context context = Context.pushContext(this, parameters, writer);
+    	try {
+    		doRender(context, writer);
         } catch (RuntimeException e) {
             throw (RuntimeException) e;
         } catch (IOException e) {

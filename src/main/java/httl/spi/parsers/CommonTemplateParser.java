@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  */
 public class CommonTemplateParser extends CommentParser {
     
-    protected static final Pattern COMMON_TEMPLATE_PATTERN = Pattern.compile("$([a-z:]+)\\{([^}]*?)\\}");
+    protected static final Pattern COMMON_TEMPLATE_PATTERN = Pattern.compile("$([a-z]+)\\{([^}]*?)\\}");
 
     protected Pattern getPattern() {
         return COMMON_TEMPLATE_PATTERN;

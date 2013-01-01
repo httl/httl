@@ -54,22 +54,17 @@ public class FileMethod {
     	Context context = Context.getContext();
     	Template template = context.getTemplate();
         if (template == null) {
-            throw new IllegalArgumentException("extend context template == null");
+            throw new IllegalArgumentException("extend context template == null, extend: " + name);
         }
         Template extend = engine.getTemplate(name);
+        if (extend == template) {
+        	throw new IllegalStateException("The template " + template.getName() + " can not be recursive extending the self template.");
+        }
         context.putAll(template.getMacros());
         if (parameters != null) {
         	 context.putAll(parameters);
         }
         return extend;
-    }
-
-    public Expression evaluate(Object source) throws IOException, ParseException {
-    	if (source instanceof byte[]) {
-    		return evaluate((byte[]) source);
-    	} else {
-    		return evaluate((String) source);
-    	}
     }
 
     public Expression evaluate(byte[] source) throws IOException, ParseException {
@@ -87,16 +82,6 @@ public class FileMethod {
             throw new IllegalArgumentException("display context template == null");
         }
     	return engine.getExpression(expr, template.getParameterTypes());
-    }
-
-    public Template render(Object source) throws IOException, ParseException {
-    	if (source instanceof byte[]) {
-    		return render((byte[]) source);
-    	} else if (source instanceof Resource) {
-    		return render((Resource) source);
-    	} else {
-    		return render((String) source);
-    	}
     }
 
     public Template render(Resource resource) throws IOException, ParseException {
@@ -156,11 +141,14 @@ public class FileMethod {
             	locale = template.getLocale();
             }
         }
-        template = engine.getTemplate(name, locale, encoding);
+        Template include = engine.getTemplate(name, locale, encoding);
         if (macro != null && macro.length() > 0) {
-			return template.getMacros().get(macro);
+        	include = include.getMacros().get(macro);
 		}
-        return template;
+        if (include == template) {
+        	throw new IllegalStateException("The template " + template.getName() + " can not be recursive including the self template.");
+        }
+        return include;
     }
 
     public Template include(String name, Map<String, Object> parameters) throws IOException, ParseException {

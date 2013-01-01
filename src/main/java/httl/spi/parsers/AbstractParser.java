@@ -129,23 +129,23 @@ public abstract class AbstractParser implements Parser {
 
     protected static final String END = "end";
 
-    protected String varName = VAR;
+    protected String varDirective = VAR;
 
-    protected String setName = SET;
+    protected String setDirective = SET;
 
-    protected String ifName = IF;
+    protected String ifDirective = IF;
 
-    protected String elseifName = ELSEIF;
+    protected String elseifDirective = ELSEIF;
 
-    protected String elseName = ELSE;
+    protected String elseDirective = ELSE;
 
-    protected String foreachName = FOREACH;
+    protected String foreachDirective = FOREACH;
 
-    protected String breakifName = BREAKIF;
+    protected String breakifDirective = BREAKIF;
 
-    protected String macroName = MACRO;
+    protected String macroDirective = MACRO;
 
-    protected String endName = END;
+    protected String endDirective = END;
 
     protected String foreachStatus = FOREACH;
     
@@ -296,23 +296,6 @@ public abstract class AbstractParser implements Parser {
 	}
 
     /**
-     * httl.properties: attribute.namespace=httl
-     */
-	public void setAttributeNamespace(String namespace) {
-		if (namespace != null && namespace.length() > 0) {
-            namespace = namespace + ":";
-            ifName = namespace + IF;
-            elseifName = namespace + ELSEIF;
-            elseName = namespace + ELSE;
-            foreachName = namespace + FOREACH;
-            breakifName = namespace + BREAKIF;
-            setName = namespace + SET;
-            varName = namespace + VAR;
-            macroName = namespace + MACRO;
-        }
-	}
-
-    /**
      * httl.properties: foreach.status=foreach
      */
 	public void setForeachStatus(String foreachStatus) {
@@ -384,6 +367,10 @@ public abstract class AbstractParser implements Parser {
         		}
         	}
         }
+    }
+    
+    protected String getDiretive(String name, String value) {
+    	return name + "(" + value + ")";
     }
 
     protected abstract String doParse(Resource resoure, boolean stream, String source, Translator translator, 
@@ -463,14 +450,10 @@ public abstract class AbstractParser implements Parser {
         	StringBuilder statusInit = new StringBuilder();
         	types.put("this", Template.class);
             types.put(foreachStatus, ForeachStatus.class);
-            statusInit.append("	" + ForeachStatus.class.getName() + " " + foreachStatus + " = null;\n");
             StringBuilder macroFields = new StringBuilder();
             StringBuilder macroInits = new StringBuilder();
             for (String macro : importMacroTemplates.keySet()) {
             	types.put(macro, Template.class);
-            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
-            	macroInits.append("	" + macro + " = getImportMacros().get(\"" + macro + "\");\n");
-            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
             }
             List<String> parameters = new ArrayList<String>();
             List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
@@ -495,7 +478,15 @@ public abstract class AbstractParser implements Parser {
                     imports.append(".*;\n");
                 }
             }
-            for (String macro : macros.keySet()) {
+            Set<String> macroKeySet = macros.keySet();
+            for (String macro : importMacroTemplates.keySet()) {
+            	if (! macroKeySet.contains(macro)) {
+	            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
+	            	macroInits.append("	" + macro + " = getImportMacros().get(\"" + macro + "\");\n");
+	            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
+            	}
+            }
+            for (String macro : macroKeySet) {
             	types.put(macro, Template.class);
             	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
             	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
@@ -801,6 +792,66 @@ public abstract class AbstractParser implements Parser {
         matcher.appendTail(buf);
         return buf.toString().replace("	$output.write();\n", "");
     }
+    
+    protected String getExpressionCode(String symbol, String code, Class<?> returnType, boolean stream) {
+    	StringBuilder buf = new StringBuilder();
+    	boolean nofilter = "$!".equals(symbol);
+        if (nofilter && Template.class.isAssignableFrom(returnType)) {
+        	buf.append("	");
+        	buf.append("(");
+        	buf.append(code);
+        	buf.append(").render($output);\n");
+        } else if (nofilter && Resource.class.isAssignableFrom(returnType)) {
+        	buf.append("	");
+        	buf.append(IOUtils.class.getName());
+        	buf.append(".copy((");
+        	buf.append(code);
+        	if (stream) {
+        		buf.append(").getInputStream()");
+        	} else {
+        		buf.append(").getReader()");
+        	}
+        	buf.append(", $output);\n");
+        } else {
+        	if (Expression.class.isAssignableFrom(returnType)) {
+        		code = "(" + code + ").evaluate()";
+        		returnType = Object.class;
+        	} else if (Resource.class.isAssignableFrom(returnType)) {
+        		code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
+        		returnType = String.class;
+        	}
+        	String pre = "";
+            boolean direct = false;
+            if (nofilter) {
+            	if (stream) {
+            		direct = byte[].class.equals(returnType);
+            	} else {
+            		direct = String.class.equals(returnType);
+            	}
+            }
+            if (! direct) {
+            	if (nofilter && stream && Object.class.equals(returnType)) {
+            		String var = "__obj" + TMP_VAR_SEQ.getAndIncrement();
+            		pre = "	Object " + var + " = " + code + ";\n";
+            		// 如果是byte[]类型，防止先format()成String，再serialize()回byte[]，浪费转换性能。
+            		code = var + " instanceof byte[] ? (byte[]) " + var + " : getFormatter().serialize(getFormatter().format(" + var + "))";
+                } else {
+                	code = "getFormatter().format(" + code + ")";
+                    if (! nofilter) {
+                    	code = "filter(" + code + ")";
+                    }
+                    if (stream) {
+                    	code = "getFormatter().serialize(" + code + ")";
+                    }
+                }
+            }
+            buf.append(pre);
+            buf.append("	$output.write(");
+            buf.append(code);
+            buf.append(");\n");
+        }
+        return buf.toString();
+    }
 
     @SuppressWarnings("unchecked")
 	protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
@@ -828,61 +879,7 @@ public abstract class AbstractParser implements Parser {
 	            Expression expr = translator.translate(expression, types, off);
 	            String code = expr.getCode();
 	            Class<?> returnType = expr.getReturnType();
-	            boolean nofilter = "$!".equals(symbol);
-	            if (nofilter && Template.class.isAssignableFrom(returnType)) {
-	            	buf.append("	");
-	            	buf.append("(");
-	            	buf.append(code);
-	            	buf.append(").render($output);");
-	            } else if (nofilter && Resource.class.isAssignableFrom(returnType)) {
-	            	buf.append("	");
-	            	buf.append(IOUtils.class.getName());
-	            	buf.append(".copy((");
-	            	buf.append(code);
-	            	if (stream) {
-	            		buf.append(").getInputStream()");
-	            	} else {
-	            		buf.append(").getReader()");
-	            	}
-	            	buf.append(", $output);\n");
-	            } else {
-	            	if (Expression.class.isAssignableFrom(returnType)) {
-	            		code = "(" + code + ").evaluate()";
-	            		returnType = Object.class;
-	            	} else if (Resource.class.isAssignableFrom(returnType)) {
-	            		code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
-	            		returnType = String.class;
-	            	}
-	            	String pre = "";
-	                boolean direct = false;
-	                if (nofilter) {
-	                	if (stream) {
-	                		direct = byte[].class.equals(returnType);
-	                	} else {
-	                		direct = String.class.equals(returnType);
-	                	}
-	                }
-	                if (! direct) {
-	                	if (nofilter && stream && Object.class.equals(returnType)) {
-	                		String var = "__obj" + TMP_VAR_SEQ.getAndIncrement();
-	                		pre = "	Object " + var + " = " + code + ";\n";
-	                		// 如果是byte[]类型，防止先format()成String，再serialize()回byte[]，浪费转换性能。
-	                		code = var + " instanceof byte[] ? (byte[]) " + var + " : getFormatter().serialize(getFormatter().format(" + var + "))";
-	                    } else {
-	                    	code = "getFormatter().format(" + code + ")";
-	                        if (! nofilter) {
-	                        	code = "filter(" + code + ")";
-	                        }
-	                        if (stream) {
-	                        	code = "getFormatter().serialize(" + code + ")";
-	                        }
-	                    }
-	                }
-	                buf.append(pre);
-	                buf.append("	$output.write(");
-		            buf.append(code);
-		            buf.append(");\n");
-	            }
+	            buf.append(getExpressionCode(symbol, code, returnType, stream));
             } else {
             	boolean nofilter = "#!".equals(symbol);
             	Expression expr = translator.translate(expression, Collections.EMPTY_MAP, off);
@@ -959,9 +956,9 @@ public abstract class AbstractParser implements Parser {
     }
     
     protected String getStatementEndCode(String name) throws IOException, ParseException {
-        if (ifName.equals(name) || elseifName.equals(name) || elseName.equals(name)) {
+        if (ifDirective.equals(name) || elseifDirective.equals(name) || elseDirective.equals(name)) {
             return "	}\n"; // 插入结束指令
-        } else if (foreachName.equals(name)) {
+        } else if (foreachDirective.equals(name)) {
             return "	" + foreachStatus + ".increment();\n	}\n	" + foreachStatus + " = " + foreachStatus + ".getParent();\n"; // 插入结束指令
         }
         return null;
@@ -973,14 +970,14 @@ public abstract class AbstractParser implements Parser {
         name = name == null ? null : name.trim();
         value = value == null ? null : value.trim();
         StringBuilder buf = new StringBuilder();
-        if (ifName.equals(name)) {
+        if (ifDirective.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The if expression == null!", begin);
             }
             buf.append("	if (");
             buf.append(getConditionCode(translator.translate(value, types, offset)));
             buf.append(") {\n");
-        } else if (elseifName.equals(name)) {
+        } else if (elseifDirective.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The elseif expression == null!", begin);
             }
@@ -990,7 +987,7 @@ public abstract class AbstractParser implements Parser {
             buf.append("else if (");
             buf.append(getConditionCode(translator.translate(value, types, offset)));
             buf.append(") {\n");
-        } else if (elseName.equals(name)) {
+        } else if (elseDirective.equals(name)) {
             if (value != null && value.length() > 0) {
                 throw new ParseException("Unsupported else expression " + value, offset);
             }
@@ -998,7 +995,7 @@ public abstract class AbstractParser implements Parser {
                 buf.append("	} ");
             }
             buf.append("else {\n");
-        } else if (foreachName.equals(name)) {
+        } else if (foreachDirective.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The foreach expression == null!", begin);
             }
@@ -1014,11 +1011,11 @@ public abstract class AbstractParser implements Parser {
             String[] tokens = value.substring(0, start).trim().split("\\s+");
             String type;
             String var;
-            String vName = code.trim();
+            String varname = code.trim();
             if (expression instanceof ExpressionImpl) {
             	String vn = ((ExpressionImpl) expression).getNode().getGenericVariableName();
             	if (vn != null) {
-            		vName = vn;
+            		varname = vn;
             	}
             }
             if (tokens.length == 1) {
@@ -1028,8 +1025,8 @@ public abstract class AbstractParser implements Parser {
                 } else if (Map.class.isAssignableFrom(returnType)) {
                     type = Map.class.getName() + ".Entry";
                 } else if (Collection.class.isAssignableFrom(returnType)
-                        && types.get(vName + ":0") != null) {
-                    type = types.get(vName + ":0").getName();
+                        && types.get(varname + ":0") != null) {
+                    type = types.get(varname + ":0").getName();
                 } else {
                     type = Object.class.getSimpleName();
                 }
@@ -1043,25 +1040,26 @@ public abstract class AbstractParser implements Parser {
             Class<?> clazz = ClassUtils.forName(importPackages, type);
             types.put(var, clazz);
             if (Map.class.isAssignableFrom(returnType)) {
-            	Class<?> keyType = types.get(vName + ":0");
+            	Class<?> keyType = types.get(varname + ":0");
             	if (keyType != null) {
             		types.put(var + ":0", keyType);
             	}
-            	Class<?> valueType = types.get(vName + ":1");
+            	Class<?> valueType = types.get(varname + ":1");
             	if (valueType != null) {
             		types.put(var + ":1", valueType);
             	}
                 code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
             }
+            variables.add(foreachStatus);
             buf.append(getForeachCode(type, clazz, var, code));
-        } else if (breakifName.equals(name)) {
+        } else if (breakifDirective.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The breakif expression == null!", begin);
             }
             buf.append("	if (");
             buf.append(getConditionCode(translator.translate(value, types, offset)));
             buf.append(") break;\n");
-        } else if (setName.equals(name)) {
+        } else if (setDirective.equals(name)) {
             Matcher matcher = ASSIGN_PATTERN.matcher(";" + value);
             List<Object[]> list = new ArrayList<Object[]>();
             Object[] pre = null;
@@ -1103,7 +1101,7 @@ public abstract class AbstractParser implements Parser {
                 Class<?> clazz = ClassUtils.forName(importPackages, type);
                 Class<?> cls = types.get(var);
                 if (cls != null && ! cls.equals(clazz)) {
-                    throw new ParseException("set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset + start);
+                    throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset + start);
                 }
                 types.put(var, clazz);
                 variables.add(var);
@@ -1116,9 +1114,8 @@ public abstract class AbstractParser implements Parser {
     	            buf.append(");\n");
     	            returnTypes.put(var, clazz);
                 }
-                
             }
-        } else if (varName.equals(name)) {
+        } else if (varDirective.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The in parameters == null!", begin);
             }

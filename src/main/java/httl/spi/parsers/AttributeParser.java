@@ -52,6 +52,28 @@ public class AttributeParser extends AbstractParser {
 
     protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--\\s*(([a-z:]+)\\s*=\\s*[\"\'](.*?)[\"\'])\\s*-->", Pattern.DOTALL);
 
+    @Override
+    protected String getDiretive(String name, String value) {
+        return name + "=\"" + value + "\"";
+    }
+
+    /**
+     * httl.properties: attribute.namespace=httl
+     */
+	public void setAttributeNamespace(String namespace) {
+		if (namespace != null && namespace.length() > 0) {
+            namespace = namespace + ":";
+            ifDirective = namespace + IF;
+            elseifDirective = namespace + ELSEIF;
+            elseDirective = namespace + ELSE;
+            foreachDirective = namespace + FOREACH;
+            breakifDirective = namespace + BREAKIF;
+            setDirective = namespace + SET;
+            varDirective = namespace + VAR;
+            macroDirective = namespace + MACRO;
+        }
+	}
+
     protected String doParse(Resource resource, boolean stream, String reader, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
                              Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
@@ -86,12 +108,12 @@ public class AttributeParser extends AbstractParser {
             		String string = matcher.group(1);
             		String name = matcher.group(2);
             		String value = matcher.group(3);
-            		if (macroName.equals(name)) {
+            		if (macroDirective.equals(name)) {
             			commentMacro = element;
             			document.remove(element); // 移除注释元素
             			continue;
                     }
-            		if (endName.equals(name) && "macro".equals(value) 
+            		if (endDirective.equals(name) && "macro".equals(value) 
             				&& commentMacro != null) {
         				Element macro = commentMacro;
         				matcher = STATEMENT_PATTERN.matcher(macro.getStartTag().toString());
@@ -143,15 +165,15 @@ public class AttributeParser extends AbstractParser {
             		if (commentMacro != null) {
             			continue;
             		}
-            		if (endName.equals(name)) {
+            		if (endDirective.equals(name)) {
             			String end = getStatementEndCode(value);
             			document.insert(element.getEnd(), LEFT + end + RIGHT); // 插入结束指令
             			document.remove(element); // 移除注释元素
             			continue;
             		}
-            		if (! ifName.equals(name) && ! elseifName.equals(name) && ! elseName.equals(name)
-                            && ! foreachName.equals(name) && ! breakifName.equals(name)
-                            && ! setName.equals(name) && ! varName.equals(name)) {
+            		if (! ifDirective.equals(name) && ! elseifDirective.equals(name) && ! elseDirective.equals(name)
+                            && ! foreachDirective.equals(name) && ! breakifDirective.equals(name)
+                            && ! setDirective.equals(name) && ! varDirective.equals(name)) {
                         continue;
                     }
                     if (value == null) {
@@ -166,7 +188,7 @@ public class AttributeParser extends AbstractParser {
                     } else {
                         offset ++;
                     }
-                    String code = getStatementCode(name, value, matcher.start(1), offset, translator, variables, types, returnTypes, parameters, parameterTypes, false);
+                    String code = getStatementCode(name, value, matcher.start(1), offset, translator, variables, types, returnTypes, parameters, parameterTypes, true);
                     buf.append(code);
                     buf.append(RIGHT);
                     document.insert(element.getBegin(), buf.toString()); // 插入块指令
@@ -189,13 +211,13 @@ public class AttributeParser extends AbstractParser {
                     continue;
                 }
                 String name = attribute.getName().trim();
-                if (macroName.equals(name)) {
+                if (macroDirective.equals(name)) {
                     macro = attribute;
                     break;
                 }
-                if (! ifName.equals(name) && ! elseifName.equals(name) && ! elseName.equals(name)
-                        && ! foreachName.equals(name) && ! breakifName.equals(name)
-                        && ! setName.equals(name) && ! varName.equals(name)) {
+                if (! ifDirective.equals(name) && ! elseifDirective.equals(name) && ! elseDirective.equals(name)
+                        && ! foreachDirective.equals(name) && ! breakifDirective.equals(name)
+                        && ! setDirective.equals(name) && ! varDirective.equals(name)) {
                     continue;
                 }
                 statements.add(attribute);
