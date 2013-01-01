@@ -82,10 +82,12 @@ public class FileMethod {
         if (macro != null && macro.length() > 0) {
         	extend = extend.getMacros().get(macro);
 		}
-        if (template != null && template == extend) {
-        	throw new IllegalStateException("The template " + template.getName() + " can not be recursive extending the self template.");
+        if (template != null) {
+        	if (template == extend) {
+            	throw new IllegalStateException("The template " + template.getName() + " can not be recursive extending the self template.");
+            }
+            Context.getContext().putAll(template.getMacros());
         }
-        Context.getContext().putAll(template.getMacros());
         return extend;
     }
 
