@@ -30,6 +30,7 @@ import java.util.AbstractMap;
 import java.util.AbstractQueue;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -1804,7 +1805,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	}
 
 	static final class LinkedDeque<E extends Linked<E>> extends
-			AbstractCollection<E> implements Queue<E> {
+			AbstractCollection<E> implements Queue<E>, Serializable {
 
 		// This class provides a doubly-linked list that is optimized for the
 		// virtual
@@ -1815,6 +1816,8 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		// NullPointerException throws in the byte code. The links to a removed
 		// element are cleared to help a generational garbage collector if the
 		// discarded elements inhabit more than one generation.
+
+		private static final long serialVersionUID = 1L;
 
 		/**
 		 * Pointer to first node. Invariant: (first == null && last == null) ||

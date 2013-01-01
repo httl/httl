@@ -53,7 +53,7 @@ public class WebEngine {
     
     private static final String LOCALIZED_KEY = "localized";
 
-	private static Engine ENGINE;
+	private static volatile Engine ENGINE;
 
     private static boolean OUTPUT_STREAM;
 

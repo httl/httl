@@ -25,8 +25,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +43,7 @@ public abstract class AbstractCompiler implements Compiler {
     
     private static final Pattern CLASS_PATTERN = Pattern.compile("class\\s+([_a-zA-Z][_a-zA-Z0-9]*)\\s+");
 
-	private static final Map<String, VolatileReference<Class<?>>> CLASS_CACHE = new ConcurrentHashMap<String, VolatileReference<Class<?>>>();
+	private static final ConcurrentMap<String, VolatileReference<Class<?>>> CLASS_CACHE = new ConcurrentHashMap<String, VolatileReference<Class<?>>>();
 
     private File compileDirectory;
     
@@ -121,13 +121,11 @@ public abstract class AbstractCompiler implements Compiler {
 	        className = pkg != null && pkg.length() > 0 ? pkg + "." + classSimpleName : classSimpleName;
 	        VolatileReference<Class<?>> ref = CLASS_CACHE.get(className);
 	    	if (ref == null) {
-		    	synchronized (CLASS_CACHE) {
-		    		ref = CLASS_CACHE.get(className);
-		        	if (ref == null) {
-		        		ref = new VolatileReference<Class<?>>();
-		        		CLASS_CACHE.put(className, ref);
-		        	}
-				}
+	    		ref = new VolatileReference<Class<?>>();
+	    		VolatileReference<Class<?>> old = CLASS_CACHE.putIfAbsent(className, ref);
+	    		if (old != null) {
+	    			ref = old;
+	    		}
 	    	}
 	    	Class<?> cls = ref.get();
 	    	if (cls == null) {

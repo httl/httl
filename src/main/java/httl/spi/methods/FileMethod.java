@@ -78,7 +78,7 @@ public class FileMethod {
 	        	locale = template.getLocale();
 	        }
         }
-        Template extend = engine.getTemplate(name);
+        Template extend = engine.getTemplate(name, locale, encoding);
         if (macro != null && macro.length() > 0) {
         	extend = extend.getMacros().get(macro);
 		}

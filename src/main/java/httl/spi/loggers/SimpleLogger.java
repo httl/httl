@@ -18,8 +18,6 @@ package httl.spi.loggers;
 
 import httl.spi.Logger;
 
-import java.io.Serializable;
-
 /**
  * SimpleLogger. (SPI, Singleton, ThreadSafe)
  * 
@@ -27,9 +25,7 @@ import java.io.Serializable;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class SimpleLogger implements Logger, Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class SimpleLogger implements Logger {
 
 	private static final String prefix = "[" + NAME + "] ";
 

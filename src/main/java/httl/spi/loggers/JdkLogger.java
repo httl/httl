@@ -18,7 +18,6 @@ package httl.spi.loggers;
 
 import httl.spi.Logger;
 
-import java.io.Serializable;
 import java.util.logging.Level;
 
 /**
@@ -28,9 +27,7 @@ import java.util.logging.Level;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class JdkLogger implements Logger, Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class JdkLogger implements Logger {
 
 	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NAME);
 

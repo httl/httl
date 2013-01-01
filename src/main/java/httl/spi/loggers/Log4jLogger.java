@@ -18,8 +18,6 @@ package httl.spi.loggers;
 
 import httl.spi.Logger;
 
-import java.io.Serializable;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
@@ -30,9 +28,7 @@ import org.apache.log4j.LogManager;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Log4jLogger implements Logger, Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Log4jLogger implements Logger {
 
 	private final org.apache.log4j.Logger logger = LogManager.getLogger(NAME);
 

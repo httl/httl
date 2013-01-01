@@ -48,7 +48,8 @@ public class UrlLoader extends AbstractLoader {
 		try {
 			return in != null;
 		} finally {
-			in.close();
+			if (in != null)
+				in.close();
 		}
 	}
 
