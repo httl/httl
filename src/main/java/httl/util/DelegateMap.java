@@ -189,15 +189,15 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 			
 			private Iterator<T> getIterator() {
 				if (iterator == null || ! iterator.hasNext()) {
-					if (level < 1 && writable != null) {
+					if (level < 1 && parent != null) {
 						level = 1;
-						iterator = DelegateSet.this.getCollection(writable).iterator();
+						iterator = DelegateSet.this.getCollection(parent).iterator();
 					} else if (level < 2 && current != null) {
 						level = 2;
 						iterator = DelegateSet.this.getCollection(current).iterator();
-					} else if (level < 3 && parent != null) {
+					} else if (level < 3 && writable != null) {
 						level = 3;
-						iterator = DelegateSet.this.getCollection(parent).iterator();
+						iterator = DelegateSet.this.getCollection(writable).iterator();
 					}
 				}
 				return iterator;
