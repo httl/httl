@@ -683,10 +683,19 @@ public class Base64
             throw e;
         }   // end catch
         finally {
-            try{ oos.close();   } catch( Exception e ){}
-            try{ gzos.close();  } catch( Exception e ){}
-            try{ b64os.close(); } catch( Exception e ){}
-            try{ baos.close();  } catch( Exception e ){}
+            try {
+				if (oos != null) oos.close();
+			} finally {
+				try {
+					if (gzos != null) gzos.close();
+				} finally {
+					try {
+    					if (b64os != null) b64os.close();
+    				} finally {
+    					if (baos != null) baos.close();
+    				}
+				}
+			}
         }   // end finally
         
         // Return value according to relevant encoding.
@@ -925,9 +934,15 @@ public class Base64
                 throw e;
             }   // end catch
             finally {
-                try{ gzos.close();  } catch( Exception e ){}
-                try{ b64os.close(); } catch( Exception e ){}
-                try{ baos.close();  } catch( Exception e ){}
+                try {
+    				if (gzos != null) gzos.close();
+    			} finally {
+    				try {
+    					if (b64os != null) b64os.close();
+    				} finally {
+    					if (baos != null) baos.close();
+    				}
+    			}
             }   // end finally
 
             return baos.toByteArray();
@@ -1285,10 +1300,16 @@ public class Base64
                     // Just return originally-decoded bytes
                 }   // end catch
                 finally {
-                    try{ baos.close(); } catch( Exception e ){}
-                    try{ gzis.close(); } catch( Exception e ){}
-                    try{ bais.close(); } catch( Exception e ){}
-                }   // end finally
+					try {
+						if (baos != null) baos.close();
+					} finally {
+						try {
+							if (gzis != null) gzis.close();
+						} finally {
+							if (bais != null) bais.close();
+						}
+					}
+                } // end finally
 
             }   // end if: gzipped
         }   // end if: bytes.length >= 2
@@ -1377,8 +1398,11 @@ public class Base64
             throw e;    // Catch and throw in order to execute finally{}
         }   // end catch
         finally {
-            try{ bais.close(); } catch( Exception e ){}
-            try{ ois.close();  } catch( Exception e ){}
+            try {
+				if (bais != null) bais.close();
+			} finally {
+				if (ois != null) ois.close();
+			}
         }   // end finally
         
         return obj;
