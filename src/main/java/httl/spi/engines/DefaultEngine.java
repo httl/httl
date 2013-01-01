@@ -203,17 +203,20 @@ public class DefaultEngine extends Engine {
         } else {
         	lastModified = Long.MIN_VALUE;
         }
-        StringBuilder buf = new StringBuilder(name.length() + 20);
-    	buf.append(name);
-    	if (locale != null) {
-    		buf.append("_");
-    		buf.append(locale);
-    	}
-    	if (encoding != null) {
-    		buf.append("_");
-    		buf.append(encoding);
-    	}
-        String key = buf.toString();
+        String key = name;
+        if (locale != null || encoding != null) {
+	        StringBuilder buf = new StringBuilder(name.length() + 20);
+	    	buf.append(name);
+	    	if (locale != null) {
+	    		buf.append("_");
+	    		buf.append(locale);
+	    	}
+	    	if (encoding != null) {
+	    		buf.append("_");
+	    		buf.append(encoding);
+	    	}
+	    	key = buf.toString();
+        }
         VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(key);
         if (reference == null) {
         	if (cache instanceof ConcurrentMap) {
