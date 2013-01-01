@@ -59,12 +59,30 @@ public class FileMethod {
     }
 
     public Template extend(String name, Locale locale, String encoding) throws IOException, ParseException {
+    	if (name == null || name.length() == 0) {
+            throw new IllegalArgumentException("include template name == null");
+        }
+        String macro = null;
+		int i = name.indexOf('#');
+        if (i > 0) {
+        	macro = name.substring(i + 1);
+        	name = name.substring(0, i);
+        }
     	Template template = Context.getContext().getTemplate();
-        if (template == null) {
-            throw new IllegalArgumentException("extend context template == null, extend: " + name);
+        if (template != null) {
+	        if (encoding == null || encoding.length() == 0) {
+	            encoding = template.getEncoding();
+	        }
+	        name = UrlUtils.relativeUrl(name, template.getName());
+	        if (locale == null) {
+	        	locale = template.getLocale();
+	        }
         }
         Template extend = engine.getTemplate(name);
-        if (extend == template) {
+        if (macro != null && macro.length() > 0) {
+        	extend = extend.getMacros().get(macro);
+		}
+        if (template != null && template == extend) {
         	throw new IllegalStateException("The template " + template.getName() + " can not be recursive extending the self template.");
         }
         Context.getContext().putAll(template.getMacros());
@@ -168,7 +186,7 @@ public class FileMethod {
         if (macro != null && macro.length() > 0) {
         	include = include.getMacros().get(macro);
 		}
-        if (include == template) {
+        if (template != null && template == include) {
         	throw new IllegalStateException("The template " + template.getName() + " can not be recursive including the self template.");
         }
         return include;
