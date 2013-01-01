@@ -35,6 +35,7 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * WebEngine (Integration, Singleton, NotThreadSafe)
@@ -154,7 +155,9 @@ public class WebEngine {
         		&& ! properties.containsKey("import.variables+")) {
         	properties.setProperty("import.variables+", 
         			HttpServletRequest.class.getName() + " request,"
-        			+ HttpServletResponse.class.getName() + " response");
+        			+ HttpServletResponse.class.getName() + " response,"
+        			+ HttpSession.class.getName() + " session,"
+        			+ ServletContext.class.getName() + " application");
         }
 	}
 

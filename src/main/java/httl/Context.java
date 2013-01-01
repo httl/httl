@@ -90,14 +90,17 @@ public final class Context extends DelegateMap<String, Object> {
         LOCAL.remove();
     }
 
-    // The context key
-    private static final String CONTEXT_KEY = "context";
-
     // The parent key
     private static final String PARENT_KEY = "parent";
 
+    // The context key
+    private static final String CONTEXT_KEY = "context";
+
     // The template key
     private static final String TEMPLATE_KEY = "template";
+
+    // The engine key
+    private static final String ENGINE_KEY = "engine";
 
     // The parameters key
     private static final String PARAMETERS_KEY = "parameters";
@@ -169,14 +172,17 @@ public final class Context extends DelegateMap<String, Object> {
     // Allows the user to override these special variables.
     @Override
     protected Object doGet(Object key) {
+    	if (PARENT_KEY.equals(key)) {
+            return parent;
+        }
         if (CONTEXT_KEY.equals(key)) {
             return this;
         }
-        if (PARENT_KEY.equals(key)) {
-            return parent;
-        }
         if (TEMPLATE_KEY.equals(key)) {
             return template;
+        }
+        if (ENGINE_KEY.equals(key)) {
+        	return template == null ? null : template.getEngine();
         }
         if (PARAMETERS_KEY.equals(key)) {
             return parameters;
