@@ -233,7 +233,7 @@ public abstract class AbstractParser implements Parser {
 	}
 
     /**
-     * httl.properties: translator=httl.spi.translators.DfaTranslator
+     * httl.properties: translator=httl.spi.translators.DefaultTranslator
      */
     public void setTranslator(Translator translator) {
 		this.translator = translator;

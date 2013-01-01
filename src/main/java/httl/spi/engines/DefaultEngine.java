@@ -50,31 +50,44 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class DefaultEngine extends Engine {
 
+	// The storage for literal resource.
+	// @see addResource() and removeResource()
     private final StringLoader stringLoader;
 
+    // httl.properties: loaders=httl.spi.loaders.ClasspathLoader
     private Loader loader;
 
+	// httl.properties: parser=httl.spi.parsers.CommentParser
     private Parser parser;
 
+    // httl.properties: translator=httl.spi.translators.DefaultTranslator
     private Translator translator;
 
+    // httl.properties: loggers=httl.spi.loggers.Log4jLogger
     private Logger logger;
 
+    // httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
     private Map<Object, Object> templateCache;
 
+    // httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
     private Map<Object, Object> expressionCache;
-    
+
+    // httl.properties: template.suffix=.httl
+    private String templateSuffix;
+
+    // httl.properties: reloadable=true
     private boolean reloadable;
     
+    // httl.properties: precompiled=true
     private boolean precompiled;
 
-    // The engine configuration name
+    // httl.properties: name
     private String name;
 
-    // The engine configuration properties
+    // httl.properties: text content
     private Properties properties;
 
-	// The engine configuration instances
+	// httl.properties: instantiated content
     private Map<String, Object> instances;
     
     public DefaultEngine() {
@@ -82,14 +95,14 @@ public class DefaultEngine extends Engine {
     }
 
 	/**
-     * Get config path
+     * Get config path.
      */
     public String getName() {
 		return name;
 	}
 
     /**
-     * Get config value.
+     * Get config text value.
      * 
      * @see #getEngine()
      * @param key - config key
@@ -101,7 +114,7 @@ public class DefaultEngine extends Engine {
     }
 
     /**
-     * Get config instance.
+     * Get config instantiated value.
      * 
      * @see #getEngine()
      * @param key - config key
@@ -163,25 +176,12 @@ public class DefaultEngine extends Engine {
 		return expression;
     }
     
-    private static String getTemplateCacheKey(String name, Locale locale, String encoding) {
-    	StringBuilder buf = new StringBuilder(name.length() + 20);
-    	buf.append(name);
-    	if (locale != null) {
-    		buf.append("_");
-    		buf.append(locale);
-    	}
-    	if (encoding != null) {
-    		buf.append("_");
-    		buf.append(encoding);
-    	}
-    	return buf.toString();
-    }
-
     /**
      * Get template.
      * 
      * @see #getEngine()
      * @param name - template name
+     * @param locale - template locale
      * @param encoding - template encoding
      * @return template instance
      * @throws IOException - If an I/O error occurs
@@ -202,7 +202,17 @@ public class DefaultEngine extends Engine {
         } else {
         	lastModified = Long.MIN_VALUE;
         }
-        String key = getTemplateCacheKey(name, locale, encoding);
+        StringBuilder buf = new StringBuilder(name.length() + 20);
+    	buf.append(name);
+    	if (locale != null) {
+    		buf.append("_");
+    		buf.append(locale);
+    	}
+    	if (encoding != null) {
+    		buf.append("_");
+    		buf.append(encoding);
+    	}
+        String key = buf.toString();
         VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(key);
         if (reference == null) {
         	if (cache instanceof ConcurrentMap) {
@@ -265,21 +275,21 @@ public class DefaultEngine extends Engine {
     }
 
 	/**
-     * Get template resource.
+     * Get resource.
      * 
      * @see #getEngine()
-     * @param name - template name
-	 * @param encoding - template encoding
-     * @return template resource
+     * @param name - resource name
+	 * @param locale - resource locale
+	 * @param encoding - resource encoding
+     * @return resource instance
      * @throws IOException - If an I/O error occurs
-     * @throws ParseException
      */
     public Resource getResource(String name, Locale locale, String encoding) throws IOException {
     	name = UrlUtils.cleanName(name);
     	return loadResource(name, locale, encoding);
     }
 
-    // Load the resource. (No clean)
+    // Load the resource. (No url clean)
     private Resource loadResource(String name, Locale locale, String encoding) throws IOException {
     	Resource resource;
     	if (stringLoader.exists(name, locale)) {
@@ -294,11 +304,12 @@ public class DefaultEngine extends Engine {
     }
 
     /**
-     * Add literal template resource.
+     * Add literal resource.
      * 
      * @see #getEngine()
-     * @param name - template name
-     * @param source - template source
+     * @param name - resource name
+     * @param locale - resource locale
+     * @param source - resource source
      */
 	public void addResource(String name, Locale locale, String source) {
 		name = UrlUtils.cleanName(name);
@@ -306,10 +317,11 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-     * Remove literal template resource.
+     * Remove literal resource.
      * 
      * @see #getEngine()
      * @param name - template name
+     * @param locale - resource locale
      */
 	public void removeResource(String name, Locale locale) {
 		name = UrlUtils.cleanName(name);
@@ -321,6 +333,7 @@ public class DefaultEngine extends Engine {
      * 
      * @see #getEngine()
      * @param name - template name
+     * @param locale - resource locale
      * @return exists
      */
     public boolean hasResource(String name, Locale locale) {
@@ -329,7 +342,7 @@ public class DefaultEngine extends Engine {
     }
 
     /**
-     * init the engine.
+     * Init the engine.
      */
     public void init() {
     	if (logger != null && logger.isInfoEnabled()
@@ -341,17 +354,8 @@ public class DefaultEngine extends Engine {
     	}
     }
 
-    private String templateSuffix;
-
     /**
-	 * httl.properties: template.suffix=.httl
-	 */
-    public void setTemplateSuffix(String suffix) {
-    	this.templateSuffix = suffix;
-    }
-
-    /**
-     * On inited.
+     * On all inited.
      */
     public void inited() {
     	if (precompiled) {
@@ -375,25 +379,32 @@ public class DefaultEngine extends Engine {
     }
 
     /**
-	 * httl.properties name
+	 * httl.properties: name
 	 */
     public void setName(String name) {
     	this.name = name;
     }
 
     /**
-	 * httl.properties
+	 * httl.properties: text content
 	 */
     public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
 
     /**
-	 * httl.properties
+	 * httl.properties: instantiated content
 	 */
     public void setInstances(Map<String, Object> instances) {
 		this.instances = instances;
 	}
+
+    /**
+	 * httl.properties: template.suffix=.httl
+	 */
+    public void setTemplateSuffix(String suffix) {
+    	this.templateSuffix = suffix;
+    }
 
     /**
 	 * httl.properties: reloadable=true
@@ -445,7 +456,7 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * httl.properties: translator=httl.spi.translators.DfaTranslator
+	 * httl.properties: translator=httl.spi.translators.DefaultTranslator
 	 */
 	public void setTranslator(Translator translator) {
 		this.translator = translator;
