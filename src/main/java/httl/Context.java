@@ -37,9 +37,9 @@ import java.util.Map;
  */
 public final class Context extends DelegateMap<String, Object> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// The context thread local holder.
+    // The context thread local holder.
     private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
     /**
@@ -118,7 +118,7 @@ public final class Context extends DelegateMap<String, Object> {
     private final Object output;
 
     private Context(Context parent, Template template, Map<String, Object> parameters, Object output) {
-    	super(parent, parameters);
+        super(parent, parameters);
         this.parent = parent;
         this.template = template;
         this.parameters = parameters;
@@ -168,23 +168,23 @@ public final class Context extends DelegateMap<String, Object> {
     // Get the special variables after the user variables.
     // Allows the user to override these special variables.
     @Override
-	protected Object doGet(Object key) {
-		if (CONTEXT_KEY.equals(key)) {
-			return this;
-		}
-		if (PARENT_KEY.equals(key)) {
-			return parent;
-		}
-		if (TEMPLATE_KEY.equals(key)) {
-			return template;
-		}
-		if (PARAMETERS_KEY.equals(key)) {
-			return parameters;
-		}
-		if (OUTPUT_KEY.equals(key)) {
-			return output;
-		}
-		return null;
-	}
+    protected Object doGet(Object key) {
+        if (CONTEXT_KEY.equals(key)) {
+            return this;
+        }
+        if (PARENT_KEY.equals(key)) {
+            return parent;
+        }
+        if (TEMPLATE_KEY.equals(key)) {
+            return template;
+        }
+        if (PARAMETERS_KEY.equals(key)) {
+            return parameters;
+        }
+        if (OUTPUT_KEY.equals(key)) {
+            return output;
+        }
+        return null;
+    }
 
 }
