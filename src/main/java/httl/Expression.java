@@ -37,12 +37,24 @@ public interface Expression {
     /**
      * Evaluate the expression.
      * 
+     * <pre>
+     * Context context = Context.getContext();
+     * context.put("foo", foo);
+     * Object result = expression.evaluate();
+     * </pre>
+     * 
      * @return evaluate result
      */
     Object evaluate();
 
     /**
      * Evaluate the expression.
+     * 
+     * <pre>
+     * Map&lt;String, Object&gt; parameters = new HashMap&lt;String, Object&gt;();
+     * parameters.put("foo", foo);
+     * Object result = expression.evaluate(parameters);
+     * </pre>
      * 
      * @param parameters - evaluate parameters
      * @return evaluate result
