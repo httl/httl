@@ -318,7 +318,7 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	/**
-     * httl.properties: import.variables=javax.servlet.http.HttpServletRequest request
+     * httl.properties: import.setVariables=javax.servlet.http.HttpServletRequest request
      */
     public void setImportVariables(String[] importVariables) {
 		this.importVariables = importVariables;
@@ -346,7 +346,7 @@ public abstract class AbstractParser implements Parser {
 			for (String var : importVariables) {
 				int i = var.lastIndexOf(' ');
 				if (i < 0) {
-					throw new IllegalArgumentException("Illegal config import.variables");
+					throw new IllegalArgumentException("Illegal config import.setVariables");
 				}
 				this.importTypes.put(var.substring(i + 1), ClassUtils.forName(importPackages, var.substring(0, i)));
 			}
@@ -375,7 +375,7 @@ public abstract class AbstractParser implements Parser {
 
     protected abstract String doParse(Resource resoure, boolean stream, String source, Translator translator, 
                                       List<String> parameters, List<Class<?>> parameterTypes, 
-                                      Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException;
+                                      Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException;
 
     public Template parse(Resource resource) throws IOException, ParseException {
     	try {
@@ -435,16 +435,11 @@ public abstract class AbstractParser implements Parser {
         try {
             return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
-        	StringBuilder declare = new StringBuilder();
-            Set<String> variables = new HashSet<String>();
+        	Set<String> getVariables = new HashSet<String>();
+            Set<String> setVariables = new HashSet<String>();
         	Map<String, Class<?>> types = new HashMap<String, Class<?>>();
         	if (importTypes != null && importTypes.size() > 0) {
         		types.putAll(importTypes);
-        		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
-        			String var = entry.getKey();
-        			String type = entry.getValue().getCanonicalName();
-        			declare.append("	" + type + " " + var + " = (" + type + ") $context.get(\"" + var + "\");\n");
-        		}
         	}
         	Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
         	StringBuilder statusInit = new StringBuilder();
@@ -464,8 +459,8 @@ public abstract class AbstractParser implements Parser {
             src = filterCData(src);
             src = filterComment(src);
             src = filterEscape(src);
-            src = doParse(resource, stream, src, translator, parameters, parameterTypes, variables, types, returnTypes, macros);
-            String code = filterStatement(src, textFilter, translator, textFields, types, new AtomicInteger(), stream, resource);
+            src = doParse(resource, stream, src, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros);
+            String code = filterStatement(src, textFilter, translator, textFields, getVariables, types, new AtomicInteger(), stream, resource);
             int i = name.lastIndexOf('.');
             String packageName = i < 0 ? "" : name.substring(0, i);
             String className = i < 0 ? name : name.substring(i + 1);
@@ -478,9 +473,19 @@ public abstract class AbstractParser implements Parser {
                     imports.append(".*;\n");
                 }
             }
+            StringBuilder declare = new StringBuilder();
+        	if (importTypes != null && importTypes.size() > 0) {
+        		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
+        			String var = entry.getKey();
+        			if (getVariables.contains(var)) {
+	        			String type = entry.getValue().getCanonicalName();
+	        			declare.append("	" + type + " " + var + " = (" + type + ") $context.get(\"" + var + "\");\n");
+        			}
+        		}
+        	}
             Set<String> macroKeySet = macros.keySet();
             for (String macro : importMacroTemplates.keySet()) {
-            	if (! macroKeySet.contains(macro)) {
+            	if (getVariables.contains(macro) && ! macroKeySet.contains(macro)) {
 	            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
 	            	macroInits.append("	" + macro + " = getImportMacros().get(\"" + macro + "\");\n");
 	            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
@@ -488,21 +493,22 @@ public abstract class AbstractParser implements Parser {
             }
             for (String macro : macroKeySet) {
             	types.put(macro, Template.class);
-            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
-            	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
-            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
+            	if (getVariables.contains(macro)) {
+	            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
+	            	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
+	            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
+            	}
             }
-            for (String var : variables) {
+            for (String var : parameters) {
+            	if (getVariables.contains(var)) {
+            		String typeName = getTypeName(types.get(var));
+            		declare.append("	" + typeName + " " + var + " = (" + typeName + ") $context.get(\"" + var + "\");\n");
+            	}
+            }
+            for (String var : setVariables) {
             	if (! parameters.contains(var)) {
 	                Class<?> type = types.get(var);
-	                String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
-	                String typeName;
-	                if (pkgName != null && ("java.lang".equals(pkgName) 
-	                        || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
-	                    typeName = type.getSimpleName();
-	                } else {
-	                    typeName = type.getCanonicalName();
-	                }
+	                String typeName = getTypeName(type);
 	                declare.append("	" + typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
             	}
             }
@@ -638,6 +644,18 @@ public abstract class AbstractParser implements Parser {
             throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
         }
     }
+    
+    private String getTypeName(Class<?> type) {
+    	String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
+        String typeName;
+        if (pkgName != null && ("java.lang".equals(pkgName) 
+                || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
+            typeName = type.getSimpleName();
+        } else {
+            typeName = type.getCanonicalName();
+        }
+        return typeName;
+    }
 
     protected String toTypeCode(Map<String, Class<?>> types) {
     	StringBuilder keyBuf = new StringBuilder();
@@ -763,7 +781,7 @@ public abstract class AbstractParser implements Parser {
         return buf.toString();
     }
     
-    protected String filterStatement(String message, Filter filter, Translator translator, StringBuilder textFields, Map<String, Class<?>> types, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
+    protected String filterStatement(String message, Filter filter, Translator translator, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
         int offset = 0;
         message = RIGHT + message + LEFT;
         StringBuffer buf = new StringBuffer();
@@ -782,7 +800,7 @@ public abstract class AbstractParser implements Parser {
                 }
                 matcher.appendReplacement(buf, next);
             } else {
-                matcher.appendReplacement(buf, Matcher.quoteReplacement("	$output.write(" + filterExpression(text, filter, translator, textFields, types, offset, seq, stream, resource) + ");\n" + next));
+                matcher.appendReplacement(buf, Matcher.quoteReplacement("	$output.write(" + filterExpression(text, filter, translator, textFields, getVariables, types, offset, seq, stream, resource) + ");\n" + next));
             }
             if (text != null) {
                 offset += text.length();
@@ -854,7 +872,7 @@ public abstract class AbstractParser implements Parser {
     }
 
     @SuppressWarnings("unchecked")
-	protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
+	protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
         if (message == null || message.length() == 0) {
             return "";
         }
@@ -877,12 +895,14 @@ public abstract class AbstractParser implements Parser {
             buf.append(");\n");
             if (symbol.charAt(0) == '$') {
 	            Expression expr = translator.translate(expression, types, off);
+	            getVariables.addAll(expr.getParameterTypes().keySet());
 	            String code = expr.getCode();
 	            Class<?> returnType = expr.getReturnType();
 	            buf.append(getExpressionCode(symbol, code, returnType, stream));
             } else {
             	boolean nofilter = "#!".equals(symbol);
             	Expression expr = translator.translate(expression, Collections.EMPTY_MAP, off);
+            	getVariables.addAll(expr.getParameterTypes().keySet());
             	ResourceTemplate template = new ResourceTemplate(resource);
             	UnsafeStringWriter writer = new UnsafeStringWriter();
             	Context.pushContext(template, Collections.EMPTY_MAP, writer);
@@ -965,7 +985,7 @@ public abstract class AbstractParser implements Parser {
     }
     
     protected String getStatementCode(String name, String value, int begin, int offset,
-                                    Translator translator, Set<String> variables, Map<String, Class<?>> types, 
+                                    Translator translator, Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
                                     Map<String, Class<?>> returnTypes, List<String> parameters, List<Class<?>> parameterTypes, boolean comment) throws IOException, ParseException {
         name = name == null ? null : name.trim();
         value = value == null ? null : value.trim();
@@ -974,18 +994,22 @@ public abstract class AbstractParser implements Parser {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The if expression == null!", begin);
             }
+            Expression expr = translator.translate(value, types, offset);
+            getVariables.addAll(expr.getParameterTypes().keySet());
             buf.append("	if (");
-            buf.append(getConditionCode(translator.translate(value, types, offset)));
+            buf.append(getConditionCode(expr));
             buf.append(") {\n");
         } else if (elseifDirective.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The elseif expression == null!", begin);
             }
+            Expression expr = translator.translate(value, types, offset);
+            getVariables.addAll(expr.getParameterTypes().keySet());
             if (comment) {
                 buf.append("	} ");
             }
             buf.append("else if (");
-            buf.append(getConditionCode(translator.translate(value, types, offset)));
+            buf.append(getConditionCode(expr));
             buf.append(") {\n");
         } else if (elseDirective.equals(name)) {
             if (value != null && value.length() > 0) {
@@ -1006,6 +1030,7 @@ public abstract class AbstractParser implements Parser {
             int start = matcher.start(1);
             int end = matcher.end(1);
             Expression expression = translator.translate(value.substring(end).trim(), types, offset + end);
+            getVariables.addAll(expression.getParameterTypes().keySet());
             Class<?> returnType = expression.getReturnType();
             String code = expression.getCode();
             String[] tokens = value.substring(0, start).trim().split("\\s+");
@@ -1050,14 +1075,16 @@ public abstract class AbstractParser implements Parser {
             	}
                 code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
             }
-            variables.add(foreachStatus);
+            setVariables.add(foreachStatus);
             buf.append(getForeachCode(type, clazz, var, code));
         } else if (breakifDirective.equals(name)) {
             if (value == null || value.length() == 0) {
                 throw new ParseException("The breakif expression == null!", begin);
             }
+            Expression expr = translator.translate(value, types, offset);
+            getVariables.addAll(expr.getParameterTypes().keySet());
             buf.append("	if (");
-            buf.append(getConditionCode(translator.translate(value, types, offset)));
+            buf.append(getConditionCode(expr));
             buf.append(") break;\n");
         } else if (setDirective.equals(name)) {
             Matcher matcher = ASSIGN_PATTERN.matcher(";" + value);
@@ -1095,6 +1122,7 @@ public abstract class AbstractParser implements Parser {
                 String expr = (String) item[4];
                 int start = (Integer) item[5];
                 Expression expression = translator.translate(expr, types, offset + end);
+                getVariables.addAll(expression.getParameterTypes().keySet());
                 if (type == null || type.length() == 0) {
                     type = expression.getReturnType().getCanonicalName();
                 }
@@ -1104,7 +1132,7 @@ public abstract class AbstractParser implements Parser {
                     throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset + start);
                 }
                 types.put(var, clazz);
-                variables.add(var);
+                setVariables.add(var);
                 buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
                 if (":=".equals(oper)) {
     	            buf.append("	($context.getParent() != null ? $context.getParent() : $context).put(\"");
@@ -1144,8 +1172,6 @@ public abstract class AbstractParser implements Parser {
                     var = v.substring(i + 1).trim();
                 }
                 type = parseGenericType(type, var, types, o);
-                parameters.add(var);
-                parameterTypes.add(ClassUtils.forName(importPackages, type));
                 Class<?> clazz = ClassUtils.forName(importPackages, type);
                 Class<?> cls = types.get(var);
                 if (cls != null) {
@@ -1156,15 +1182,8 @@ public abstract class AbstractParser implements Parser {
                 	}
                 }
                 types.put(var, clazz);
-                buf.append("	");
-                buf.append(type);
-                buf.append(" ");
-                buf.append(var);
-                buf.append(" = (");
-                buf.append(type);
-                buf.append(") $context.get(\"");
-                buf.append(var);
-                buf.append("\");\n");
+                parameters.add(var);
+                parameterTypes.add(clazz);
             }
         }else {
             throw new ParseException("Unsupported directive " + name, begin);

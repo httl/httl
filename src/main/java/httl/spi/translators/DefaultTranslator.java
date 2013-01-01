@@ -27,8 +27,10 @@ import httl.util.StringUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -105,8 +107,9 @@ public class DefaultTranslator implements Translator {
 
 	public Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
 	    source = StringUtils.unescapeHtml(source);
-	    Node node = new DfaParser(this, parameterTypes, functions.keySet(), sequences, importPackages, offset).parse(source);
-        return new ExpressionImpl(source, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, importPackages, functions);
+	    Set<String> variables = new HashSet<String>();
+	    Node node = new DfaParser(this, parameterTypes, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
+        return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, importPackages, functions);
 	}
 
 }

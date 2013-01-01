@@ -76,10 +76,10 @@ public class AttributeParser extends AbstractParser {
 
     protected String doParse(Resource resource, boolean stream, String reader, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
-                             Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
+                             Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
     	Source source = new Source(reader);
         OutputDocument document = new OutputDocument(source);
-        parseAttribute(resource, stream, source, source, document, translator, parameters, parameterTypes, variables, types, returnTypes, macros);
+        parseAttribute(resource, stream, source, source, document, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros);
         return document.toString();
     }
 
@@ -88,7 +88,7 @@ public class AttributeParser extends AbstractParser {
                                  Segment segment, OutputDocument document, 
                                  Translator translator, 
                                  List<String> parameters, List<Class<?>> parameterTypes, 
-                                 Set<String> variables, Map<String, Class<?>> types, Map<String, 
+                                 Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, 
                                  Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
         List<Element> elements = segment.getChildElements();
         if (elements == null) {
@@ -138,6 +138,21 @@ public class AttributeParser extends AbstractParser {
                                 var = value;
                                 param = null;
                             }
+                            String out = null;
+                            String set = null;
+                            if (var.startsWith("$")) {
+                            	if (var.startsWith("$!")) {
+                            		out = var.substring(0, 2);
+                            		var = var.substring(2).trim();
+                            	} else {
+                            		out = var.substring(0, 1);
+                            		var = var.substring(1).trim();
+                            	}
+                            } else if (var.contains("=")) {
+                            	int l = var.indexOf("=");
+                        		set = var.substring(0, l + 1).trim();
+                        		var = var.substring(l + 1).trim();
+                            }
                             if (var == null || var.trim().length() == 0) {
                                 throw new ParseException("Macro name == null!", macro.getBegin());
                             }
@@ -158,6 +173,21 @@ public class AttributeParser extends AbstractParser {
                             }
                             types.put(var, Template.class);
                             commentMacro = null;
+                            StringBuilder buf = new StringBuilder();
+                            buf.append(LEFT);
+                            buf.append(element.getEnd() - macro.getBegin());
+                        	if (out != null && out.length() > 0) {
+                            	getVariables.add(var);
+                                String code = getExpressionCode(out, var, Template.class, stream);
+                                buf.append(code);
+                            } else if (set != null && set.length() > 0) {
+                            	getVariables.add(var);
+                                String setValue = set + " " + var + ".evaluate()";
+                                String code = getStatementCode(setDirective, setValue, matcher.start(2), matcher.start(3), translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
+                                buf.append(code);
+                            }
+                        	buf.append(RIGHT);
+                            document.insert(element.getBegin(), buf.toString()); // 插入块指令
                             document.remove(element); // 移除注释元素
                             continue;
                     	}
@@ -188,7 +218,7 @@ public class AttributeParser extends AbstractParser {
                     } else {
                         offset ++;
                     }
-                    String code = getStatementCode(name, value, matcher.start(1), offset, translator, variables, types, returnTypes, parameters, parameterTypes, true);
+                    String code = getStatementCode(name, value, matcher.start(1), offset, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
                     buf.append(code);
                     buf.append(RIGHT);
                     document.insert(element.getBegin(), buf.toString()); // 插入块指令
@@ -241,6 +271,21 @@ public class AttributeParser extends AbstractParser {
                     var = value;
                     param = null;
                 }
+                String out = null;
+                String set = null;
+                if (var.startsWith("$")) {
+                	if (var.startsWith("$!")) {
+                		out = var.substring(0, 2);
+                		var = var.substring(2).trim();
+                	} else {
+                		out = var.substring(0, 1);
+                		var = var.substring(1).trim();
+                	}
+                } else if (var.contains("=")) {
+                	int l = var.indexOf("=");
+            		set = var.substring(0, l + 1).trim();
+            		var = var.substring(l + 1).trim();
+                }
                 if (var == null || var.trim().length() == 0) {
                     throw new ParseException("Macro name == null!", macro.getBegin());
                 }
@@ -258,6 +303,21 @@ public class AttributeParser extends AbstractParser {
                     throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macro.getBegin());
                 }
                 types.put(var, Template.class);
+                StringBuilder buf = new StringBuilder();
+                buf.append(LEFT);
+                buf.append(element.length());
+            	if (out != null && out.length() > 0) {
+                	getVariables.add(var);
+                    String code = getExpressionCode(out, var, Template.class, stream);
+                    buf.append(code);
+                } else if (set != null && set.length() > 0) {
+                	getVariables.add(var);
+                    String setValue = set + " " + var + ".evaluate()";
+                    String code = getStatementCode(setDirective, setValue, macro.getBegin(), macro.getBegin() + macro.getName().length() + 2, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
+                    buf.append(code);
+                }
+            	buf.append(RIGHT);
+                document.insert(element.getBegin(), buf.toString()); // 插入块指令
                 document.remove(element); // 移除宏
                 continue;
             }
@@ -278,7 +338,7 @@ public class AttributeParser extends AbstractParser {
                 } else {
                     offset ++;
                 }
-                String code = getStatementCode(name, value, attribute.getBegin(), offset, translator, variables, types, returnTypes, parameters, parameterTypes, false);
+                String code = getStatementCode(name, value, attribute.getBegin(), offset, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, false);
                 buf.append(code);
                 buf.append(RIGHT);
                 document.insert(element.getBegin(), buf.toString()); // 插入块指令
@@ -292,7 +352,7 @@ public class AttributeParser extends AbstractParser {
                 String end = ends.pop();
                 document.insert(element.getEnd(), LEFT + end + RIGHT); // 插入结束指令
             }
-            parseAttribute(resource, stream, source, element, document, translator, parameters, parameterTypes, variables, types, returnTypes, macros); // 递归处理子标签
+            parseAttribute(resource, stream, source, element, document, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros); // 递归处理子标签
         }
     }
     

@@ -26,6 +26,7 @@ import httl.util.Digest;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -65,18 +66,30 @@ public class ExpressionImpl implements Expression, Serializable {
     
     private volatile Evaluator evaluator;
     
-    public ExpressionImpl(String source, Map<String, Class<?>> parameterTypes, int offset, Node node, String code, Class<?> returnType, Engine engine, Compiler compiler, String[] importPackages, Map<Class<?>, Object> functions){
+    public ExpressionImpl(String source, Set<String> variables, Map<String, Class<?>> parameterTypes, int offset, Node node, String code, Class<?> returnType, Engine engine, Compiler compiler, String[] importPackages, Map<Class<?>, Object> functions){
         this.engine = engine;
         this.compiler = compiler;
         this.source = source;
         this.offset = offset;
         this.node = node;
         this.code = code;
-        this.parameterTypes = parameterTypes;
+        this.parameterTypes = getUsedParameterTypes(variables, parameterTypes);
         this.returnType = returnType;
         this.importPackages = importPackages;
         this.importPackageSet = new HashSet<String>(Arrays.asList(importPackages));
         this.functions = functions;
+    }
+    
+    private static Map<String, Class<?>> getUsedParameterTypes(Set<String> variables, Map<String, Class<?>> parameterTypes) {
+    	Map<String, Class<?>> usedParameterTypes = new HashMap<String, Class<?>>();
+    	for (String variable : variables) {
+    		Class<?> type = parameterTypes.get(variable);
+    		if (variable == null) {
+    			throw new IllegalStateException("Undefined variable type " + variable);
+    		}
+    		usedParameterTypes.put(variable, type);
+    	}
+    	return usedParameterTypes;
     }
 
     public Node getNode() {

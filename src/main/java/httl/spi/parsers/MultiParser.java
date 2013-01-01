@@ -43,12 +43,12 @@ public class MultiParser extends AbstractParser {
 
     protected String doParse(Resource resource, boolean stream, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
-                             Set<String> variables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
+                             Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
         if (parsers == null || parsers.length == 0) {
         	throw new IllegalStateException("parsers == null");
         }
     	for (AbstractParser parser : parsers) {
-            source = parser.doParse(resource, stream, source, translator, parameters, parameterTypes, variables, types, returnTypes, macros);
+            source = parser.doParse(resource, stream, source, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros);
         }
         return source;
     }

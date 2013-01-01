@@ -53,7 +53,7 @@ public class CommentParser extends AbstractParser {
     
     protected String doParse(Resource resource, boolean stream, String source, Translator translator, 
                              List<String> parameters, List<Class<?>> parameterTypes, 
-                             Set<String> variables, Map<String, Class<?>> types, 
+                             Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
                              Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
         LinkedStack<String> nameStack = new LinkedStack<String>();
         LinkedStack<String> valueStack = new LinkedStack<String>();
@@ -124,11 +124,13 @@ public class CommentParser extends AbstractParser {
                         buf.append(LEFT);
                         buf.append(matcher.group().length());
                         if (out != null && out.length() > 0) {
+                        	getVariables.add(var);
                             String code = getExpressionCode(out, var, Template.class, stream);
                             buf.append(code);
                         } else if (set != null && set.length() > 0) {
+                        	getVariables.add(var);
                             String setValue = set + " " + var + ".evaluate()";
-                            String code = getStatementCode(setDirective, setValue, matcher.start(1), offset, translator, variables, types, returnTypes, parameters, parameterTypes, true);
+                            String code = getStatementCode(setDirective, setValue, matcher.start(1), offset, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
                             buf.append(code);
                         }
                         buf.append(RIGHT);
@@ -163,7 +165,7 @@ public class CommentParser extends AbstractParser {
                     } else {
                         buf.append(LEFT);
                         buf.append(matcher.group().length());
-                        String code = getStatementCode(name, value, matcher.start(1), offset, translator, variables, types, returnTypes, parameters, parameterTypes, true);
+                        String code = getStatementCode(name, value, matcher.start(1), offset, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
                         buf.append(code);
                         buf.append(RIGHT);
                     }

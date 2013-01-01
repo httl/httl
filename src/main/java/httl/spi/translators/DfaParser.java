@@ -298,7 +298,7 @@ public class DfaParser {
         return tokens;
     }
     
-	public Node parse(String source) throws ParseException {
+	public Node parse(String source, Set<String> variables) throws ParseException {
 	    List<Token> tokens = scan(source);
         boolean beforeOperator = true;
         for (int i = 0; i < tokens.size(); i ++) {
@@ -317,6 +317,9 @@ public class DfaParser {
                     && StringUtils.isNamed(msg) && i < tokens.size() - 1) {
                 String next = tokens.get(i + 1).getMessage().trim();
                 if ("(".equals(next)) {
+                	if (parameterTypes.containsKey(msg)) {
+                		variables.add(msg);
+                	}
                     msg = "." + msg;
                 } else if (")".equals(next) && i > 0
                         && i < tokens.size() - 2) {
@@ -400,6 +403,7 @@ public class DfaParser {
                 if (! parameterTypes.containsKey(msg)) {
                     throw new ParseException("Undefined variable \"" + msg + "\". Please add variable type definition <!--#var(Xxx " + msg + ")--> in your template.", getTokenOffset(token) + offset);
                 }
+                variables.add(msg);
                 parameterStack.push(new Variable(translator, msg, getTokenOffset(token) + offset, parameterTypes, msg));
                 beforeOperator = false;
             } else if ("(".equals(msg)) {
