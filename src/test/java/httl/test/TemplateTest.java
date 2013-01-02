@@ -110,7 +110,7 @@ public class TemplateTest extends TestCase {
         for (long m = 0; m < max; m ++) {
         	{
 		        for (String config : configs) {
-		        	if (! profile)
+		        	if (! profile) 
 		        		System.out.println("========" + config + "========");
 		        	Engine engine = Engine.getEngine(config);
 		        	Loader loader = engine.getProperty("loader", Loader.class);
@@ -129,7 +129,7 @@ public class TemplateTest extends TestCase {
 			        	}
 		        	}
 			        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-			        super.assertTrue(directory.isDirectory());
+			        assertTrue(directory.isDirectory());
 			        File[] files = directory.listFiles();
 			        for (int i = 0, n = files.length; i < n; i ++) {
 			            File file = files[i];
@@ -149,7 +149,6 @@ public class TemplateTest extends TestCase {
 			            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, "UTF-8");
 			            super.assertEquals(AdaptiveTemplate.class, template.getClass());
 			            super.assertEquals(Locale.CHINA, template.getLocale());
-			            String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), "UTF-8"));
 			            UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 			            StringWriter actualWriter = new StringWriter();;
 			            try {
@@ -158,11 +157,14 @@ public class TemplateTest extends TestCase {
 			            } catch (Exception e) {
 			            	throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
 			            }
-			            expected = expected.replace("\r", "").replace("\n", "\\n\n");
-			            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", "").replace("\n", "\\n\n"));
-			            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", "").replace("\n", "\\n\n"));
-			            if ("set_parameters.httl".equals(file.getName())) {
-			            	super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
+			            if (! profile) {
+				            String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), "UTF-8"));
+				            expected = expected.replace("\r", "").replace("\n", "\\n\n");
+				            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", "").replace("\n", "\\n\n"));
+				            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", "").replace("\n", "\\n\n"));
+				            if ("set_parameters.httl".equals(file.getName())) {
+				            	super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
+				            }
 			            }
 			        }
 		        }
@@ -198,18 +200,20 @@ public class TemplateTest extends TestCase {
 		            if (! result.exists()) {
 		                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
 		            }
-		            List<String> expected = IOUtils.readLines(new FileReader(result));
-		            assertTrue(expected != null && expected.size() > 0);
 		            try {
 		            	engine.getTemplate("/templates/" + file.getName());
 		            	fail(file.getName());
 		            } catch (ParseException e) {
-		            	String message = e.getMessage();
-		            	assertTrue(message != null && message.length() > 0);
-	            		for (String part : expected)  {
-		            		assertTrue(part != null && part.length() > 0);
-		            		part = StringUtils.unescapeString(part).trim();
-		            		super.assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
+		            	if (! profile) {
+			            	String message = e.getMessage();
+			            	assertTrue(message != null && message.length() > 0);
+			            	List<String> expected = IOUtils.readLines(new FileReader(result));
+				            assertTrue(expected != null && expected.size() > 0);
+		            		for (String part : expected)  {
+			            		assertTrue(part != null && part.length() > 0);
+			            		part = StringUtils.unescapeString(part).trim();
+			            		super.assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
+			            	}
 		            	}
 		            }
 		        }
