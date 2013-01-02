@@ -18,7 +18,6 @@ package httl.spi.loaders.resources;
 
 import httl.Engine;
 import httl.Resource;
-import httl.spi.loaders.AbstractLoader;
 import httl.util.IOUtils;
 
 import java.io.IOException;

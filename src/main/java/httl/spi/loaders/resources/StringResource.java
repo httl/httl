@@ -17,7 +17,6 @@
 package httl.spi.loaders.resources;
 
 import httl.Engine;
-import httl.spi.loaders.StringLoader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
