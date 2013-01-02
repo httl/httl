@@ -992,11 +992,11 @@ public abstract class AbstractParser implements Parser {
     	Filter filter = textFilter;
     	if (valueSwitcher != null || textSwitcher != null) {
     		Set<String> locations = new HashSet<String>();
-    		List<String> valueLocations = valueSwitcher.locations();
+    		List<String> valueLocations = valueSwitcher == null ? null : valueSwitcher.locations();
     		if (valueLocations != null) {
     			locations.addAll(valueLocations);
     		}
-    		List<String> textLocations = textSwitcher.locations();
+    		List<String> textLocations = textSwitcher == null ? null : textSwitcher.locations();
     		if (textLocations != null) {
     			locations.addAll(textLocations);
     		}
