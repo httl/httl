@@ -113,10 +113,12 @@ public class TemplateTest extends TestCase {
 		        	if (! profile) 
 		        		System.out.println("========" + config + "========");
 		        	Engine engine = Engine.getEngine(config);
-		        	Loader loader = engine.getProperty("loader", Loader.class);
-		        	String suffix = engine.getProperty("template.suffix");
-		        	List<String> list = loader.list(suffix);
-		        	assertTrue(list.size() > 0);
+		        	if (! profile) {
+			        	Loader loader = engine.getProperty("loader", Loader.class);
+			        	String suffix = engine.getProperty("template.suffix");
+			        	List<String> list = loader.list(suffix);
+			        	assertTrue(list.size() > 0);
+		        	}
 		        	String dir = engine.getProperty("template.directory");
 		        	if (dir == null) {
 		        		dir = "";
