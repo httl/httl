@@ -59,7 +59,7 @@ public class ClassUtils {
     public static final String CLASS_EXTENSION = ".class";
 
     public static final String JAVA_EXTENSION = ".java";
-    
+
     private static final ConcurrentMap<String, Class<?>> CLASS_CACHE = new ConcurrentHashMap<String, Class<?>>();
 
     private static final ConcurrentMap<Class<?>, Map<String, Method>> GETTER_CACHE = new ConcurrentHashMap<Class<?>, Map<String, Method>>();
@@ -108,7 +108,8 @@ public class ClassUtils {
     
     public static Class<?> forName(String className) {
         try {
-            return _forName(className);
+            return Class.forName(className, true, 
+            		Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -188,8 +189,8 @@ public class ClassUtils {
 				else if ("String".equals(name))
 					return String.class;
 			}
-			clazz = Class.forName(name, true, Thread.currentThread()
-					.getContextClassLoader());
+			clazz = Class.forName(name, true, 
+					Thread.currentThread().getContextClassLoader());
 			CLASS_CACHE.put(key, clazz);
 		}
 		return clazz;
