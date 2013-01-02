@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * ExpressionImpl. (SPI, Prototype, ThreadSafe)
@@ -39,6 +41,8 @@ import java.util.Set;
 public class ExpressionImpl implements Expression, Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final ConcurrentMap<String, Evaluator> EVALUATOR_CACHE = new ConcurrentHashMap<String, Evaluator>();
 
     private final Engine engine;
 
@@ -199,11 +203,16 @@ public class ExpressionImpl implements Expression, Serializable {
     		md5 = Digest.getMD5(source);
     	}
     	String className = (Evaluator.class.getSimpleName() + "_" + md5);
-        try {
-            return (Evaluator) newEvaluatorClass(className).getConstructor(Map.class).newInstance(functions);
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to create expression instance. class: " + className + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
-        }
+    	Evaluator evaluator = EVALUATOR_CACHE.get(className);
+    	if (evaluator == null) {
+	        try {
+	        	evaluator = (Evaluator) newEvaluatorClass(className).getConstructor(Map.class).newInstance(functions);
+	        	EVALUATOR_CACHE.putIfAbsent(className, evaluator);
+	        } catch (Exception e) {
+	            throw new IllegalStateException("Failed to create expression instance. class: " + className + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
+	        }
+    	}
+    	return evaluator;
     }
 
     public String getSource() {

@@ -40,6 +40,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -60,9 +61,83 @@ public class ClassUtils {
 
     public static final String JAVA_EXTENSION = ".java";
 
-    private static final ConcurrentMap<String, Class<?>> CLASS_CACHE = new ConcurrentHashMap<String, Class<?>>();
-
     private static final ConcurrentMap<Class<?>, Map<String, Method>> GETTER_CACHE = new ConcurrentHashMap<Class<?>, Map<String, Method>>();
+
+    private static final ConcurrentMap<String, Class<?>> CLASS_CACHE = new ConcurrentHashMap<String, Class<?>>();
+    
+    static {
+    	CLASS_CACHE.put("boolean", boolean.class);
+    	CLASS_CACHE.put("char", char.class);
+    	CLASS_CACHE.put("byte", byte.class);
+    	CLASS_CACHE.put("short", short.class);
+    	CLASS_CACHE.put("int", int.class);
+    	CLASS_CACHE.put("long", long.class);
+    	CLASS_CACHE.put("float", float.class);
+    	CLASS_CACHE.put("double", double.class);
+    	CLASS_CACHE.put("void", void.class);
+    	CLASS_CACHE.put("Boolean", Boolean.class);
+    	CLASS_CACHE.put("Character", Character.class);
+    	CLASS_CACHE.put("Byte", Byte.class);
+    	CLASS_CACHE.put("Short", Short.class);
+    	CLASS_CACHE.put("Integer", Integer.class);
+    	CLASS_CACHE.put("Long", Long.class);
+    	CLASS_CACHE.put("Float", Float.class);
+    	CLASS_CACHE.put("Double", Double.class);
+    	CLASS_CACHE.put("Number", Number.class);
+    	CLASS_CACHE.put("String", String.class);
+    	CLASS_CACHE.put("Object", Object.class);
+    	CLASS_CACHE.put("Class", Class.class);
+    	CLASS_CACHE.put("Void", Void.class);
+    	CLASS_CACHE.put("java.lang.Boolean", Boolean.class);
+    	CLASS_CACHE.put("java.lang.Character", Character.class);
+    	CLASS_CACHE.put("java.lang.Byte", Byte.class);
+    	CLASS_CACHE.put("java.lang.Short", Short.class);
+    	CLASS_CACHE.put("java.lang.Integer", Integer.class);
+    	CLASS_CACHE.put("java.lang.Long", Long.class);
+    	CLASS_CACHE.put("java.lang.Float", Float.class);
+    	CLASS_CACHE.put("java.lang.Double", Double.class);
+    	CLASS_CACHE.put("java.lang.Number", Number.class);
+    	CLASS_CACHE.put("java.lang.String", String.class);
+    	CLASS_CACHE.put("java.lang.Object", Object.class);
+    	CLASS_CACHE.put("java.lang.Class", Class.class);
+    	CLASS_CACHE.put("java.lang.Void", Void.class);
+    	CLASS_CACHE.put("java.util.Date", Date.class);
+    	CLASS_CACHE.put("boolean[]", boolean[].class);
+    	CLASS_CACHE.put("char[]", char[].class);
+    	CLASS_CACHE.put("byte[]", byte[].class);
+    	CLASS_CACHE.put("short[]", short[].class);
+    	CLASS_CACHE.put("int[]", int[].class);
+    	CLASS_CACHE.put("long[]", long[].class);
+    	CLASS_CACHE.put("float[]", float[].class);
+    	CLASS_CACHE.put("double[]", double[].class);
+    	CLASS_CACHE.put("Boolean[]", Boolean[].class);
+    	CLASS_CACHE.put("Character[]", Character[].class);
+    	CLASS_CACHE.put("Byte[]", Byte[].class);
+    	CLASS_CACHE.put("Short[]", Short[].class);
+    	CLASS_CACHE.put("Integer[]", Integer[].class);
+    	CLASS_CACHE.put("Long[]", Long[].class);
+    	CLASS_CACHE.put("Float[]", Float[].class);
+    	CLASS_CACHE.put("Double[]", Double[].class);
+    	CLASS_CACHE.put("Number[]", Number[].class);
+    	CLASS_CACHE.put("String[]", String[].class);
+    	CLASS_CACHE.put("Object[]", Object[].class);
+    	CLASS_CACHE.put("Class[]", Class[].class);
+    	CLASS_CACHE.put("Void[]", Void[].class);
+    	CLASS_CACHE.put("java.lang.Boolean[]", Boolean[].class);
+    	CLASS_CACHE.put("java.lang.Character[]", Character[].class);
+    	CLASS_CACHE.put("java.lang.Byte[]", Byte[].class);
+    	CLASS_CACHE.put("java.lang.Short[]", Short[].class);
+    	CLASS_CACHE.put("java.lang.Integer[]", Integer[].class);
+    	CLASS_CACHE.put("java.lang.Long[]", Long[].class);
+    	CLASS_CACHE.put("java.lang.Float[]", Float[].class);
+    	CLASS_CACHE.put("java.lang.Double[]", Double[].class);
+    	CLASS_CACHE.put("java.lang.Number[]", Number[].class);
+    	CLASS_CACHE.put("java.lang.String[]", String[].class);
+    	CLASS_CACHE.put("java.lang.Object[]", Object[].class);
+    	CLASS_CACHE.put("java.lang.Class[]", Class[].class);
+    	CLASS_CACHE.put("java.lang.Void[]", Void[].class);
+    	CLASS_CACHE.put("java.util.Date[]", Date[].class);
+    }
 
     public static Object newInstance(String name) {
         try {
@@ -75,46 +150,39 @@ public class ClassUtils {
     }
     
     public static Class<?> forName(String[] packages, String className)  {
+    	// import class
+		if (packages != null && packages.length > 0 
+				&& ! className.contains(".") && ! CLASS_CACHE.containsKey(className)) {
+            for (String pkg : packages) {
+                try {
+                    return _forName(pkg + "." + className);
+                } catch (ClassNotFoundException e2) {
+                }
+            }
+		}
         try {
             return _forName(className);
         } catch (ClassNotFoundException e) {
-        	// import class
-    		if (! className.contains(".")) {
-    			if (packages != null && packages.length > 0) {
-                    for (String pkg : packages) {
-                        try {
-                            return _forName(pkg + "." + className);
-                        } catch (ClassNotFoundException e2) {
-                        }
-                    }
-                }
-    			try {
-                    return _forName("java.lang." + className);
+        	// inner class
+    		int i = className.lastIndexOf('.');
+        	if (i > 0 && i < className.length() - 1) {
+        		try {
+                    return _forName(className.substring(0, i) + "$" + className.substring(i + 1));
                 } catch (ClassNotFoundException e2) {
                 }
-    		} else {
-	    		// inner class
-	    		int i = className.lastIndexOf('.');
-	        	if (i > 0 && i < className.length() - 1) {
-	        		try {
-	                    return _forName(className.substring(0, i) + "$" + className.substring(i + 1));
-	                } catch (ClassNotFoundException e2) {
-	                }
-	        	}
-    		}
+        	}
         	throw new IllegalStateException(e.getMessage(), e);
         }
     }
-    
+
     public static Class<?> forName(String className) {
         try {
-            return Class.forName(className, true, 
-            		Thread.currentThread().getContextClassLoader());
+            return _forName(className);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
-    
+
     private static Class<?> _forName(String name) throws ClassNotFoundException {
 		if (name == null || name.length() == 0)
 			return null;
@@ -149,49 +217,9 @@ public class ClassUtils {
 				else
 					sb.append('L').append(name).append(';');
 				name = sb.toString();
-			} else {
-				if ("void".equals(name))
-					return void.class;
-				else if ("boolean".equals(name))
-					return boolean.class;
-				else if ("byte".equals(name))
-					return byte.class;
-				else if ("char".equals(name))
-					return char.class;
-				else if ("double".equals(name))
-					return double.class;
-				else if ("float".equals(name))
-					return float.class;
-				else if ("int".equals(name))
-					return int.class;
-				else if ("long".equals(name))
-					return long.class;
-				else if ("short".equals(name))
-					return short.class;
-				else if ("Void".equals(name))
-					return Void.class;
-				else if ("Boolean".equals(name))
-					return Boolean.class;
-				else if ("Byte".equals(name))
-					return Byte.class;
-				else if ("Char".equals(name))
-					return Character.class;
-				else if ("Double".equals(name))
-					return Double.class;
-				else if ("Float".equals(name))
-					return Float.class;
-				else if ("Integer".equals(name))
-					return Integer.class;
-				else if ("Long".equals(name))
-					return Long.class;
-				else if ("Short".equals(name))
-					return Short.class;
-				else if ("String".equals(name))
-					return String.class;
 			}
-			clazz = Class.forName(name, true, 
-					Thread.currentThread().getContextClassLoader());
-			CLASS_CACHE.put(key, clazz);
+			clazz = Class.forName(name);
+			CLASS_CACHE.putIfAbsent(key, clazz);
 		}
 		return clazz;
     }
