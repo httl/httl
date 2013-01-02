@@ -1,2 +1,2 @@
 No such macro "abcdefg" or import method "abcdefg" with parameters [class java.lang.String].
-Occur to offset: 6, line: 2, column: 3, char: a,
+line: 2, column: 3, char: a,

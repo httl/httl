@@ -208,7 +208,7 @@ public class TemplateTest extends TestCase {
 		            	assertTrue(message != null && message.length() > 0);
 	            		for (String part : expected)  {
 		            		assertTrue(part != null && part.length() > 0);
-		            		part = StringUtils.unescapeString(part);
+		            		part = StringUtils.unescapeString(part).trim();
 		            		super.assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
 		            	}
 		            }
