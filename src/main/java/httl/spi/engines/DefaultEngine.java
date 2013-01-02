@@ -266,13 +266,13 @@ public class DefaultEngine extends Engine {
             try {
                 Reader reader = resource.getReader();
                 try {
-                    location = StringUtils.getLocationMessage(reader, offset);
+                    location = StringUtils.getLocationMessage(name, reader, offset);
                 } finally {
                     reader.close();
                 }
             } catch (Throwable t) {
             }
-            throw new ParseException(e.getMessage()  + ". occur to offset: " + offset + 
+            throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
                                      (location == null || location.length() == 0 ? "" : ", " + location) 
                                      + ", stack: " + ClassUtils.toString(e), offset);
         }

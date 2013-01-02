@@ -625,7 +625,7 @@ public class StringUtils {
         return code;
     }
     
-    public static String getLocationMessage(Reader reader, int offset) {
+    public static String getLocationMessage(String name, Reader reader, int offset) {
         String location = "";
         if (offset <= 0) {
             return location;
@@ -682,7 +682,7 @@ public class StringUtils {
                             }
                         }
                         StringBuilder msg = new StringBuilder();
-                        msg.append("line: " + line + ", column: " + column + ", char: " + ch + ", in: \n");
+                        msg.append("line: " + line + ", column: " + column + ", char: " + ch + ", in: \n" + name + "\n");
                         for (int j = 0; j < padding * 2; j ++) {
                             msg.append("=");
                         }
