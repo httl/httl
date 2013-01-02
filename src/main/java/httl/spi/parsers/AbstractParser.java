@@ -1104,7 +1104,7 @@ public abstract class AbstractParser implements Parser {
             	}
                 item[2] = matcher.group(3);
                 item[3] = matcher.end();
-                item[5] = matcher.start(1);
+                item[5] = matcher.start(1) - 1; // 减掉前面追加的分号
                 list.add(item);
             	pre = item;
             }
