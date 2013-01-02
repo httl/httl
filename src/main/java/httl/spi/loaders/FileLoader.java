@@ -18,6 +18,7 @@ package httl.spi.loaders;
 
 import httl.Resource;
 import httl.spi.Loader;
+import httl.spi.loaders.resources.FileResource;
 import httl.util.UrlUtils;
 
 import java.io.File;

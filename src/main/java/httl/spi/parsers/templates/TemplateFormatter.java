@@ -1,4 +1,4 @@
-package httl.spi.parsers.template;
+package httl.spi.parsers.templates;
 
 import httl.Engine;
 import httl.Expression;

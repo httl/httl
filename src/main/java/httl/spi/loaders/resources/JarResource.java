@@ -14,39 +14,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.loaders;
+package httl.spi.loaders.resources;
 
 import httl.Engine;
+import httl.spi.loaders.JarLoader;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
-import java.util.zip.ZipFile;
+import java.util.jar.JarFile;
 
 /**
- * ZipResource. (SPI, Prototype, ThreadSafe)
+ * JarResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.ZipLoader#load(String, Locale, String)
+ * @see httl.spi.loaders.JarLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ZipResource extends InputStreamResource {
+public class JarResource extends InputStreamResource {
 
 	private static final long serialVersionUID = 1L;
 
 	private final File file;
 
-	public ZipResource(Engine engine, String name, Locale locale, String encoding, File file) {
+	public JarResource(Engine engine, String name, Locale locale, String encoding, File file) {
 		super(engine, name, locale, encoding);
 		this.file = file;
 	}
 
 	public InputStream getInputStream() throws IOException {
-		// 注：ZipFile与File的设计是不一样的，File相当于C#的FileInfo，只持有信息，
-		// 而ZipFile构造时即打开流，所以每次读取数据时，重新new新的实例，而不作为属性字段持有。
-		ZipFile zipFile = new ZipFile(file);
-		return zipFile.getInputStream(zipFile.getEntry(getName()));
+		// 注：JarFile与File的设计是不一样的，File相当于C#的FileInfo，只持有信息，
+		// 而JarFile构造时即打开流，所以每次读取数据时，重新new新的实例，而不作为属性字段持有。
+		JarFile jarFile = new JarFile(file);
+		return jarFile.getInputStream(jarFile.getEntry(getName()));
 	}
 
 	public long getLastModified() {
@@ -55,8 +56,8 @@ public class ZipResource extends InputStreamResource {
 
 	public long getLength() {
 		try {
-			ZipFile zipFile = new ZipFile(file);
-			return zipFile.getEntry(getName()).getSize();
+			JarFile jarFile = new JarFile(file);
+			return jarFile.getEntry(getName()).getSize();
 		} catch (IOException e) {
 			return super.getLength();
 		}

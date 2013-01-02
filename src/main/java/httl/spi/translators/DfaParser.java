@@ -18,14 +18,14 @@ package httl.spi.translators;
 
 import httl.spi.Translator;
 import httl.spi.sequences.StringSequence;
-import httl.spi.translators.expression.BinaryOperator;
-import httl.spi.translators.expression.Bracket;
-import httl.spi.translators.expression.Constant;
-import httl.spi.translators.expression.Node;
-import httl.spi.translators.expression.Operator;
-import httl.spi.translators.expression.Token;
-import httl.spi.translators.expression.UnaryOperator;
-import httl.spi.translators.expression.Variable;
+import httl.spi.translators.expressions.BinaryOperator;
+import httl.spi.translators.expressions.Bracket;
+import httl.spi.translators.expressions.Constant;
+import httl.spi.translators.expressions.Node;
+import httl.spi.translators.expressions.Operator;
+import httl.spi.translators.expressions.Token;
+import httl.spi.translators.expressions.UnaryOperator;
+import httl.spi.translators.expressions.Variable;
 import httl.util.LinkedStack;
 import httl.util.StringUtils;
 

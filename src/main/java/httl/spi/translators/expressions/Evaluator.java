@@ -14,33 +14,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.translators.expression;
+package httl.spi.translators.expressions;
 
-import java.text.ParseException;
+import java.util.Map;
 
 /**
- * Bracket. (SPI, Singleton, ThreadSafe)
+ * Evaluator. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Bracket extends Operator {
+public interface Evaluator {
 
-	private static final long serialVersionUID = 1L;
+	Object evaluate(Map<String, Object> parameters) throws Exception;
 
-    public static final Bracket ROUND = new Bracket("(");
-    
-    public static final Bracket SQUARE = new Bracket("[");
-
-    private Bracket(String name) {
-        super(null, null, 0, null, null, null, name, Integer.MAX_VALUE);
-    }
-
-    public Class<?> getReturnType() throws ParseException {
-        return null;
-    }
-
-    public String getCode() throws ParseException {
-        return getName();
-    }
-    
 }

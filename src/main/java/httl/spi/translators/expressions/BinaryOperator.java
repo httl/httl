@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.translators.expression;
+package httl.spi.translators.expressions;
 
 import httl.spi.Translator;
 import httl.spi.sequences.CharacterSequence;

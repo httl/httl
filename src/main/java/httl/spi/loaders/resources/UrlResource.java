@@ -14,41 +14,41 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.loaders;
+package httl.spi.loaders.resources;
 
 import httl.Engine;
+import httl.spi.loaders.UrlLoader;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Locale;
 
 /**
- * FileResource. (SPI, Prototype, ThreadSafe)
+ * UrlResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.FileLoader#load(String, Locale, String)
+ * @see httl.spi.loaders.UrlLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class FileResource extends InputStreamResource {
+public class UrlResource extends InputStreamResource {
     
     private static final long serialVersionUID = 1L;
+
+    private final URL url;
     
-    private final File file;
-    
-    public FileResource(Engine engine, String name, Locale locale, String encoding, String path) {
+    public UrlResource(Engine engine, String name, Locale locale, String encoding, String path) throws IOException {
         super(engine, name, locale, encoding);
-        this.file = new File(path);
+        this.url = new URL(path);
     }
 
     public InputStream getInputStream() throws IOException {
-        return new FileInputStream(this.file);
+        return url.openStream();
     }
 
     @Override
-    public File getFile() {
-        return file;
+    protected URL getUrl() {
+		return url;
     }
 
 }

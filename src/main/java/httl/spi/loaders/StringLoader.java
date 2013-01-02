@@ -19,6 +19,7 @@ package httl.spi.loaders;
 import httl.Engine;
 import httl.Resource;
 import httl.spi.Loader;
+import httl.spi.loaders.resources.StringResource;
 import httl.util.LocaleUtils;
 
 import java.io.FileNotFoundException;

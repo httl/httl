@@ -14,40 +14,42 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.loaders;
+package httl.spi.loaders.resources;
 
 import httl.Engine;
+import httl.spi.loaders.FileLoader;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Locale;
 
 /**
- * ClasspathResource. (SPI, Prototype, ThreadSafe)
+ * FileResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.ClasspathLoader#load(String, Locale, String)
+ * @see httl.spi.loaders.FileLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ClasspathResource extends InputStreamResource {
-
-    private static final long serialVersionUID = 2499229996487593996L;
+public class FileResource extends InputStreamResource {
     
-    private final String path;
+    private static final long serialVersionUID = 1L;
     
-    public ClasspathResource(Engine engine, String name, String encoding, String path, Locale locale) {
+    private final File file;
+    
+    public FileResource(Engine engine, String name, Locale locale, String encoding, String path) {
         super(engine, name, locale, encoding);
-        this.path = path;
+        this.file = new File(path);
     }
 
     public InputStream getInputStream() throws IOException {
-    	return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+        return new FileInputStream(this.file);
     }
 
     @Override
-    protected URL getUrl() {
-		return Thread.currentThread().getContextClassLoader().getResource(path);
+    public File getFile() {
+        return file;
     }
 
 }

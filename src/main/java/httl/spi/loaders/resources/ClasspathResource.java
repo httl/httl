@@ -14,9 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.loaders;
+package httl.spi.loaders.resources;
 
 import httl.Engine;
+import httl.spi.loaders.ClasspathLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,30 +25,30 @@ import java.net.URL;
 import java.util.Locale;
 
 /**
- * UrlResource. (SPI, Prototype, ThreadSafe)
+ * ClasspathResource. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.loaders.UrlLoader#load(String, Locale, String)
+ * @see httl.spi.loaders.ClasspathLoader#load(String, Locale, String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class UrlResource extends InputStreamResource {
-    
-    private static final long serialVersionUID = 1L;
+public class ClasspathResource extends InputStreamResource {
 
-    private final URL url;
+    private static final long serialVersionUID = 2499229996487593996L;
     
-    public UrlResource(Engine engine, String name, Locale locale, String encoding, String path) throws IOException {
+    private final String path;
+    
+    public ClasspathResource(Engine engine, String name, String encoding, String path, Locale locale) {
         super(engine, name, locale, encoding);
-        this.url = new URL(path);
+        this.path = path;
     }
 
     public InputStream getInputStream() throws IOException {
-        return url.openStream();
+    	return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
     }
 
     @Override
     protected URL getUrl() {
-		return url;
+		return Thread.currentThread().getContextClassLoader().getResource(path);
     }
 
 }

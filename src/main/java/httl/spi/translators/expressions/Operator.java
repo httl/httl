@@ -14,44 +14,57 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.translators.expression;
+package httl.spi.translators.expressions;
 
 import httl.spi.Translator;
 
-import java.text.ParseException;
+import java.util.Collection;
 import java.util.Map;
 
 /**
- * Variable. (SPI, Prototype, ThreadSafe)
+ * Operator. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Variable extends Node {
+public abstract class Operator extends Node {
 
 	private static final long serialVersionUID = 1L;
 
     private final String name;
     
-    public Variable(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, String name){
+    private final int priority;
+
+    private final Collection<Class<?>> functions;
+    
+    private final String[] packages;
+
+    public Operator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, String name, int priority){
         super(parameterTypes, offset);
         this.name = name;
+        this.priority = priority;
+        this.functions = functions;
+        this.packages = packages;
     }
 
+    public Collection<Class<?>> getFunctions() {
+        return functions;
+    }
+
+    public String[] getPackages() {
+        return packages;
+    }
+    
     public String getName() {
         return name;
+    }
+    
+    public int getPriority() {
+        return priority;
     }
 
     @Override
     public String toString() {
         return name;
     }
-
-    public Class<?> getReturnType() throws ParseException {
-        return getParameterTypes().get(name);
-    }
-
-    public String getCode() throws ParseException {
-        return name;
-    }
-
+    
 }

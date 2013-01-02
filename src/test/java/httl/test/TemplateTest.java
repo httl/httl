@@ -20,7 +20,7 @@ import httl.Context;
 import httl.Engine;
 import httl.Template;
 import httl.spi.Loader;
-import httl.spi.parsers.template.AdaptiveTemplate;
+import httl.spi.parsers.templates.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.User;
 import httl.test.util.DiscardOutputStream;

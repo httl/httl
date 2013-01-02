@@ -21,6 +21,7 @@ import httl.Resource;
 import httl.spi.Loader;
 import httl.spi.Locator;
 import httl.spi.Logger;
+import httl.spi.loaders.resources.InputStreamResource;
 import httl.util.LocaleUtils;
 import httl.util.UrlUtils;
 

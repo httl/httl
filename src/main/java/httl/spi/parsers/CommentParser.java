@@ -20,7 +20,7 @@ import httl.Resource;
 import httl.Template;
 import httl.spi.Parser;
 import httl.spi.Translator;
-import httl.spi.loaders.StringResource;
+import httl.spi.loaders.resources.StringResource;
 import httl.util.LinkedStack;
 
 import java.io.IOException;

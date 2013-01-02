@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.parsers.template;
+package httl.spi.parsers.templates;
 
 import httl.Context;
 import httl.Engine;

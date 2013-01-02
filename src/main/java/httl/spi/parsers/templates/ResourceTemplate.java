@@ -1,4 +1,4 @@
-package httl.spi.parsers.template;
+package httl.spi.parsers.templates;
 
 import java.io.IOException;
 import java.io.InputStream;
