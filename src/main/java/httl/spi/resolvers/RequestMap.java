@@ -79,18 +79,6 @@ public class RequestMap implements Map<String, Object> {
         if (k == null || k.length() == 0) {
             return null;
         }
-        if (REQUEST_KEY.equals(key)) {
-        	return request;
-        }
-        if (RESPONSE_KEY.equals(key)) {
-        	return response;
-        }
-        if (SESSION_KEY.equals(key)) {
-        	return request.getSession();
-        }
-        if (APPLICATION_KEY.equals(key)) {
-        	return request.getSession().getServletContext();
-        }
         if (k.startsWith(REQUEST_PREFIX)) {
         	String property = k.substring(REQUEST_PREFIX.length());
         	Object value = ClassUtils.getProperty(request, property);
@@ -164,6 +152,18 @@ public class RequestMap implements Map<String, Object> {
 			if (value != null) {
         		return value;
         	}
+			if (REQUEST_KEY.equals(key)) {
+	        	return request;
+	        }
+	        if (RESPONSE_KEY.equals(key)) {
+	        	return response;
+	        }
+	        if (SESSION_KEY.equals(key)) {
+	        	return request.getSession();
+	        }
+	        if (APPLICATION_KEY.equals(key)) {
+	        	return request.getSession().getServletContext();
+	        }
             return value;
         }
     }

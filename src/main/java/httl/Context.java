@@ -149,6 +149,16 @@ public final class Context extends DelegateMap<String, Object> {
     }
 
     /**
+     * Get the current engine.
+     * 
+     * @see #getContext()
+     * @return current engine
+     */
+    public Engine getEngine() {
+        return template == null ? null : template.getEngine();
+    }
+
+    /**
      * Get the current parameters.
      * 
      * @see #getContext()
@@ -173,22 +183,22 @@ public final class Context extends DelegateMap<String, Object> {
     @Override
     protected Object doGet(Object key) {
     	if (PARENT_KEY.equals(key)) {
-            return parent;
+            return getParent();
         }
         if (CONTEXT_KEY.equals(key)) {
             return this;
         }
         if (TEMPLATE_KEY.equals(key)) {
-            return template;
+            return getTemplate();
         }
         if (ENGINE_KEY.equals(key)) {
-        	return template == null ? null : template.getEngine();
+        	return getEngine();
         }
         if (PARAMETERS_KEY.equals(key)) {
-            return parameters;
+            return getParameters();
         }
         if (OUTPUT_KEY.equals(key)) {
-            return output;
+            return getOutput();
         }
         return null;
     }

@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentMap;
  * Engine engine = Engine.getEngine();
  * </pre>
  * 
+ * @see httl.Context#getEngine()
  * @see httl.Template#getEngine()
  * @see httl.Resource#getEngine()
  * @see httl.Expression#getEngine()
