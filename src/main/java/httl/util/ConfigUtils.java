@@ -109,12 +109,16 @@ public final class ConfigUtils {
 		}
 	}
     
+    public static boolean isFilePath(String path) {
+    	return path != null && (path.startsWith("/") || path.startsWith("./") || path.startsWith("../") 
+				|| WINDOWS_FILE_PATTERN.matcher(path).matches());
+    }
+    
     public static String getRealPath(String path) {
     	if (path == null || path.length() == 0) {
     		return null;
     	}
-    	if (path.startsWith("/") || path.startsWith("./") || path.startsWith("../") 
-				|| WINDOWS_FILE_PATTERN.matcher(path).matches()) {
+    	if (isFilePath(path)) {
 			File file = new File(path);
 			if (file.exists()) {
 				return file.getAbsolutePath();

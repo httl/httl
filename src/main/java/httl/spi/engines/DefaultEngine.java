@@ -34,7 +34,10 @@ import httl.util.VolatileReference;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -349,12 +352,28 @@ public class DefaultEngine extends Engine {
      * Init the engine.
      */
     public void init() {
-    	if (logger != null && logger.isInfoEnabled()
-    			&& name != null && name.length() > 0) {
-    		String realPath = ConfigUtils.getRealPath(name);
-            if (realPath != null && realPath.length() > 0) {
-            	logger.info("Load httl config from " + realPath + " in " + (name.startsWith("/") ? "filesystem" : "classpath") + ".");
-            }
+    	if (logger != null && name != null && name.length() > 0) {
+    		if (logger.isWarnEnabled() && ! ConfigUtils.isFilePath(name)) {
+    			try {
+    				List<String> realPaths = new ArrayList<String>();
+					Enumeration<URL> e = Thread.currentThread().getContextClassLoader().getResources(name);
+					while (e.hasMoreElements()) {
+						URL url = (URL) e.nextElement();
+						realPaths.add(url.getFile());
+					}
+					if (realPaths.size() > 1) {
+						logger.warn("Multi httl config in classpath, conflict configs: " + realPaths + ". Please keep only one config.");
+					}
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+				}
+    		}
+    		if (logger.isInfoEnabled()) {
+	    		String realPath = ConfigUtils.getRealPath(name);
+	            if (realPath != null && realPath.length() > 0) {
+	            	logger.info("Load httl config from " + realPath + " in " + (name.startsWith("/") ? "filesystem" : "classpath") + ".");
+	            }
+    		}
     	}
     }
 
