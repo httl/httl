@@ -1,0 +1,20 @@
+<!--#var(String html)-->
+<htmL>
+
+${html}
+
+<script type="text/javascript">
+var name = "${html}";
+</script>
+
+${html}
+
+<style type="text/css">
+.name {
+	font-family: "${html}"
+}
+</style>
+
+${html}
+
+</htmL>

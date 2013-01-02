@@ -91,6 +91,7 @@ public class TemplateTest extends TestCase {
         }
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("impvar", "abcxyz");
+        context.put("html", "<a href=\"foo.html\">foo</a>");
         context.put("user", user);
         context.put("books", books);
         context.put("booklist", Arrays.asList(books));
@@ -125,9 +126,9 @@ public class TemplateTest extends TestCase {
 	        File[] files = directory.listFiles();
 	        for (int i = 0, n = files.length; i < n; i ++) {
 	            File file = files[i];
-	            /*if (! "extend.httl".equals(file.getName())) {
-	                continue;
-	            }*/
+	            //if (! "switch_filter.httl".equals(file.getName())) {
+	            //    continue;
+	            //}
 	            System.out.println(file.getName());
 	            URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
 	            if (url == null) {

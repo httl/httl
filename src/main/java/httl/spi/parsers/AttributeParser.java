@@ -178,7 +178,7 @@ public class AttributeParser extends AbstractParser {
                             buf.append(element.getEnd() - macro.getBegin());
                         	if (out != null && out.length() > 0) {
                             	getVariables.add(var);
-                                String code = getExpressionCode(out, var, Template.class, stream);
+                                String code = getExpressionCode(out, var, Template.class, stream, getVariables);
                                 buf.append(code);
                             } else if (set != null && set.length() > 0) {
                             	getVariables.add(var);
@@ -308,7 +308,7 @@ public class AttributeParser extends AbstractParser {
                 buf.append(element.length());
             	if (out != null && out.length() > 0) {
                 	getVariables.add(var);
-                    String code = getExpressionCode(out, var, Template.class, stream);
+                    String code = getExpressionCode(out, var, Template.class, stream, getVariables);
                     buf.append(code);
                 } else if (set != null && set.length() > 0) {
                 	getVariables.add(var);

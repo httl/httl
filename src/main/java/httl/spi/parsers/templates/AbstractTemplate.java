@@ -19,6 +19,7 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.spi.Switcher;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.util.UnsafeByteArrayInputStream;
@@ -35,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Abstract template. (SPI, Prototype, ThreadSafe)
+ * AbstractTemplate. (SPI, Prototype, ThreadSafe)
  * 
  * @see httl.Engine#getTemplate(String)
  * 
@@ -46,37 +47,55 @@ public abstract class AbstractTemplate implements Template, Serializable {
     private static final long serialVersionUID = 8780375327644594903L;
 
     private transient final Engine engine;
-    
+
+    private transient final Switcher switcher;
+
     private transient final Filter filter;
     
-    private final TemplateFormatter formatter;
+	private final TemplateFormatter formatter;
     
 	private final Map<String, Template> importMacros;
 
 	private final Map<String, Template> macros;
 
-    public AbstractTemplate(Engine engine, Filter filter, 
+    public AbstractTemplate(Engine engine, Switcher switcher, Filter filter, 
     		Formatter<?> formatter, Map<Class<?>, Object> functions,
     		Map<String, Template> importMacros) {
 		this.engine = engine;
+		this.switcher = switcher;
 		this.filter = filter;
 		this.formatter = new TemplateFormatter(engine, formatter);
 		this.importMacros = importMacros;
 		this.macros = initMacros(engine, filter, formatter, functions, importMacros);
 	}
 
-    protected String filter(String value) {
+    protected Filter enter(String location, Filter defaultFilter) {
+    	if (switcher != null) {
+    		return switcher.enter(location, defaultFilter);
+    	}
+    	return defaultFilter;
+    }
+
+    protected String doFilter(Filter filter, String value) {
         if (filter != null)
             return filter.filter(value);
         return value;
     }
-    
+
+    protected Filter getFilter(Context context, String key) {
+    	Object value = context.get(key);
+    	if (value instanceof Filter) {
+    		return (Filter) value;
+    	}
+		return filter;
+	}
+
 	protected Template getMacro(Context context, String key, Template defaultValue) {
     	Object value = context.get(key);
-    	if (! (value instanceof Template)) {
-    		return defaultValue;
+    	if (value instanceof Template) {
+    		return (Template) value;
     	}
-    	return (Template) value;
+    	return defaultValue;
     }
 
 	protected TemplateFormatter getFormatter() {
@@ -118,8 +137,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
 			try {
 				Template macro = (Template) entry.getValue()
-						.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, filter, formatter, functions, importMacros);
+						.getConstructor(Engine.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, switcher, filter, formatter, functions, importMacros);
 				macros.put(entry.getKey(), macro);
 			} catch (Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);

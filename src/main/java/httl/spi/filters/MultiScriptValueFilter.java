@@ -19,18 +19,18 @@ package httl.spi.filters;
 import httl.spi.Filter;
 
 /**
- * MultiValueFilter. (SPI, Singleton, ThreadSafe)
+ * MultiScriptValueFilter. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.parsers.AbstractParser#setValueFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class MultiValueFilter extends MultiFilter {
+public class MultiScriptValueFilter extends MultiFilter {
 
     /**
-     * httl.properties: value.filters=httl.spi.filters.EscapeXmlFilter
+     * httl.properties: script.value.filters=httl.spi.filters.EscapeStringFilter
      */
-    public void setValueFilters(Filter[] filters) {
+    public void setScriptValueFilters(Filter[] filters) {
     	setFilters(filters);
     }
 

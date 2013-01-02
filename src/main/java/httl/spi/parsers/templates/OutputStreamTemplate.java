@@ -19,6 +19,7 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.spi.Switcher;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.util.UnsafeByteArrayOutputStream;
@@ -40,10 +41,10 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
 
     private static final long serialVersionUID = 7127901461769617745L;
 
-    public OutputStreamTemplate(Engine engine, Filter filter, 
+    public OutputStreamTemplate(Engine engine, Switcher switcher, Filter filter, 
     		Formatter<?> formatter, Map<Class<?>, Object> functions,
     		Map<String, Template> importMacros){
-        super(engine, filter, formatter, functions, importMacros);
+        super(engine, switcher, filter, formatter, functions, importMacros);
     }
     
     public Class<?> getReturnType() {

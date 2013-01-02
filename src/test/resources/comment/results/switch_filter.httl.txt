@@ -1,0 +1,20 @@
+
+<htmL>
+
+&lt;a href=&quot;foo.html&quot;&gt;foo&lt;/a&gt;
+
+<script type="text/javascript">
+var name = "<a href=\"foo.html\">foo</a>";
+</script>
+
+&lt;a href=&quot;foo.html&quot;&gt;foo&lt;/a&gt;
+
+<style type="text/css">
+.name {
+	font-family: "<a href=\"foo.html\">foo</a>"
+}
+</style>
+
+&lt;a href=&quot;foo.html&quot;&gt;foo&lt;/a&gt;
+
+</htmL>

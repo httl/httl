@@ -58,6 +58,7 @@ public class CommentParser extends AbstractParser {
         LinkedStack<String> nameStack = new LinkedStack<String>();
         LinkedStack<String> valueStack = new LinkedStack<String>();
         StringBuffer macro = null;
+        int macroStart = 0;
         int macroParameterStart = 0;
         StringBuffer buf = new StringBuffer();
         Matcher matcher = getPattern().matcher(source);
@@ -119,13 +120,11 @@ public class CommentParser extends AbstractParser {
                             throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macroParameterStart);
                         }
                         types.put(var, Template.class);
-                        macro = null;
-                        macroParameterStart = 0;
                         buf.append(LEFT);
-                        buf.append(matcher.group().length());
+                        buf.append(matcher.end() - macroStart);
                         if (out != null && out.length() > 0) {
                         	getVariables.add(var);
-                            String code = getExpressionCode(out, var, Template.class, stream);
+                            String code = getExpressionCode(out, var, Template.class, stream, getVariables);
                             buf.append(code);
                         } else if (set != null && set.length() > 0) {
                         	getVariables.add(var);
@@ -134,6 +133,9 @@ public class CommentParser extends AbstractParser {
                             buf.append(code);
                         }
                         buf.append(RIGHT);
+                        macro = null;
+                        macroStart = 0;
+                        macroParameterStart = 0;
                     } else {
                         matcher.appendReplacement(macro, "$0");
                     }
@@ -161,6 +163,7 @@ public class CommentParser extends AbstractParser {
                             throw new ParseException("Macro name == null!", matcher.start(1));
                         }
                         macro = new StringBuffer();
+                        macroStart = matcher.start();
                         macroParameterStart = matcher.start(1);
                     } else {
                         buf.append(LEFT);

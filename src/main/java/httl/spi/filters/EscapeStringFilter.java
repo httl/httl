@@ -17,45 +17,19 @@
 package httl.spi.filters;
 
 import httl.spi.Filter;
+import httl.util.StringUtils;
 
 /**
- * MultiFilter. (SPI, Singleton, ThreadSafe)
+ * EscapeStringFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTextFilter(Filter)
  * @see httl.spi.parsers.AbstractParser#setValueFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class MultiFilter implements Filter {
-    
-    private Filter[] filters;
-    
-    /**
-     * httl.properties: filters=httl.spi.filters.CompressBlankFilter
-     */
-    public void setFilters(Filter[] filters) {
-    	if (filters != null && filters.length > 0 
-    			&& this.filters != null && this.filters.length > 0) {
-    		Filter[] oldFilters = this.filters;
-    		this.filters = new Filter[oldFilters.length + filters.length];
-    		System.arraycopy(oldFilters, 0, this.filters, 0, oldFilters.length);
-    		System.arraycopy(filters, 0, this.filters, oldFilters.length, filters.length);
-    	} else {
-    		this.filters = filters;
-    	}
-    }
+public class EscapeStringFilter implements Filter {
 
     public String filter(String value) {
-    	if (filters == null || filters.length == 0) {
-    		return value;
-    	}
-    	if (filters.length == 1) {
-    		return filters[0].filter(value);
-    	}
-        for (Filter filter : filters) {
-            value = filter.filter(value);
-        }
-        return value;
+        return StringUtils.escapeString(value);
     }
 
 }

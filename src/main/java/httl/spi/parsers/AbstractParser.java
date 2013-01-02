@@ -22,6 +22,7 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Compiler;
+import httl.spi.Switcher;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Logger;
@@ -59,6 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -147,8 +149,12 @@ public abstract class AbstractParser implements Parser {
 
     protected String endDirective = END;
 
-    protected String foreachStatus = FOREACH;
-    
+    protected String foreachVariable = FOREACH;
+
+    protected String filterVariable = "filter";
+
+    protected String defaultFilterVariable = "$filter";
+
     protected String version;
     
     protected Engine engine;
@@ -156,6 +162,10 @@ public abstract class AbstractParser implements Parser {
     protected Compiler compiler;
     
 	protected Translator translator;
+	
+	protected Switcher textSwitcher;
+
+	protected Switcher valueSwitcher;
 
 	protected Filter textFilter;
 
@@ -240,6 +250,20 @@ public abstract class AbstractParser implements Parser {
 	}
 
     /**
+     * httl.properties: text.switchers=httl.spi.switchers.JavaScriptSwitcher
+     */
+    public void setTextSwitcher(Switcher textSwitcher) {
+		this.textSwitcher = textSwitcher;
+	}
+
+    /**
+     * httl.properties: value.switchers=httl.spi.switchers.JavaScriptSwitcher
+     */
+    public void setValueSwitcher(Switcher valueSwitcher) {
+		this.valueSwitcher = valueSwitcher;
+	}
+
+    /**
      * httl.properties: text.filters=httl.spi.filters.CompressBlankFilter
      */
     public void setTextFilter(Filter filter) {
@@ -296,10 +320,17 @@ public abstract class AbstractParser implements Parser {
 	}
 
     /**
-     * httl.properties: foreach.status=foreach
+     * httl.properties: foreach.variable=foreach
      */
-	public void setForeachStatus(String foreachStatus) {
-		this.foreachStatus = foreachStatus;
+	public void setForeachVariable(String foreachVariable) {
+		this.foreachVariable = foreachVariable;
+	}
+	
+    /**
+     * httl.properties: filter.variable=filter
+     */
+	public void setFilterVariable(String filterVariable) {
+		this.filterVariable = filterVariable;
 	}
 
     /**
@@ -383,13 +414,13 @@ public abstract class AbstractParser implements Parser {
 	    	Template streamTemplate = null;
 	    	if (isOutputWriter || ! isOutputStream) {
 	    		Class<?> clazz = parseClass(resource, false, 0);
-	        	writerTemplate = (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
+	        	writerTemplate = (Template) clazz.getConstructor(Engine.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
 	    	}
 	    	if (isOutputStream) {
 	    		Class<?> clazz = parseClass(resource, true, 0);
-	    		streamTemplate = (Template) clazz.getConstructor(Engine.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, valueFilter, formatter, functions, importMacroTemplates);
+	    		streamTemplate = (Template) clazz.getConstructor(Engine.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
 	    	}
 	    	if (writerTemplate != null && streamTemplate != null) {
 	    		return new AdaptiveTemplate(writerTemplate, streamTemplate);
@@ -444,7 +475,9 @@ public abstract class AbstractParser implements Parser {
         	Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
         	StringBuilder statusInit = new StringBuilder();
         	types.put("this", Template.class);
-            types.put(foreachStatus, ForeachStatus.class);
+        	types.put(defaultFilterVariable, Filter.class);
+        	types.put(filterVariable, Filter.class);
+            types.put(foreachVariable, ForeachStatus.class);
             StringBuilder macroFields = new StringBuilder();
             StringBuilder macroInits = new StringBuilder();
             for (String macro : importMacroTemplates.keySet()) {
@@ -460,7 +493,7 @@ public abstract class AbstractParser implements Parser {
             src = filterComment(src);
             src = filterEscape(src);
             src = doParse(resource, stream, src, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros);
-            String code = filterStatement(src, textFilter, translator, textFields, getVariables, types, new AtomicInteger(), stream, resource);
+            String code = filterStatement(src, textFields, getVariables, types, new AtomicInteger(), stream, resource);
             int i = name.lastIndexOf('.');
             String packageName = i < 0 ? "" : name.substring(0, i);
             String className = i < 0 ? name : name.substring(i + 1);
@@ -474,7 +507,7 @@ public abstract class AbstractParser implements Parser {
                 }
             }
             StringBuilder declare = new StringBuilder();
-        	if (importTypes != null && importTypes.size() > 0) {
+            if (importTypes != null && importTypes.size() > 0) {
         		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
         			String var = entry.getKey();
         			if (getVariables.contains(var)) {
@@ -498,6 +531,10 @@ public abstract class AbstractParser implements Parser {
 	            	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
 	            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
             	}
+            }
+            if (getVariables.contains(filterVariable)) {
+            	declare.append("	" + Filter.class.getName() + " " + defaultFilterVariable + " = getFilter($context, \"" + filterVariable + "\");\n");
+            	declare.append("	" + Filter.class.getName() + " " + filterVariable + " = " + defaultFilterVariable + ";\n");
             }
             for (String var : parameters) {
             	if (getVariables.contains(var)) {
@@ -572,11 +609,12 @@ public abstract class AbstractParser implements Parser {
                     + "\n"
                     + "public " + className + "("
                     + Engine.class.getName() + " engine, " 
+                    + Switcher.class.getName() + " switcher, " 
                     + Filter.class.getName() + " filter, "
                     + Formatter.class.getName() + " formatter, "
                     + Map.class.getName() + " functions, " 
                     + Map.class.getName() + " importMacros) {\n" 
-                    + "	super(engine, filter, formatter, functions, importMacros);\n"
+                    + "	super(engine, switcher, filter, formatter, functions, importMacros);\n"
                     + functionInits
                     + macroInits
                     + "}\n"
@@ -645,7 +683,7 @@ public abstract class AbstractParser implements Parser {
         }
     }
     
-    private String getTypeName(Class<?> type) {
+	private String getTypeName(Class<?> type) {
     	String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
         String typeName;
         if (pkgName != null && ("java.lang".equals(pkgName) 
@@ -781,7 +819,7 @@ public abstract class AbstractParser implements Parser {
         return buf.toString();
     }
     
-    protected String filterStatement(String message, Filter filter, Translator translator, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
+    protected String filterStatement(String message, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
         int offset = 0;
         message = RIGHT + message + LEFT;
         StringBuffer buf = new StringBuffer();
@@ -800,7 +838,7 @@ public abstract class AbstractParser implements Parser {
                 }
                 matcher.appendReplacement(buf, next);
             } else {
-                matcher.appendReplacement(buf, Matcher.quoteReplacement("	$output.write(" + filterExpression(text, filter, translator, textFields, getVariables, types, offset, seq, stream, resource) + ");\n" + next));
+                matcher.appendReplacement(buf, Matcher.quoteReplacement("	$output.write(" + filterExpression(text, translator, textFields, getVariables, types, offset, seq, stream, resource) + ");\n" + next));
             }
             if (text != null) {
                 offset += text.length();
@@ -811,7 +849,7 @@ public abstract class AbstractParser implements Parser {
         return buf.toString().replace("	$output.write();\n", "");
     }
     
-    protected String getExpressionCode(String symbol, String code, Class<?> returnType, boolean stream) {
+    protected String getExpressionCode(String symbol, String code, Class<?> returnType, boolean stream, Set<String> getVariables) {
     	StringBuilder buf = new StringBuilder();
     	boolean nofilter = "$!".equals(symbol);
         if (nofilter && Template.class.isAssignableFrom(returnType)) {
@@ -856,7 +894,8 @@ public abstract class AbstractParser implements Parser {
                 } else {
                 	code = "getFormatter().format(" + code + ")";
                     if (! nofilter) {
-                    	code = "filter(" + code + ")";
+                    	getVariables.add(filterVariable);
+                    	code = "doFilter(" + filterVariable + ", " + code + ")";
                     }
                     if (stream) {
                     	code = "getFormatter().serialize(" + code + ")";
@@ -870,9 +909,9 @@ public abstract class AbstractParser implements Parser {
         }
         return buf.toString();
     }
-
+    
     @SuppressWarnings("unchecked")
-	protected String filterExpression(String message, Filter filter, Translator translator, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
+	protected String filterExpression(String message, Translator translator, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
         if (message == null || message.length() == 0) {
             return "";
         }
@@ -891,14 +930,14 @@ public abstract class AbstractParser implements Parser {
         	String expression = matcher.group(2);
             int off = matcher.start(2) + offset;
             String txt = message.substring(last, matcher.start());
-            appendText(buf, txt, filter, textFields, seq, stream);
+            appendSwitcher(buf, txt, textFields, seq, stream, getVariables);
             buf.append(");\n");
             if (symbol.charAt(0) == '$') {
 	            Expression expr = translator.translate(expression, types, off);
 	            getVariables.addAll(expr.getParameterTypes().keySet());
 	            String code = expr.getCode();
 	            Class<?> returnType = expr.getReturnType();
-	            buf.append(getExpressionCode(symbol, code, returnType, stream));
+	            buf.append(getExpressionCode(symbol, code, returnType, stream, getVariables));
             } else {
             	boolean nofilter = "#!".equals(symbol);
             	Expression expr = translator.translate(expression, Collections.EMPTY_MAP, off);
@@ -918,12 +957,12 @@ public abstract class AbstractParser implements Parser {
 	            		str = valueFilter.filter(str);
 	            	}
 	            	buf.append("	$output.write(");
-		            appendText(buf, str, filter, textFields, seq, stream);
+	            	appendSwitcher(buf, str, textFields, seq, stream, getVariables);
 		            buf.append(");\n");
 		            String msg = writer.getBuffer().toString();
 		            if (msg != null && msg.length() > 0) {
 		            	buf.append("	$output.write(");
-			            appendText(buf, msg, filter, textFields, seq, stream);
+		            	appendSwitcher(buf, msg, textFields, seq, stream, getVariables);
 			            buf.append(");\n");
 		            }
             	} finally {
@@ -942,36 +981,91 @@ public abstract class AbstractParser implements Parser {
         } else {
             txt = null;
         }
-        appendText(buf, txt, filter, textFields, seq, stream);
+        appendSwitcher(buf, txt, textFields, seq, stream, getVariables);
         return buf.toString();
     }
-    
+
+    private void appendSwitcher(StringBuffer buf, String txt, StringBuilder textFields, AtomicInteger seq, boolean stream, Set<String> getVariables) {
+    	if (txt == null || txt.length() == 0) {
+            return;
+        }
+    	Filter filter = textFilter;
+    	if (valueSwitcher != null || textSwitcher != null) {
+    		Set<String> locations = new HashSet<String>();
+    		List<String> valueLocations = valueSwitcher.locations();
+    		if (valueLocations != null) {
+    			locations.addAll(valueLocations);
+    		}
+    		List<String> textLocations = textSwitcher.locations();
+    		if (textLocations != null) {
+    			locations.addAll(textLocations);
+    		}
+    		if (locations != null && locations.size() > 0) {
+    			Map<Integer, Set<String>> switchesd = new TreeMap<Integer, Set<String>>();
+    			for (String location : locations) {
+    				int i = -1;
+    				while ((i = txt.indexOf(location, i + 1)) >= 0) {
+    					Integer key = Integer.valueOf(i);
+    					Set<String> values = switchesd.get(key);
+    					if (values == null) {
+    						values = new HashSet<String>();
+    						switchesd.put(key, values);
+    					}
+    					values.add(location);
+    				}
+    			}
+    			if (switchesd.size() > 0) {
+    				getVariables.add(filterVariable);
+    				int begin = 0;
+    				for (Map.Entry<Integer, Set<String>> entry : switchesd.entrySet()) {
+    					int end = entry.getKey();
+    					appendText(buf, txt.substring(begin, end), filter, textFields, seq, stream);
+    					begin = end;
+    					buf.append(");\n");
+    					for (String location : entry.getValue()) {
+        					if (textLocations != null && textLocations.contains(location)) {
+        						filter = textSwitcher.enter(location, textFilter);
+        					}
+        					if (valueLocations != null && valueLocations.contains(location)) {
+        						buf.append("	" + filterVariable + " = enter(\"" + StringUtils.escapeString(location) + "\", " + defaultFilterVariable + ");\n");
+        					}
+        				}
+    					buf.append("	$output.write(");
+    				}
+    				txt = txt.substring(begin);
+    			}
+    		}
+    	}
+    	appendText(buf, txt, filter, textFields, seq, stream);
+    }
+
     private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder textFields, AtomicInteger seq, boolean stream) {
+        if (txt == null || txt.length() == 0) {
+            return;
+        }
+        txt = txt.replace(POUND_SPECIAL, POUND);
+        txt = txt.replace(DOLLAR_SPECIAL, DOLLAR);
+        if (filter != null) {
+        	txt = filter.filter(txt);
+        }
         if (txt != null && txt.length() > 0) {
-            txt = txt.replace(POUND_SPECIAL, POUND);
-            txt = txt.replace(DOLLAR_SPECIAL, DOLLAR);
-            if (filter != null) {
-            	txt = filter.filter(txt);
+            String var = "$TXT" + seq.incrementAndGet();
+            if (stream) {
+            	if (textInClass) {
+            		textFields.append("private static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(StringUtils.toBytes(txt, outputEncoding)) + "};\n");
+            	} else {
+            		String txtId = ByteCache.put(StringUtils.toBytes(txt, outputEncoding));
+            		textFields.append("private static final byte[] " + var + " = " + ByteCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
+            	}
+            } else {
+            	if (textInClass) {
+            		textFields.append("private static final String " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
+            	} else {
+            		String txtId = StringCache.put(txt);
+            		textFields.append("private static final String " + var + " = " + StringCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
+            	}
             }
-            if (txt != null && txt.length() > 0) {
-                String var = "$TXT" + seq.incrementAndGet();
-                if (stream) {
-                	if (textInClass) {
-                		textFields.append("private static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(StringUtils.toBytes(txt, outputEncoding)) + "};\n");
-                	} else {
-                		String txtId = ByteCache.put(StringUtils.toBytes(txt, outputEncoding));
-                		textFields.append("private static final byte[] " + var + " = " + ByteCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
-                	}
-                } else {
-                	if (textInClass) {
-                		textFields.append("private static final String " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
-                	} else {
-                		String txtId = StringCache.put(txt);
-                		textFields.append("private static final String " + var + " = " + StringCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
-                	}
-                }
-                buf.append(var);
-            }
+            buf.append(var);
         }
     }
     
@@ -979,7 +1073,7 @@ public abstract class AbstractParser implements Parser {
         if (ifDirective.equals(name) || elseifDirective.equals(name) || elseDirective.equals(name)) {
             return "	}\n"; // 插入结束指令
         } else if (foreachDirective.equals(name)) {
-            return "	" + foreachStatus + ".increment();\n	}\n	" + foreachStatus + " = " + foreachStatus + ".getParent();\n"; // 插入结束指令
+            return "	" + foreachVariable + ".increment();\n	}\n	" + foreachVariable + " = " + foreachVariable + ".getParent();\n"; // 插入结束指令
         }
         return null;
     }
@@ -1075,7 +1169,7 @@ public abstract class AbstractParser implements Parser {
             	}
                 code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
             }
-            setVariables.add(foreachStatus);
+            setVariables.add(foreachVariable);
             buf.append(getForeachCode(type, clazz, var, code));
         } else if (breakifDirective.equals(name)) {
             if (value == null || value.length() == 0) {
@@ -1251,11 +1345,11 @@ public abstract class AbstractParser implements Parser {
     protected String getForeachCode(String type, Class<?> clazz, String var, String code) {
         StringBuilder buf = new StringBuilder();
         String name = "_i_" + var;
-        buf.append("for (" + Iterator.class.getName() + " " + name + " = " + ClassUtils.class.getName() + ".toIterator((" + foreachStatus + " = new " + ForeachStatus.class.getName() + "(" + foreachStatus + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
+        buf.append("	for (" + Iterator.class.getName() + " " + name + " = " + ClassUtils.class.getName() + ".toIterator((" + foreachVariable + " = new " + ForeachStatus.class.getName() + "(" + foreachVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
         if (clazz.isPrimitive()) {
-            buf.append(type + " " + var + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next());\n");
+            buf.append("	" + type + " " + var + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next());\n");
         } else {
-            buf.append(type + " " + var + " = (" + type + ") " + name + ".next();\n");
+            buf.append("	" + type + " " + var + " = (" + type + ") " + name + ".next();\n");
         }
         return buf.toString();
     }

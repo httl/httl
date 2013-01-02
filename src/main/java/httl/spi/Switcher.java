@@ -14,24 +14,44 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.filters;
+package httl.spi;
 
-import httl.spi.Filter;
+import java.util.List;
 
 /**
- * MultiValueFilter. (SPI, Singleton, ThreadSafe)
+ * Filter Switcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setValueFilter(Filter)
+ * @see httl.spi.parsers.AbstractParser#setTextSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setValueSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class MultiValueFilter extends MultiFilter {
+public interface Switcher {
 
-    /**
-     * httl.properties: value.filters=httl.spi.filters.EscapeXmlFilter
-     */
-    public void setValueFilters(Filter[] filters) {
-    	setFilters(filters);
-    }
+	/**
+	 * Switch's locations.
+	 * 
+	 * <pre>
+	 * locations = ["&lt;script", "&lt;script&gt;"]
+	 * </pre>
+	 * 
+	 * @return locations
+	 */
+	List<String> locations();
+
+	/**
+	 * Enter the location.
+	 * 
+	 * <pre>
+	 * filter = switcher.enter("&lt;script", defaultFilter); // return EscapeStringFilter
+	 * &lt;script type="text/javascript"&gt;
+	 * ...
+	 * filter = switcher.enter("&lt;script&gt;", defaultFilter); // return defaultFilter
+	 * &lt;script&gt;
+	 * </pre>
+	 * 
+	 * @return locations
+	 */
+	Filter enter(String location, Filter defaultFilter);
 
 }

@@ -19,18 +19,18 @@ package httl.spi.filters;
 import httl.spi.Filter;
 
 /**
- * MultiTextFilter. (SPI, Singleton, ThreadSafe)
+ * MultiScriptTextFilter. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.parsers.AbstractParser#setTextFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class MultiTextFilter extends MultiFilter {
+public class MultiScriptTextFilter extends MultiFilter {
 
     /**
-     * httl.properties: text.filters=httl.spi.filters.ClearBlankLineFilter
+     * httl.properties: script.text.filters=httl.spi.filters.ClearBlankLineFilter
      */
-    public void setTextFilters(Filter[] filters) {
+    public void setScriptTextFilters(Filter[] filters) {
     	setFilters(filters);
     }
 
