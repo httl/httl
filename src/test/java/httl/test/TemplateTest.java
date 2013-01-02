@@ -158,8 +158,9 @@ public class TemplateTest extends TestCase {
 			            } catch (Exception e) {
 			            	throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
 			            }
-			            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString());
-			            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()));
+			            expected = expected.replace("\r", "").replace("\n", "\\n\n");
+			            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", "").replace("\n", "\\n\n"));
+			            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", "").replace("\n", "\\n\n"));
 			            if ("set_parameters.httl".equals(file.getName())) {
 			            	super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
 			            }
