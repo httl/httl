@@ -117,7 +117,8 @@ public class ClassUtils {
     private static Class<?> _forName(String name) throws ClassNotFoundException {
 		if (name == null || name.length() == 0)
 			return null;
-		Class<?> clazz = CLASS_CACHE.get(name);
+		String key = name;
+		Class<?> clazz = CLASS_CACHE.get(key);
 		if (clazz == null) {
 			int index = name.indexOf('[');
 			if (index > 0) {
@@ -189,7 +190,7 @@ public class ClassUtils {
 			}
 			clazz = Class.forName(name, true, Thread.currentThread()
 					.getContextClassLoader());
-			CLASS_CACHE.put(name, clazz);
+			CLASS_CACHE.put(key, clazz);
 		}
 		return clazz;
     }
