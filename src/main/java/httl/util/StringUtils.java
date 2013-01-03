@@ -219,73 +219,72 @@ public class StringUtils {
     	return escapeXml(value);
     }
     
-    public static String escapeXml(String value) {
-        if (value == null || value.length() == 0) {
-            return value;
-        }
-        int len = value.length();
-        StringBuilder buf = null;
-        for (int i = 0; i < len; i ++) {
-            char ch = value.charAt(i);
-            switch (ch) {
-                case '&':
-                    if (buf == null) {
-                        buf = new StringBuilder(len * 2);
-                        if(i > 0) {
-                            buf.append(value.substring(0, i));
-                        }
-                    }
-                    buf.append("&amp;");
-                    break;
-                case '<':
-                	if (buf == null) {
-                        buf = new StringBuilder(len * 2);
-                        if(i > 0) {
-                            buf.append(value.substring(0, i));
-                        }
-                    }
-                    buf.append("&lt;");
-                    break;
-                case '>':
-                	if (buf == null) {
-                        buf = new StringBuilder(len * 2);
-                        if(i > 0) {
-                            buf.append(value.substring(0, i));
-                        }
-                    }
-                    buf.append("&gt;");
-                    break;
-                case '\"':
-                	if (buf == null) {
-                        buf = new StringBuilder(len * 2);
-                        if(i > 0) {
-                            buf.append(value.substring(0, i));
-                        }
-                    }
-                    buf.append("&quot;");
-                    break;
-                case '\'':
-                	if (buf == null) {
-                        buf = new StringBuilder(len * 2);
-                        if(i > 0) {
-                            buf.append(value.substring(0, i));
-                        }
-                    }
-                    buf.append("&apos;");
-                    break;
-                default:
-                	if (buf != null) {
-                        buf.append(ch);
-                    }
-                    break;
-            }
-            
-        }
-        if (buf != null) {
-            return buf.toString();
-        }
-        return value;
-    }
+	public static String escapeXml(String value) {
+	    if (value == null || value.length() == 0) {
+	        return value;
+	    }
+	    int len = value.length();
+	    StringBuilder buf = null;
+	    for (int i = 0; i < len; i ++) {
+	        char ch = value.charAt(i);
+	        switch (ch) {
+	            case '&':
+	                if (buf == null) {
+	                    buf = new StringBuilder(len * 2);
+	                    if(i > 0) {
+	                        buf.append(value.substring(0, i));
+	                    }
+	                }
+	                buf.append("&amp;");
+	                break;
+	            case '<':
+	            	if (buf == null) {
+	                    buf = new StringBuilder(len * 2);
+	                    if(i > 0) {
+	                        buf.append(value.substring(0, i));
+	                    }
+	                }
+	                buf.append("&lt;");
+	                break;
+	            case '>':
+	            	if (buf == null) {
+	                    buf = new StringBuilder(len * 2);
+	                    if(i > 0) {
+	                        buf.append(value.substring(0, i));
+	                    }
+	                }
+	                buf.append("&gt;");
+	                break;
+	            case '\"':
+	            	if (buf == null) {
+	                    buf = new StringBuilder(len * 2);
+	                    if(i > 0) {
+	                        buf.append(value.substring(0, i));
+	                    }
+	                }
+	                buf.append("&quot;");
+	                break;
+	            case '\'':
+	            	if (buf == null) {
+	                    buf = new StringBuilder(len * 2);
+	                    if(i > 0) {
+	                        buf.append(value.substring(0, i));
+	                    }
+	                }
+	                buf.append("&apos;");
+	                break;
+	            default:
+	            	if (buf != null) {
+	                    buf.append(ch);
+	                }
+	                break;
+	        }
+	    }
+	    if (buf != null) {
+	        return buf.toString();
+	    }
+	    return value;
+	}
 
     /**
      * HTML特殊符转义还原。
