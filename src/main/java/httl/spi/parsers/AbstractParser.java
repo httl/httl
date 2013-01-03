@@ -579,7 +579,6 @@ public abstract class AbstractParser implements Parser {
             	functionInits.append(".class);\n");
             }
             
-            // TODO 将ForeachStatus中的Stack改成直接生成局部变量，使用JVM的线程栈
             String methodCode = statusInit.toString() + declare + code;
             
             if (sourceInClass) {
