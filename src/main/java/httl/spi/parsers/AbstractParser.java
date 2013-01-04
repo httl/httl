@@ -192,8 +192,10 @@ public abstract class AbstractParser implements Parser {
     protected static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
 
     protected final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
+    
+    protected boolean alwaysSetContext;
 
-    protected boolean isOutputStream;
+	protected boolean isOutputStream;
 
     protected boolean isOutputWriter;
 
@@ -282,6 +284,13 @@ public abstract class AbstractParser implements Parser {
      */
 	public void setFormatter(Formatter<?> formatter) {
 		this.formatter = formatter;
+	}
+
+    /**
+     * httl.properties: always.set.context=true
+     */
+    public void setAlwaysSetContext(boolean alwaysSetContext) {
+		this.alwaysSetContext = alwaysSetContext;
 	}
 
     /**
@@ -1247,7 +1256,7 @@ public abstract class AbstractParser implements Parser {
                 types.put(var, clazz);
                 setVariables.add(var);
                 buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
-                if (":=".equals(oper)) {
+                if (alwaysSetContext || ":=".equals(oper)) {
     	            buf.append("	($context.getParent() != null ? $context.getParent() : $context).put(\"");
     	            buf.append(var);
     	            buf.append("\", ");
