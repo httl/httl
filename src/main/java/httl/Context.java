@@ -90,14 +90,23 @@ public final class Context extends DelegateMap<String, Object> {
         LOCAL.remove();
     }
 
-    // The parent key
-    private static final String PARENT_KEY = "parent";
-
     // The context key
     private static final String CONTEXT_KEY = "context";
 
+    // The current context key
+    private static final String CURRENT_KEY = "current";
+
+    // The parent context key
+    private static final String PARENT_KEY = "parent";
+
     // The template key
     private static final String TEMPLATE_KEY = "template";
+
+    // The this template key
+    private static final String THIS_KEY = "this";
+
+    // The super template key
+    private static final String SUPER_KEY = "super";
 
     // The engine key
     private static final String ENGINE_KEY = "engine";
@@ -136,6 +145,16 @@ public final class Context extends DelegateMap<String, Object> {
      */
     public Context getParent() {
         return parent;
+    }
+    
+    /**
+     * Get the super template.
+     * 
+     * @see #getContext()
+     * @return super template
+     */
+    public Template getSuper() {
+        return parent == null ? null : parent.getTemplate();
     }
 
     /**
@@ -185,14 +204,23 @@ public final class Context extends DelegateMap<String, Object> {
     	if (PARENT_KEY.equals(key)) {
             return getParent();
         }
+    	if (SUPER_KEY.equals(key)) {
+            return getSuper();
+        }
+    	if (ENGINE_KEY.equals(key)) {
+        	return getEngine();
+        }
         if (CONTEXT_KEY.equals(key)) {
             return this;
         }
         if (TEMPLATE_KEY.equals(key)) {
             return getTemplate();
         }
-        if (ENGINE_KEY.equals(key)) {
-        	return getEngine();
+        if (CURRENT_KEY.equals(key)) {
+            return this;
+        }
+    	if (THIS_KEY.equals(key)) {
+            return getTemplate();
         }
         if (PARAMETERS_KEY.equals(key)) {
             return getParameters();

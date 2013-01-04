@@ -148,7 +148,11 @@ public class ExpressionImpl implements Expression, Serializable {
             } else {
                 typeName = type.getCanonicalName();
             }
-            declare.append(typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
+            if (type.isPrimitive()) {
+            	declare.append(typeName + " " + ClassUtils.filterJavaKeyword(var) + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(type).getSimpleName() + ") $parameters.get(\"" + var + "\"));\n");
+            } else {
+            	declare.append(typeName + " " + ClassUtils.filterJavaKeyword(var) + " = (" + typeName + ") $parameters.get(\"" + var + "\");\n");
+            }
         }
         StringBuilder funtionFileds = new StringBuilder();
         StringBuilder functionInits = new StringBuilder();
@@ -186,7 +190,7 @@ public class ExpressionImpl implements Expression, Serializable {
                 + "public " + className + "(Map functions) {\n"
                 + functionInits
                 + "}\n"
-                + "public " + Object.class.getSimpleName() + " evaluate(" + Map.class.getName() + " parameters) throws Exception {\n"
+                + "public " + Object.class.getSimpleName() + " evaluate(" + Map.class.getName() + " $parameters) throws Exception {\n"
                 + declare.toString()
                 + "return " + ClassUtils.class.getName() + ".boxed(" + getCode() + ");\n"
                 + "}\n"

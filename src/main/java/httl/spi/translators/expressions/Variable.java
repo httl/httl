@@ -17,6 +17,7 @@
 package httl.spi.translators.expressions;
 
 import httl.spi.Translator;
+import httl.util.ClassUtils;
 
 import java.text.ParseException;
 import java.util.Map;
@@ -51,7 +52,7 @@ public final class Variable extends Node {
     }
 
     public String getCode() throws ParseException {
-        return name;
+        return ClassUtils.filterJavaKeyword(name);
     }
 
 }

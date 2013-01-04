@@ -66,6 +66,7 @@ public final class UnaryOperator extends Operator {
             if (t != null && Expression.class.isAssignableFrom(t)) {
                 return Object.class;
             } else {
+            	name = ClassUtils.filterJavaKeyword(name);
                 Class<?>[] types = parameter.getReturnTypes();
                 Collection<Class<?>> functions = getFunctions();
                 if (functions != null && functions.size() > 0) {
@@ -108,6 +109,7 @@ public final class UnaryOperator extends Operator {
             if (t != null && Expression.class.isAssignableFrom(t)) {
                 return name + ".evaluate(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " ))";
             } else {
+            	name = ClassUtils.filterJavaKeyword(name);
                 Collection<Class<?>> functions = getFunctions();
                 if (functions != null && functions.size() > 0) {
                     for (Class<?> function : functions) {

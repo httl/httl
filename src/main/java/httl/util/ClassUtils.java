@@ -1283,6 +1283,36 @@ public class ClassUtils {
     public static <K, V> Set<Map.Entry<K, V>> entrySet(Map<K, V> map) {
     	return map == null ? null : map.entrySet();
     }
+    
+	public static String filterJavaKeyword(String name) {
+		if ("abstract".equals(name) || "assert".equals(name)
+				|| "boolean".equals(name) || "break".equals(name)
+				|| "byte".equals(name) || "case".equals(name)
+				|| "catch".equals(name) || "char".equals(name)
+				|| "class".equals(name) || "continue".equals(name)
+				|| "default".equals(name) || "do".equals(name)
+				|| "double".equals(name) || "else".equals(name)
+				|| "enum".equals(name) || "extends".equals(name)
+				|| "final".equals(name) || "finally".equals(name)
+				|| "float".equals(name) || "for".equals(name)
+				|| "if".equals(name) || "implements".equals(name)
+				|| "import".equals(name) || "instanceof".equals(name)
+				|| "int".equals(name) || "interface".equals(name)
+				|| "long".equals(name) || "native".equals(name)
+				|| "new".equals(name) || "package".equals(name)
+				|| "private".equals(name) || "protected".equals(name)
+				|| "public".equals(name) || "return".equals(name)
+				|| "strictfp".equals(name) || "short".equals(name)
+				|| "static".equals(name) || "super".equals(name)
+				|| "switch".equals(name) || "synchronized".equals(name)
+				|| "this".equals(name) || "throw".equals(name)
+				|| "throws".equals(name) || "transient".equals(name)
+				|| "try".equals(name) || "void".equals(name)
+				|| "volatile".equals(name) || "while".equals(name)) {
+			return "$" + name;
+		}
+		return name;
+	}
 
     private ClassUtils() {}
 

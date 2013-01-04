@@ -153,7 +153,7 @@ public abstract class AbstractParser implements Parser {
 
     protected String filterVariable = "filter";
 
-    protected String defaultFilterVariable = "$filter";
+    protected String defaultFilterVariable = "$" + filterVariable;
 
     protected String version;
     
@@ -331,6 +331,7 @@ public abstract class AbstractParser implements Parser {
      */
 	public void setFilterVariable(String filterVariable) {
 		this.filterVariable = filterVariable;
+		this.defaultFilterVariable = "$" + filterVariable;
 	}
 
     /**
@@ -475,6 +476,7 @@ public abstract class AbstractParser implements Parser {
         	Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
         	StringBuilder statusInit = new StringBuilder();
         	types.put("this", Template.class);
+        	types.put("super", Template.class);
         	types.put(defaultFilterVariable, Filter.class);
         	types.put(filterVariable, Filter.class);
             types.put(foreachVariable, ForeachStatus.class);
@@ -511,8 +513,20 @@ public abstract class AbstractParser implements Parser {
         		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
         			String var = entry.getKey();
         			if (getVariables.contains(var)) {
-	        			String type = entry.getValue().getCanonicalName();
-	        			declare.append("	" + type + " " + var + " = (" + type + ") $context.get(\"" + var + "\");\n");
+        				Class<?> type = entry.getValue();
+        				String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
+        				String typeName;
+        				if (pkgName != null && ("java.lang".equals(pkgName) 
+        	                    || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
+        	                typeName = type.getSimpleName();
+        	            } else {
+        	                typeName = type.getCanonicalName();
+        	            }
+	        			if (entry.getValue().isPrimitive()) {
+	                    	declare.append("	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(type).getSimpleName() + ") $context.get(\"" + var + "\"));\n");
+	                    } else {
+	                    	declare.append("	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = (" + typeName + ") $context.get(\"" + var + "\");\n");
+	                    }
         			}
         		}
         	}
@@ -535,6 +549,12 @@ public abstract class AbstractParser implements Parser {
             if (getVariables.contains(filterVariable)) {
             	declare.append("	" + Filter.class.getName() + " " + defaultFilterVariable + " = getFilter($context, \"" + filterVariable + "\");\n");
             	declare.append("	" + Filter.class.getName() + " " + filterVariable + " = " + defaultFilterVariable + ";\n");
+            }
+            if (getVariables.contains("this")) {
+            	declare.append("	" + Template.class.getName() + " " + ClassUtils.filterJavaKeyword("this") + " = this;\n");
+            }
+            if (getVariables.contains("super")) {
+            	declare.append("	" + Template.class.getName() + " " + ClassUtils.filterJavaKeyword("super") + " = ($context.getParent() == null ? null : $context.getParent().getTemplate());\n");
             }
             for (String var : parameters) {
             	if (getVariables.contains(var)) {

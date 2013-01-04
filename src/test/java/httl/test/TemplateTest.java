@@ -134,9 +134,9 @@ public class TemplateTest extends TestCase {
 	        for (long m = 0; m < max; m ++) {
 		        for (int i = 0, n = files.length; i < n; i ++) {
 		            File file = files[i];
-		            //if (! "switch_filter.httl".equals(file.getName())) {
-		            //    continue;
-		            //}
+		            /*if (! "extend.httl".equals(file.getName())) {
+		                continue;
+		            }*/
 		            if (! profile)
 		        		System.out.println(file.getName());
 		            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, "UTF-8");

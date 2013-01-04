@@ -16,6 +16,7 @@
  */
 package httl.spi.translators.expressions;
 
+import httl.Template;
 import httl.spi.Translator;
 import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
@@ -151,6 +152,12 @@ public final class BinaryOperator extends Operator {
             	}
             }
             Class<?>[] rightTypes = rightParameter.getReturnTypes();
+            if (Template.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
+            	if (! hasMethod(leftType, name, rightTypes)) {
+            		return getNotNullCode(leftCode, "((" + Template.class.getName() + ")" + leftCode + ".getMacros().get(\"" + name + "\"))");
+            	}
+            }
+            name = ClassUtils.filterJavaKeyword(name);
             Collection<Class<?>> functions = getFunctions();
             if (functions != null && functions.size() > 0) {
                 Class<?>[] allTypes;
@@ -400,6 +407,12 @@ public final class BinaryOperator extends Operator {
             	}
             }
             Class<?>[] rightTypes = rightParameter.getReturnTypes();
+            if (Template.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
+            	if (! hasMethod(leftType, name, rightTypes)) {
+            		return Template.class;
+            	}
+            }
+            name = ClassUtils.filterJavaKeyword(name);
             Collection<Class<?>> functions = getFunctions();
             if (functions != null && functions.size() > 0) {
                 Class<?>[] allTypes;
@@ -520,6 +533,49 @@ public final class BinaryOperator extends Operator {
         return super.getReturnTypes();
     }
 
+    private boolean hasMethod(Class<?> leftType, String name, Class<?>[] rightTypes) {
+    	if (leftType == null) {
+            return false;
+        }
+        try {
+            Method method = ClassUtils.searchMethod(leftType, name, rightTypes);
+            return method != null;
+        } catch (NoSuchMethodException e) {
+            if (rightTypes != null && rightTypes.length > 0) {
+                return false;
+            } else { // search property
+                try {
+                    String getter = "get" + name.substring(0, 1).toUpperCase()
+                            + name.substring(1);
+                    Method method = leftType.getMethod(getter,
+                            new Class<?>[0]);
+                    return method != null;
+                } catch (NoSuchMethodException e2) {
+                    try {
+                        String getter = "is"
+                                + name.substring(0, 1).toUpperCase()
+                                + name.substring(1);
+                        Method method = leftType.getMethod(getter,
+                                new Class<?>[0]);
+                        return method != null;
+                    } catch (NoSuchMethodException e3) {
+                        try {
+                            Field field = leftType.getField(name);
+                            return field != null;
+                        } catch (NoSuchFieldException e4) {
+                            if (Map.class.isAssignableFrom(leftType)
+                                    && (rightTypes == null || rightTypes.length == 0 
+                                            || (rightTypes.length == 1 && rightTypes[0] == null))) {
+                                return true;
+                            }
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private String getMethodName(Class<?> leftType, String name, Class<?>[] rightTypes, String leftCode, String rightCode) throws ParseException {
         if (leftType == null) {
             throw new ParseException("No such method " + name + "("

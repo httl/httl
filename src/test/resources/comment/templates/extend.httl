@@ -1,7 +1,7 @@
-$!{extend("/macros/layout.httl")}
+$!{extends("/macros/layout.httl")}
 
 <!--#macro(crumbs)-->
-  $!{parent.template.macros.crumbs} &gt; <a href="/books">Books</a>
+  $!{super.crumbs} &gt; <a href="/books">Books</a>
 <!--#end-->
 
 <!--#macro(main(Book[] books))-->
