@@ -92,17 +92,20 @@ public class ExtendsInterceptor implements Interceptor {
 		if (extendsVariable != null && extendsVariable.length() > 0) {
 			name = (String) context.get(extendsVariable);
 		}
-		if ((name == null || name.length() == 0) 
-				&& extendsDirectory != null && extendsDirectory.length() > 0) {
+		if (extendsDirectory != null && extendsDirectory.length() > 0) {
 			String directory = "/".equals(extendsDirectory) ? "" : extendsDirectory;
-			Template template = context.getTemplate();
-			name = directory + template.getName();
-			if (! engine.hasResource(name)) {
-				if (extendsDefault != null && extendsDefault.length() > 0
-						&& engine.hasResource(directory + extendsDefault)) {
-					name = directory + extendsDefault;
-				} else {
-					name = null;
+			if (name != null && name.length() > 0) {
+				name = directory + name;
+			} else {
+				Template template = context.getTemplate();
+				name = directory + template.getName();
+				if (! engine.hasResource(name)) {
+					if (extendsDefault != null && extendsDefault.length() > 0
+							&& engine.hasResource(directory + extendsDefault)) {
+						name = directory + extendsDefault;
+					} else {
+						name = null;
+					}
 				}
 			}
 		}
