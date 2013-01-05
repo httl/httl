@@ -96,6 +96,8 @@ public class DfaParser {
 
 	private final Map<String, Class<?>> parameterTypes;
 
+	private final Class<?> defaultType;
+
 	private final Collection<Class<?>> functions;
 
     private final List<StringSequence> sequences;
@@ -110,9 +112,10 @@ public class DfaParser {
 	
 	private final Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
 
-    public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, List<StringSequence> sequences, String[] packages, int offset) {
+    public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] packages, int offset) {
         this.translator = translator;
         this.parameterTypes = parameterTypes;
+        this.defaultType = defaultType;
         this.functions = functions;
         this.sequences = sequences;
         this.packages = packages;
@@ -400,11 +403,11 @@ public class DfaParser {
             } else if (StringUtils.isNamed(msg)
             		&& ! "gt".equals(msg) && ! "ge".equals(msg) 
             		&& ! "lt".equals(msg) && ! "le".equals(msg)) {
-                if (! parameterTypes.containsKey(msg)) {
+                if (defaultType == null && ! parameterTypes.containsKey(msg)) {
                     throw new ParseException("Undefined variable \"" + msg + "\". \nPlease add variable type definition <!--#var(Xxx " + msg + ")--> in your template.", getTokenOffset(token) + offset);
                 }
                 variables.add(msg);
-                parameterStack.push(new Variable(translator, msg, getTokenOffset(token) + offset, parameterTypes, msg));
+                parameterStack.push(new Variable(translator, msg, getTokenOffset(token) + offset, parameterTypes, defaultType));
                 beforeOperator = false;
             } else if ("(".equals(msg)) {
                 operatorStack.push(Bracket.ROUND);

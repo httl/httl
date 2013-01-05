@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HttlFilter implements Filter {
 
+    private static final String TEMPLATE_SUFFIX = "template.suffix";
+
 	public void init(FilterConfig config) throws ServletException {
 		WebEngine.setServletContext(config.getServletContext());
 	}
@@ -50,13 +52,40 @@ public class HttlFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		chain.doFilter(request, response);
 		try {
-			WebEngine.render(request, response);
+			WebEngine.render(request, response, getTemplatePath(request));
         } catch (ParseException e) {
             throw new ServletException(e.getMessage(), e);
         }
 	}
 
 	public void destroy() {
+	}
+	
+	protected String getTemplatePath(HttpServletRequest request) {
+		String path = request.getPathInfo();
+        if (path == null || path.length() == 0) {
+        	path = request.getServletPath();
+        }
+        if (path == null || path.length() == 0) {
+        	path = request.getRequestURI();
+        	String contextPath = request.getContextPath();
+        	if (contextPath != null && ! "/".equals(contextPath)
+        			&& path != null && path.startsWith(contextPath)) {
+        		path = path.substring(contextPath.length());
+        	}
+        }
+        if (path == null || path.length() == 0) {
+        	path = getRootPath();
+        }
+        String suffix = WebEngine.getEngine().getProperty(TEMPLATE_SUFFIX);
+        if (suffix != null && suffix.length() > 0 && ! path.endsWith(suffix)) {
+        	path += suffix;
+        }
+        return path;
+	}
+	
+	protected String getRootPath() {
+		return "/index.httl";
 	}
 
 }

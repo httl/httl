@@ -42,9 +42,7 @@ public class DirectoryLocator implements Locator {
 	 * httl.properties: template.directory=/META-INF/templates
 	 */
     public void setTemplateDirectory(String directory) {
-    	if (directory != null && directory.length() > 0) {
-            this.templateDirectory = UrlUtils.cleanDirectory(directory);
-        }
+        this.templateDirectory = UrlUtils.cleanDirectory(directory);
     }
 
     /**
@@ -58,9 +56,7 @@ public class DirectoryLocator implements Locator {
 	 * httl.properties: message.directory=/META-INF/messages
 	 */
     public void setMessageDirectory(String directory) {
-    	if (directory != null && directory.length() > 0) {
-            this.messageDirectory = UrlUtils.cleanDirectory(directory);
-        }
+        this.messageDirectory = UrlUtils.cleanDirectory(directory);
     }
 
     /**

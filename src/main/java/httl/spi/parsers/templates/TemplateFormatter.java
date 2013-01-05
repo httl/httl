@@ -9,6 +9,7 @@ import httl.spi.formatters.MultiFormatter;
 import httl.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.Date;
 
 public class TemplateFormatter {
@@ -245,11 +246,11 @@ public class TemplateFormatter {
         return value;
     }
 
-    public String format(Template e) {
+    public String format(Template e) throws ParseException {
     	return format(e.evaluate());
     }
 
-    public String format(Expression e) {
+    public String format(Expression e) throws ParseException {
     	return format(e.evaluate());
     }
 
@@ -257,7 +258,7 @@ public class TemplateFormatter {
     	return e.getSource();
     }
 
-    public String format(Object value) {
+    public String format(Object value) throws ParseException {
     	if (value == null)
             return nullValue;
     	if (value instanceof String)

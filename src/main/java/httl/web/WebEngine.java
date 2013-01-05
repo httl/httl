@@ -48,8 +48,6 @@ public class WebEngine {
 
     private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
 
-    private static final String TEMPLATE_SUFFIX = "template.suffix";
-
     private static final String OUTPUT_STREAM_KEY = "output.stream";
     
     private static final String LOCALIZED_KEY = "localized";
@@ -203,27 +201,6 @@ public class WebEngine {
 		Map<String, Object> parameters = RequestResolver.getAndCheckPrarameters();
 		if (model != null) {
 			parameters = new DelegateMap<String, Object>(parameters, model);
-		}
-		if (path == null || path.length() == 0) {
-			path = request.getPathInfo();
-	        if (path == null || path.length() == 0) {
-	        	path = request.getServletPath();
-	        }
-	        if (path == null || path.length() == 0) {
-	        	path = request.getRequestURI();
-	        	String contextPath = request.getContextPath();
-	        	if (contextPath != null && ! "/".equals(contextPath)
-	        			&& path != null && path.startsWith(contextPath)) {
-	        		path = path.substring(contextPath.length());
-	        	}
-	        }
-	        if (path == null || path.length() == 0) {
-	        	path = "/index";
-	        }
-	        String suffix = ENGINE.getProperty(TEMPLATE_SUFFIX);
-	        if (suffix != null && suffix.length() > 0 && ! path.endsWith(suffix)) {
-	        	path += suffix;
-	        }
 		}
 		try {
 			Template template = LOCALIZED ? ENGINE.getTemplate(path, request.getLocale()) : ENGINE.getTemplate(path);

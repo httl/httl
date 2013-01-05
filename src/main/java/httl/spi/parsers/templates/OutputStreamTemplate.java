@@ -19,15 +19,18 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
-import httl.spi.Switcher;
 import httl.spi.Filter;
 import httl.spi.Formatter;
+import httl.spi.Interceptor;
+import httl.spi.Rendition;
+import httl.spi.Switcher;
 import httl.util.UnsafeByteArrayOutputStream;
 import httl.util.WriterOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -41,17 +44,17 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
 
     private static final long serialVersionUID = 7127901461769617745L;
 
-    public OutputStreamTemplate(Engine engine, Switcher switcher, Filter filter, 
+    public OutputStreamTemplate(Engine engine, Interceptor interceptor, Switcher switcher, Filter filter, 
     		Formatter<?> formatter, Map<Class<?>, Object> functions,
     		Map<String, Template> importMacros){
-        super(engine, switcher, filter, formatter, functions, importMacros);
+        super(engine, interceptor, switcher, filter, formatter, functions, importMacros);
     }
     
     public Class<?> getReturnType() {
     	return byte[].class;
     }
 
-    public Object evaluate(Map<String, Object> parameters) {
+    public Object evaluate(Map<String, Object> parameters) throws ParseException {
         UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
         try {
             render(parameters, output);
@@ -61,28 +64,45 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         return output.toByteArray();
     }
 
-    public void render(Map<String, Object> parameters, Writer writer) throws IOException {
+    public void render(Map<String, Object> parameters, Writer writer) throws IOException, ParseException {
     	OutputStream output = new WriterOutputStream(writer);
         render(parameters, output);
         output.flush();
     }
 
-    public void render(Map<String, Object> parameters, OutputStream output) throws IOException {
+    public void render(Map<String, Object> parameters, OutputStream output) throws IOException, ParseException {
         if (output == null) 
         	throw new IllegalArgumentException("output == null");
         if (Context.getContext().getTemplate() == this)
     		throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
         Context context = Context.pushContext(this, parameters, output);
         try {
+        	Interceptor interceptor = getInterceptor();
+        	if (interceptor != null) {
+        		interceptor.render(context, new Rendition() {
+    				public void render(Context context) throws IOException, ParseException {
+    					_render(context, (OutputStream) context.getOutput());
+    				}
+    			});
+        	} else {
+        		_render(context, output);
+        	}
+        } finally {
+        	Context.popContext();
+        }
+    }
+
+    private void _render(Context context, OutputStream output) throws IOException, ParseException {
+    	try {
             doRender(context, output);
         } catch (RuntimeException e) {
             throw (RuntimeException) e;
         } catch (IOException e) {
             throw (IOException) e;
+        } catch (ParseException e) {
+            throw (ParseException) e;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-        	Context.popContext();
         }
     }
 

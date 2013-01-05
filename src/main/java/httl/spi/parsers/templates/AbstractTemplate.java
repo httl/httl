@@ -19,6 +19,7 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.spi.Interceptor;
 import httl.spi.Switcher;
 import httl.spi.Filter;
 import httl.spi.Formatter;
@@ -31,6 +32,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +50,9 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
     private transient final Engine engine;
 
-    private transient final Switcher switcher;
+    private transient final Interceptor interceptor;
+
+	private transient final Switcher switcher;
 
     private transient final Filter filter;
     
@@ -58,15 +62,21 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private final Map<String, Template> macros;
 
-    public AbstractTemplate(Engine engine, Switcher switcher, Filter filter, 
+    public AbstractTemplate(Engine engine, Interceptor interceptor, 
+    		Switcher switcher, Filter filter, 
     		Formatter<?> formatter, Map<Class<?>, Object> functions,
     		Map<String, Template> importMacros) {
 		this.engine = engine;
+		this.interceptor = interceptor;
 		this.switcher = switcher;
 		this.filter = filter;
 		this.formatter = new TemplateFormatter(engine, formatter);
 		this.importMacros = importMacros;
 		this.macros = initMacros(engine, filter, formatter, functions, importMacros);
+	}
+
+    protected Interceptor getInterceptor() {
+		return interceptor;
 	}
 
     protected Filter enter(String location, Filter defaultFilter) {
@@ -110,15 +120,15 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return new UnsafeByteArrayInputStream(getSource().getBytes(getEncoding()));
 	}
 
-	public Object evaluate() {
+	public Object evaluate() throws ParseException {
 		return evaluate(null);
 	}
 
-	public void render(OutputStream output) throws IOException {
+	public void render(OutputStream output) throws IOException, ParseException {
 		render(null, output);
 	}
 
-	public void render(Writer writer) throws IOException {
+	public void render(Writer writer) throws IOException, ParseException {
 		render(null, writer);
 	}
 
@@ -137,8 +147,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
 			try {
 				Template macro = (Template) entry.getValue()
-						.getConstructor(Engine.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, switcher, filter, formatter, functions, importMacros);
+						.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, switcher, filter, formatter, functions, importMacros);
 				macros.put(entry.getKey(), macro);
 			} catch (Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);

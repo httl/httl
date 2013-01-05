@@ -48,10 +48,33 @@ public class HttlServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-        	WebEngine.render(request, response);
+        	WebEngine.render(request, response, getTemplatePath(request));
         } catch (ParseException e) {
             throw new ServletException(e.getMessage(), e);
         }
     }
+
+	protected String getTemplatePath(HttpServletRequest request) {
+		String path = request.getPathInfo();
+        if (path == null || path.length() == 0) {
+        	path = request.getServletPath();
+        }
+        if (path == null || path.length() == 0) {
+        	path = request.getRequestURI();
+        	String contextPath = request.getContextPath();
+        	if (contextPath != null && ! "/".equals(contextPath)
+        			&& path != null && path.startsWith(contextPath)) {
+        		path = path.substring(contextPath.length());
+        	}
+        }
+        if (path == null || path.length() == 0) {
+        	path = getRootPath();
+        }
+        return path;
+	}
+
+	protected String getRootPath() {
+		return "/index.httl";
+	}
 
 }

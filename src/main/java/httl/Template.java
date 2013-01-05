@@ -19,6 +19,7 @@ package httl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -51,8 +52,9 @@ public interface Template extends Resource, Expression {
      * @see httl.Context#getOutput()
      * @param output - output stream
      * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed on runtime
      */
-    void render(OutputStream output) throws IOException;
+    void render(OutputStream output) throws IOException, ParseException;
 
     /**
      * Render the template to output stream.
@@ -69,8 +71,9 @@ public interface Template extends Resource, Expression {
      * @param parameters - render parameters
      * @param output - output stream
      * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed on runtime
      */
-    void render(Map<String, Object> parameters, OutputStream output) throws IOException;
+    void render(Map<String, Object> parameters, OutputStream output) throws IOException, ParseException;
 
     /**
      * Render the template to writer.
@@ -85,8 +88,9 @@ public interface Template extends Resource, Expression {
      * @see httl.Context#getOutput()
      * @param writer - writer
      * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed on runtime
      */
-    void render(Writer writer) throws IOException;
+    void render(Writer writer) throws IOException, ParseException;
 
     /**
      * Render the template to writer.
@@ -103,8 +107,9 @@ public interface Template extends Resource, Expression {
      * @param parameters - render parameters
      * @param writer - writer
      * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed on runtime
      */
-    void render(Map<String, Object> parameters, Writer writer) throws IOException;
+    void render(Map<String, Object> parameters, Writer writer) throws IOException, ParseException;
 
     /**
      * Get the template set to context types.

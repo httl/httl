@@ -1,0 +1,2 @@
+<!--#set(aaa .= "VVV")-->
+$!{include("macro.httl#div")}

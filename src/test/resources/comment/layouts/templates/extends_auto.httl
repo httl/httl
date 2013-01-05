@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>
+      <!--#macro($title)-->
+        BookStore
+      <!--#end-->
+    </title>
+  </head>
+  <body>
+     <table>
+      <tr>
+        <td>
+          <!--#macro($!crumbs)-->
+            <a href="/">Home</a>
+          <!--#end-->
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <!--#macro($!menus)-->
+            <a href="/users">Users</a><br/>
+            <a href="/books">Books</a><br/>
+          <!--#end-->
+        </td>
+        <td>
+          $!{nested}
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

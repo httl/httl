@@ -100,11 +100,11 @@ public class ExpressionImpl implements Expression, Serializable {
 		return node;
 	}
     
-    public Object evaluate() {
+    public Object evaluate() throws ParseException {
     	return evaluate(Context.getContext());
     }
 
-    public Object evaluate(Map<String, Object> parameters) {
+    public Object evaluate(Map<String, Object> parameters) throws ParseException {
     	if (evaluator == null) {
     		synchronized (this) {
     			if (evaluator == null) { // double check

@@ -22,15 +22,15 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Compiler;
-import httl.spi.Switcher;
 import httl.spi.Filter;
 import httl.spi.Formatter;
+import httl.spi.Interceptor;
 import httl.spi.Logger;
 import httl.spi.Parser;
+import httl.spi.Switcher;
 import httl.spi.Translator;
 import httl.spi.parsers.templates.AbstractTemplate;
 import httl.spi.parsers.templates.AdaptiveTemplate;
-import httl.spi.parsers.templates.ForeachStatus;
 import httl.spi.parsers.templates.OutputStreamTemplate;
 import httl.spi.parsers.templates.ResourceTemplate;
 import httl.spi.parsers.templates.TemplateFormatter;
@@ -38,6 +38,7 @@ import httl.spi.parsers.templates.WriterTemplate;
 import httl.spi.translators.expressions.ExpressionImpl;
 import httl.util.ByteCache;
 import httl.util.ClassUtils;
+import httl.util.ForeachStatus;
 import httl.util.IOUtils;
 import httl.util.LocaleUtils;
 import httl.util.OrderedMap;
@@ -97,7 +98,7 @@ public abstract class AbstractParser implements Parser {
 
     protected static final Pattern IN_PATTERN = Pattern.compile("(\\s+in\\s+)");
 
-    protected static final Pattern ASSIGN_PATTERN = Pattern.compile(";\\s*(\\w+)\\s*(\\w*)\\s*(:?=)");
+    protected static final Pattern ASSIGN_PATTERN = Pattern.compile(";\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)");
 
     protected static final Pattern ESCAPE_PATTERN = Pattern.compile("(\\\\+)([#$])");
     
@@ -163,6 +164,8 @@ public abstract class AbstractParser implements Parser {
     
 	protected Translator translator;
 	
+	protected Interceptor interceptor;
+	
 	protected Switcher textSwitcher;
 
 	protected Switcher valueSwitcher;
@@ -193,8 +196,6 @@ public abstract class AbstractParser implements Parser {
 
     protected final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
     
-    protected boolean alwaysSetContext;
-
 	protected boolean isOutputStream;
 
     protected boolean isOutputWriter;
@@ -208,6 +209,15 @@ public abstract class AbstractParser implements Parser {
 	protected String outputEncoding;
 	
 	protected Logger logger;
+	
+	protected Class<?> defaultParameterType;
+
+    /**
+     * httl.properties: default.parameter.type=java.lang.String
+     */
+    public void setDefaultParameterType(String defaultParameterType) {
+    	this.defaultParameterType = ClassUtils.forName(defaultParameterType);
+    }
 
 	/**
 	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
@@ -252,6 +262,13 @@ public abstract class AbstractParser implements Parser {
 	}
 
     /**
+     * httl.properties: interceptors=httl.spi.interceptors.ExtendsInterceptor
+     */
+	public void setInterceptor(Interceptor interceptor) {
+		this.interceptor = interceptor;
+	}
+
+    /**
      * httl.properties: text.switchers=httl.spi.switchers.JavaScriptSwitcher
      */
     public void setTextSwitcher(Switcher textSwitcher) {
@@ -284,13 +301,6 @@ public abstract class AbstractParser implements Parser {
      */
 	public void setFormatter(Formatter<?> formatter) {
 		this.formatter = formatter;
-	}
-
-    /**
-     * httl.properties: always.set.context=true
-     */
-    public void setAlwaysSetContext(boolean alwaysSetContext) {
-		this.alwaysSetContext = alwaysSetContext;
 	}
 
     /**
@@ -424,13 +434,13 @@ public abstract class AbstractParser implements Parser {
 	    	Template streamTemplate = null;
 	    	if (isOutputWriter || ! isOutputStream) {
 	    		Class<?> clazz = parseClass(resource, false, 0);
-	        	writerTemplate = (Template) clazz.getConstructor(Engine.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
+	        	writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
 	    	}
 	    	if (isOutputStream) {
 	    		Class<?> clazz = parseClass(resource, true, 0);
-	    		streamTemplate = (Template) clazz.getConstructor(Engine.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
+	    		streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
 	    	}
 	    	if (writerTemplate != null && streamTemplate != null) {
 	    		return new AdaptiveTemplate(writerTemplate, streamTemplate);
@@ -517,62 +527,57 @@ public abstract class AbstractParser implements Parser {
                     imports.append(".*;\n");
                 }
             }
+            Set<String> defined = new HashSet<String>();
             StringBuilder declare = new StringBuilder();
-            if (importTypes != null && importTypes.size() > 0) {
-        		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
-        			String var = entry.getKey();
-        			if (getVariables.contains(var)) {
-        				Class<?> type = entry.getValue();
-        				String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
-        				String typeName;
-        				if (pkgName != null && ("java.lang".equals(pkgName) 
-        	                    || (importPackageSet != null && importPackageSet.contains(pkgName)))) {
-        	                typeName = type.getSimpleName();
-        	            } else {
-        	                typeName = type.getCanonicalName();
-        	            }
-	        			if (entry.getValue().isPrimitive()) {
-	                    	declare.append("	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(type).getSimpleName() + ") $context.get(\"" + var + "\"));\n");
-	                    } else {
-	                    	declare.append("	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = (" + typeName + ") $context.get(\"" + var + "\");\n");
-	                    }
-        			}
-        		}
-        	}
-            Set<String> macroKeySet = macros.keySet();
-            for (String macro : importMacroTemplates.keySet()) {
-            	if (getVariables.contains(macro) && ! macroKeySet.contains(macro)) {
-	            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
-	            	macroInits.append("	" + macro + " = getImportMacros().get(\"" + macro + "\");\n");
-	            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
+            if (getVariables.contains("this")) {
+            	defined.add("this");
+            	declare.append("	" + Template.class.getName() + " " + ClassUtils.filterJavaKeyword("this") + " = this;\n");
+            }
+            if (getVariables.contains("super")) {
+            	defined.add("super");
+            	declare.append("	" + Template.class.getName() + " " + ClassUtils.filterJavaKeyword("super") + " = ($context.getParent() == null ? null : $context.getParent().getTemplate());\n");
+            }
+            if (getVariables.contains(filterVariable)) {
+            	defined.add(filterVariable);
+            	defined.add(defaultFilterVariable);
+            	declare.append("	" + Filter.class.getName() + " " + defaultFilterVariable + " = getFilter($context, \"" + filterVariable + "\");\n");
+            	declare.append("	" + Filter.class.getName() + " " + filterVariable + " = " + defaultFilterVariable + ";\n");
+            }
+            for (String var : parameters) {
+            	if (getVariables.contains(var) && ! defined.contains(var)) {
+            		defined.add(var);
+            		declare.append(getTypeCode(types.get(var), var));
             	}
             }
+            Set<String> macroKeySet = macros.keySet();
             for (String macro : macroKeySet) {
             	types.put(macro, Template.class);
-            	if (getVariables.contains(macro)) {
+            	if (getVariables.contains(macro) && ! defined.contains(macro)) {
+            		defined.add(macro);
 	            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
 	            	macroInits.append("	" + macro + " = getMacros().get(\"" + macro + "\");\n");
 	            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
             	}
             }
-            if (getVariables.contains(filterVariable)) {
-            	declare.append("	" + Filter.class.getName() + " " + defaultFilterVariable + " = getFilter($context, \"" + filterVariable + "\");\n");
-            	declare.append("	" + Filter.class.getName() + " " + filterVariable + " = " + defaultFilterVariable + ";\n");
-            }
-            if (getVariables.contains("this")) {
-            	declare.append("	" + Template.class.getName() + " " + ClassUtils.filterJavaKeyword("this") + " = this;\n");
-            }
-            if (getVariables.contains("super")) {
-            	declare.append("	" + Template.class.getName() + " " + ClassUtils.filterJavaKeyword("super") + " = ($context.getParent() == null ? null : $context.getParent().getTemplate());\n");
-            }
-            for (String var : parameters) {
-            	if (getVariables.contains(var)) {
-            		String typeName = getTypeName(types.get(var));
-            		declare.append("	" + typeName + " " + var + " = (" + typeName + ") $context.get(\"" + var + "\");\n");
+            if (importTypes != null && importTypes.size() > 0) {
+        		for (Map.Entry<String, Class<?>> entry : importTypes.entrySet()) {
+        			String var = entry.getKey();
+        			if (getVariables.contains(var)  && ! defined.contains(var)) {
+        				defined.add(var);
+        				declare.append(getTypeCode(entry.getValue(), var));
+        			}
+        		}
+        	}
+            for (String macro : importMacroTemplates.keySet()) {
+            	if (getVariables.contains(macro) && ! defined.contains(macro)) {
+            		defined.add(macro);
+	            	macroFields.append("private final " + Template.class.getName() + " " + macro + ";\n");
+	            	macroInits.append("	" + macro + " = getImportMacros().get(\"" + macro + "\");\n");
+	            	declare.append("	" + Template.class.getName() + " " + macro + " = getMacro($context, \"" + macro + "\", this." + macro + ");\n");
             	}
             }
             for (String var : setVariables) {
-            	if (! parameters.contains(var)) {
+            	if (! defined.contains(var)) {
 	                Class<?> type = types.get(var);
 	                String typeName = getTypeName(type);
 	                declare.append("	" + typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
@@ -637,12 +642,13 @@ public abstract class AbstractParser implements Parser {
                     + "\n"
                     + "public " + className + "("
                     + Engine.class.getName() + " engine, " 
+                    + Interceptor.class.getName() + " interceptor, " 
                     + Switcher.class.getName() + " switcher, " 
                     + Filter.class.getName() + " filter, "
                     + Formatter.class.getName() + " formatter, "
                     + Map.class.getName() + " functions, " 
                     + Map.class.getName() + " importMacros) {\n" 
-                    + "	super(engine, switcher, filter, formatter, functions, importMacros);\n"
+                    + "	super(engine, interceptor, switcher, filter, formatter, functions, importMacros);\n"
                     + functionInits
                     + macroInits
                     + "}\n"
@@ -708,6 +714,15 @@ public abstract class AbstractParser implements Parser {
             return compiler.compile(sorceCode);
         } catch (Exception e) {
             throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
+        }
+    }
+    
+    private String getTypeCode(Class<?> type, String var) {
+    	String typeName = getTypeName(type);
+    	if (type.isPrimitive()) {
+        	return "	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(type).getSimpleName() + ") $context.get(\"" + var + "\"));\n";
+        } else {
+        	return "	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = (" + typeName + ") $context.get(\"" + var + "\");\n";
         }
     }
     
@@ -1256,13 +1271,19 @@ public abstract class AbstractParser implements Parser {
                 types.put(var, clazz);
                 setVariables.add(var);
                 buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
-                if (alwaysSetContext || ":=".equals(oper)) {
-    	            buf.append("	($context.getParent() != null ? $context.getParent() : $context).put(\"");
+                String ctx = null;
+                if (":=".equals(oper)) {
+                	ctx = "($context.getParent() != null ? $context.getParent() : $context)";
+    	            returnTypes.put(var, clazz);
+                } else if (! ".=".equals(oper)) {
+                	ctx = "$context";
+                }
+                if (ctx != null && ctx.length() > 0) {
+                	buf.append("	" + ctx + ".put(\"");
     	            buf.append(var);
     	            buf.append("\", ");
     	            buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
     	            buf.append(");\n");
-    	            returnTypes.put(var, clazz);
                 }
             }
         } else if (varDirective.equals(name)) {
@@ -1287,7 +1308,7 @@ public abstract class AbstractParser implements Parser {
                 String type;
                 int i = v.lastIndexOf(' ');
                 if (i <= 0) {
-                    type = String.class.getSimpleName();
+                    type = defaultParameterType == null ? Object.class.getSimpleName() : defaultParameterType.getCanonicalName();
                     var = v;
                 } else {
                     type = v.substring(0, i).trim();

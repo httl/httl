@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -99,7 +100,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
     }
 
-	public Object evaluate() {
+	public Object evaluate() throws ParseException {
 		if (Context.getContext().getOutput() instanceof OutputStream) {
 			return streamTemplate.evaluate();
 		} else {
@@ -107,7 +108,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
 	}
 
-	public Object evaluate(Map<String, Object> parameters) {
+	public Object evaluate(Map<String, Object> parameters) throws ParseException {
 		if (Context.getContext().getOutput() instanceof OutputStream) {
 			return streamTemplate.evaluate(parameters);
 		} else {
@@ -115,21 +116,21 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
 	}
 
-	public void render(OutputStream output) throws IOException {
+	public void render(OutputStream output) throws IOException, ParseException {
 		streamTemplate.render(output);
 	}
 
 	public void render(Map<String, Object> parameters, OutputStream output)
-			throws IOException {
+			throws IOException, ParseException {
 		streamTemplate.render(parameters, output);
 	}
 
-	public void render(Writer writer) throws IOException {
+	public void render(Writer writer) throws IOException, ParseException {
 		writerTemplate.render(writer);
 	}
 
 	public void render(Map<String, Object> parameters, Writer writer)
-			throws IOException {
+			throws IOException, ParseException {
 		writerTemplate.render(parameters, writer);
 	}
 

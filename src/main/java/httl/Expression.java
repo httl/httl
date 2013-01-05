@@ -16,6 +16,7 @@
  */
 package httl;
 
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -44,8 +45,9 @@ public interface Expression {
      * </pre>
      * 
      * @return evaluate result
+     * @throws ParseException - If the expression cannot be parsed on runtime
      */
-    Object evaluate();
+    Object evaluate() throws ParseException;
 
     /**
      * Evaluate the expression.
@@ -58,8 +60,9 @@ public interface Expression {
      * 
      * @param parameters - evaluate parameters
      * @return evaluate result
+     * @throws ParseException - If the expression cannot be parsed on runtime
      */
-    Object evaluate(Map<String, Object> parameters);
+    Object evaluate(Map<String, Object> parameters) throws ParseException;
 
     /**
      * Get the expression parameter types. (Ordered)

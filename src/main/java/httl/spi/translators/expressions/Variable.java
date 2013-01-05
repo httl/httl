@@ -30,10 +30,12 @@ import java.util.Map;
 public final class Variable extends Node {
 
 	private static final long serialVersionUID = 1L;
+	
+	private Class<?> defaultType;
 
     private final String name;
     
-    public Variable(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, String name){
+    public Variable(Translator translator, String name, int offset, Map<String, Class<?>> parameterTypes, Class<?> defaultType){
         super(parameterTypes, offset);
         this.name = name;
     }
@@ -48,7 +50,11 @@ public final class Variable extends Node {
     }
 
     public Class<?> getReturnType() throws ParseException {
-        return getParameterTypes().get(name);
+        Class<?> type = getParameterTypes().get(name);
+        if (type == null && defaultType != null) {
+        	return defaultType;
+        }
+        return type;
     }
 
     public String getCode() throws ParseException {

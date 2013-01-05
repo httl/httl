@@ -214,7 +214,6 @@ public abstract class Engine {
      * @param name - template name
      * @return template resource
      * @throws IOException - If an I/O error occurs
-     * @throws ParseException
      */
     public Resource getResource(String name) throws IOException {
         return getResource(name, null, null);
@@ -228,7 +227,6 @@ public abstract class Engine {
      * @param encoding - template encoding
      * @return template resource
      * @throws IOException - If an I/O error occurs
-     * @throws ParseException
      */
     public Resource getResource(String name, String encoding) throws IOException {
         return getResource(name, null, encoding);
@@ -242,7 +240,6 @@ public abstract class Engine {
      * @param locale - template locale
      * @return template resource
      * @throws IOException - If an I/O error occurs
-     * @throws ParseException
      */
     public Resource getResource(String name, Locale locale) throws IOException {
         return getResource(name, locale, null);
@@ -257,7 +254,6 @@ public abstract class Engine {
      * @param encoding - template encoding
      * @return template resource
      * @throws IOException - If an I/O error occurs
-     * @throws ParseException
      */
     public abstract Resource getResource(String name, Locale locale, String encoding) throws IOException;
 

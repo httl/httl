@@ -23,6 +23,7 @@ import httl.spi.Translator;
 import httl.spi.sequences.StringSequence;
 import httl.spi.translators.expressions.ExpressionImpl;
 import httl.spi.translators.expressions.Node;
+import httl.util.ClassUtils;
 import httl.util.StringUtils;
 
 import java.text.ParseException;
@@ -47,6 +48,8 @@ public class DefaultTranslator implements Translator {
     private Engine engine;
 
     private Compiler compiler;
+    
+    private Class<?> defaultParameterType;
     
     protected String[] importPackages;
 
@@ -73,6 +76,13 @@ public class DefaultTranslator implements Translator {
      */
     public void setImportPackages(String[] importPackages) {
     	this.importPackages = importPackages;
+    }
+
+    /**
+     * httl.properties: default.parameter.type=java.lang.String
+     */
+    public void setDefaultParameterType(String defaultParameterType) {
+    	this.defaultParameterType = ClassUtils.forName(defaultParameterType);
     }
 
     public void setImportMethods(Object[] importMethods) {
@@ -108,7 +118,7 @@ public class DefaultTranslator implements Translator {
 	public Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
 	    source = StringUtils.unescapeHtml(source);
 	    Set<String> variables = new HashSet<String>();
-	    Node node = new DfaParser(this, parameterTypes, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
+	    Node node = new DfaParser(this, parameterTypes, defaultParameterType, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
         return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, importPackages, functions);
 	}
 

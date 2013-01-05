@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class ResourceTemplate implements Template {
 		throw new UnsupportedOperationException();
 	}
 
-	public Object evaluate(Map<String, Object> parameters) {
+	public Object evaluate(Map<String, Object> parameters) throws ParseException {
 		throw new UnsupportedOperationException();
 	}
 

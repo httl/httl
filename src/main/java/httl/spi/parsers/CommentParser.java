@@ -72,9 +72,15 @@ public class CommentParser extends AbstractParser {
             	offset = matcher.start(2);
             }
             if (endDirective.equals(name)) {
+            	if (nameStack.isEmpty()) {
+            		throw new ParseException("The #end directive without start directive.", matcher.start(1));
+            	}
                 String startName = nameStack.pop();
                 String startValue = valueStack.pop();
                 while(elseifDirective.equals(startName) || elseDirective.equals(startName)) {
+                	if (nameStack.isEmpty()) {
+                		throw new ParseException("The #" + startName + " directive without #if directive.", matcher.start(1));
+                	}
                     startName = nameStack.pop();
                     startValue = valueStack.pop();  
                 }

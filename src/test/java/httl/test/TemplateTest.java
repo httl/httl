@@ -134,9 +134,9 @@ public class TemplateTest extends TestCase {
 	        for (long m = 0; m < max; m ++) {
 		        for (int i = 0, n = files.length; i < n; i ++) {
 		            File file = files[i];
-		            /*if (! "extend.httl".equals(file.getName())) {
-		                continue;
-		            }*/
+		            //if (! "extends_auto.httl".equals(file.getName())) {
+		            //    continue;
+		            //}
 		            if (! profile)
 		        		System.out.println(file.getName());
 		            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, "UTF-8");
@@ -162,9 +162,9 @@ public class TemplateTest extends TestCase {
 			                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
 			            }
 			            String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), "UTF-8"));
-			            expected = expected.replace("\r", "").replace("\n", "\\n\n");
-			            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", "").replace("\n", "\\n\n"));
-			            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", "").replace("\n", "\\n\n"));
+			            expected = expected.replace("\r", "");
+			            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
+			            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
 			            if ("set_parameters.httl".equals(file.getName())) {
 			            	super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
 			            }

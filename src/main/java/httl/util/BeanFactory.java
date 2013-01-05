@@ -27,6 +27,60 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+/**
+ * 该BeanFactory是一个仿Spring的轻量级“IoC + AOP”容器。
+ * 
+ * IoC: 基于Setter递归注入属性，如：
+ * 
+ * <pre>
+ * public class DefaultEngine {
+ * 
+ *     // 配置：intput.encoding=UTF-8
+ *     // 将点号转为大写驼峰命名注入。
+ *     // 可以注入数组，如String[]或Parser[]，多全值用逗号分隔。
+ *     public void setInputEncoding(String inputEncoding) {
+ *         this.inputEncoding = inputEncoding;
+ *     }
+ * 
+ *     // 配置：parser=httl.spi.parsers.CommentParser
+ *     // 通过无参构造函数实例化，对象会被单例缓存，
+ *     // 其中，Parser对象的Setter同样会被递归注入属性
+ *     public void setParser(Parser parser) {
+ *         this.parser = parser;
+ *     }
+ * 
+ *     // 所有属性注入完成后，会执行init()方法。
+ *     public void init() {
+ *     }
+ * 
+ * }
+ * </pre>
+ * 
+ * AOP: 基于同类型构造函数进行层层包装，如：
+ * 
+ * <pre>
+ * public class MyParserWrapper implements Parser {
+ * 
+ *     private final Parser parser;
+ * 
+ *     // 配置：parser^=com.my.MyParserWrapper
+ *     // 注意配置的等号(=)前面有个尖号(^)，多个包装类用逗号分隔，
+ *     // 基于同类型构造函数，注入原始Parser，
+ *     // 如果有多个Wrapper，这里也可能注入的是另一个Wrapper。
+ *     public MyParserWrapper(Parser parser) {
+ *         this.parser = parser;
+ *     }
+ * 
+ *     // Wrapper类可以代理原始类的所有行为
+ *     public Template parse(Resource resource) throws IOException, ParseException {
+ *         return new MyTemplateWrapper(parser.parse(resource));
+ *     }
+ * 
+ * }
+ * </pre>
+ * 
+ * @author liangfei
+ */
 public class BeanFactory {
 
     private static final String SET_METHOD = "set";
@@ -34,6 +88,8 @@ public class BeanFactory {
     private static final String INIT_METHOD = "init";
 
     private static final String INITED_METHOD = "inited";
+
+    private static final String WRAPPER_KEY_SUFFIX = "^";
 
     private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
     
@@ -152,6 +208,25 @@ public class BeanFactory {
 	            		instance = cls;
 	            	} else {
 	            		throw new NoSuchMethodException("No such public empty constructor in " + cls.getName());
+	            	}
+            	}
+            	if (cls.getInterfaces().length > 0) {
+            		Class<?> face = cls.getInterfaces()[0];
+	            	String insert = properties.getProperty(key + WRAPPER_KEY_SUFFIX);
+	            	if (insert != null && insert.trim().length() > 0) {
+	            		insert = insert.trim();
+	            		String[] wrappers = COMMA_SPLIT_PATTERN.split(insert);
+	            		for (String wrapper : wrappers) {
+	            			Class<?> wrapperClass = ClassUtils.forName(wrapper);
+	            			if (! face.isAssignableFrom(wrapperClass)) {
+	            				throw new IllegalStateException("The wrapper class " + wrapperClass.getName() + " must be implements interface " + face.getName() + ", config key: " + key + WRAPPER_KEY_SUFFIX);
+	            			}
+	            			Constructor<?> constructor = wrapperClass.getConstructor(new Class<?>[] { face });
+	    	            	if (Modifier.isPublic(constructor.getModifiers())) {
+	    	            		injectInstance(instance, properties, key, caches, instances, inits);
+	    	            		instance = constructor.newInstance(new Object[] {instance});
+	    	            	}
+	            		}
 	            	}
             	}
             	caches.put(index, instance);
