@@ -30,6 +30,8 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.text.ParseException;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Extends Interceptor. (SPI, Singleton, ThreadSafe)
  * 
@@ -88,30 +90,35 @@ public class ExtendsInterceptor implements Interceptor {
 	}
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
+		Template template = context.getTemplate();
 		String name = null;
-		if (extendsVariable != null && extendsVariable.length() > 0) {
+		if (StringUtils.isNotEmpty(extendsVariable)) {
 			name = (String) context.get(extendsVariable);
+			if (StringUtils.isNotEmpty(name)) {
+				name = UrlUtils.relativeUrl(name, template.getName());
+			}
 		}
-		if (extendsDirectory != null && extendsDirectory.length() > 0) {
-			String directory = "/".equals(extendsDirectory) ? "" : extendsDirectory;
-			if (name != null && name.length() > 0) {
+		if (StringUtils.isNotEmpty(extendsDirectory)) {
+			String directory = "";
+			if (StringUtils.isNotEmpty(extendsDirectory) && ! "/".equals(extendsDirectory)) {
+				directory = extendsDirectory;
+			}
+			if (StringUtils.isNotEmpty(name)) {
 				name = directory + name;
 			} else {
-				Template template = context.getTemplate();
-				name = directory + template.getName();
-				if (! engine.hasResource(name)) {
-					if (extendsDefault != null && extendsDefault.length() > 0
-							&& engine.hasResource(directory + extendsDefault)) {
-						name = directory + extendsDefault;
-					} else {
-						name = null;
+				String samePath = directory + template.getName();
+				if (engine.hasResource(samePath)) {
+					name = samePath;
+				} else if (StringUtils.isNotEmpty(extendsDefault)) {
+					String defaultPath = directory + UrlUtils.relativeUrl(extendsDefault, template.getName());
+					if (engine.hasResource(defaultPath)) {
+						name = defaultPath;
 					}
 				}
 			}
 		}
-		if (name != null && name.length() > 0) {
-			Template template = context.getTemplate();
-			if (extendsNested != null && extendsNested.length() > 0) {
+		if (StringUtils.isNotEmpty(name)) {
+			if (StringUtils.isNotEmpty(extendsNested)) {
 				context.put(extendsNested, new RenditionTemplate(template, rendition));
 			}
 			Template extend = fileMethod.$extends(name, template.getLocale(), template.getEncoding());

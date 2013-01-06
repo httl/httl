@@ -54,7 +54,47 @@ public class StringUtils {
     public static boolean isFunction(String value) {
         return FUNCTION_PATTERN.matcher(value).matches();
     }
+
+    public static boolean isNotEmpty(String value) {
+    	return value != null && value.length() > 0;
+    }
+
+    public static boolean isEmpty(String value) {
+    	return value == null || value.length() == 0;
+    }
+
+    public static boolean isBlank(String value) {
+    	if (value != null && value.length() > 0) {
+	    	int len = value.length();
+	    	for (int i = 0; i < len; i ++) {
+	    		char ch = value.charAt(i);
+	    		switch (ch) {
+					case ' ': case '\t': case '\n': case '\r': case '\b': case '\f':
+						break;
+					default:
+						return false;
+				}
+	    	}
+    	}
+    	return true;
+    }
     
+    public static boolean isNotBlank(String value) {
+    	if (value != null && value.length() > 0) {
+	    	int len = value.length();
+	    	for (int i = 0; i < len; i ++) {
+	    		char ch = value.charAt(i);
+	    		switch (ch) {
+					case ' ': case '\t': case '\n': case '\r': case '\b': case '\f':
+						break;
+					default:
+						return true;
+				}
+	    	}
+    	}
+    	return false;
+    }
+
     public static String toString(Object value) {
         if (value == null)
             return null;
