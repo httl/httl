@@ -38,6 +38,7 @@ public final class Variable extends Node {
     public Variable(Translator translator, String name, int offset, Map<String, Class<?>> parameterTypes, Class<?> defaultType){
         super(parameterTypes, offset);
         this.name = name;
+        this.defaultType = defaultType;
     }
 
     public String getName() {

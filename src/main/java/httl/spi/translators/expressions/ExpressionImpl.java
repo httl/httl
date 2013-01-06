@@ -211,7 +211,10 @@ public class ExpressionImpl implements Expression, Serializable {
     	if (evaluator == null) {
 	        try {
 	        	evaluator = (Evaluator) newEvaluatorClass(className).getConstructor(Map.class).newInstance(functions);
-	        	EVALUATOR_CACHE.putIfAbsent(className, evaluator);
+	        	Evaluator old = EVALUATOR_CACHE.putIfAbsent(className, evaluator);
+	        	if (old != null) {
+	        		evaluator = old;
+	        	}
 	        } catch (Exception e) {
 	            throw new IllegalStateException("Failed to create expression instance. class: " + className + ", offset: " + getOffset() + ", cause:" + ClassUtils.toString(e));
 	        }

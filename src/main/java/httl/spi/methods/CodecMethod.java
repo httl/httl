@@ -79,7 +79,11 @@ public class CodecMethod {
 		}
 		ByteArrayInputStream bi = new ByteArrayInputStream(xml.getBytes());
 		XMLDecoder xd = new XMLDecoder(bi);
-		return xd.readObject();
+		try {
+			return xd.readObject();
+		} finally {
+			xd.close();
+		}
 	}
 
 }

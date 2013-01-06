@@ -63,7 +63,15 @@ public class ZipLoader extends AbstractLoader {
 	}
 
 	public boolean doExists(String name, Locale locale, String path) throws Exception {
-		return file != null && file.exists() && new ZipFile(file).getEntry(name) != null;
+		if (file != null && file.exists()) {
+			ZipFile zipFile = new ZipFile(file);
+			try {
+				return zipFile.getEntry(name) != null;
+			} finally {
+				zipFile.close();
+			}
+		}
+		return false;
 	}
 
 }

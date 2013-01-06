@@ -219,7 +219,10 @@ public class ClassUtils {
 				name = sb.toString();
 			}
 			clazz = Class.forName(name);
-			CLASS_CACHE.putIfAbsent(key, clazz);
+			Class<?> old = CLASS_CACHE.putIfAbsent(key, clazz);
+			if (old != null) {
+				clazz = old;
+			}
 		}
 		return clazz;
     }

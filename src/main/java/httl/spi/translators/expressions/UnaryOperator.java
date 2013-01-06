@@ -107,7 +107,7 @@ public final class UnaryOperator extends Operator {
             String name = getName().substring(1);
             Class<?> t = getParameterTypes().get(name);
             if (t != null && Expression.class.isAssignableFrom(t)) {
-                return name + ".evaluate(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " ))";
+                return "(" + name + " == null ? null : " + name + ".evaluate(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " )))";
             } else {
             	name = ClassUtils.filterJavaKeyword(name);
                 Collection<Class<?>> functions = getFunctions();

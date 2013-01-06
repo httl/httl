@@ -875,6 +875,9 @@ public abstract class AbstractParser implements Parser {
             if (len != null && len.length() > 0) {
                 length = Integer.parseInt(len);
             }
+            if (next == null) {
+            	next = "";
+            }
             if ("else".equals(next)) {
                 if (text != null && text.trim().length() > 0) {
                     throw new ParseException("Found invaild text \"" + text.trim() + "\" before " + next + " directive!", offset);
@@ -1118,7 +1121,7 @@ public abstract class AbstractParser implements Parser {
         } else if (foreachDirective.equals(name)) {
             return "	" + foreachVariable + ".increment();\n	}\n	" + foreachVariable + " = " + foreachVariable + ".getParent();\n"; // 插入结束指令
         }
-        return null;
+        return "";
     }
     
     protected String getStatementCode(String name, String value, int begin, int offset,

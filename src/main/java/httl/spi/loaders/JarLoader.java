@@ -63,7 +63,15 @@ public class JarLoader extends AbstractLoader {
 	}
 
 	public boolean doExists(String name, Locale locale, String path) throws Exception {
-		return file != null && file.exists() && new JarFile(file).getEntry(name) != null;
+		if (file != null && file.exists()) {
+			JarFile jarFile = new JarFile(file);
+			try {
+				return jarFile.getEntry(name) != null;
+			} finally {
+				jarFile.close();
+			}
+		}
+		return false; 
 	}
 
 }

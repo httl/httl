@@ -32,6 +32,8 @@ public class LinkedStack<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final LinkedList<T> stack = new LinkedList<T>();
+	
+	private volatile List<T> unmodifiable;
 
 	public int size() {
 		return stack.size();
@@ -70,11 +72,14 @@ public class LinkedStack<T> implements Serializable {
 	}
 
 	public Iterator<T> iterator() {
-		return Collections.unmodifiableList(stack).iterator();
+		return toList().iterator();
 	}
 
 	public List<T> toList() {
-		return Collections.unmodifiableList(stack);
+		if (unmodifiable == null) {
+			unmodifiable = Collections.unmodifiableList(stack);
+		}
+		return unmodifiable;
 	}
 
 	public String toString() {

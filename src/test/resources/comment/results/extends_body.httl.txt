@@ -8,26 +8,6 @@
   </head>
   <body>
     
-    <table>
-      <tr>
-        <td>
-          
-  
-            <a href="/">Home</a>
-           &gt; <a href="/books">Books</a>
-
-        </td>
-      </tr>
-      <tr>
-        <td>
-          
-          
-            <a href="/users">Users</a><br/>
-            <a href="/books">Books</a><br/>
-          
-        </td>
-        <td>
-          
   <table>
     
     <tr>
@@ -142,12 +122,6 @@
     
   </table>
 
-        </td>
-      </tr>
-    </table>
-    
   </body>
 </html>
-
-
 

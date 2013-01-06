@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  */
 public class CommentParser extends AbstractParser {
     
-    protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--#([a-z]+)\\(?(.*?)\\)?-->", Pattern.DOTALL);
+    protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--\\s*#\\s*([a-z]+)\\s*\\(?(.*?)\\)?\\s*-->", Pattern.DOTALL);
     
     protected Pattern getPattern() {
         return STATEMENT_PATTERN;
@@ -81,11 +81,16 @@ public class CommentParser extends AbstractParser {
                 	if (nameStack.isEmpty()) {
                 		throw new ParseException("The #" + startName + " directive without #if directive.", matcher.start(1));
                 	}
+                	String oldStartName = startName;
                     startName = nameStack.pop();
                     startValue = valueStack.pop();  
+                    if (! ifDirective.equals(startName) && ! elseifDirective.equals(startName)) {
+                    	throw new ParseException("The #" + oldStartName + " directive without #if directive.", matcher.start(1));
+                    }
                 }
                 if (macro != null) {
-                    if (macroDirective.equals(startName)) {
+                    if (macroDirective.equals(startName) && 
+                    		! nameStack.toList().contains(macroDirective)) {
                         int i = startValue.indexOf('(');
                         String var;
                         String param;
@@ -146,12 +151,16 @@ public class CommentParser extends AbstractParser {
                         matcher.appendReplacement(macro, "$0");
                     }
                 } else {
-                    matcher.appendReplacement(buf, "");
-                    buf.append(LEFT);
-                    buf.append(matcher.group().length());
-                    String code = getStatementEndCode(startName);
-                    buf.append(code);
-                    buf.append(RIGHT);
+                	String end = getStatementEndCode(startName);
+                	if (end != null && end.length() > 0) {
+	                    matcher.appendReplacement(buf, "");
+	                    buf.append(LEFT);
+	                    buf.append(matcher.group().length());
+	                    buf.append(end);
+	                    buf.append(RIGHT);
+                	} else {
+                		throw new ParseException("The #end directive without start directive.", matcher.start(1));
+                	}
                 }
             } else {
                 if (ifDirective.equals(name) || elseifDirective.equals(name) 

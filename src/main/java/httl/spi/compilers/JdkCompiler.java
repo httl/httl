@@ -73,6 +73,7 @@ public class JdkCompiler extends AbstractCompiler {
 
     private final List<String> lintOptions = new ArrayList<String>();
 
+    @SuppressWarnings("resource")
     public JdkCompiler(){
         if (compiler == null) {
         	throw new IllegalStateException("Can not get system java compiler. Please add jdk tools.jar to your classpath.");

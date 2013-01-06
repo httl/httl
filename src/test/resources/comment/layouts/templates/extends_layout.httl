@@ -7,7 +7,8 @@
     </title>
   </head>
   <body>
-     <table>
+    <!--#macro($!body)-->
+    <table>
       <tr>
         <td>
           <!--#macro($!crumbs)-->
@@ -30,5 +31,6 @@
         </td>
       </tr>
     </table>
+    <!--#end-->
   </body>
 </html>

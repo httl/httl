@@ -42,6 +42,7 @@ public class ZipResource extends InputStreamResource {
 		this.file = file;
 	}
 
+	@SuppressWarnings("resource")
 	public InputStream getInputStream() throws IOException {
 		// 注：ZipFile与File的设计是不一样的，File相当于C#的FileInfo，只持有信息，
 		// 而ZipFile构造时即打开流，所以每次读取数据时，重新new新的实例，而不作为属性字段持有。
@@ -56,7 +57,11 @@ public class ZipResource extends InputStreamResource {
 	public long getLength() {
 		try {
 			ZipFile zipFile = new ZipFile(file);
-			return zipFile.getEntry(getName()).getSize();
+			try {
+				return zipFile.getEntry(getName()).getSize();
+			} finally {
+				zipFile.close();
+			}
 		} catch (IOException e) {
 			return super.getLength();
 		}
