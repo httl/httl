@@ -22,6 +22,7 @@ import httl.spi.Logger;
 import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.RequestResolver;
 import httl.util.DelegateMap;
+import httl.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,15 +45,25 @@ import javax.servlet.http.HttpSession;
  */
 public class WebEngine {
 
+	private static final String DEFAULT_CONTENT_TYPE = "text/html";
+
+	private static final String CHARSET_SEPARATOR = "; ";
+
+	private static final String CHARSET_KEY = "charset=";
+
     private static final String CONFIG_KEY = "httl.properties";
 
     private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
+
+    private static final String OUTPUT_ENCODING_KEY = "output.encoding";
 
     private static final String OUTPUT_STREAM_KEY = "output.stream";
     
     private static final String LOCALIZED_KEY = "localized";
 
 	private static volatile Engine ENGINE;
+
+    private static String OUTPUT_ENCODING;
 
     private static boolean OUTPUT_STREAM;
 
@@ -113,6 +124,7 @@ public class WebEngine {
 			        		ENGINE = Engine.getEngine(properties);
 			        	}
 			        }
+			        OUTPUT_ENCODING = ENGINE.getProperty(OUTPUT_ENCODING_KEY);
 			        OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
 			        LOCALIZED = ENGINE.getProperty(LOCALIZED_KEY, false);
 				}
@@ -203,6 +215,20 @@ public class WebEngine {
 			parameters = new DelegateMap<String, Object>(parameters, model);
 		}
 		try {
+			if (StringUtils.isNotEmpty(OUTPUT_ENCODING)) {
+				response.setCharacterEncoding(OUTPUT_ENCODING);
+				String contentType = response.getContentType();
+				if (StringUtils.isEmpty(contentType)) {
+					response.setContentType(DEFAULT_CONTENT_TYPE + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
+				} else {
+					int i = contentType.indexOf(CHARSET_KEY);
+					if (i > 0) {
+						response.setContentType(contentType.substring(0, i + CHARSET_KEY.length()) + OUTPUT_ENCODING);
+					} else {
+						response.setContentType(contentType + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
+					}
+				}
+			}
 			Template template = LOCALIZED ? ENGINE.getTemplate(path, request.getLocale()) : ENGINE.getTemplate(path);
 			if (output == null) {
 				if (OUTPUT_STREAM) {

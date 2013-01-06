@@ -93,6 +93,7 @@ public class TemplateTest extends TestCase {
             bookmap2.put(book.getTitle().replaceAll("\\s+", ""), book);
         }
         Map<String, Object> context = new HashMap<String, Object>();
+        context.put("chinese", "中文");
         context.put("impvar", "abcxyz");
         context.put("html", "<a href=\"foo.html\">foo</a>");
         context.put("user", user);
@@ -134,23 +135,33 @@ public class TemplateTest extends TestCase {
 	        for (long m = 0; m < max; m ++) {
 		        for (int i = 0, n = files.length; i < n; i ++) {
 		            File file = files[i];
-		            //if (! "extends_body.httl".equals(file.getName())) {
-		            //    continue;
-		            //}
+		            if (! "gbk.httl".equals(file.getName())) {
+		                continue;
+		            }
 		            if (! profile)
 		        		System.out.println(file.getName());
-		            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, "UTF-8");
+		            String encoding = "UTF-8";
+		            if ("gbk.httl".equals(file.getName())) {
+		            	encoding = "GBK";
+		            }
+		            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
 		            if (! profile) {
 			            super.assertEquals(AdaptiveTemplate.class, template.getClass());
 			            super.assertEquals(Locale.CHINA, template.getLocale());
 		            }
 		            UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
-		            StringWriter actualWriter = new StringWriter();;
+		            StringWriter actualWriter = new StringWriter();
+		            if ("extends_var.httl".equals(file.getName())) {
+		            	context.put("extends", "extends_auto.httl");
+		            }
 		            try {
 		            	template.render(context, actualWriter);
 		            	template.render(context, actualStream);
 		            } catch (Exception e) {
 		            	throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
+		            }
+		            if ("extends_var.httl".equals(file.getName())) {
+		            	context.remove("extends");
 		            }
 		            if (! profile) {
 		            	URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
@@ -161,7 +172,7 @@ public class TemplateTest extends TestCase {
 			            if (! result.exists()) {
 			                throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
 			            }
-			            String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), "UTF-8"));
+			            String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
 			            expected = expected.replace("\r", "");
 			            super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
 			            super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
