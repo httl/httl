@@ -80,19 +80,7 @@ public class StringUtils {
     }
     
     public static boolean isNotBlank(String value) {
-    	if (value != null && value.length() > 0) {
-	    	int len = value.length();
-	    	for (int i = 0; i < len; i ++) {
-	    		char ch = value.charAt(i);
-	    		switch (ch) {
-					case ' ': case '\t': case '\n': case '\r': case '\b': case '\f':
-						break;
-					default:
-						return true;
-				}
-	    	}
-    	}
-    	return false;
+    	return ! isBlank(value);
     }
 
     public static String toString(Object value) {
