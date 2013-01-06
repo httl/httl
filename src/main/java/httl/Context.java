@@ -116,11 +116,11 @@ public final class Context extends DelegateMap<String, Object> {
 
     // The output key
     private static final String OUTPUT_KEY = "output";
-
+    
     // The parent context.
     private final Context parent;
 
-    // The current template.
+	// The current template.
     private final Template template;
 
     // The current parameters.
@@ -129,12 +129,16 @@ public final class Context extends DelegateMap<String, Object> {
     // The current output.
     private final Object output;
 
+    // The context level.
+    private final int level;
+
     private Context(Context parent, Template template, Map<String, Object> parameters, Object output) {
         super(parent, parameters);
         this.parent = parent;
         this.template = template;
         this.parameters = parameters;
         this.output = output;
+        this.level = parent == null ? 0 : parent.getLevel() + 1;
     }
 
     /**
@@ -146,7 +150,17 @@ public final class Context extends DelegateMap<String, Object> {
     public Context getParent() {
         return parent;
     }
-    
+
+    /**
+     * Get the context level.
+     * 
+     * @see #getContext()
+     * @return context level
+     */
+    public int getLevel() {
+    	return level;
+	}
+
     /**
      * Get the super template.
      * 

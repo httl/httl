@@ -42,8 +42,6 @@ public class ExtendsInterceptor implements Interceptor {
 
 	private final FileMethod fileMethod = new FileMethod();
 	
-	private static final String IN_AUTO_EXTENDS_KEY = "__IN_AUTO_EXTENDS__";
-
 	private Engine engine;
 
 	private String extendsDirectory;
@@ -95,68 +93,57 @@ public class ExtendsInterceptor implements Interceptor {
 	}
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
-		if ((extendsVariable == null && extendsDefault == null)
-				|| context.getTemplate().isMacro() 
-				|| context.containsKey(IN_AUTO_EXTENDS_KEY)) { 
+		// 只处理一级自动布局，防止递归
+		if (context.getLevel() > 1 || context.getTemplate().isMacro()) { 
 			rendition.render(context);
 			return;
 		}
-		// 通过标记，只处理一级自动布局，防止递归
-		Object oldFlag = context.put(IN_AUTO_EXTENDS_KEY, Boolean.TRUE);
-		try {
-			String extendsName = null;
-			// extends.varibale=layout
-			// 如果上下文中有指定要继承的模板，则自动继承它。
-			// 注意：此模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　context.get(extends.varibale)
-			if (StringUtils.isNotEmpty(extendsVariable)) {
-				extendsName = (String) context.get(extendsVariable);
+		String extendsName = null;
+		// extends.varibale=layout
+		// 如果上下文中有指定要继承的模板，则自动继承它。
+		// 注意：此模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　context.get(extends.varibale)
+		if (StringUtils.isNotEmpty(extendsVariable)) {
+			extendsName = (String) context.get(extendsVariable);
+		}
+		// extends.default=default.httl
+		// 如果默认模板存在，则继承默认模板。
+		// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
+		Template template = context.getTemplate();
+		if (StringUtils.isEmpty(extendsName) && StringUtils.isNotEmpty(extendsDefault)) {
+			String templateName = template.getName();
+			String name = UrlUtils.relativeUrl(extendsDefault, templateName);
+			if (StringUtils.isNotEmpty(extendsDirectory)) {
+				name = extendsDirectory + name;
 			}
-			// extends.default=default.httl
-			// 如果默认模板存在，则继承默认模板。
-			// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
-			Template template = context.getTemplate();
-			if (StringUtils.isEmpty(extendsName) && StringUtils.isNotEmpty(extendsDefault)) {
-				String templateName = template.getName();
-				String name = UrlUtils.relativeUrl(extendsDefault, templateName);
-				if (StringUtils.isNotEmpty(extendsDirectory)) {
-					name = extendsDirectory + name;
-				}
-				if (! name.equals(templateName) && engine.hasResource(name)) {
-					extendsName = extendsDefault;
-				}
+			if (! name.equals(templateName) && engine.hasResource(name)) {
+				extendsName = extendsDefault;
 			}
-			if (StringUtils.isNotEmpty(extendsName)) {
-				// extends.nested=nested
-				Object oldNested = null;
+		}
+		if (StringUtils.isNotEmpty(extendsName)) {
+			// extends.nested=nested
+			Object oldNested = null;
+			if (StringUtils.isNotEmpty(extendsNested)) {
+				oldNested = context.put(extendsNested, new RenditionTemplate(template, rendition));
+			}
+			try {
+				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
+				Object output = Context.getContext().getOutput();
+				if (output instanceof OutputStream) {
+					extend.render((OutputStream) output);
+				} else {
+					extend.render((Writer) output);
+				}
+			} finally {
 				if (StringUtils.isNotEmpty(extendsNested)) {
-					oldNested = context.put(extendsNested, new RenditionTemplate(template, rendition));
-				}
-				try {
-					Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
-					Object output = Context.getContext().getOutput();
-					if (output instanceof OutputStream) {
-						extend.render((OutputStream) output);
+					if (oldNested != null) {
+						context.put(extendsNested, oldNested);
 					} else {
-						extend.render((Writer) output);
-					}
-				} finally {
-					if (StringUtils.isNotEmpty(extendsNested)) {
-						if (oldNested != null) {
-							context.put(extendsNested, oldNested);
-						} else {
-							context.remove(extendsNested);
-						}
+						context.remove(extendsNested);
 					}
 				}
-			} else {
-				rendition.render(context);
 			}
-		} finally {
-			if (oldFlag != null) {
-				context.put(IN_AUTO_EXTENDS_KEY, oldFlag);
-			} else {
-				context.remove(IN_AUTO_EXTENDS_KEY);
-			}
+		} else {
+			rendition.render(context);
 		}
 	}
 
