@@ -42,7 +42,7 @@ public class ExtendsInterceptor implements Interceptor {
 
 	private final FileMethod fileMethod = new FileMethod();
 	
-	private static final String IN_EXTENDS_KEY = "__IN_EXTENDS__";
+	private static final String IN_AUTO_EXTENDS_KEY = "__IN_AUTO_EXTENDS__";
 
 	private Engine engine;
 
@@ -95,35 +95,37 @@ public class ExtendsInterceptor implements Interceptor {
 	}
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
-		Template template = context.getTemplate();
-		if (template.isMacro() || (extendsVariable == null && extendsDefault == null)
-				|| context.containsKey(IN_EXTENDS_KEY)) { // 通过标记，只处理一级自动布局，防止递归
+		if ((extendsVariable == null && extendsDefault == null)
+				|| context.getTemplate().isMacro() 
+				|| context.containsKey(IN_AUTO_EXTENDS_KEY)) { 
 			rendition.render(context);
 			return;
 		}
-		String extendsName = null;
-		// extends.varibale=layout
-		// 如果上下文中有指定要继承的模板，则自动继承它。
-		// 注意：此模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　context.get(extends.varibale)
-		if (StringUtils.isNotEmpty(extendsVariable)) {
-			extendsName = (String) context.get(extendsVariable);
-		}
-		// extends.default=default.httl
-		// 如果默认模板存在，则继承默认模板。
-		// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
-		if (StringUtils.isEmpty(extendsName) && StringUtils.isNotEmpty(extendsDefault)) {
-			String templateName = template.getName();
-			String name = UrlUtils.relativeUrl(extendsDefault, templateName);
-			if (StringUtils.isNotEmpty(extendsDirectory)) {
-				name = extendsDirectory + name;
+		// 通过标记，只处理一级自动布局，防止递归
+		Object oldFlag = context.put(IN_AUTO_EXTENDS_KEY, Boolean.TRUE);
+		try {
+			String extendsName = null;
+			// extends.varibale=layout
+			// 如果上下文中有指定要继承的模板，则自动继承它。
+			// 注意：此模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　context.get(extends.varibale)
+			if (StringUtils.isNotEmpty(extendsVariable)) {
+				extendsName = (String) context.get(extendsVariable);
 			}
-			if (! name.equals(templateName) && engine.hasResource(name)) {
-				extendsName = extendsDefault;
+			// extends.default=default.httl
+			// 如果默认模板存在，则继承默认模板。
+			// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
+			Template template = context.getTemplate();
+			if (StringUtils.isEmpty(extendsName) && StringUtils.isNotEmpty(extendsDefault)) {
+				String templateName = template.getName();
+				String name = UrlUtils.relativeUrl(extendsDefault, templateName);
+				if (StringUtils.isNotEmpty(extendsDirectory)) {
+					name = extendsDirectory + name;
+				}
+				if (! name.equals(templateName) && engine.hasResource(name)) {
+					extendsName = extendsDefault;
+				}
 			}
-		}
-		if (StringUtils.isNotEmpty(extendsName)) {
-			Object oldFlag = context.put(IN_EXTENDS_KEY, Boolean.TRUE);
-			try {
+			if (StringUtils.isNotEmpty(extendsName)) {
 				// extends.nested=nested
 				Object oldNested = null;
 				if (StringUtils.isNotEmpty(extendsNested)) {
@@ -146,15 +148,15 @@ public class ExtendsInterceptor implements Interceptor {
 						}
 					}
 				}
-			} finally {
-				if (oldFlag != null) {
-					context.put(IN_EXTENDS_KEY, oldFlag);
-				} else {
-					context.remove(IN_EXTENDS_KEY);
-				}
+			} else {
+				rendition.render(context);
 			}
-		} else {
-			rendition.render(context);
+		} finally {
+			if (oldFlag != null) {
+				context.put(IN_AUTO_EXTENDS_KEY, oldFlag);
+			} else {
+				context.remove(IN_AUTO_EXTENDS_KEY);
+			}
 		}
 	}
 

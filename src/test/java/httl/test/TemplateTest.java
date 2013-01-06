@@ -146,7 +146,7 @@ public class TemplateTest extends TestCase {
 	        for (long m = 0; m < max; m ++) {
 		        for (int i = 0, n = files.length; i < n; i ++) {
 		            File file = files[i];
-		            //if (! "extends_default.httl".equals(file.getName())) {
+		            //if (! "extends_var.httl".equals(file.getName())) {
 		            //    continue;
 		            //}
 		            if (! profile)
