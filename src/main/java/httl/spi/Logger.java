@@ -23,6 +23,9 @@ package httl.spi;
  */
 public interface Logger {
 
+	/**
+	 * The httl log name space.
+	 */
     public static final String NAME = "httl";
 
     /**

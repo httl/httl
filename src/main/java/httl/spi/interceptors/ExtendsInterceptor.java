@@ -93,8 +93,9 @@ public class ExtendsInterceptor implements Interceptor {
 	}
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
-		// 只处理一级自动布局，防止递归
-		if (context.getLevel() > 1 || context.getTemplate().isMacro()) { 
+		if ((extendsVariable == null && extendsDefault == null)
+				|| context.getLevel() > 1 // 只处理一级自动布局，防止递归
+				|| context.getTemplate().isMacro()) { 
 			rendition.render(context);
 			return;
 		}
