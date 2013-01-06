@@ -23,14 +23,13 @@ import httl.spi.Interceptor;
 import httl.spi.Rendition;
 import httl.spi.methods.FileMethod;
 import httl.spi.parsers.templates.RenditionTemplate;
+import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.text.ParseException;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Extends Interceptor. (SPI, Singleton, ThreadSafe)

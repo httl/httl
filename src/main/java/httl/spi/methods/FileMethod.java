@@ -23,14 +23,13 @@ import httl.Resource;
 import httl.Template;
 import httl.util.Digest;
 import httl.util.IOUtils;
+import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * FileMethod. (SPI, Singleton, ThreadSafe)
