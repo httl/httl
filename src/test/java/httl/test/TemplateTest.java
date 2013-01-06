@@ -135,16 +135,20 @@ public class TemplateTest extends TestCase {
 	        for (long m = 0; m < max; m ++) {
 		        for (int i = 0, n = files.length; i < n; i ++) {
 		            File file = files[i];
-		            if (! "gbk.httl".equals(file.getName())) {
-		                continue;
-		            }
+		            //if (! "extends_default.httl".equals(file.getName())) {
+		            //    continue;
+		            //}
 		            if (! profile)
 		        		System.out.println(file.getName());
 		            String encoding = "UTF-8";
 		            if ("gbk.httl".equals(file.getName())) {
 		            	encoding = "GBK";
 		            }
-		            Template template = engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
+		            Engine _engine = engine;
+		            if ("extends_default.httl".equals(file.getName())) {
+		            	_engine = Engine.getEngine("httl-extends.properties");
+		            }
+		            Template template = _engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
 		            if (! profile) {
 			            super.assertEquals(AdaptiveTemplate.class, template.getClass());
 			            super.assertEquals(Locale.CHINA, template.getLocale());
@@ -152,7 +156,7 @@ public class TemplateTest extends TestCase {
 		            UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 		            StringWriter actualWriter = new StringWriter();
 		            if ("extends_var.httl".equals(file.getName())) {
-		            	context.put("extends", "extends_auto.httl");
+		            	context.put("extends", "default.httl");
 		            }
 		            try {
 		            	template.render(context, actualWriter);

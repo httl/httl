@@ -1,4 +1,4 @@
-$!{extends("/layouts/templates/extends_layout.httl")}
+$!{extends("/templates/extends_layout.httl")}
 
 <!--#macro(body(Book[] books))-->
   <table>

@@ -1,4 +1,4 @@
-$!{extends("/layouts/templates/extends_layout.httl")}
+$!{extends("/templates/extends_layout.httl")}
 
 <!--#macro(crumbs)-->
   $!{super.crumbs} &gt; <a href="/books">Books</a>

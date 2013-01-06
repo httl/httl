@@ -28,7 +28,6 @@ import httl.util.UrlUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.text.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,13 +69,14 @@ public class ExtendsInterceptor implements Interceptor {
 		if ("/".equals(this.extendsDirectory)) {
 			this.extendsDirectory = null;
 		}
+		fileMethod.setExtendsDirectory(extendsDirectory);
 	}
 
 	/**
 	 * httl.properties: extends.default=default.httl
 	 */
 	public void setExtendsDefault(String extendsDefault) {
-		this.extendsDefault = UrlUtils.cleanName(extendsDefault);
+		this.extendsDefault = extendsDefault;
 	}
 
 	/**
@@ -92,20 +92,13 @@ public class ExtendsInterceptor implements Interceptor {
 	public void setExtendsNested(String extendsNested) {
 		this.extendsNested = extendsNested;
 	}
-	
-	private String relativeUrl(String extendsPath, String templatePath) throws MalformedURLException {
-		if (StringUtils.isNotEmpty(extendsPath)) {
-			if (StringUtils.isNotEmpty(extendsDirectory)) {
-				return extendsDirectory + UrlUtils.relativeUrl(extendsPath, templatePath);
-			} else {
-				return UrlUtils.relativeUrl(extendsPath, templatePath);
-			}
-		}
-		return extendsPath;
-	}
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
 		Template template = context.getTemplate();
+		if (template.isMacro()) {
+			rendition.render(context);
+			return;
+		}
 		String templateName = template.getName();
 		String extendsName = null;
 		// extends.varibale=layout
@@ -114,46 +107,45 @@ public class ExtendsInterceptor implements Interceptor {
 		if (StringUtils.isNotEmpty(extendsVariable)) {
 			extendsName = (String) context.get(extendsVariable);
 			if (StringUtils.isNotEmpty(extendsName)) {
-				extendsName = relativeUrl(extendsName, templateName);
 				context.put(extendsVariable, ""); // 已继承则移除，防止父模板又拿到。
 			}
 		}
-		// extends.directory=layouts
-		// 如果自动继承目录存在，则继承其中的同名模板。
-		// 注意：同名模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory + template.name
-		if (StringUtils.isEmpty(extendsName) 
-				&& StringUtils.isNotEmpty(extendsDirectory)
-				&& ! templateName.startsWith(extendsDirectory)) {
-			String name = extendsDirectory + templateName;
-			if (engine.hasResource(name)) {
-				extendsName = name;
-			}
-		}
 		// extends.default=default.httl
-		// 如果同名继承模板不存在时，则继承默认模板。
+		// 如果默认模板存在，则继承默认模板。
 		// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
 		if (StringUtils.isEmpty(extendsName) 
-				&& StringUtils.isNotEmpty(extendsDefault)
-				&& ! templateName.endsWith(extendsDefault)
-				// 允许没有extends.directory时，直接在当前模板目录中查找extends.default模板。
-				&& (StringUtils.isEmpty(extendsDirectory)
-						|| ! templateName.startsWith(extendsDirectory))) {
-			String name = relativeUrl(extendsDefault, templateName);
-			if (engine.hasResource(name)) {
-				extendsName = name;
+				&& StringUtils.isNotEmpty(extendsDefault)) {
+			String name = UrlUtils.relativeUrl(extendsDefault, templateName);
+			if (StringUtils.isNotEmpty(extendsDirectory)) {
+				name = extendsDirectory + name;
+			}
+			if (! name.equals(templateName) 
+					&& engine.hasResource(name)) {
+				extendsName = extendsDefault;
 			}
 		}
 		if (StringUtils.isNotEmpty(extendsName)) {
 			// extends.nested=nested
+			Object oldNested = null;
 			if (StringUtils.isNotEmpty(extendsNested)) {
-				context.put(extendsNested, new RenditionTemplate(template, rendition));
+				oldNested = context.put(extendsNested, new RenditionTemplate(template, rendition));
 			}
-			Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
-			Object output = Context.getContext().getOutput();
-			if (output instanceof OutputStream) {
-				extend.render((OutputStream) output);
-			} else {
-				extend.render((Writer) output);
+			try {
+				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
+				Object output = Context.getContext().getOutput();
+				if (output instanceof OutputStream) {
+					extend.render((OutputStream) output);
+				} else {
+					extend.render((Writer) output);
+				}
+			} finally {
+				if (StringUtils.isNotEmpty(extendsNested)) {
+					if (oldNested != null) {
+						context.put(extendsNested, oldNested);
+					} else {
+						context.remove(extendsNested);
+					}
+				}
 			}
 		} else {
 			rendition.render(context);

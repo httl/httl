@@ -30,6 +30,8 @@ import java.text.ParseException;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * FileMethod. (SPI, Singleton, ThreadSafe)
  * 
@@ -39,6 +41,8 @@ public class FileMethod {
 
     private Engine engine;
 
+	private String extendsDirectory;
+
     /**
      * httl.properties: engine=httl.spi.engines.DefaultEngine
      */
@@ -46,7 +50,17 @@ public class FileMethod {
         this.engine = engine;
     }
 
-    public Template extend(String name) throws IOException, ParseException {
+	/**
+	 * httl.properties: extends.directory=layouts
+	 */
+    public void setExtendsDirectory(String extendsDirectory) {
+    	this.extendsDirectory = UrlUtils.cleanDirectory(extendsDirectory);
+		if ("/".equals(this.extendsDirectory)) {
+			this.extendsDirectory = null;
+		}
+	}
+
+	public Template extend(String name) throws IOException, ParseException {
     	return $extends(name, (Locale) null, (String) null);
     }
 
@@ -109,6 +123,9 @@ public class FileMethod {
 	        if (locale == null) {
 	        	locale = template.getLocale();
 	        }
+        }
+        if (StringUtils.isNotEmpty(extendsDirectory)) {
+        	name = extendsDirectory + name;
         }
         Template extend = engine.getTemplate(name, locale, encoding);
         if (macro != null && macro.length() > 0) {
