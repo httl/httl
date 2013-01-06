@@ -115,8 +115,8 @@ public class ExtendsInterceptor implements Interceptor {
 		// 如果默认模板存在，则继承默认模板。
 		// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
 		if (StringUtils.isEmpty(extendsName) 
-				&& ! context.containsKey(IN_EXTENDS_DEFAULT_KEY)
-				&& StringUtils.isNotEmpty(extendsDefault)) {
+				&& StringUtils.isNotEmpty(extendsDefault)
+				&& ! context.containsKey(IN_EXTENDS_DEFAULT_KEY)) {
 			String name = UrlUtils.relativeUrl(extendsDefault, templateName);
 			if (StringUtils.isNotEmpty(extendsDirectory)) {
 				name = extendsDirectory + name;
