@@ -42,7 +42,7 @@ public class ExtendsInterceptor implements Interceptor {
 
 	private final FileMethod fileMethod = new FileMethod();
 	
-	private static final String IN_EXTENDS_DEFAULT_KEY = "__IN_EXTENDS_DEFAULT__";
+	private static final String IN_EXTENDS_KEY = "__IN_EXTENDS__";
 
 	private Engine engine;
 
@@ -96,68 +96,61 @@ public class ExtendsInterceptor implements Interceptor {
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
 		Template template = context.getTemplate();
-		if (template.isMacro() || (extendsVariable == null && extendsDefault == null)) {
+		if (template.isMacro() || (extendsVariable == null && extendsDefault == null)
+				|| context.containsKey(IN_EXTENDS_KEY)) { // 通过标记，只处理一级自动布局，防止递归
 			rendition.render(context);
 			return;
 		}
-		String templateName = template.getName();
 		String extendsName = null;
 		// extends.varibale=layout
 		// 如果上下文中有指定要继承的模板，则自动继承它。
 		// 注意：此模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　context.get(extends.varibale)
 		if (StringUtils.isNotEmpty(extendsVariable)) {
 			extendsName = (String) context.get(extendsVariable);
-			if (StringUtils.isNotEmpty(extendsName)) {
-				context.put(extendsVariable, ""); // 已继承则移除，防止父模板又拿到。
-			}
 		}
 		// extends.default=default.httl
 		// 如果默认模板存在，则继承默认模板。
 		// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
-		if (StringUtils.isEmpty(extendsName) 
-				&& StringUtils.isNotEmpty(extendsDefault)
-				&& ! context.containsKey(IN_EXTENDS_DEFAULT_KEY)) {
+		if (StringUtils.isEmpty(extendsName) && StringUtils.isNotEmpty(extendsDefault)) {
+			String templateName = template.getName();
 			String name = UrlUtils.relativeUrl(extendsDefault, templateName);
 			if (StringUtils.isNotEmpty(extendsDirectory)) {
 				name = extendsDirectory + name;
 			}
-			if (! name.equals(templateName) 
-					&& engine.hasResource(name)) {
+			if (! name.equals(templateName) && engine.hasResource(name)) {
 				extendsName = extendsDefault;
 			}
 		}
 		if (StringUtils.isNotEmpty(extendsName)) {
-			// extends.nested=nested
-			Object oldNested = null;
-			if (StringUtils.isNotEmpty(extendsNested)) {
-				oldNested = context.put(extendsNested, new RenditionTemplate(template, rendition));
-			}
-			Object oldDefault = null;
-			if (extendsName.equals(extendsDefault)) {
-				oldDefault = context.put(IN_EXTENDS_DEFAULT_KEY, Boolean.TRUE);
-			}
+			Object oldFlag = context.put(IN_EXTENDS_KEY, Boolean.TRUE);
 			try {
-				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
-				Object output = Context.getContext().getOutput();
-				if (output instanceof OutputStream) {
-					extend.render((OutputStream) output);
-				} else {
-					extend.render((Writer) output);
+				// extends.nested=nested
+				Object oldNested = null;
+				if (StringUtils.isNotEmpty(extendsNested)) {
+					oldNested = context.put(extendsNested, new RenditionTemplate(template, rendition));
+				}
+				try {
+					Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
+					Object output = Context.getContext().getOutput();
+					if (output instanceof OutputStream) {
+						extend.render((OutputStream) output);
+					} else {
+						extend.render((Writer) output);
+					}
+				} finally {
+					if (StringUtils.isNotEmpty(extendsNested)) {
+						if (oldNested != null) {
+							context.put(extendsNested, oldNested);
+						} else {
+							context.remove(extendsNested);
+						}
+					}
 				}
 			} finally {
-				if (StringUtils.isNotEmpty(extendsNested)) {
-					if (oldNested != null) {
-						context.put(extendsNested, oldNested);
-					} else {
-						context.remove(extendsNested);
-					}
-				}
-				if (extendsName.equals(extendsDefault)) {
-					if (oldDefault != null) {
-						context.put(IN_EXTENDS_DEFAULT_KEY, oldDefault);
-					} else {
-						context.remove(IN_EXTENDS_DEFAULT_KEY);
-					}
+				if (oldFlag != null) {
+					context.put(IN_EXTENDS_KEY, oldFlag);
+				} else {
+					context.remove(IN_EXTENDS_KEY);
 				}
 			}
 		} else {
