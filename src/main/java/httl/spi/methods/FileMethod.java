@@ -60,48 +60,16 @@ public class FileMethod {
 		}
 	}
 
-	public Template extend(String name) throws IOException, ParseException {
+    public Template $extends(String name) throws IOException, ParseException {
     	return $extends(name, (Locale) null, (String) null);
     }
 
-    public Template extend(String name, String encoding) throws IOException, ParseException {
+    public Template $extends(String name, String encoding) throws IOException, ParseException {
     	return $extends(name, (Locale) null, encoding);
     }
 
-    public Template extend(String name, Locale locale) throws IOException, ParseException {
-    	return $extends(name, locale, (String) null);
-    }
-
-    public Template extend(String name, Locale locale, String encoding) throws IOException, ParseException {
-        return $extends(name, locale, encoding);
-    }
-
-    public Template extend(String name, Map<String, Object> parameters) throws IOException, ParseException {
-    	return $extends(name, null, null, parameters);
-    }
-
-    public Template extend(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
-    	return $extends(name, null, encoding, parameters);
-    }
-
-    public Template extend(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
-    	return $extends(name, locale, null, parameters);
-    }
-
-    public Template extend(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
-        return $extends(name, locale, encoding, parameters);
-    }
-
-    public Template $extends(String name) throws IOException, ParseException {
-    	return extend(name, (Locale) null, (String) null);
-    }
-
-    public Template $extends(String name, String encoding) throws IOException, ParseException {
-    	return extend(name, (Locale) null, encoding);
-    }
-
     public Template $extends(String name, Locale locale) throws IOException, ParseException {
-    	return extend(name, locale, (String) null);
+    	return $extends(name, locale, (String) null);
     }
 
     public Template $extends(String name, Locale locale, String encoding) throws IOException, ParseException {
@@ -141,22 +109,22 @@ public class FileMethod {
     }
 
     public Template $extends(String name, Map<String, Object> parameters) throws IOException, ParseException {
-    	return extend(name, null, null, parameters);
+    	return $extends(name, null, null, parameters);
     }
 
     public Template $extends(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
-    	return extend(name, null, encoding, parameters);
+    	return $extends(name, null, encoding, parameters);
     }
 
     public Template $extends(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
-    	return extend(name, locale, null, parameters);
+    	return $extends(name, locale, null, parameters);
     }
 
     public Template $extends(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
         if (parameters != null) {
         	Context.getContext().putAll(parameters);
         }
-        return extend(name, locale, encoding);
+        return $extends(name, locale, encoding);
     }
 
     public Expression evaluate(byte[] source) throws IOException, ParseException {
