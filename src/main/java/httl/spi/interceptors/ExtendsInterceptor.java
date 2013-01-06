@@ -96,8 +96,7 @@ public class ExtendsInterceptor implements Interceptor {
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
 		Template template = context.getTemplate();
-		if (template.isMacro() || (extendsVariable == null && extendsDefault == null)
-				 || context.containsKey(IN_EXTENDS_DEFAULT_KEY)) {
+		if (template.isMacro() || (extendsVariable == null && extendsDefault == null)) {
 			rendition.render(context);
 			return;
 		}
@@ -116,6 +115,7 @@ public class ExtendsInterceptor implements Interceptor {
 		// 如果默认模板存在，则继承默认模板。
 		// 注意：默认模板是从继承模板目录中查找的，即实际为：template.directory + extends.directory +　extends.default
 		if (StringUtils.isEmpty(extendsName) 
+				&& ! context.containsKey(IN_EXTENDS_DEFAULT_KEY)
 				&& StringUtils.isNotEmpty(extendsDefault)) {
 			String name = UrlUtils.relativeUrl(extendsDefault, templateName);
 			if (StringUtils.isNotEmpty(extendsDirectory)) {
