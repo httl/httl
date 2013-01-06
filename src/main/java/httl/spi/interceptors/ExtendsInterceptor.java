@@ -41,6 +41,8 @@ import java.text.ParseException;
 public class ExtendsInterceptor implements Interceptor {
 
 	private final FileMethod fileMethod = new FileMethod();
+	
+	private static final String IN_EXTENDS_DEFAULT_KEY = "__IN_EXTENDS_DEFAULT__";
 
 	private Engine engine;
 
@@ -94,7 +96,8 @@ public class ExtendsInterceptor implements Interceptor {
 
 	public void render(Context context, Rendition rendition) throws IOException, ParseException {
 		Template template = context.getTemplate();
-		if (template.isMacro()) {
+		if (template.isMacro() || (extendsVariable == null && extendsDefault == null)
+				 || context.containsKey(IN_EXTENDS_DEFAULT_KEY)) {
 			rendition.render(context);
 			return;
 		}
@@ -129,6 +132,10 @@ public class ExtendsInterceptor implements Interceptor {
 			if (StringUtils.isNotEmpty(extendsNested)) {
 				oldNested = context.put(extendsNested, new RenditionTemplate(template, rendition));
 			}
+			Object oldDefault = null;
+			if (extendsName.equals(extendsDefault)) {
+				oldDefault = context.put(IN_EXTENDS_DEFAULT_KEY, Boolean.TRUE);
+			}
 			try {
 				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
 				Object output = Context.getContext().getOutput();
@@ -143,6 +150,13 @@ public class ExtendsInterceptor implements Interceptor {
 						context.put(extendsNested, oldNested);
 					} else {
 						context.remove(extendsNested);
+					}
+				}
+				if (extendsName.equals(extendsDefault)) {
+					if (oldDefault != null) {
+						context.put(IN_EXTENDS_DEFAULT_KEY, oldDefault);
+					} else {
+						context.remove(IN_EXTENDS_DEFAULT_KEY);
 					}
 				}
 			}

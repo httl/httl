@@ -64,23 +64,15 @@ public abstract class AbstractCompiler implements Compiler {
     public void setCompileDirectory(String directory) {
         if (directory != null && directory.trim().length() > 0) {
             File file = new File(directory);
-            if (file.exists() && file.isDirectory()) {
+            if (file.exists() || file.mkdirs()) {
                 this.compileDirectory = file;
             }
         }
     }
     
     protected void saveBytecode(String name, byte[] bytecode) throws IOException {
-        // ClassUtils.checkBytecode(name, bytecode);
-        if (compileDirectory != null && compileDirectory.exists()) {
+        if (compileDirectory != null) {
             File file = new File(compileDirectory, name.replace('.', '/') + ".class");
-            File dir = file.getParentFile();
-            if (! dir.exists()) {
-                boolean ok = dir.mkdirs();
-                if (! ok) {
-                    throw new IOException("Failed to create directory " + dir.getAbsolutePath());
-                }
-            }
             FileOutputStream out = new FileOutputStream(file);
             try {
                 out.write(bytecode);

@@ -42,9 +42,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -62,6 +64,15 @@ public class TemplateTest extends TestCase {
     @Test
     public void testTemplate() throws Exception {
     	boolean profile = "true".equals(System.getProperty("profile"));
+    	String include = System.getProperty("includes");
+    	String exclude = System.getProperty("excludes");
+    	Set<String> includes = new HashSet<String>();
+    	Set<String> excludes = new HashSet<String>();
+    	if (include != null && include.length() > 0 && ! include.startsWith("$")) {
+    		includes.addAll(Arrays.asList(include.split("\\,")));
+    	} else if (exclude != null && exclude.length() > 0 && ! exclude.startsWith("$")) {
+    		excludes.addAll(Arrays.asList(exclude.split("\\,")));
+    	}
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         format.setTimeZone(TimeZone.getTimeZone("+0"));
         User user = new User("liangfei", "admin", "Y");
@@ -140,6 +151,10 @@ public class TemplateTest extends TestCase {
 		            //}
 		            if (! profile)
 		        		System.out.println(file.getName());
+		            if (excludes.contains(file.getName()) || 
+		            		(includes.size() > 0 && ! includes.contains(file.getName()))) {
+		            	continue;
+		            }
 		            String encoding = "UTF-8";
 		            if ("gbk.httl".equals(file.getName())) {
 		            	encoding = "GBK";
