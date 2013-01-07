@@ -132,8 +132,8 @@ public class DefaultEngine extends Engine {
 			}
 		}
 		if (properties != null) {
-			if (cls != null && cls != Object.class 
-					&& cls != String.class && ! cls.isInterface()) {
+			if (cls != null && cls != Object.class && cls != String.class 
+					&& ! cls.isInterface() && ! cls.isArray()) {
 				// engine.getProperty("loaders", ClasspathLoader.class);
 				key = key + "=" + cls.getName();
 			}

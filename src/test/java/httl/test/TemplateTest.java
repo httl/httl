@@ -125,8 +125,10 @@ public class TemplateTest extends TestCase {
         		System.out.println("========" + config + "========");
         	Engine engine = Engine.getEngine(config);
         	if (! profile) {
-	        	Loader loader = engine.getProperty("loader", Loader.class);
+        		Loader loader = engine.getProperty("loader", Loader.class);
 	        	assertEquals(MultiLoader.class, loader.getClass());
+	        	Loader[] loaders = engine.getProperty("loaders", Loader[].class);
+	        	assertEquals(ClasspathLoader.class, loaders[0].getClass());
 	        	loader = engine.getProperty("loaders", ClasspathLoader.class);
 	        	assertEquals(ClasspathLoader.class, loader.getClass());
 	        	String suffix = engine.getProperty("template.suffix", ".httl");
