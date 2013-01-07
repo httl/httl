@@ -184,12 +184,12 @@ public abstract class Engine {
     }
 
     /**
-     * Get config boolean value.
+     * Get config instantiated value.
      * 
      * @see #getEngine()
      * @param key - config key
      * @param cls - config value type
-     * @return config boolean value
+     * @return config value
      */
     public abstract <T> T getProperty(String key, Class<T> cls);
 
@@ -347,7 +347,6 @@ public abstract class Engine {
      * @see #getEngine()
      * @param source - template source
      * @return template instance
-     * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed
      */
     public abstract Template parseTemplate(String source) throws ParseException;
