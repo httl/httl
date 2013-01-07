@@ -94,7 +94,7 @@ public class WebEngine {
 			                try {
 								properties.load(in);
 							} catch (IOException e) {
-								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp.");
+								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp. cause: " + e.getMessage(), e);
 							}
 			                addProperties(properties);
 			                ENGINE = Engine.getEngine(config, properties);
@@ -111,7 +111,7 @@ public class WebEngine {
 			        		try {
 			        			properties.load(in);
 			        		} catch (IOException e) {
-								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp.");
+								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp. cause: " + e.getMessage(), e);
 							}
 			        		addProperties(properties);
 			        		ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
@@ -148,21 +148,38 @@ public class WebEngine {
 	}
 
 	private static void addProperties(Properties properties) {
+		Properties def = new Properties();
+		InputStream in = Engine.class.getClassLoader().getResourceAsStream("httl-default.properties");
+		if (in != null) {
+			try {
+				def.load(in);
+			} catch (IOException e) {
+				throw new IllegalStateException("Failed to load httl-default.properties. cause: " + e.getMessage());
+			}
+		}
 		if (! properties.containsKey("loader") 
-        		&& ! properties.containsKey("loaders")
-        		&& ! properties.containsKey("loaders+")) {
-        	properties.setProperty("loaders+", ServletLoader.class.getName());
+        		&& ! properties.containsKey("loaders")) {
+			String loaders = def.getProperty("loaders", "");
+			if (loaders.length() > 0) {
+				loaders = loaders + ",";
+			}
+        	properties.setProperty("loaders", loaders + ServletLoader.class.getName());
         }
         if (! properties.containsKey("resolver") 
-        		&& ! properties.containsKey("resolvers")
-        		&& ! properties.containsKey("resolvers+")) {
-        	properties.setProperty("resolvers+", ServletResolver.class.getName());
+        		&& ! properties.containsKey("resolvers")) {
+        	String resolvers = def.getProperty("resolvers", "");
+			if (resolvers.length() > 0) {
+				resolvers = resolvers + ",";
+			}
+        	properties.setProperty("resolvers", resolvers + ServletResolver.class.getName());
         }
-        if (! properties.containsKey("import.variables") 
-        		&& ! properties.containsKey("import.variables")
-        		&& ! properties.containsKey("import.variables+")) {
-        	properties.setProperty("import.variables+", 
-        			HttpServletRequest.class.getName() + " request,"
+        if (! properties.containsKey("import.variables")) {
+        	String variables = def.getProperty("import.variables", "");
+			if (variables.length() > 0) {
+				variables = variables + ",";
+			}
+        	properties.setProperty("import.variables",  variables 
+        			+ HttpServletRequest.class.getName() + " request,"
         			+ HttpServletResponse.class.getName() + " response,"
         			+ HttpSession.class.getName() + " session,"
         			+ ServletContext.class.getName() + " application");
