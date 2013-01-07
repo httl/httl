@@ -20,11 +20,9 @@ import httl.Engine;
 import httl.Template;
 import httl.spi.Logger;
 import httl.spi.loaders.ServletLoader;
-import httl.spi.resolvers.RequestResolver;
-import httl.util.DelegateMap;
+import httl.spi.resolvers.ServletResolver;
 import httl.util.StringUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- * WebEngine (Integration, Singleton, NotThreadSafe)
+ * WebEngine (Integration, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -124,7 +122,7 @@ public class WebEngine {
 			        		ENGINE = Engine.getEngine(properties);
 			        	}
 			        }
-			        OUTPUT_ENCODING = ENGINE.getProperty(OUTPUT_ENCODING_KEY);
+			        OUTPUT_ENCODING = ENGINE.getProperty(OUTPUT_ENCODING_KEY, String.class);
 			        OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
 			        LOCALIZED = ENGINE.getProperty(LOCALIZED_KEY, false);
 				}
@@ -158,7 +156,7 @@ public class WebEngine {
         if (! properties.containsKey("resolver") 
         		&& ! properties.containsKey("resolvers")
         		&& ! properties.containsKey("resolvers+")) {
-        	properties.setProperty("resolvers+", RequestResolver.class.getName());
+        	properties.setProperty("resolvers+", ServletResolver.class.getName());
         }
         if (! properties.containsKey("import.variables") 
         		&& ! properties.containsKey("import.variables")
@@ -178,77 +176,43 @@ public class WebEngine {
 		return ENGINE;
 	}
 
-	public static void render(HttpServletRequest request, HttpServletResponse response) throws IOException, ParseException {
-		doRender(request, response, null, null, null);
-	}
-
-	public static void render(HttpServletRequest request, HttpServletResponse response, Map<String, Object> model) throws IOException, ParseException {
-		doRender(request, response, null, model, null);
-	}
-
 	public static void render(HttpServletRequest request, HttpServletResponse response, String path) throws IOException, ParseException {
-		doRender(request, response, path, null, null);
-	}
-	
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> model) throws IOException, ParseException {
-		doRender(request, response, path, model, null);
-	}
-	
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> model, OutputStream output) throws IOException, ParseException {
-		doRender(request, response, path, model, output);
-	}
-	
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> model, Writer writer) throws IOException, ParseException {
-		doRender(request, response, path, model, writer);
+		render(request, response, path, null);
 	}
 
-	private static void doRender(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> model, Object output) throws IOException, ParseException {
-		if (ENGINE == null) {
-			setServletContext(request.getSession().getServletContext());
-		}
-		boolean unresolved = RequestResolver.getRequest() == null;
-		if (unresolved) {
-			RequestResolver.set(request, response);
-		}
-		Map<String, Object> parameters = RequestResolver.getAndCheckPrarameters();
-		if (model != null) {
-			parameters = new DelegateMap<String, Object>(parameters, model);
-		}
+	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> parameters) throws IOException, ParseException {
+		render(request, response, path, parameters, OUTPUT_STREAM ? response.getOutputStream() : response.getWriter());
+	}
+
+	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> parameters, Object out) throws IOException, ParseException {
+		ServletResolver.set(request, response);
 		try {
-			if (StringUtils.isNotEmpty(OUTPUT_ENCODING)) {
-				response.setCharacterEncoding(OUTPUT_ENCODING);
-				String contentType = response.getContentType();
-				if (StringUtils.isEmpty(contentType)) {
-					response.setContentType(DEFAULT_CONTENT_TYPE + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
-				} else {
-					int i = contentType.indexOf(CHARSET_KEY);
-					if (i > 0) {
-						response.setContentType(contentType.substring(0, i + CHARSET_KEY.length()) + OUTPUT_ENCODING);
-					} else {
-						response.setContentType(contentType + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
-					}
-				}
-			}
-			Template template = LOCALIZED ? ENGINE.getTemplate(path, request.getLocale()) : ENGINE.getTemplate(path);
-			if (output == null) {
-				if (OUTPUT_STREAM) {
-					template.render(parameters, response.getOutputStream());
-				} else {
-					template.render(parameters, response.getWriter());
-				}
+			setResponseEncoding(response);
+			Template template = LOCALIZED ? getEngine().getTemplate(path, request.getLocale()) : getEngine().getTemplate(path);
+			if (out instanceof OutputStream) {
+				template.render(parameters, (OutputStream) out);
 			} else {
-				if (output instanceof OutputStream) {
-					template.render(parameters, (OutputStream) output);
-				} else {
-					template.render(parameters, (Writer) output);
-				}
+				template.render(parameters, (Writer) out);
 			}
-			response.flushBuffer();
-		} catch (FileNotFoundException e) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
 		} finally {
-			if (unresolved) {
-				RequestResolver.remove();
+			ServletResolver.remove();
+		}
+	}
+	
+	public static void setResponseEncoding(HttpServletResponse response) {
+		getEngine();
+		if (StringUtils.isNotEmpty(OUTPUT_ENCODING)) {
+			response.setCharacterEncoding(OUTPUT_ENCODING);
+			String contentType = response.getContentType();
+			if (StringUtils.isEmpty(contentType)) {
+				response.setContentType(DEFAULT_CONTENT_TYPE + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
+			} else {
+				int i = contentType.indexOf(CHARSET_KEY);
+				if (i > 0) {
+					response.setContentType(contentType.substring(0, i + CHARSET_KEY.length()) + OUTPUT_ENCODING);
+				} else {
+					response.setContentType(contentType + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
+				}
 			}
 		}
 	}

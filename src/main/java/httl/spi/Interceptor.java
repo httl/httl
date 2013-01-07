@@ -38,6 +38,6 @@ public interface Interceptor {
 	 * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	void render(Context context, Rendition rendition) throws IOException, ParseException;
+	void render(Context context, Listener rendition) throws IOException, ParseException;
 
 }

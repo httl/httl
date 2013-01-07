@@ -127,23 +127,22 @@ public abstract class Engine {
     public abstract String getName();
 
     /**
+     * Get the engine version.
+     * 
+     * @return engine version
+     */
+    public abstract String getVersion();
+
+    /**
      * Get config value.
      * 
      * @see #getEngine()
      * @param key - config key
      * @return config value
      */
-    public abstract String getProperty(String key);
-
-    /**
-     * Get config boolean value.
-     * 
-     * @see #getEngine()
-     * @param key - config key
-     * @param cls - config value type
-     * @return config boolean value
-     */
-    public abstract <T> T getProperty(String key, Class<T> cls);
+    public Object getProperty(String key) {
+    	return getProperty(key, Object.class);
+    }
 
     /**
      * Get config value.
@@ -154,7 +153,7 @@ public abstract class Engine {
      * @return config value
      */
     public String getProperty(String key, String defaultValue) {
-        String value = getProperty(key);
+        String value = getProperty(key, String.class);
         return value == null || value.length() == 0 ? defaultValue : value;
     }
 
@@ -167,7 +166,7 @@ public abstract class Engine {
      * @return config int value
      */
     public int getProperty(String key, int defaultValue) {
-        String value = getProperty(key);
+        String value = getProperty(key, String.class);
         return value == null || value.length() == 0 ? defaultValue : Integer.parseInt(value);
     }
 
@@ -180,9 +179,19 @@ public abstract class Engine {
      * @return config boolean value
      */
     public boolean getProperty(String key, boolean defaultValue) {
-        String value = getProperty(key);
+        String value = getProperty(key, String.class);
         return value == null || value.length() == 0 ? defaultValue : "true".equalsIgnoreCase(value);
     }
+
+    /**
+     * Get config boolean value.
+     * 
+     * @see #getEngine()
+     * @param key - config key
+     * @param cls - config value type
+     * @return config boolean value
+     */
+    public abstract <T> T getProperty(String key, Class<T> cls);
 
     /**
      * Get expression.
@@ -265,7 +274,7 @@ public abstract class Engine {
      * @return exists
      */
     public boolean hasResource(String name) {
-    	return hasResource(name, null);
+        return hasResource(name, null);
     }
 
     /**
@@ -277,46 +286,6 @@ public abstract class Engine {
      * @return exists
      */
     public abstract boolean hasResource(String name, Locale locale);
-
-    /**
-     * Add literal template resource.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @param source - template source
-     */
-    public void addResource(String name, String source) {
-    	addResource(name, null, source);
-    }
-
-    /**
-     * Add literal template resource.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @param locale - template locale
-     * @param source - template source
-     */
-    public abstract void addResource(String name, Locale locale, String source);
-
-    /**
-     * Remove literal template resource.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     */
-    public void removeResource(String name) {
-    	removeResource(name, null);
-    }
-
-    /**
-     * Remove literal template resource.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @param locale - template locale
-     */
-    public abstract void removeResource(String name, Locale locale);
 
     /**
      * Get template.
@@ -371,5 +340,16 @@ public abstract class Engine {
      * @throws ParseException - If the template cannot be parsed
      */
     public abstract Template getTemplate(String name, Locale locale, String encoding) throws IOException, ParseException;
+
+    /**
+     * Parse string template.
+     * 
+     * @see #getEngine()
+     * @param source - template source
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
+     */
+    public abstract Template parseTemplate(String source) throws ParseException;
 
 }

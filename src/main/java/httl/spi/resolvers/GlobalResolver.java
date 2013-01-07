@@ -14,29 +14,32 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi;
+package httl.spi.resolvers;
 
-import httl.Context;
+import httl.spi.Resolver;
 
-import java.io.IOException;
-import java.text.ParseException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Rendition. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.spi.Interceptor#render(Context, Rendition)
+ * GlobalResolver. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Rendition {
+public class GlobalResolver implements Resolver {
 
-	/**
-	 * Render the rendition.
-	 * 
-	 * @param context - render context
-	 * @throws IOException - If an I/O error occurs
-     * @throws ParseException - If the template cannot be parsed on runtime
-	 */
-	void render(Context context) throws IOException, ParseException;
+	private static final Map<String, Object> global = new ConcurrentHashMap<String, Object>();
+
+	public static Map<String, Object> getGlobal() {
+		return global;
+	}
+
+	public static Object put(String key, Object value) {
+		return global.put(key, value);
+	}
+
+	public Object get(String key) {
+		return global.get(key);
+	}
 
 }

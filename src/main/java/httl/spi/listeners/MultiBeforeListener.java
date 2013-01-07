@@ -14,33 +14,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi.resolvers;
+package httl.spi.listeners;
 
-import httl.Engine;
-import httl.spi.Resolver;
+import httl.spi.Listener;
 
 /**
- * EngineResolver. (SPI, Singleton, ThreadSafe)
+ * MultiListener. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Interceptor)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class EngineResolver implements Resolver {
-
-	private Engine engine;
+public class MultiBeforeListener extends MultiListener {
 
 	/**
-     * httl.properties: engine=httl.spi.engines.DefaultEngine
-     */
-	public void setEngine(Engine engine) {
-		this.engine = engine;
-	}
-
-	public Object get(String key) {
-		Object value = engine.getProperty(key, (Class<?>) null);
-		if (value != null) {
-			return value;
-		}
-		return engine.getProperty(key);
+	 * httl.properties: before.listeners=httl.spi.listeners.ExtendsListener
+	 */
+	public void setBeforeListeners(Listener[] listeners) {
+		super.setListeners(listeners);
 	}
 
 }

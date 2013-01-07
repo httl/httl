@@ -22,7 +22,7 @@ import httl.Template;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
-import httl.spi.Rendition;
+import httl.spi.Listener;
 import httl.spi.Switcher;
 import httl.util.UnsafeStringWriter;
 
@@ -64,8 +64,8 @@ public abstract class WriterTemplate extends AbstractTemplate {
         return writer.toString();
     }
 
-    public void render(Map<String, Object> parameters, OutputStream output) throws IOException, ParseException {
-    	Writer writer = new OutputStreamWriter(output);
+    public void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException {
+    	Writer writer = new OutputStreamWriter(stream);
     	render(parameters, writer);
     	writer.flush();
     }
@@ -79,7 +79,7 @@ public abstract class WriterTemplate extends AbstractTemplate {
         try {
         	Interceptor interceptor = getInterceptor();
         	if (interceptor != null) {
-        		interceptor.render(context, new Rendition() {
+        		interceptor.render(context, new Listener() {
 					public void render(Context context) throws IOException, ParseException {
 						_render(context, (Writer) context.getOut());
 					}

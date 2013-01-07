@@ -23,12 +23,15 @@ import httl.Template;
 import httl.spi.Loader;
 import httl.spi.Logger;
 import httl.spi.Parser;
+import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
 import httl.util.ClassUtils;
 import httl.util.ConfigUtils;
+import httl.util.Digest;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
+import httl.util.Version;
 import httl.util.VolatileReference;
 
 import java.io.FileNotFoundException;
@@ -53,8 +56,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class DefaultEngine extends Engine {
 
-	// The storage for literal resource.
-	// @see addResource() and removeResource()
+	// The storage for string template.
+	// @see parseTemplate()
     private final StringLoader stringLoader;
 
     // httl.properties: loaders=httl.spi.loaders.ClasspathLoader
@@ -65,8 +68,11 @@ public class DefaultEngine extends Engine {
 
     // httl.properties: translator=httl.spi.translators.DefaultTranslator
     private Translator translator;
+    
+    // httl.properties: resolver=httl.spi.resolvers.SystemResolver
+    private Resolver resolver;
 
-    // httl.properties: loggers=httl.spi.loggers.Log4jLogger
+	// httl.properties: loggers=httl.spi.loggers.Log4jLogger
     private Logger logger;
 
     // httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
@@ -92,6 +98,8 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: instantiated content
     private Map<String, Object> instances;
+
+    private final String version = Version.getVersion(DefaultEngine.class, "1.0.0");
     
     public DefaultEngine() {
     	this.stringLoader = new StringLoader(this);
@@ -105,16 +113,11 @@ public class DefaultEngine extends Engine {
 	}
 
     /**
-     * Get config text value.
-     * 
-     * @see #getEngine()
-     * @param key - config key
-     * @return config value
+     * Get engine version.
      */
-	public String getProperty(String key) {
-        String value = properties == null ? null : properties.getProperty(key);
-        return value == null ? null : value.trim();
-    }
+	public String getVersion() {
+		return version;
+	}
 
     /**
      * Get config instantiated value.
@@ -126,7 +129,25 @@ public class DefaultEngine extends Engine {
      */
 	@SuppressWarnings("unchecked")
 	public <T> T getProperty(String key, Class<T> cls) {
-        return instances == null ? null : (T) instances.get(key);
+		if (resolver != null) {
+			Object value = resolver.get(key);
+			if (value != null) {
+				return (T) value;
+			}
+		}
+		if (instances != null && ! String.class.equals(cls)) {
+			if (cls != null && ! cls.isInterface() && ! Object.class.equals(cls)) {
+				Object value = instances.get(key + "=" + cls.getName());
+				if (value != null) {
+					return (T) value;
+				}
+			}
+			Object value = instances.get(key);
+			if (value != null) {
+				return (T) value;
+			}
+		}
+		return (T) properties.getProperty(key);
     }
 
     /**
@@ -311,28 +332,24 @@ public class DefaultEngine extends Engine {
     }
 
     /**
-     * Add literal resource.
+     * Parse string template.
      * 
      * @see #getEngine()
-     * @param name - resource name
-     * @param locale - resource locale
-     * @param source - resource source
+     * @param source - template source
+     * @return template instance
+     * @throws IOException - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed
      */
-	public void addResource(String name, Locale locale, String source) {
-		name = UrlUtils.cleanName(name);
-		stringLoader.add(name, locale, source);
-	}
-
-	/**
-     * Remove literal resource.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @param locale - resource locale
-     */
-	public void removeResource(String name, Locale locale) {
-		name = UrlUtils.cleanName(name);
-		stringLoader.remove(name, locale);
+	public Template parseTemplate(String source) throws ParseException {
+		String name = "/$" + Digest.getMD5(source);
+        if (! hasResource(name)) {
+        	stringLoader.add(name, source);
+        }
+		try {
+			return getTemplate(name);
+		} catch (IOException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -483,6 +500,13 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setTranslator(Translator translator) {
 		this.translator = translator;
+	}
+
+    /**
+     * httl.properties: resolver=httl.spi.resolvers.SystemResolver
+     */
+	public void setResolver(Resolver resolver) {
+		this.resolver = resolver;
 	}
 
 }

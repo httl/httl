@@ -25,6 +25,21 @@ import java.util.Map;
  * 
  * <pre>
  * Context context = Context.getContext();
+ * Object value = context.get(key);
+ * </pre>
+ * 
+ * Lookup variable:
+ * 
+ * <pre>
+ * if (value == null) value = puts.get(key); // context.put(key, value);
+ * if (value == null) value = parameters.get(key); // render(parameters);
+ * if (value == null) value = parent.get(key); // recursive above
+ * 
+ * if (value == null) value = servletResovler.get(key); // httl.properties: resovlers+=ServletResovler
+ * if (value == null) value = globalResovler.get(key); // GlobalResovler.put(key, value)
+ * if (value == null) value = systemResovler.get(key); // System.setProperty(key, value);
+ * 
+ * if (value == null) value = engineConfig.get(key); // httl.properties
  * </pre>
  * 
  * @see httl.Template#evaluate(Map)
@@ -38,57 +53,6 @@ import java.util.Map;
 public final class Context extends DelegateMap<String, Object> {
 
     private static final long serialVersionUID = 1L;
-
-    // The context thread local holder.
-    private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
-
-    /**
-     * Get the current context from thread local.
-     * 
-     * @return current context
-     */
-    public static Context getContext() {
-        Context context = LOCAL.get();
-        if (context == null) {
-            context = new Context(null, null, null, null);
-            LOCAL.set(context);
-        }
-        return context;
-    }
-
-    /**
-     * Push the current context to thread local.
-     * 
-     * @param template - current template
-     * @param parameters - current parameters
-     */
-    public static Context pushContext(Template template, Map<String, Object> parameters, Object out) {
-        Context context = new Context(getContext(), template, parameters, out);
-        LOCAL.set(context);
-        return context;
-    }
-
-    /**
-     * Pop the current context from thread local, and restore parent context to thread local.
-     */
-    public static void popContext() {
-        Context context = LOCAL.get();
-        if (context != null) {
-            Context parent = context.getParent();
-            if (parent != null) {
-                LOCAL.set(parent);
-            } else {
-                LOCAL.remove();
-            }
-        }
-    }
-
-    /**
-     * Remove the current context from thread local.
-     */
-    public static void removeContext() {
-        LOCAL.remove();
-    }
 
     // The context key
     private static final String CONTEXT_KEY = "context";
@@ -117,10 +81,65 @@ public final class Context extends DelegateMap<String, Object> {
     // The context level key
     private static final String LEVEL_KEY = "level";
 
+    // The context thread local holder.
+    private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
+
+    /**
+     * Get the current context from thread local.
+     * 
+     * @return current context
+     */
+    public static Context getContext() {
+        Context context = LOCAL.get();
+        if (context == null) {
+            context = new Context(null, null, null, null);
+            LOCAL.set(context);
+        }
+        return context;
+    }
+
+    /**
+     * Push the current context to thread local.
+     * 
+     * @param template - current template
+     * @param parameters - current parameters
+     */
+    public static Context pushContext(Template template, Map<String, Object> parameters, Object out) {
+        Context parent = getContext();
+        if (template != null && parent.parent == null) {
+        	parent.engine = template.getEngine(); // set root context engine
+        }
+    	Context context = new Context(parent, template, parameters, out);
+        LOCAL.set(context);
+        return context;
+    }
+
+    /**
+     * Pop the current context from thread local, and restore parent context to thread local.
+     */
+    public static void popContext() {
+        Context context = LOCAL.get();
+        if (context != null) {
+            Context parent = context.getParent();
+            if (parent != null) {
+                LOCAL.set(parent);
+            } else {
+                LOCAL.remove();
+            }
+        }
+    }
+
+    /**
+     * Remove the current context from thread local.
+     */
+    public static void removeContext() {
+        LOCAL.remove();
+    }
+
     // The parent context.
     private final Context parent;
-
-	// The current template.
+    
+    // The current template.
     private final Template template;
 
     // The current out.
@@ -129,7 +148,9 @@ public final class Context extends DelegateMap<String, Object> {
     // The context level.
     private final int level;
 
-    private Context(Context parent, Template template, Map<String, Object> parameters, Object out) {
+    private Engine engine;
+
+	private Context(Context parent, Template template, Map<String, Object> parameters, Object out) {
         super(parent, parameters);
         this.parent = parent;
         this.template = template;
@@ -144,8 +165,8 @@ public final class Context extends DelegateMap<String, Object> {
      * @return context level
      */
     public int getLevel() {
-    	return level;
-	}
+        return level;
+    }
 
     /**
      * Get the parent context.
@@ -184,7 +205,9 @@ public final class Context extends DelegateMap<String, Object> {
      * @return current engine
      */
     public Engine getEngine() {
-        return template == null ? null : template.getEngine();
+    	if (engine == null && template != null)
+    		engine = template.getEngine();
+    	return engine;
     }
 
     /**
@@ -201,12 +224,12 @@ public final class Context extends DelegateMap<String, Object> {
     // Allows the user to override these special variables.
     @Override
     protected Object doGet(Object key) {
-    	if (SUPER_KEY.equals(key)) {
+        if (SUPER_KEY.equals(key)) {
             return getSuper();
         } else if (TEMPLATE_KEY.equals(key) || THIS_KEY.equals(key)) {
             return getTemplate();
         } else if (ENGINE_KEY.equals(key)) {
-        	return getEngine();
+            return getEngine();
         } else if (OUT_KEY.equals(key)) {
             return getOut();
         } else if (LEVEL_KEY.equals(key)) {
@@ -215,8 +238,11 @@ public final class Context extends DelegateMap<String, Object> {
             return getParent();
         } else if (CONTEXT_KEY.equals(key) || CURRENT_KEY.equals(key)) {
             return this;
+        } else if (getParent() == null) {
+            Engine engine = getEngine();
+            return engine == null ? null : engine.getProperty((String) key);
         } else {
-        	return null;
+            return null;
         }
     }
 

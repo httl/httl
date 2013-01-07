@@ -124,8 +124,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return evaluate(null);
 	}
 
-	public void render(OutputStream output) throws IOException, ParseException {
-		render(null, output);
+	public void render(OutputStream stream) throws IOException, ParseException {
+		render(null, stream);
 	}
 
 	public void render(Writer writer) throws IOException, ParseException {

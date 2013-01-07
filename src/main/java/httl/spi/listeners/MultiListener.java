@@ -26,7 +26,8 @@ import java.text.ParseException;
 /**
  * MultiListener. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.interceptors.ListenerInterceptor#setListener(Interceptor)
+ * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Interceptor)
+ * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Interceptor)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -50,34 +51,16 @@ public class MultiListener implements Listener {
 		this.logger = logger;
 	}
 
-	public void rendering(Context context) throws IOException, ParseException {
+	public void render(Context context) throws IOException, ParseException {
 		if (listeners == null || listeners.length == 0)
 			return;
 		if (listeners.length == 1) {
-			listeners[0].rendering(context);
+			listeners[0].render(context);
 			return;
 		}
 		for (Listener listener : listeners) {
 			try {
-				listener.rendering(context);
-			} catch (Exception e) { // 确保第一个出错，不影响第二个执行
-				if (logger != null && logger.isErrorEnabled()) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-		}
-	}
-
-	public void rendered(Context context) throws IOException, ParseException {
-		if (listeners == null || listeners.length == 0)
-			return;
-		if (listeners.length == 1) {
-			listeners[0].rendered(context);
-			return;
-		}
-		for (Listener listener : listeners) {
-			try {
-				listener.rendered(context);
+				listener.render(context);
 			} catch (Exception e) { // 确保第一个出错，不影响第二个执行
 				if (logger != null && logger.isErrorEnabled()) {
 					logger.error(e.getMessage(), e);

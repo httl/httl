@@ -20,7 +20,7 @@ import httl.Context;
 import httl.Engine;
 import httl.Template;
 import httl.spi.Interceptor;
-import httl.spi.Rendition;
+import httl.spi.Listener;
 import httl.spi.methods.FileMethod;
 import httl.spi.parsers.templates.RenditionTemplate;
 import httl.util.StringUtils;
@@ -92,7 +92,7 @@ public class ExtendsInterceptor implements Interceptor {
 		this.extendsNested = extendsNested;
 	}
 
-	public void render(Context context, Rendition rendition) throws IOException, ParseException {
+	public void render(Context context, Listener rendition) throws IOException, ParseException {
 		if ((extendsVariable == null && extendsDefault == null)
 				|| context.getLevel() > 1 // 只处理一级自动布局，防止递归
 				|| context.getTemplate().isMacro()) { 

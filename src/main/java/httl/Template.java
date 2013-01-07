@@ -50,11 +50,11 @@ public interface Template extends Resource, Expression {
      * </pre>
      * 
      * @see httl.Context#getOut()
-     * @param output - output stream
+     * @param stream - output stream
      * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
      */
-    void render(OutputStream output) throws IOException, ParseException;
+    void render(OutputStream stream) throws IOException, ParseException;
 
     /**
      * Render the template to output stream.
@@ -69,11 +69,11 @@ public interface Template extends Resource, Expression {
      * @see httl.Context#getParameters()
      * @see httl.Context#getOut()
      * @param parameters - render parameters
-     * @param output - output stream
+     * @param stream - output stream
      * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
      */
-    void render(Map<String, Object> parameters, OutputStream output) throws IOException, ParseException;
+    void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException;
 
     /**
      * Render the template to writer.
@@ -86,7 +86,7 @@ public interface Template extends Resource, Expression {
      * </pre>
      * 
      * @see httl.Context#getOut()
-     * @param writer - writer
+     * @param writer - output writer
      * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
      */
@@ -105,7 +105,7 @@ public interface Template extends Resource, Expression {
      * @see httl.Context#getParameters()
      * @see httl.Context#getOut()
      * @param parameters - render parameters
-     * @param writer - writer
+     * @param writer - output writer
      * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
      */

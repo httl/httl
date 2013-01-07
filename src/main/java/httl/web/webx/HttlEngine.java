@@ -27,9 +27,6 @@ import java.text.ParseException;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.alibaba.citrus.service.template.TemplateContext;
 import com.alibaba.citrus.service.template.TemplateEngine;
 import com.alibaba.citrus.service.template.TemplateException;
@@ -95,14 +92,12 @@ public class HttlEngine implements TemplateEngine {
 		return writer.toString();
 	}
 
-	public void writeTo(String templateName, TemplateContext context,
-			OutputStream ostream) throws TemplateException, IOException {
+	public void writeTo(String templateName, TemplateContext context, OutputStream ostream) throws TemplateException, IOException {
 		try {
 			TurbineRunData rundata = (TurbineRunData) context.get("rundata");
-			if (rundata != null) {
-				HttpServletRequest request = rundata.getRequest();
-				HttpServletResponse response = rundata.getResponse();
-				WebEngine.render(request, response, getTemplatePath(templateName), new ContextMap(context), ostream);
+			if (rundata != null && rundata.getRequest() != null && rundata.getResponse() != null) {
+				WebEngine.render(rundata.getRequest(), rundata.getResponse(), 
+						getTemplatePath(templateName), new ContextMap(context), ostream);
 			} else {
 				WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), ostream);
 			}
@@ -115,10 +110,10 @@ public class HttlEngine implements TemplateEngine {
 			Writer writer) throws TemplateException, IOException {
 		try {
 			TurbineRunData rundata = (TurbineRunData) context.get("rundata");
-			if (rundata != null) {
-				HttpServletRequest request = rundata.getRequest();
-				HttpServletResponse response = rundata.getResponse();
-				WebEngine.render(request, response, getTemplatePath(templateName), new ContextMap(context), writer);
+			if (rundata != null && rundata.getRequest() != null
+					&& rundata.getResponse() != null) {
+				WebEngine.render(rundata.getRequest(), rundata.getResponse(), 
+						getTemplatePath(templateName), new ContextMap(context), writer);
 			} else {
 				WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), writer);
 			}

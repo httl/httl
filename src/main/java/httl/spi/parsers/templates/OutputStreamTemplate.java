@@ -22,7 +22,7 @@ import httl.Template;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
-import httl.spi.Rendition;
+import httl.spi.Listener;
 import httl.spi.Switcher;
 import httl.util.UnsafeByteArrayOutputStream;
 import httl.util.WriterOutputStream;
@@ -70,31 +70,31 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         output.flush();
     }
 
-    public void render(Map<String, Object> parameters, OutputStream output) throws IOException, ParseException {
-        if (output == null) 
+    public void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException {
+        if (stream == null) 
         	throw new IllegalArgumentException("output == null");
         if (Context.getContext().getTemplate() == this)
     		throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
-        Context context = Context.pushContext(this, parameters, output);
+        Context context = Context.pushContext(this, parameters, stream);
         try {
         	Interceptor interceptor = getInterceptor();
         	if (interceptor != null) {
-        		interceptor.render(context, new Rendition() {
+        		interceptor.render(context, new Listener() {
     				public void render(Context context) throws IOException, ParseException {
     					_render(context, (OutputStream) context.getOut());
     				}
     			});
         	} else {
-        		_render(context, output);
+        		_render(context, stream);
         	}
         } finally {
         	Context.popContext();
         }
     }
 
-    private void _render(Context context, OutputStream output) throws IOException, ParseException {
+    private void _render(Context context, OutputStream stream) throws IOException, ParseException {
     	try {
-            doRender(context, output);
+            doRender(context, stream);
         } catch (RuntimeException e) {
             throw (RuntimeException) e;
         } catch (IOException e) {
@@ -106,6 +106,6 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         }
     }
 
-    protected abstract void doRender(Context context, OutputStream output) throws Exception;
+    protected abstract void doRender(Context context, OutputStream stream) throws Exception;
 
 }

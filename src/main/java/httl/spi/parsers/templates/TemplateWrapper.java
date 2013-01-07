@@ -47,17 +47,17 @@ public class TemplateWrapper implements Template {
 		}
 	}
 
-	public void render(OutputStream output) throws IOException, ParseException {
-		render(null, output);
+	public void render(OutputStream stream) throws IOException, ParseException {
+		render(null, stream);
 	}
 
 	public void render(Writer writer) throws IOException, ParseException {
 		render(null, writer);
 	}
 
-	public void render(Map<String, Object> parameters, OutputStream output)
+	public void render(Map<String, Object> parameters, OutputStream stream)
 			throws IOException, ParseException {
-		template.render(parameters, output);
+		template.render(parameters, stream);
 	}
 
 	public void render(Map<String, Object> parameters, Writer writer)

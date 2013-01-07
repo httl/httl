@@ -117,27 +117,23 @@ public class TemplateTest extends TestCase {
         context.put("books2", books2);
         context.put("booklist2", Arrays.asList(books2));
         context.put("bookmap2", bookmap2);
-        String[] configs = new String[] { "httl.properties", "httl-javassist.properties", "httl-attribute.properties" };
+        String[] configs = new String[] { "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
         for (String config : configs) {
         	if (! profile) 
         		System.out.println("========" + config + "========");
         	Engine engine = Engine.getEngine(config);
         	if (! profile) {
 	        	Loader loader = engine.getProperty("loader", Loader.class);
-	        	String suffix = engine.getProperty("template.suffix");
+	        	String suffix = engine.getProperty("template.suffix", ".httl");
 	        	List<String> list = loader.list(suffix);
 	        	assertTrue(list.size() > 0);
         	}
-        	String dir = engine.getProperty("template.directory");
-        	if (dir == null) {
-        		dir = "";
-        	} else {
-	        	if (dir.length() > 0 && dir.startsWith("/")) {
-	        		dir = dir.substring(1);
-	        	}
-	        	if (dir.length() > 0 && ! dir.endsWith("/")) {
-	        		dir += "/";
-	        	}
+        	String dir = engine.getProperty("template.directory", "");
+        	if (dir.length() > 0 && dir.startsWith("/")) {
+        		dir = dir.substring(1);
+        	}
+        	if (dir.length() > 0 && ! dir.endsWith("/")) {
+        		dir += "/";
         	}
 	        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
 	        assertTrue(directory.isDirectory());
@@ -215,16 +211,12 @@ public class TemplateTest extends TestCase {
         	if (! profile)
         		System.out.println("========" + config + " (null parameters)========");
         	Engine engine = Engine.getEngine(config);
-        	String dir = engine.getProperty("template.directory");
-        	if (dir == null) {
-        		dir = "";
-        	} else {
-	        	if (dir.length() > 0 && dir.startsWith("/")) {
-	        		dir = dir.substring(1);
-	        	}
-	        	if (dir.length() > 0 && ! dir.endsWith("/")) {
-	        		dir += "/";
-	        	}
+        	String dir = engine.getProperty("template.directory", "");
+        	if (dir.length() > 0 && dir.startsWith("/")) {
+        		dir = dir.substring(1);
+        	}
+        	if (dir.length() > 0 && ! dir.endsWith("/")) {
+        		dir += "/";
         	}
 	        File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
 	        super.assertTrue(directory.isDirectory());
@@ -259,16 +251,12 @@ public class TemplateTest extends TestCase {
     	if (! profile)
     		System.out.println("========httl-exception.properties========");
     	Engine engine = Engine.getEngine("httl-exception.properties");
-    	String dir = engine.getProperty("template.directory");
-    	if (dir == null) {
-    		dir = "";
-    	} else {
-        	if (dir.length() > 0 && dir.startsWith("/")) {
-        		dir = dir.substring(1);
-        	}
-        	if (dir.length() > 0 && ! dir.endsWith("/")) {
-        		dir += "/";
-        	}
+    	String dir = engine.getProperty("template.directory", "");
+    	if (dir.length() > 0 && dir.startsWith("/")) {
+    		dir = dir.substring(1);
+    	}
+    	if (dir.length() > 0 && ! dir.endsWith("/")) {
+    		dir += "/";
     	}
         File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
         super.assertTrue(directory.isDirectory());

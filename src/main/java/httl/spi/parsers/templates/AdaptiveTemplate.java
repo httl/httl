@@ -116,13 +116,13 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
 	}
 
-	public void render(OutputStream output) throws IOException, ParseException {
-		streamTemplate.render(output);
+	public void render(OutputStream stream) throws IOException, ParseException {
+		streamTemplate.render(stream);
 	}
 
-	public void render(Map<String, Object> parameters, OutputStream output)
+	public void render(Map<String, Object> parameters, OutputStream stream)
 			throws IOException, ParseException {
-		streamTemplate.render(parameters, output);
+		streamTemplate.render(parameters, stream);
 	}
 
 	public void render(Writer writer) throws IOException, ParseException {

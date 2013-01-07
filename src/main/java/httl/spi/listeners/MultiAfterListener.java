@@ -14,31 +14,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package httl.spi;
+package httl.spi.listeners;
 
-import httl.Context;
-
-import java.io.IOException;
-import java.text.ParseException;
+import httl.spi.Listener;
 
 /**
- * Render Listener. (SPI, Singleton, ThreadSafe)
+ * MultiListener. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.Interceptor#render(Context, Listener)
- * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Listener)
- * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Listener)
+ * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Interceptor)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Listener {
+public class MultiAfterListener extends MultiListener {
 
 	/**
-	 * On template render.
-	 * 
-	 * @param context - render context
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed on runtime
+	 * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
 	 */
-	void render(Context context) throws IOException, ParseException;
+	public void setAfterListeners(Listener[] listeners) {
+		super.setListeners(listeners);
+	}
 
 }

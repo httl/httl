@@ -97,11 +97,11 @@ public class ResourceTemplate implements Template {
 		throw new UnsupportedOperationException();
 	}
 
-	public void render(OutputStream output) throws IOException {
+	public void render(OutputStream stream) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
-	public void render(Map<String, Object> parameters, OutputStream output)
+	public void render(Map<String, Object> parameters, OutputStream stream)
 			throws IOException {
 		throw new UnsupportedOperationException();
 	}

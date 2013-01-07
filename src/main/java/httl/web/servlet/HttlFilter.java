@@ -77,7 +77,7 @@ public class HttlFilter implements Filter {
         if (path == null || path.length() == 0) {
         	path = getRootPath();
         }
-        String suffix = WebEngine.getEngine().getProperty(TEMPLATE_SUFFIX);
+        String suffix = WebEngine.getEngine().getProperty(TEMPLATE_SUFFIX, ".httl");
         if (suffix != null && suffix.length() > 0 && ! path.endsWith(suffix)) {
         	path += suffix;
         }

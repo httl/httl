@@ -20,7 +20,6 @@ import httl.Context;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.Logger;
-import httl.spi.Rendition;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -34,15 +33,24 @@ import java.text.ParseException;
  */
 public class ListenerInterceptor implements Interceptor {
 
-	private Listener listener;
+	private Listener beforeListener;
+
+	private Listener afterListener;
 
 	private Logger logger;
 
 	/**
-	 * httl.properties: listeners=httl.spi.listeners.ExtendsListener
+	 * httl.properties: before.listeners=httl.spi.listeners.ExtendsListener
 	 */
-	public void setListener(Listener listener) {
-		this.listener = listener;
+	public void setBeforeListener(Listener listener) {
+		this.beforeListener = listener;
+	}
+
+	/**
+	 * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
+	 */
+	public void setAfterListener(Listener listener) {
+		this.afterListener = listener;
 	}
 
 	/**
@@ -52,10 +60,10 @@ public class ListenerInterceptor implements Interceptor {
 		this.logger = logger;
 	}
 
-	public void render(Context context, Rendition rendition) throws IOException, ParseException {
-		if (listener != null) {
+	public void render(Context context, Listener rendition) throws IOException, ParseException {
+		if (beforeListener != null) {
 			try {
-				listener.rendering(context);
+				beforeListener.render(context);
 			} catch (Exception e) {
 				if (logger != null && logger.isErrorEnabled()) {
 					logger.error(e.getMessage(), e);
@@ -65,9 +73,9 @@ public class ListenerInterceptor implements Interceptor {
 		try {
 			rendition.render(context);
 		} finally {
-			if (listener != null) {
+			if (afterListener != null) {
 				try {
-					listener.rendered(context);
+					afterListener.render(context);
 				} catch (Exception e) {
 					if (logger != null && logger.isErrorEnabled()) {
 						logger.error(e.getMessage(), e);

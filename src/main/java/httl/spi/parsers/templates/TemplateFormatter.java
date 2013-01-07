@@ -82,7 +82,7 @@ public class TemplateFormatter {
 		this.nullValue = engine.getProperty(NULL_VALUE, "");
 		this.trueValue = engine.getProperty(TRUE_VALUE, "true");
 		this.falseValue = engine.getProperty(FALSE_VALUE, "false");
-		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING);
+		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING, String.class);
 	}
 
 	@SuppressWarnings("unchecked")

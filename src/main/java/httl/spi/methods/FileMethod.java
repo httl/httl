@@ -21,7 +21,6 @@ import httl.Engine;
 import httl.Expression;
 import httl.Resource;
 import httl.Template;
-import httl.util.Digest;
 import httl.util.IOUtils;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
@@ -161,11 +160,7 @@ public class FileMethod {
         if (template == null) {
             throw new IllegalArgumentException("display context template == null");
         }
-        String name = template.getName() + "$" + Digest.getMD5(source);
-        if (! engine.hasResource(name)) {
-        	engine.addResource(name, source);
-        }
-        return engine.getTemplate(name);
+        return engine.parseTemplate(source);
     }
 
     public Template include(String name) throws IOException, ParseException {

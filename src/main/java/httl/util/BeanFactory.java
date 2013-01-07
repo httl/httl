@@ -232,6 +232,7 @@ public class BeanFactory {
             	caches.put(index, instance);
             	injectInstance(instance, properties, key, caches, instances, inits);
             }
+            instances.put(index, instance);
             instances.put(key, instance);
             return (T) instance;
         } catch (Exception e) {
