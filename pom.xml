@@ -174,6 +174,14 @@
 							<name>profile</name>
 							<value>${profile}</value>
 						</property>
+						<property>
+							<name>includes</name>
+							<value>${includes}</value>
+						</property>
+						<property>
+							<name>excludes</name>
+							<value>${excludes}</value>
+						</property>
 					</systemProperties>
 				</configuration>
 			</plugin>
