@@ -34,10 +34,10 @@ public interface Interceptor {
 	 * Intercept the template rendition.
 	 * 
 	 * @param context - render context
-	 * @param rendition - template rendition.
+	 * @param listener - render listener.
 	 * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	void render(Context context, Listener rendition) throws IOException, ParseException;
+	void render(Context context, Listener listener) throws IOException, ParseException;
 
 }

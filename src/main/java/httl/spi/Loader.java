@@ -33,8 +33,8 @@ public interface Loader {
 
     /**
      * list resource names.
-     * @param suffix resource suffix
      * 
+     * @param suffix resource suffix
      * @return resource names.
      */
     List<String> list(String suffix) throws IOException;

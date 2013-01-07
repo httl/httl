@@ -22,7 +22,7 @@ import httl.Template;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.methods.FileMethod;
-import httl.spi.parsers.templates.RenditionTemplate;
+import httl.spi.parsers.templates.ListenerTemplate;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
@@ -124,7 +124,7 @@ public class ExtendsInterceptor implements Interceptor {
 			// extends.nested=nested
 			Object oldNested = null;
 			if (StringUtils.isNotEmpty(extendsNested)) {
-				oldNested = context.put(extendsNested, new RenditionTemplate(template, rendition));
+				oldNested = context.put(extendsNested, new ListenerTemplate(template, rendition));
 			}
 			try {
 				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
