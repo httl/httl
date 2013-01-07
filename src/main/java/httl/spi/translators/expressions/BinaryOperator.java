@@ -16,7 +16,9 @@
  */
 package httl.spi.translators.expressions;
 
+import httl.Engine;
 import httl.Template;
+import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
@@ -155,6 +157,14 @@ public final class BinaryOperator extends Operator {
             if (Template.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
             	if (! hasMethod(leftType, name, rightTypes)) {
             		return getNotNullCode(leftCode, "((" + Template.class.getName() + ")" + leftCode + ".getMacros().get(\"" + name + "\"))");
+            	}
+            } else if (Engine.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
+            	if (! hasMethod(leftType, name, rightTypes)) {
+            		return getNotNullCode(leftCode, leftCode + ".getProperty(\"" + name + "\")");
+            	}
+            } else if (Resolver.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
+            	if (! hasMethod(leftType, name, rightTypes)) {
+            		return getNotNullCode(leftCode, leftCode + ".get(\"" + name + "\")");
             	}
             }
             name = ClassUtils.filterJavaKeyword(name);
@@ -410,6 +420,14 @@ public final class BinaryOperator extends Operator {
             if (Template.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
             	if (! hasMethod(leftType, name, rightTypes)) {
             		return Template.class;
+            	}
+            } else if (Engine.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
+            	if (! hasMethod(leftType, name, rightTypes)) {
+            		return Object.class;
+            	}
+            } else if (Resolver.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
+            	if (! hasMethod(leftType, name, rightTypes)) {
+            		return Object.class;
             	}
             }
             name = ClassUtils.filterJavaKeyword(name);
