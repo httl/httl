@@ -49,7 +49,7 @@ public interface Template extends Resource, Expression {
      * template.render(output);
      * </pre>
      * 
-     * @see httl.Context#getOutput()
+     * @see httl.Context#getOut()
      * @param output - output stream
      * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
@@ -67,7 +67,7 @@ public interface Template extends Resource, Expression {
      * </pre>
      * 
      * @see httl.Context#getParameters()
-     * @see httl.Context#getOutput()
+     * @see httl.Context#getOut()
      * @param parameters - render parameters
      * @param output - output stream
      * @throws IOException - If an I/O error occurs
@@ -85,7 +85,7 @@ public interface Template extends Resource, Expression {
      * template.render(writer);
      * </pre>
      * 
-     * @see httl.Context#getOutput()
+     * @see httl.Context#getOut()
      * @param writer - writer
      * @throws IOException - If an I/O error occurs
      * @throws ParseException - If the template cannot be parsed on runtime
@@ -103,7 +103,7 @@ public interface Template extends Resource, Expression {
      * </pre>
      * 
      * @see httl.Context#getParameters()
-     * @see httl.Context#getOutput()
+     * @see httl.Context#getOut()
      * @param parameters - render parameters
      * @param writer - writer
      * @throws IOException - If an I/O error occurs

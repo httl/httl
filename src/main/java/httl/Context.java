@@ -62,8 +62,8 @@ public final class Context extends DelegateMap<String, Object> {
      * @param template - current template
      * @param parameters - current parameters
      */
-    public static Context pushContext(Template template, Map<String, Object> parameters, Object output) {
-        Context context = new Context(getContext(), template, parameters, output);
+    public static Context pushContext(Template template, Map<String, Object> parameters, Object out) {
+        Context context = new Context(getContext(), template, parameters, out);
         LOCAL.set(context);
         return context;
     }
@@ -111,44 +111,30 @@ public final class Context extends DelegateMap<String, Object> {
     // The engine key
     private static final String ENGINE_KEY = "engine";
 
-    // The parameters key
-    private static final String PARAMETERS_KEY = "parameters";
+    // The render out key
+    private static final String OUT_KEY = "out";
 
-    // The output key
-    private static final String OUTPUT_KEY = "output";
-    
+    // The context level key
+    private static final String LEVEL_KEY = "level";
+
     // The parent context.
     private final Context parent;
 
 	// The current template.
     private final Template template;
 
-    // The current parameters.
-    private final Map<String, Object> parameters;
-
-    // The current output.
-    private final Object output;
+    // The current out.
+    private final Object out;
 
     // The context level.
     private final int level;
 
-    private Context(Context parent, Template template, Map<String, Object> parameters, Object output) {
+    private Context(Context parent, Template template, Map<String, Object> parameters, Object out) {
         super(parent, parameters);
         this.parent = parent;
         this.template = template;
-        this.parameters = parameters;
-        this.output = output;
+        this.out = out;
         this.level = parent == null ? 0 : parent.getLevel() + 1;
-    }
-
-    /**
-     * Get the parent context.
-     * 
-     * @see #getContext()
-     * @return parent context
-     */
-    public Context getParent() {
-        return parent;
     }
 
     /**
@@ -160,6 +146,16 @@ public final class Context extends DelegateMap<String, Object> {
     public int getLevel() {
     	return level;
 	}
+
+    /**
+     * Get the parent context.
+     * 
+     * @see #getContext()
+     * @return parent context
+     */
+    public Context getParent() {
+        return parent;
+    }
 
     /**
      * Get the super template.
@@ -192,57 +188,36 @@ public final class Context extends DelegateMap<String, Object> {
     }
 
     /**
-     * Get the current parameters.
+     * Get the current out.
      * 
      * @see #getContext()
-     * @return current parameters
+     * @return current out
      */
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
-
-    /**
-     * Get the current output.
-     * 
-     * @see #getContext()
-     * @return current output
-     */
-    public Object getOutput() {
-        return output;
+    public Object getOut() {
+        return out;
     }
 
     // Get the special variables after the user variables.
     // Allows the user to override these special variables.
     @Override
     protected Object doGet(Object key) {
-    	if (PARENT_KEY.equals(key)) {
-            return getParent();
-        }
     	if (SUPER_KEY.equals(key)) {
             return getSuper();
-        }
-    	if (ENGINE_KEY.equals(key)) {
+        } else if (TEMPLATE_KEY.equals(key) || THIS_KEY.equals(key)) {
+            return getTemplate();
+        } else if (ENGINE_KEY.equals(key)) {
         	return getEngine();
-        }
-        if (CONTEXT_KEY.equals(key)) {
+        } else if (OUT_KEY.equals(key)) {
+            return getOut();
+        } else if (LEVEL_KEY.equals(key)) {
+            return getLevel();
+        } else if (PARENT_KEY.equals(key)) {
+            return getParent();
+        } else if (CONTEXT_KEY.equals(key) || CURRENT_KEY.equals(key)) {
             return this;
+        } else {
+        	return null;
         }
-        if (TEMPLATE_KEY.equals(key)) {
-            return getTemplate();
-        }
-        if (CURRENT_KEY.equals(key)) {
-            return this;
-        }
-    	if (THIS_KEY.equals(key)) {
-            return getTemplate();
-        }
-        if (PARAMETERS_KEY.equals(key)) {
-            return getParameters();
-        }
-        if (OUTPUT_KEY.equals(key)) {
-            return getOutput();
-        }
-        return null;
     }
 
 }

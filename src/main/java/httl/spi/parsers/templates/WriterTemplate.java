@@ -81,7 +81,7 @@ public abstract class WriterTemplate extends AbstractTemplate {
         	if (interceptor != null) {
         		interceptor.render(context, new Rendition() {
 					public void render(Context context) throws IOException, ParseException {
-						_render(context, (Writer) context.getOutput());
+						_render(context, (Writer) context.getOut());
 					}
 				});
         	} else {

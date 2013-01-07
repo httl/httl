@@ -22,7 +22,7 @@ public class RenditionTemplate extends TemplateWrapper {
 	@Override
 	public void render(Map<String, Object> parameters, OutputStream output)
 			throws IOException, ParseException {
-		if (Context.getContext().getOutput() != output) {
+		if (Context.getContext().getOut() != output) {
 			Context.pushContext(this, parameters, output);
 			try {
 				rendition.render(Context.getContext());
@@ -37,7 +37,7 @@ public class RenditionTemplate extends TemplateWrapper {
 	@Override
 	public void render(Map<String, Object> parameters, Writer writer)
 			throws IOException, ParseException {
-		if (Context.getContext().getOutput() != writer) {
+		if (Context.getContext().getOut() != writer) {
 			Context.pushContext(this, parameters, writer);
 			try {
 				rendition.render(Context.getContext());

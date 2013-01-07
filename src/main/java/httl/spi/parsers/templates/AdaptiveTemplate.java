@@ -93,7 +93,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 	}
 
     public Class<?> getReturnType() {
-    	if (Context.getContext().getOutput() instanceof OutputStream) {
+    	if (Context.getContext().getOut() instanceof OutputStream) {
 			return streamTemplate.getReturnType();
 		} else {
 			return writerTemplate.getReturnType();
@@ -101,7 +101,7 @@ public class AdaptiveTemplate implements Template, Serializable {
     }
 
 	public Object evaluate() throws ParseException {
-		if (Context.getContext().getOutput() instanceof OutputStream) {
+		if (Context.getContext().getOut() instanceof OutputStream) {
 			return streamTemplate.evaluate();
 		} else {
 			return writerTemplate.evaluate();
@@ -109,7 +109,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 	}
 
 	public Object evaluate(Map<String, Object> parameters) throws ParseException {
-		if (Context.getContext().getOutput() instanceof OutputStream) {
+		if (Context.getContext().getOut() instanceof OutputStream) {
 			return streamTemplate.evaluate(parameters);
 		} else {
 			return writerTemplate.evaluate(parameters);

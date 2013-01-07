@@ -128,7 +128,7 @@ public class ExtendsInterceptor implements Interceptor {
 			}
 			try {
 				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
-				Object output = Context.getContext().getOutput();
+				Object output = Context.getContext().getOut();
 				if (output instanceof OutputStream) {
 					extend.render((OutputStream) output);
 				} else {

@@ -81,7 +81,7 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
         	if (interceptor != null) {
         		interceptor.render(context, new Rendition() {
     				public void render(Context context) throws IOException, ParseException {
-    					_render(context, (OutputStream) context.getOutput());
+    					_render(context, (OutputStream) context.getOut());
     				}
     			});
         	} else {
