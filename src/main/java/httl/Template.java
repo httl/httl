@@ -27,7 +27,7 @@ import java.util.Map;
  * 
  * <pre>
  * Engine engine = Engine.getEngine();
- * Template template = engine.getTemplate("/books.httl");
+ * Template template = engine.getTemplate("/foo.httl");
  * </pre>
  * 
  * @see httl.Engine#getTemplate(String)

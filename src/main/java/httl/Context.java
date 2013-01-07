@@ -53,33 +53,6 @@ public final class Context extends DelegateMap<String, Object> {
 
     private static final long serialVersionUID = 1L;
 
-    // The context key
-    private static final String CONTEXT_KEY = "context";
-
-    // The current context key
-    private static final String CURRENT_KEY = "current";
-
-    // The parent context key
-    private static final String PARENT_KEY = "parent";
-
-    // The template key
-    private static final String TEMPLATE_KEY = "template";
-
-    // The this template key
-    private static final String THIS_KEY = "this";
-
-    // The super template key
-    private static final String SUPER_KEY = "super";
-
-    // The engine key
-    private static final String ENGINE_KEY = "engine";
-
-    // The render out key
-    private static final String OUT_KEY = "out";
-
-    // The context level key
-    private static final String LEVEL_KEY = "level";
-
     // The context thread local holder.
     private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
 
@@ -106,9 +79,9 @@ public final class Context extends DelegateMap<String, Object> {
     public static Context pushContext(Template template, Map<String, Object> parameters, Object out) {
         Context parent = getContext();
         if (template != null && parent.parent == null) {
-        	parent.engine = template.getEngine(); // set root context engine
+            parent.engine = template.getEngine(); // set root context engine
         }
-    	Context context = new Context(parent, template, parameters, out);
+        Context context = new Context(parent, template, parameters, out);
         LOCAL.set(context);
         return context;
     }
@@ -147,9 +120,10 @@ public final class Context extends DelegateMap<String, Object> {
     // The context level.
     private final int level;
 
+    // The current engine.
     private Engine engine;
 
-	private Context(Context parent, Template template, Map<String, Object> parameters, Object out) {
+    private Context(Context parent, Template template, Map<String, Object> parameters, Object out) {
         super(parent, parameters);
         this.parent = parent;
         this.template = template;
@@ -204,9 +178,9 @@ public final class Context extends DelegateMap<String, Object> {
      * @return current engine
      */
     public Engine getEngine() {
-    	if (engine == null && template != null)
-    		engine = template.getEngine();
-    	return engine;
+        if (engine == null && template != null)
+            engine = template.getEngine();
+        return engine;
     }
 
     /**
@@ -218,6 +192,33 @@ public final class Context extends DelegateMap<String, Object> {
     public Object getOut() {
         return out;
     }
+
+    // The context key
+    private static final String CONTEXT_KEY = "context";
+
+    // The current context key
+    private static final String CURRENT_KEY = "current";
+
+    // The parent context key
+    private static final String PARENT_KEY = "parent";
+
+    // The template key
+    private static final String TEMPLATE_KEY = "template";
+
+    // The this template key
+    private static final String THIS_KEY = "this";
+
+    // The super template key
+    private static final String SUPER_KEY = "super";
+
+    // The engine key
+    private static final String ENGINE_KEY = "engine";
+
+    // The render out key
+    private static final String OUT_KEY = "out";
+
+    // The context level key
+    private static final String LEVEL_KEY = "level";
 
     // Get the special variables after the user variables.
     // Allows the user to override these special variables.

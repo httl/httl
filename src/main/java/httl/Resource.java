@@ -26,7 +26,7 @@ import java.util.Locale;
  * 
  * <pre>
  * Engine engine = Engine.getEngine();
- * Resource resource = engine.getResource("/books.txt");
+ * Resource resource = engine.getResource("/foo.txt");
  * </pre>
  * 
  * @see httl.Engine#getResource(String)
