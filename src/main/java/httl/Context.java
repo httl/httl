@@ -132,16 +132,6 @@ public final class Context extends DelegateMap<String, Object> {
     }
 
     /**
-     * Get the context level.
-     * 
-     * @see #getContext()
-     * @return context level
-     */
-    public int getLevel() {
-        return level;
-    }
-
-    /**
      * Get the parent context.
      * 
      * @see #getContext()
@@ -191,6 +181,16 @@ public final class Context extends DelegateMap<String, Object> {
      */
     public Object getOut() {
         return out;
+    }
+
+    /**
+     * Get the context level.
+     * 
+     * @see #getContext()
+     * @return context level
+     */
+    public int getLevel() {
+        return level;
     }
 
     // The context key
