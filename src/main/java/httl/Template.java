@@ -43,10 +43,10 @@ public interface Template extends Resource, Expression {
      * Render the template to output stream.
      * 
      * <pre>
-     * OutputStream output = ...;
+     * OutputStream stream = ...;
      * Context context = Context.getContext();
      * context.put("foo", foo);
-     * template.render(output);
+     * template.render(stream);
      * </pre>
      * 
      * @see httl.Context#getOut()
@@ -60,10 +60,10 @@ public interface Template extends Resource, Expression {
      * Render the template to output stream.
      * 
      * <pre>
-     * OutputStream output = ...;
+     * OutputStream stream = ...;
      * Map&lt;String, Object&gt; parameters = new HashMap&lt;String, Object&gt;();
      * parameters.put("foo", foo);
-     * template.render(parameters, output);
+     * template.render(parameters, stream);
      * </pre>
      * 
      * @see httl.Context#getParameters()
