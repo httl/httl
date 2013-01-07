@@ -85,6 +85,8 @@ public class BeanFactory {
 
     private static final String SET_METHOD = "set";
 
+    private static final String SET_PROPERTIES_METHOD = "setProperties";
+
     private static final String INIT_METHOD = "init";
 
     private static final String INITED_METHOD = "inited";
@@ -97,9 +99,11 @@ public class BeanFactory {
     	return StringUtils.splitCamelName(beanClass.getSimpleName(), ".") + "." + property;
     }
     
-    public static <T> T createBean(Class<T> beanClass, Properties properties) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> T createBean(Class<T> beanClass, Properties properties) {
     	Map<String, Object> caches = new HashMap<String, Object>();
     	Map<String, Object> instances = new HashMap<String, Object>();
+    	instances.putAll((Map) properties);
     	List<Object> inits = new ArrayList<Object>();
     	String key = StringUtils.splitCamelName(beanClass.getSimpleName(), ".");
     	String value = properties.getProperty(key);
@@ -136,11 +140,7 @@ public class BeanFactory {
 						&& !Modifier.isStatic(method.getModifiers())
 						&& method.getParameterTypes().length == 1) {
 					Class<?> parameterType = method.getParameterTypes()[0];
-					if (Properties.class.equals(parameterType)
-							&& Properties.class.getSimpleName().equals(name.substring(3))) {
-						method.invoke(object, new Object[] { properties });
-					} else if (Map.class.equals(parameterType)
-								&& "Instances".equals(name.substring(3))) {
+					if (Map.class.equals(parameterType) && SET_PROPERTIES_METHOD.equals(name)) {
 						method.invoke(object, new Object[] { instances });
 					} else {
 						String key = StringUtils.splitCamelName(name.substring(3), ".");

@@ -37,7 +37,6 @@ import java.util.Map;
  * 
  * if (value == null) value = servletResovler.get(key); // httl.properties: resovlers+=ServletResovler
  * if (value == null) value = globalResovler.get(key); // GlobalResovler.put(key, value)
- * if (value == null) value = systemResovler.get(key); // System.setProperty(key, value);
  * 
  * if (value == null) value = engineConfig.get(key); // httl.properties
  * </pre>

@@ -28,18 +28,25 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GlobalResolver implements Resolver {
 
-	private static final Map<String, Object> global = new ConcurrentHashMap<String, Object>();
+	private static volatile Map<String, Object> global;
 
 	public static Map<String, Object> getGlobal() {
+		if (global == null) {
+			synchronized (GlobalResolver.class) {
+				if (global == null) {
+					global = new ConcurrentHashMap<String, Object>();
+				}
+			}
+		}
 		return global;
 	}
 
 	public static Object put(String key, Object value) {
-		return global.put(key, value);
+		return getGlobal().put(key, value);
 	}
 
 	public Object get(String key) {
-		return global.get(key);
+		return global == null ? null : global.get(key);
 	}
 
 }

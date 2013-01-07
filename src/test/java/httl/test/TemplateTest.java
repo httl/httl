@@ -20,6 +20,8 @@ import httl.Context;
 import httl.Engine;
 import httl.Template;
 import httl.spi.Loader;
+import httl.spi.loaders.ClasspathLoader;
+import httl.spi.loaders.MultiLoader;
 import httl.spi.parsers.templates.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.User;
@@ -124,6 +126,9 @@ public class TemplateTest extends TestCase {
         	Engine engine = Engine.getEngine(config);
         	if (! profile) {
 	        	Loader loader = engine.getProperty("loader", Loader.class);
+	        	assertEquals(MultiLoader.class, loader.getClass());
+	        	loader = engine.getProperty("loaders", ClasspathLoader.class);
+	        	assertEquals(ClasspathLoader.class, loader.getClass());
 	        	String suffix = engine.getProperty("template.suffix", ".httl");
 	        	List<String> list = loader.list(suffix);
 	        	assertTrue(list.size() > 0);

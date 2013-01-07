@@ -44,7 +44,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -93,11 +92,8 @@ public class DefaultEngine extends Engine {
     // httl.properties: name
     private String name;
 
-    // httl.properties: text content
-    private Properties properties;
-
 	// httl.properties: instantiated content
-    private Map<String, Object> instances;
+    private Map<String, Object> properties;
 
     private final String version = Version.getVersion(DefaultEngine.class, "1.0.0");
     
@@ -135,19 +131,21 @@ public class DefaultEngine extends Engine {
 				return (T) value;
 			}
 		}
-		if (instances != null && ! String.class.equals(cls)) {
-			if (cls != null && ! cls.isInterface() && ! Object.class.equals(cls)) {
-				Object value = instances.get(key + "=" + cls.getName());
-				if (value != null) {
-					return (T) value;
-				}
+		if (properties != null) {
+			if (cls != null && cls != Object.class 
+					&& cls != String.class && ! cls.isInterface()) {
+				// engine.getProperty("loaders", ClasspathLoader.class);
+				key = key + "=" + cls.getName();
 			}
-			Object value = instances.get(key);
+			Object value = properties.get(key);
 			if (value != null) {
+				if (cls == String.class && value.getClass() != String.class) {
+					return (T) value.getClass().getName();
+				}
 				return (T) value;
 			}
 		}
-		return (T) properties.getProperty(key);
+		return null;
     }
 
     /**
@@ -426,17 +424,10 @@ public class DefaultEngine extends Engine {
     }
 
     /**
-	 * httl.properties: text content
-	 */
-    public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
-    /**
 	 * httl.properties: instantiated content
 	 */
-    public void setInstances(Map<String, Object> instances) {
-		this.instances = instances;
+    public void setProperties(Map<String, Object> properties) {
+		this.properties = properties;
 	}
 
     /**
