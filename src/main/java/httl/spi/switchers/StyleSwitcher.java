@@ -17,15 +17,15 @@ public class StyleSwitcher implements Switcher {
 	private Filter styleFilter;
 
 	/**
-     * httl.properties: style.locations=&lt;style,&lt;/style&gt;
-     */
+	 * httl.properties: style.locations=&lt;style,&lt;/style&gt;
+	 */
 	public void setStyleLocations(String[] locations) {
 		this.styleLocations = Arrays.asList(locations);
 	}
 
 	/**
-     * httl.properties: style.filter=httl.spi.filters.StyleFilter
-     */
+	 * httl.properties: style.filter=httl.spi.filters.StyleFilter
+	 */
 	public void setStyleFilter(Filter filter) {
 		this.styleFilter = filter;
 	}

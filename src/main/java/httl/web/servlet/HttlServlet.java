@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,45 +32,45 @@ import javax.servlet.http.HttpServletResponse;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class HttlServlet extends HttpServlet {
-    
-    private static final long serialVersionUID = 1L;
+	
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public void init() throws ServletException {
-    	WebEngine.setServletContext(getServletContext());
-    }
+	@Override
+	public void init() throws ServletException {
+		WebEngine.setServletContext(getServletContext());
+	}
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doPost(request, response);
-    }
-    
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-        	WebEngine.render(request, response, getTemplatePath(request));
-        } catch (ParseException e) {
-            throw new ServletException(e.getMessage(), e);
-        }
-    }
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doPost(request, response);
+	}
+	
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			WebEngine.render(request, response, getTemplatePath(request));
+		} catch (ParseException e) {
+			throw new ServletException(e.getMessage(), e);
+		}
+	}
 
 	protected String getTemplatePath(HttpServletRequest request) {
 		String path = request.getPathInfo();
-        if (path == null || path.length() == 0) {
-        	path = request.getServletPath();
-        }
-        if (path == null || path.length() == 0) {
-        	path = request.getRequestURI();
-        	String contextPath = request.getContextPath();
-        	if (contextPath != null && ! "/".equals(contextPath)
-        			&& path != null && path.startsWith(contextPath)) {
-        		path = path.substring(contextPath.length());
-        	}
-        }
-        if (path == null || path.length() == 0) {
-        	path = getRootPath();
-        }
-        return path;
+		if (path == null || path.length() == 0) {
+			path = request.getServletPath();
+		}
+		if (path == null || path.length() == 0) {
+			path = request.getRequestURI();
+			String contextPath = request.getContextPath();
+			if (contextPath != null && ! "/".equals(contextPath)
+					&& path != null && path.startsWith(contextPath)) {
+				path = path.substring(contextPath.length());
+			}
+		}
+		if (path == null || path.length() == 0) {
+			path = getRootPath();
+		}
+		return path;
 	}
 
 	protected String getRootPath() {

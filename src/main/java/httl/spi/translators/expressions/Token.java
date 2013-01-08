@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,7 +50,7 @@ public final class Token {
 	 */
 	public Token(String message, int offset, int type) {
 		if (message == null || message.length() == 0)
-		    throw new IllegalArgumentException("message == null");
+			throw new IllegalArgumentException("message == null");
 		this.message = message;
 		this.offset = offset;
 		this.type = type;
@@ -65,14 +65,14 @@ public final class Token {
 		return message;
 	}
 
-    /**
-     * Get offset.
-     * 
-     * @return offset
-     */
-    public int getOffset() {
-        return offset;
-    }
+	/**
+	 * Get offset.
+	 * 
+	 * @return offset
+	 */
+	public int getOffset() {
+		return offset;
+	}
 
 	/**
 	 * Get type.
@@ -88,28 +88,28 @@ public final class Token {
 		return message;
 	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((message == null) ? 0 : message.hashCode());
-        result = prime * result + offset;
-        result = prime * result + type;
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((message == null) ? 0 : message.hashCode());
+		result = prime * result + offset;
+		result = prime * result + type;
+		return result;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        Token other = (Token) obj;
-        if (message == null) {
-            if (other.message != null) return false;
-        } else if (!message.equals(other.message)) return false;
-        if (offset != other.offset) return false;
-        if (type != other.type) return false;
-        return true;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Token other = (Token) obj;
+		if (message == null) {
+			if (other.message != null) return false;
+		} else if (!message.equals(other.message)) return false;
+		if (offset != other.offset) return false;
+		if (type != other.type) return false;
+		return true;
+	}
 
 }

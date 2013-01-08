@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,60 +41,60 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StringLoader implements Loader {
 	
 	private static final String STRING_ENCODING = "UTF-8";
-    
-    private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
-    
-    private Engine engine;
-    
-    public StringLoader() {
-    }
+	
+	private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
+	
+	private Engine engine;
+	
+	public StringLoader() {
+	}
 
-    public StringLoader(Engine engine) {
-    	this.engine = engine;
-    }
-    
-    public void setEngine(Engine engine) {
+	public StringLoader(Engine engine) {
+		this.engine = engine;
+	}
+	
+	public void setEngine(Engine engine) {
 		this.engine = engine;
 	}
 
 	public void add(String name, String source) {
-        add(name, null, source);
-    }
-    
-    public void add(String name, Locale locale, String source) {
-        templates.put(getTemplateKey(name, locale), new StringResource(engine, name, locale, STRING_ENCODING, System.currentTimeMillis(), source));
-    }
-    
-    public void remove(String name) {
-    	remove(name, null);
-    }
+		add(name, null, source);
+	}
+	
+	public void add(String name, Locale locale, String source) {
+		templates.put(getTemplateKey(name, locale), new StringResource(engine, name, locale, STRING_ENCODING, System.currentTimeMillis(), source));
+	}
+	
+	public void remove(String name) {
+		remove(name, null);
+	}
 
-    public void remove(String name, Locale locale) {
-        templates.remove(getTemplateKey(name, locale));
-    }
+	public void remove(String name, Locale locale) {
+		templates.remove(getTemplateKey(name, locale));
+	}
 
-    public void clear() {
-        templates.clear();
-    }
+	public void clear() {
+		templates.clear();
+	}
 
-    public List<String> list(String suffix) throws IOException {
-        return new ArrayList<String>(templates.keySet());
-    }
+	public List<String> list(String suffix) throws IOException {
+		return new ArrayList<String>(templates.keySet());
+	}
 
 	public Resource load(String name, Locale locale, String encoding) throws IOException {
-    	StringResource resource = templates.get(getTemplateKey(name, locale));
-        if (resource == null) {
-            throw new FileNotFoundException("Not found template " + name);
-        }
-        return resource;
-    }
+		StringResource resource = templates.get(getTemplateKey(name, locale));
+		if (resource == null) {
+			throw new FileNotFoundException("Not found template " + name);
+		}
+		return resource;
+	}
 
 	public boolean exists(String name, Locale locale) {
-        return templates.containsKey(getTemplateKey(name, locale));
-    }
+		return templates.containsKey(getTemplateKey(name, locale));
+	}
 
-    private String getTemplateKey(String name, Locale locale) {
-    	return LocaleUtils.appendLocale(name, locale);
-    }
+	private String getTemplateKey(String name, Locale locale) {
+		return LocaleUtils.appendLocale(name, locale);
+	}
 
 }

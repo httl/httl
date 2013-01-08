@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,33 +33,33 @@ public final class Variable extends Node {
 	
 	private Class<?> defaultType;
 
-    private final String name;
-    
-    public Variable(Translator translator, String name, int offset, Map<String, Class<?>> parameterTypes, Class<?> defaultType){
-        super(parameterTypes, offset);
-        this.name = name;
-        this.defaultType = defaultType;
-    }
+	private final String name;
+	
+	public Variable(Translator translator, String name, int offset, Map<String, Class<?>> parameterTypes, Class<?> defaultType){
+		super(parameterTypes, offset);
+		this.name = name;
+		this.defaultType = defaultType;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public String toString() {
-        return name;
-    }
+	@Override
+	public String toString() {
+		return name;
+	}
 
-    public Class<?> getReturnType() throws ParseException {
-        Class<?> type = getParameterTypes().get(name);
-        if (type == null && defaultType != null) {
-        	return defaultType;
-        }
-        return type;
-    }
+	public Class<?> getReturnType() throws ParseException {
+		Class<?> type = getParameterTypes().get(name);
+		if (type == null && defaultType != null) {
+			return defaultType;
+		}
+		return type;
+	}
 
-    public String getCode() throws ParseException {
-        return ClassUtils.filterJavaKeyword(name);
-    }
+	public String getCode() throws ParseException {
+		return ClassUtils.filterJavaKeyword(name);
+	}
 
 }

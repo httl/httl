@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,10 +35,10 @@ import java.util.Locale;
 public class ClasspathLoader extends AbstractLoader {
 
 	public List<String> doList(String directory, String suffix) throws IOException {
-        return UrlUtils.listUrl(Thread.currentThread().getContextClassLoader().getResource(cleanPath(directory)), suffix);
-    }
-    
-    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+		return UrlUtils.listUrl(Thread.currentThread().getContextClassLoader().getResource(cleanPath(directory)), suffix);
+	}
+	
+	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
 		return new ClasspathResource(getEngine(), name, encoding, cleanPath(path), locale);
 	}
 

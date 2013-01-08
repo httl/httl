@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,19 +29,19 @@ import java.text.DecimalFormat;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class NumberFormatter implements Formatter<Number> {
-    
-    private String numberFormat;
-    
-    /**
+	
+	private String numberFormat;
+	
+	/**
 	 * httl.properties: number.format=###,##0.###
 	 */
-    public void setNumberFormat(String numberFormat) {
-    	new DecimalFormat(numberFormat).format(0);
+	public void setNumberFormat(String numberFormat) {
+		new DecimalFormat(numberFormat).format(0);
 		this.numberFormat = numberFormat;
 	}
 
-    public String format(Number value) {
-        return NumberUtils.format(value, numberFormat);
-    }
+	public String format(Number value) {
+		return NumberUtils.format(value, numberFormat);
+	}
 
 }

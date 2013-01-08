@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,7 +46,7 @@ public abstract class AbstractLoader implements Loader {
 	private Logger logger;
 	
 	private Locator locator;
-    
+	
 	private String encoding;
 
 	private boolean reloadable;
@@ -56,40 +56,40 @@ public abstract class AbstractLoader implements Loader {
 	/**
 	 * httl.properties: engine=httl.spi.engines.DefaultEngine
 	 */
-    public void setEngine(Engine engine) {
+	public void setEngine(Engine engine) {
 		this.engine = engine;
 	}
 
 	/**
 	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
 	 */
-    public void setLogger(Logger logger) {
+	public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
 
-    /**
+	/**
 	 * httl.properties: locators=httl.spi.locators.TemplateLocator
 	 */
 	public void setLocator(Locator locator) {
 		this.locator = locator;
 	}
 
-    /**
+	/**
 	 * httl.properties: reloadable=true
 	 */
 	public void setReloadable(boolean reloadable) {
 		this.reloadable = reloadable;
 	}
 
-    /**
+	/**
 	 * httl.properties: input.encoding=UTF-8
 	 */
-    public void setInputEncoding(String encoding) {
-    	if (encoding != null && encoding.length() > 0) {
-            Charset.forName(encoding);
-            this.encoding = encoding;
-        }
-    }
+	public void setInputEncoding(String encoding) {
+		if (encoding != null && encoding.length() > 0) {
+			Charset.forName(encoding);
+			this.encoding = encoding;
+		}
+	}
 
 	protected Engine getEngine() {
 		return engine;
@@ -99,42 +99,42 @@ public abstract class AbstractLoader implements Loader {
 		return logger;
 	}
 
-    protected String getEncoding() {
-        return encoding;
-    }
+	protected String getEncoding() {
+		return encoding;
+	}
 
-    protected String toPath(String name, Locale locale) {
-    	return locator == null ? name : locator.relocate(name, locale);
-    }
+	protected String toPath(String name, Locale locale) {
+		return locator == null ? name : locator.relocate(name, locale);
+	}
 
-    public List<String> list(String suffix) throws IOException {
-        String directory = locator.root(suffix);
-        if (directory == null || directory.length() == 0) {
-        	directory = "/";
-        }
-        List<String> list = doList(directory, suffix);
-        if (list == null || list.size() == 0) {
-            return new ArrayList<String>(0);
-        } else {
-        	List<String> result = new ArrayList<String>(list.size());
-        	for (String name : list) {
-        		if (name != null && name.length() > 0) {
-        			result.add(UrlUtils.cleanName(name));
-        		}
-        	}
-        	return result;
-        }
-    }
+	public List<String> list(String suffix) throws IOException {
+		String directory = locator.root(suffix);
+		if (directory == null || directory.length() == 0) {
+			directory = "/";
+		}
+		List<String> list = doList(directory, suffix);
+		if (list == null || list.size() == 0) {
+			return new ArrayList<String>(0);
+		} else {
+			List<String> result = new ArrayList<String>(list.size());
+			for (String name : list) {
+				if (name != null && name.length() > 0) {
+					result.add(UrlUtils.cleanName(name));
+				}
+			}
+			return result;
+		}
+	}
 
 	public boolean exists(String name, Locale locale) {
 		Locale cur = locale;
-        while (cur != null) {
-        	if (_exists(name, locale, toPath(name, cur))) {
-        		return true;
-        	}
-        	cur = LocaleUtils.getParentLocale(cur);
-        }
-        return _exists(name, locale, toPath(name, null));
+		while (cur != null) {
+			if (_exists(name, locale, toPath(name, cur))) {
+				return true;
+			}
+			cur = LocaleUtils.getParentLocale(cur);
+		}
+		return _exists(name, locale, toPath(name, null));
 	}
 
 	private boolean _exists(String name, Locale locale, String path) {
@@ -145,50 +145,50 @@ public abstract class AbstractLoader implements Loader {
 		}
 	}
 
-    public Resource load(String name, Locale locale, String encoding) throws IOException {
-        if (encoding == null || encoding.length() == 0) {
-            encoding = this.encoding;
-        }
-        Locale cur = locale;
-        String path = toPath(name, cur);
-        while (cur != null && ! _exists(name, locale, path)) {
-        	cur = LocaleUtils.getParentLocale(cur);
-        	path = toPath(name, cur);
-        }
-        Resource resource = doLoad(name, locale, encoding, path);
-        logResourceDirectory(resource);
-        return resource;
-    }
-    
-    private void logResourceDirectory(Resource resource) {
-    	if (first) {
-        	first = false;
-        	if (logger != null && logger.isInfoEnabled()
-        			&& resource instanceof InputStreamResource) {
-	        	File file = ((InputStreamResource) resource).getFile();
-	    		if (file != null && file.exists()) {
-	    			String uri = resource.getName().replace('\\', '/');
-		    		String abs = file.getAbsolutePath().replace('\\', '/');
-		    		if (abs.endsWith(uri)) {
-		    			abs = abs.substring(0, abs.length() - uri.length());
-		    		} else {
-			    		int i = abs.lastIndexOf('/');
-			        	if (i > 0) {
-			        		abs = abs.substring(0, i);
-			        	} else {
-			        		abs = "/";
-			        	}
-		    		}
-		        	logger.info("Load httl template from" + (reloadable ? " RELOADABLE" : "") + " directory " + abs + " by " + getClass().getSimpleName() + ".");
-	    		}
-        	}
-        }
-    }
+	public Resource load(String name, Locale locale, String encoding) throws IOException {
+		if (encoding == null || encoding.length() == 0) {
+			encoding = this.encoding;
+		}
+		Locale cur = locale;
+		String path = toPath(name, cur);
+		while (cur != null && ! _exists(name, locale, path)) {
+			cur = LocaleUtils.getParentLocale(cur);
+			path = toPath(name, cur);
+		}
+		Resource resource = doLoad(name, locale, encoding, path);
+		logResourceDirectory(resource);
+		return resource;
+	}
+	
+	private void logResourceDirectory(Resource resource) {
+		if (first) {
+			first = false;
+			if (logger != null && logger.isInfoEnabled()
+					&& resource instanceof InputStreamResource) {
+				File file = ((InputStreamResource) resource).getFile();
+				if (file != null && file.exists()) {
+					String uri = resource.getName().replace('\\', '/');
+					String abs = file.getAbsolutePath().replace('\\', '/');
+					if (abs.endsWith(uri)) {
+						abs = abs.substring(0, abs.length() - uri.length());
+					} else {
+						int i = abs.lastIndexOf('/');
+						if (i > 0) {
+							abs = abs.substring(0, i);
+						} else {
+							abs = "/";
+						}
+					}
+					logger.info("Load httl template from" + (reloadable ? " RELOADABLE" : "") + " directory " + abs + " by " + getClass().getSimpleName() + ".");
+				}
+			}
+		}
+	}
 
-    protected abstract List<String> doList(String directory, String suffix) throws IOException;
+	protected abstract List<String> doList(String directory, String suffix) throws IOException;
 
 	protected abstract boolean doExists(String name, Locale locale, String path) throws Exception;
 
-    protected abstract Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException;
+	protected abstract Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException;
 
 }

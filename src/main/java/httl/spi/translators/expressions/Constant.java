@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,42 +27,42 @@ public final class Constant extends Node {
 
 	private static final long serialVersionUID = 1L;
 
-    public static final Constant NULL = new Constant(null, null, "null");
+	public static final Constant NULL = new Constant(null, null, "null");
 
-    public static final Constant EMPTY = new Constant(null, null, "");
+	public static final Constant EMPTY = new Constant(null, null, "");
 
-    public static final Constant TRUE = new Constant(true, boolean.class, "true");
+	public static final Constant TRUE = new Constant(true, boolean.class, "true");
 
-    public static final Constant FALSE = new Constant(false, boolean.class, "false");
-    
-    private final Object value;
+	public static final Constant FALSE = new Constant(false, boolean.class, "false");
+	
+	private final Object value;
 
-    private final Class<?> type;
-    
-    private final String literal;
+	private final Class<?> type;
+	
+	private final String literal;
 
-    public Constant(Object value, Class<?> type, String literal){
-        super(null, 0);
-        this.value = value;
-        this.type = type;
-        this.literal = literal;
-    }
+	public Constant(Object value, Class<?> type, String literal){
+		super(null, 0);
+		this.value = value;
+		this.type = type;
+		this.literal = literal;
+	}
 
-    public Object getValue() {
-        return value;
-    }
+	public Object getValue() {
+		return value;
+	}
 
-    public Class<?> getReturnType() throws ParseException {
-        return type;
-    }
+	public Class<?> getReturnType() throws ParseException {
+		return type;
+	}
 
-    public String getCode() throws ParseException {
-        return literal;
-    }
+	public String getCode() throws ParseException {
+		return literal;
+	}
 
-    @Override
-    public String toString() {
-        return literal;
-    }
+	@Override
+	public String toString() {
+		return literal;
+	}
 
 }

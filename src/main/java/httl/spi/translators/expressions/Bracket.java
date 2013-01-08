@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,20 +27,20 @@ public class Bracket extends Operator {
 
 	private static final long serialVersionUID = 1L;
 
-    public static final Bracket ROUND = new Bracket("(");
-    
-    public static final Bracket SQUARE = new Bracket("[");
+	public static final Bracket ROUND = new Bracket("(");
+	
+	public static final Bracket SQUARE = new Bracket("[");
 
-    private Bracket(String name) {
-        super(null, null, 0, null, null, null, name, Integer.MAX_VALUE);
-    }
+	private Bracket(String name) {
+		super(null, null, 0, null, null, null, name, Integer.MAX_VALUE);
+	}
 
-    public Class<?> getReturnType() throws ParseException {
-        return null;
-    }
+	public Class<?> getReturnType() throws ParseException {
+		return null;
+	}
 
-    public String getCode() throws ParseException {
-        return getName();
-    }
-    
+	public String getCode() throws ParseException {
+		return getName();
+	}
+	
 }

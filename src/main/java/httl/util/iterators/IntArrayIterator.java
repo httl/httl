@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,33 +26,33 @@ import java.util.NoSuchElementException;
  */
 public class IntArrayIterator implements Iterator<Integer> {
 
-    private final int[] array;
+	private final int[] array;
 
-    private final int length;
+	private final int length;
 
-    private int index;
+	private int index;
 
-    public IntArrayIterator(int[] array){
-        this.array = array;
-        this.length = array == null ? 0 : array.length;
-    }
+	public IntArrayIterator(int[] array){
+		this.array = array;
+		this.length = array == null ? 0 : array.length;
+	}
 
-    public Object getArray() {
-        return array;
-    }
+	public Object getArray() {
+		return array;
+	}
 
-    public boolean hasNext() {
-        return index < length;
-    }
+	public boolean hasNext() {
+		return index < length;
+	}
 
-    public Integer next() {
-        if (! hasNext()) {
-            throw new NoSuchElementException();
-        }
-        return array[index ++];
-    }
+	public Integer next() {
+		if (! hasNext()) {
+			throw new NoSuchElementException();
+		}
+		return array[index ++];
+	}
 
-    public void remove() {
-        throw new UnsupportedOperationException("remove() method is not supported");
-    }
+	public void remove() {
+		throw new UnsupportedOperationException("remove() method is not supported");
+	}
 }

@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,37 +38,37 @@ import javax.servlet.ServletContextListener;
  */
 public class ServletLoader extends AbstractLoader implements ServletContextListener {
 
-    private static ServletContext SERVLET_CONTEXT;
+	private static ServletContext SERVLET_CONTEXT;
 
-    public static ServletContext getAndCheckServletContext() {
-    	if (SERVLET_CONTEXT == null) {
+	public static ServletContext getAndCheckServletContext() {
+		if (SERVLET_CONTEXT == null) {
 			throw new IllegalStateException("servletContext == null. Please add config in your /WEB-INF/web.xml: " +
 					"\n<listener>\n\t<listener-class>" + ServletLoader.class.getName() + "</listener-class>\n</listener>\n");
 		}
-    	return SERVLET_CONTEXT;
-    }
+		return SERVLET_CONTEXT;
+	}
 
-    public static ServletContext getServletContext() {
-        return SERVLET_CONTEXT;
-    }
+	public static ServletContext getServletContext() {
+		return SERVLET_CONTEXT;
+	}
 
-    public static void setServletContext(ServletContext servletContext) {
-        SERVLET_CONTEXT = servletContext;
-    }
+	public static void setServletContext(ServletContext servletContext) {
+		SERVLET_CONTEXT = servletContext;
+	}
 
-    public void contextInitialized(ServletContextEvent sce) {
-    	setServletContext(sce.getServletContext());
-    }
+	public void contextInitialized(ServletContextEvent sce) {
+		setServletContext(sce.getServletContext());
+	}
 
-    public void contextDestroyed(ServletContextEvent sce) {
-    	setServletContext(null);
-    }
+	public void contextDestroyed(ServletContextEvent sce) {
+		setServletContext(null);
+	}
 
-    public List<String> doList(String directory, String suffix) throws IOException {
-        return UrlUtils.listUrl(getAndCheckServletContext().getResource(directory), suffix);
-    }
+	public List<String> doList(String directory, String suffix) throws IOException {
+		return UrlUtils.listUrl(getAndCheckServletContext().getResource(directory), suffix);
+	}
 
-    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
 		return new ServletResource(getEngine(), name, locale, encoding, path, getAndCheckServletContext());
 	}
 

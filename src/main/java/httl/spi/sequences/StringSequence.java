@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,18 +43,18 @@ public class StringSequence implements List<String>, Serializable {
 	private final boolean ignoreCase;
 
 	public StringSequence(List<String> sequence) {
-	    this(sequence, true);
+		this(sequence, true);
 	}
 
 	public StringSequence(List<String> sequence, boolean ignoreCase) {
-	    if (sequence == null || sequence.size() == 0) {
-	        throw new IllegalArgumentException("sequence == null");
-	    }
+		if (sequence == null || sequence.size() == 0) {
+			throw new IllegalArgumentException("sequence == null");
+		}
 		List<String> list = new ArrayList<String>(sequence);
 		boolean cycle = false;
 		if (list.size() > 1 && list.get(0).equals(list.get(list.size() - 1))) {
-		    cycle = true;
-		    list.remove(list.size() - 1);
+			cycle = true;
+			list.remove(list.size() - 1);
 		}
 		this.sequence = list;
 		this.cycle = cycle;

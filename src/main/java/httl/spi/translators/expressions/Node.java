@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,35 +29,35 @@ public abstract class Node implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    private final int offset;
-    
-    private final Map<String, Class<?>> parameterTypes;
+	private final int offset;
+	
+	private final Map<String, Class<?>> parameterTypes;
 
-    public Node(Map<String, Class<?>> parameterTypes, int offset) {
-        this.offset = offset;
-        this.parameterTypes = parameterTypes;
-    }
-    
-    public int getOffset() {
-        return offset;
-    }
+	public Node(Map<String, Class<?>> parameterTypes, int offset) {
+		this.offset = offset;
+		this.parameterTypes = parameterTypes;
+	}
+	
+	public int getOffset() {
+		return offset;
+	}
 
-    public Map<String, Class<?>> getParameterTypes() {
-        return parameterTypes;
-    }
+	public Map<String, Class<?>> getParameterTypes() {
+		return parameterTypes;
+	}
 
-    public Class<?>[] getReturnTypes() throws ParseException {
-        Class<?> type = getReturnType();
-        return type == null ? new Class<?>[0] : new Class<?>[] { type };
-    }
+	public Class<?>[] getReturnTypes() throws ParseException {
+		Class<?> type = getReturnType();
+		return type == null ? new Class<?>[0] : new Class<?>[] { type };
+	}
 
-    public String getGenericVariableName() {
-    	return getGenericVariableName(this);
-    }
+	public String getGenericVariableName() {
+		return getGenericVariableName(this);
+	}
 
-    protected static String getGenericVariableName(Node node) {
-    	if (node instanceof Variable) {
-    		return ((Variable)node).getName();
+	protected static String getGenericVariableName(Node node) {
+		if (node instanceof Variable) {
+			return ((Variable)node).getName();
 		}
 		while (node instanceof BinaryOperator) {
 			String name = ((BinaryOperator)node).getName();
@@ -66,17 +66,17 @@ public abstract class Node implements Serializable {
 					 || "entrySet".equals(name)) {
 				node = ((BinaryOperator)node).getLeftParameter();
 				if (node instanceof Variable) {
-	        		return ((Variable)node).getName();
+					return ((Variable)node).getName();
 				}
 			} else {
 				return null;
 			}
 		}
-    	return null;
-    }
+		return null;
+	}
 
-    public abstract Class<?> getReturnType() throws ParseException;
+	public abstract Class<?> getReturnType() throws ParseException;
 
-    public abstract String getCode() throws ParseException;
+	public abstract String getCode() throws ParseException;
 
 }

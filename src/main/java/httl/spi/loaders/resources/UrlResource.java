@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,23 +31,23 @@ import java.util.Locale;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class UrlResource extends InputStreamResource {
-    
-    private static final long serialVersionUID = 1L;
+	
+	private static final long serialVersionUID = 1L;
 
-    private final URL url;
-    
-    public UrlResource(Engine engine, String name, Locale locale, String encoding, String path) throws IOException {
-        super(engine, name, locale, encoding);
-        this.url = new URL(path);
-    }
+	private final URL url;
+	
+	public UrlResource(Engine engine, String name, Locale locale, String encoding, String path) throws IOException {
+		super(engine, name, locale, encoding);
+		this.url = new URL(path);
+	}
 
-    public InputStream getInputStream() throws IOException {
-        return url.openStream();
-    }
+	public InputStream getInputStream() throws IOException {
+		return url.openStream();
+	}
 
-    @Override
-    protected URL getUrl() {
+	@Override
+	protected URL getUrl() {
 		return url;
-    }
+	}
 
 }

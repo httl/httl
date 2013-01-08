@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -159,158 +159,158 @@ public class UrlUtils {
 
 	public static final String JAR_URL_SEPARATOR = "!/";
 
-    /** URL prefix for loading from the file system: "file:" */
-    public static final String FILE_URL_PREFIX = "file:";
-    
-    public static List<String> listUrl(URL rootDirUrl, String suffix) throws IOException {
-        if ("file".equals(rootDirUrl.getProtocol())) {
-            return listFile(new File(rootDirUrl.getFile()), suffix);
-        } else {
-            return listJarUrl(rootDirUrl, suffix);
-        }
-    }
-    
-    public static List<String> listFile(File dirFile, final String suffix) throws IOException {
-    	List<String> list = new ArrayList<String>();
-    	addListFile(list, "/", dirFile, suffix);
-    	return list;
-    }
-    
-    private static void addListFile(List<String> list, String dir, File dirFile, final String suffix) throws IOException {
-    	for (File file : dirFile.listFiles()) {
-    		if (file.isHidden() || ! file.canRead()) {
-    			continue;
-    		}
-    		if (file.isDirectory()) {
-    			addListFile(list, dir + file.getName() + "/", file, suffix);
-    		} else if (isMatch(file.getName(), suffix)) {
-    			list.add(dir + file.getName());
-    		}
-    	}
-    }
-    
-    private static boolean isMatch(String name, String suffix) {
-    	if (suffix == null || suffix.length() == 0) {
-    		return true;
-    	}
-        return name.endsWith(suffix);
-    }
-    
-    public static List<String> listZip(ZipFile zipFile, String suffix) throws IOException {
-        List<String> result = new ArrayList<String>();
-        for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();) {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-            if (! entry.isDirectory()) {
-	            String name = entry.getName();
-	            if (isMatch(name, suffix)) {
-	            	if (! name.startsWith("/")) {
-	            		name = "/" + name;
-	            	}
-	            	result.add(name);
-	            }
-            }
-        }
-        return result;
-    }
-    
-    public static List<String> listJar(JarFile jarFile, String suffix) throws IOException {
-        List<String> result = new ArrayList<String>();
-        for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
-            JarEntry entry = (JarEntry) entries.nextElement();
-            if (! entry.isDirectory()) {
-	            String name = entry.getName();
-	            if (isMatch(name, suffix)) {
-	            	if (! name.startsWith("/")) {
-	            		name = "/" + name;
-	            	}
-	            	result.add(name);
-	            }
-            }
-        }
-        return result;
-    }
+	/** URL prefix for loading from the file system: "file:" */
+	public static final String FILE_URL_PREFIX = "file:";
+	
+	public static List<String> listUrl(URL rootDirUrl, String suffix) throws IOException {
+		if ("file".equals(rootDirUrl.getProtocol())) {
+			return listFile(new File(rootDirUrl.getFile()), suffix);
+		} else {
+			return listJarUrl(rootDirUrl, suffix);
+		}
+	}
+	
+	public static List<String> listFile(File dirFile, final String suffix) throws IOException {
+		List<String> list = new ArrayList<String>();
+		addListFile(list, "/", dirFile, suffix);
+		return list;
+	}
+	
+	private static void addListFile(List<String> list, String dir, File dirFile, final String suffix) throws IOException {
+		for (File file : dirFile.listFiles()) {
+			if (file.isHidden() || ! file.canRead()) {
+				continue;
+			}
+			if (file.isDirectory()) {
+				addListFile(list, dir + file.getName() + "/", file, suffix);
+			} else if (isMatch(file.getName(), suffix)) {
+				list.add(dir + file.getName());
+			}
+		}
+	}
+	
+	private static boolean isMatch(String name, String suffix) {
+		if (suffix == null || suffix.length() == 0) {
+			return true;
+		}
+		return name.endsWith(suffix);
+	}
+	
+	public static List<String> listZip(ZipFile zipFile, String suffix) throws IOException {
+		List<String> result = new ArrayList<String>();
+		for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements();) {
+			ZipEntry entry = (ZipEntry) entries.nextElement();
+			if (! entry.isDirectory()) {
+				String name = entry.getName();
+				if (isMatch(name, suffix)) {
+					if (! name.startsWith("/")) {
+						name = "/" + name;
+					}
+					result.add(name);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static List<String> listJar(JarFile jarFile, String suffix) throws IOException {
+		List<String> result = new ArrayList<String>();
+		for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
+			JarEntry entry = (JarEntry) entries.nextElement();
+			if (! entry.isDirectory()) {
+				String name = entry.getName();
+				if (isMatch(name, suffix)) {
+					if (! name.startsWith("/")) {
+						name = "/" + name;
+					}
+					result.add(name);
+				}
+			}
+		}
+		return result;
+	}
 
-    private static List<String> listJarUrl(URL rootDirUrl, String suffix) throws IOException {
-        URLConnection con = rootDirUrl.openConnection();
-        JarFile jarFile = null;
-        String jarFileUrl = null;
-        String rootEntryPath = null;
-        boolean newJarFile = false;
-        if (con instanceof JarURLConnection) {
-            // Should usually be the case for traditional JAR files.
-            JarURLConnection jarCon = (JarURLConnection) con;
-            jarCon.setUseCaches(false);
-            jarFile = jarCon.getJarFile();
-            jarFileUrl = jarCon.getJarFileURL().toExternalForm();
-            JarEntry jarEntry = jarCon.getJarEntry();
-            rootEntryPath = (jarEntry != null ? jarEntry.getName() : "");
-        } else {
-            // No JarURLConnection -> need to resort to URL file parsing.
-            // We'll assume URLs of the format "jar:path!/entry", with the protocol
-            // being arbitrary as long as following the entry format.
-            // We'll also handle paths with and without leading "file:" prefix.
-            String urlFile = rootDirUrl.getFile();
-            int separatorIndex = urlFile.indexOf(JAR_URL_SEPARATOR);
-            if (separatorIndex != -1) {
-                jarFileUrl = urlFile.substring(0, separatorIndex);
-                rootEntryPath = urlFile.substring(separatorIndex + JAR_URL_SEPARATOR.length());
-                jarFile = getJarFile(jarFileUrl);
-            }
-            else {
-                jarFile = new JarFile(urlFile);
-                jarFileUrl = urlFile;
-                rootEntryPath = "";
-            }
-            newJarFile = true;
-        }
-        try {
-            if (!"".equals(rootEntryPath) && !rootEntryPath.endsWith("/")) {
-                // Root entry path must end with slash to allow for proper matching.
-                // The Sun JRE does not return a slash here, but BEA JRockit does.
-                rootEntryPath = rootEntryPath + "/";
-            }
-            List<String> result = new ArrayList<String>();
-            for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
-                JarEntry entry = (JarEntry) entries.nextElement();
-                String entryPath = entry.getName();
-                if (entryPath.startsWith(rootEntryPath)) {
-                    String relativePath = entryPath.substring(rootEntryPath.length());
-                    if (relativePath.endsWith(suffix)) {
-                        result.add(relativePath);
-                    }
-                }
-            }
-            return result;
-        } finally {
-            // Close jar file, but only if freshly obtained -
-            // not from JarURLConnection, which might cache the file reference.
-            if (newJarFile) {
-                jarFile.close();
-            }
-        }
-    }
+	private static List<String> listJarUrl(URL rootDirUrl, String suffix) throws IOException {
+		URLConnection con = rootDirUrl.openConnection();
+		JarFile jarFile = null;
+		String jarFileUrl = null;
+		String rootEntryPath = null;
+		boolean newJarFile = false;
+		if (con instanceof JarURLConnection) {
+			// Should usually be the case for traditional JAR files.
+			JarURLConnection jarCon = (JarURLConnection) con;
+			jarCon.setUseCaches(false);
+			jarFile = jarCon.getJarFile();
+			jarFileUrl = jarCon.getJarFileURL().toExternalForm();
+			JarEntry jarEntry = jarCon.getJarEntry();
+			rootEntryPath = (jarEntry != null ? jarEntry.getName() : "");
+		} else {
+			// No JarURLConnection -> need to resort to URL file parsing.
+			// We'll assume URLs of the format "jar:path!/entry", with the protocol
+			// being arbitrary as long as following the entry format.
+			// We'll also handle paths with and without leading "file:" prefix.
+			String urlFile = rootDirUrl.getFile();
+			int separatorIndex = urlFile.indexOf(JAR_URL_SEPARATOR);
+			if (separatorIndex != -1) {
+				jarFileUrl = urlFile.substring(0, separatorIndex);
+				rootEntryPath = urlFile.substring(separatorIndex + JAR_URL_SEPARATOR.length());
+				jarFile = getJarFile(jarFileUrl);
+			}
+			else {
+				jarFile = new JarFile(urlFile);
+				jarFileUrl = urlFile;
+				rootEntryPath = "";
+			}
+			newJarFile = true;
+		}
+		try {
+			if (!"".equals(rootEntryPath) && !rootEntryPath.endsWith("/")) {
+				// Root entry path must end with slash to allow for proper matching.
+				// The Sun JRE does not return a slash here, but BEA JRockit does.
+				rootEntryPath = rootEntryPath + "/";
+			}
+			List<String> result = new ArrayList<String>();
+			for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
+				JarEntry entry = (JarEntry) entries.nextElement();
+				String entryPath = entry.getName();
+				if (entryPath.startsWith(rootEntryPath)) {
+					String relativePath = entryPath.substring(rootEntryPath.length());
+					if (relativePath.endsWith(suffix)) {
+						result.add(relativePath);
+					}
+				}
+			}
+			return result;
+		} finally {
+			// Close jar file, but only if freshly obtained -
+			// not from JarURLConnection, which might cache the file reference.
+			if (newJarFile) {
+				jarFile.close();
+			}
+		}
+	}
 
 	private static JarFile getJarFile(String jarFileUrl) throws IOException {
-        if (jarFileUrl.startsWith(FILE_URL_PREFIX)) {
-            try {
-                return new JarFile(toURI(jarFileUrl).getSchemeSpecificPart());
-            }
-            catch (URISyntaxException ex) {
-                // Fallback for URLs that are not valid URIs (should hardly ever happen).
-                return new JarFile(jarFileUrl.substring(FILE_URL_PREFIX.length()));
-            }
-        }
-        else {
-            return new JarFile(jarFileUrl);
-        }
-    }
+		if (jarFileUrl.startsWith(FILE_URL_PREFIX)) {
+			try {
+				return new JarFile(toURI(jarFileUrl).getSchemeSpecificPart());
+			}
+			catch (URISyntaxException ex) {
+				// Fallback for URLs that are not valid URIs (should hardly ever happen).
+				return new JarFile(jarFileUrl.substring(FILE_URL_PREFIX.length()));
+			}
+		}
+		else {
+			return new JarFile(jarFileUrl);
+		}
+	}
 	
 	public static URI toURI(URL url) throws URISyntaxException {
-        return toURI(url.toString());
-    }
+		return toURI(url.toString());
+	}
 	
 	public static URI toURI(String location) throws URISyntaxException {
-        return new URI(location.replace(" ", "%20"));
-    }
+		return new URI(location.replace(" ", "%20"));
+	}
 	
 }

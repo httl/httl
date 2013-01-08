@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,12 +55,12 @@ public class HttlEngine implements TemplateEngine {
 		this.templateEncoding = templateEncoding;
 	}
 
-    public void setAdvancedProperties(Map<String, String> configuration) {
-        this.properties.clear();
-        for (Map.Entry<String, String> entry : configuration.entrySet()) {
-            this.properties.setProperty(entry.getKey(), entry.getValue());
-        }
-    }
+	public void setAdvancedProperties(Map<String, String> configuration) {
+		this.properties.clear();
+		for (Map.Entry<String, String> entry : configuration.entrySet()) {
+			this.properties.setProperty(entry.getKey(), entry.getValue());
+		}
+	}
 
 	public String[] getDefaultExtensions() {
 		return new String[] { "httl" };
@@ -68,8 +68,8 @@ public class HttlEngine implements TemplateEngine {
 	
 	private String getTemplatePath(String name) {
 		if (name == null || name.length() == 0) {
-    		throw new IllegalArgumentException("template name == null");
-    	}
+			throw new IllegalArgumentException("template name == null");
+		}
 		name = UrlUtils.cleanName(name);
 		if (path == null) {
 			return name;

@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -108,30 +108,30 @@ public class ContextMap implements Map<String, Object> {
 		return values;
 	}
 
-    private class ContextEntry implements Entry<String, Object> {
+	private class ContextEntry implements Entry<String, Object> {
 
-        private final String key;
-        
-        private volatile Object value;
+		private final String key;
+		
+		private volatile Object value;
 
-        public ContextEntry(String key){
-            this.key = key;
-            this.value = ContextMap.this.get(key);
-        }
+		public ContextEntry(String key){
+			this.key = key;
+			this.value = ContextMap.this.get(key);
+		}
 
-        public String getKey() {
-            return key;
-        }
+		public String getKey() {
+			return key;
+		}
 
-        public Object getValue() {
-            return value;
-        }
+		public Object getValue() {
+			return value;
+		}
 
-        public Object setValue(Object value) {
-            this.value = value;
-            return ContextMap.this.put(key, value);
-        }
+		public Object setValue(Object value) {
+			this.value = value;
+			return ContextMap.this.put(key, value);
+		}
 
-    }
+	}
 
 }

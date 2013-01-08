@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,17 +40,17 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class ServletResolver implements Resolver, Filter {
 
-    private static final String REQUEST_KEY = "request";
+	private static final String REQUEST_KEY = "request";
 
-    private static final String RESPONSE_KEY = "response";
+	private static final String RESPONSE_KEY = "response";
 
-    private static final String SESSION_KEY = "session";
+	private static final String SESSION_KEY = "session";
 
-    private static final String APPLICATION_KEY = "application";
+	private static final String APPLICATION_KEY = "application";
 
-    private static final ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
+	private static final ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
 
-    private static final ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
+	private static final ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
 
 	public static void set(HttpServletRequest request, HttpServletResponse response) {
 		if (request != null) {
@@ -73,13 +73,13 @@ public class ServletResolver implements Resolver, Filter {
 		RESPONSE_LOCAL.remove();
 	}
 
-    public static HttpServletRequest getRequest() {
-    	return REQUEST_LOCAL.get();
-    }
-    
-    public static HttpServletResponse getResponse() {
-    	return RESPONSE_LOCAL.get();
-    }
+	public static HttpServletRequest getRequest() {
+		return REQUEST_LOCAL.get();
+	}
+	
+	public static HttpServletResponse getResponse() {
+		return RESPONSE_LOCAL.get();
+	}
 
 	public static HttpServletRequest getAndCheckRequest() {
 		return assertNotNull(getRequest());
@@ -99,28 +99,28 @@ public class ServletResolver implements Resolver, Filter {
 		return object;
 	}
 
-    private Object getParameterValue(HttpServletRequest request, String key) {
-        String[] values = request.getParameterValues(key);
-        if (values == null || values.length == 0) {
-            return null;
-        } else if (values.length == 1) {
-            return values[0];
-        } else  {
-            return values;
-        }
-    }
-    
-    private Object getCookieValue(HttpServletRequest request, String key) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                if (key.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
+	private Object getParameterValue(HttpServletRequest request, String key) {
+		String[] values = request.getParameterValues(key);
+		if (values == null || values.length == 0) {
+			return null;
+		} else if (values.length == 1) {
+			return values[0];
+		} else  {
+			return values;
+		}
+	}
+	
+	private Object getCookieValue(HttpServletRequest request, String key) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null && cookies.length > 0) {
+			for (Cookie cookie : cookies) {
+				if (key.equals(cookie.getName())) {
+					return cookie.getValue();
+				}
+			}
+		}
+		return null;
+	}
 
 	public Object get(String key) {
 		HttpServletRequest request = getRequest();
@@ -131,58 +131,58 @@ public class ServletResolver implements Resolver, Filter {
 		if (value != null) {
 			if ("contextPath".equals(key) && "/".equals(value)) {
 				return ""; // e.g. ${contextPath}/index.html
-        	}
-    		return value;
-    	}
+			}
+			return value;
+		}
 		value = request.getAttribute(key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = getParameterValue(request, key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = request.getHeader(key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = request.getHeader(StringUtils.splitCamelName(key, "-", true));
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = ClassUtils.getProperty(request.getSession(), key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = request.getSession().getAttribute(key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = getCookieValue(request, key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = ClassUtils.getProperty(request.getSession().getServletContext(), key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		value = request.getSession().getServletContext().getAttribute(key);
 		if (value != null) {
-    		return value;
-    	}
+			return value;
+		}
 		if (REQUEST_KEY.equals(key)) {
-        	return request;
-        }
-        if (RESPONSE_KEY.equals(key)) {
-        	return getResponse();
-        }
-        if (SESSION_KEY.equals(key)) {
-        	return request.getSession();
-        }
-        if (APPLICATION_KEY.equals(key)) {
-        	return request.getSession().getServletContext();
-        }
-        return value;
+			return request;
+		}
+		if (RESPONSE_KEY.equals(key)) {
+			return getResponse();
+		}
+		if (SESSION_KEY.equals(key)) {
+			return request.getSession();
+		}
+		if (APPLICATION_KEY.equals(key)) {
+			return request.getSession().getServletContext();
+		}
+		return value;
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {

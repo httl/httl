@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,72 +57,72 @@ public class DefaultEngine extends Engine {
 
 	// The storage for string template.
 	// @see parseTemplate()
-    private final StringLoader stringLoader;
+	private final StringLoader stringLoader;
 
-    // httl.properties: loaders=httl.spi.loaders.ClasspathLoader
-    private Loader loader;
+	// httl.properties: loaders=httl.spi.loaders.ClasspathLoader
+	private Loader loader;
 
 	// httl.properties: parser=httl.spi.parsers.CommentParser
-    private Parser parser;
+	private Parser parser;
 
-    // httl.properties: translator=httl.spi.translators.DefaultTranslator
-    private Translator translator;
-    
-    // httl.properties: resolver=httl.spi.resolvers.SystemResolver
-    private Resolver resolver;
+	// httl.properties: translator=httl.spi.translators.DefaultTranslator
+	private Translator translator;
+	
+	// httl.properties: resolver=httl.spi.resolvers.SystemResolver
+	private Resolver resolver;
 
 	// httl.properties: loggers=httl.spi.loggers.Log4jLogger
-    private Logger logger;
+	private Logger logger;
 
-    // httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
-    private Map<Object, Object> templateCache;
+	// httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
+	private Map<Object, Object> templateCache;
 
-    // httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
-    private Map<Object, Object> expressionCache;
+	// httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
+	private Map<Object, Object> expressionCache;
 
-    // httl.properties: template.suffix=.httl
-    private String templateSuffix;
+	// httl.properties: template.suffix=.httl
+	private String templateSuffix;
 
-    // httl.properties: reloadable=true
-    private boolean reloadable;
-    
-    // httl.properties: precompiled=true
-    private boolean precompiled;
+	// httl.properties: reloadable=true
+	private boolean reloadable;
+	
+	// httl.properties: precompiled=true
+	private boolean precompiled;
 
-    // httl.properties: name
-    private String name;
+	// httl.properties: name
+	private String name;
 
 	// httl.properties: instantiated content
-    private Map<String, Object> properties;
+	private Map<String, Object> properties;
 
-    private final String version = Version.getVersion(DefaultEngine.class, "1.0.0");
-    
-    public DefaultEngine() {
-    	this.stringLoader = new StringLoader(this);
-    }
+	private final String version = Version.getVersion(DefaultEngine.class, "1.0.0");
+	
+	public DefaultEngine() {
+		this.stringLoader = new StringLoader(this);
+	}
 
 	/**
-     * Get config path.
-     */
-    public String getName() {
+	 * Get config path.
+	 */
+	public String getName() {
 		return name;
 	}
 
-    /**
-     * Get engine version.
-     */
+	/**
+	 * Get engine version.
+	 */
 	public String getVersion() {
 		return version;
 	}
 
-    /**
-     * Get config instantiated value.
-     * 
-     * @see #getEngine()
-     * @param key - config key
-     * @param cls - config value type
-     * @return config value
-     */
+	/**
+	 * Get config instantiated value.
+	 * 
+	 * @see #getEngine()
+	 * @param key - config key
+	 * @param cls - config value type
+	 * @return config value
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getProperty(String key, Class<T> cls) {
 		if (resolver != null) {
@@ -146,46 +146,46 @@ public class DefaultEngine extends Engine {
 			}
 		}
 		return null;
-    }
+	}
 
-    /**
-     * Get expression.
-     * 
-     * @see #getEngine()
-     * @param source - expression source
-     * @param parameterTypes - expression parameter types
-     * @return expression instance
-     * @throws ParseException - If the expression cannot be parsed
-     */
-    @SuppressWarnings("unchecked")
+	/**
+	 * Get expression.
+	 * 
+	 * @see #getEngine()
+	 * @param source - expression source
+	 * @param parameterTypes - expression parameter types
+	 * @return expression instance
+	 * @throws ParseException - If the expression cannot be parsed
+	 */
+	@SuppressWarnings("unchecked")
 	public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
-    	if (source == null || source.length() == 0) {
-    		throw new IllegalArgumentException("expression source == null");
-    	}
-    	Map<Object, Object> cache = this.expressionCache; // safe copy reference
-		if (cache == null) {
-		    return translator.translate(source, parameterTypes, 0);
+		if (source == null || source.length() == 0) {
+			throw new IllegalArgumentException("expression source == null");
 		}
-        VolatileReference<Expression> reference = (VolatileReference<Expression>) cache.get(source);
-        if (reference == null) {
-        	if (cache instanceof ConcurrentMap) {
-        		reference = new VolatileReference<Expression>(); // quickly
-        		VolatileReference<Expression> old = (VolatileReference<Expression>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(source, reference);
-        		if (old != null) { // duplicate
-        			reference = old;
-        		}
-        	} else {
-	        	synchronized (cache) { // cache lock
-	        		reference = (VolatileReference<Expression>) cache.get(source);
-	                if (reference == null) { // double check
-	                	reference = new VolatileReference<Expression>(); // quickly
-	                	cache.put(source, reference);
-	                }
+		Map<Object, Object> cache = this.expressionCache; // safe copy reference
+		if (cache == null) {
+			return translator.translate(source, parameterTypes, 0);
+		}
+		VolatileReference<Expression> reference = (VolatileReference<Expression>) cache.get(source);
+		if (reference == null) {
+			if (cache instanceof ConcurrentMap) {
+				reference = new VolatileReference<Expression>(); // quickly
+				VolatileReference<Expression> old = (VolatileReference<Expression>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(source, reference);
+				if (old != null) { // duplicate
+					reference = old;
 				}
-        	}
-        }
-        assert(reference != null);
-        Expression expression = (Expression) reference.get();
+			} else {
+				synchronized (cache) { // cache lock
+					reference = (VolatileReference<Expression>) cache.get(source);
+					if (reference == null) { // double check
+						reference = new VolatileReference<Expression>(); // quickly
+						cache.put(source, reference);
+					}
+				}
+			}
+		}
+		assert(reference != null);
+		Expression expression = (Expression) reference.get();
 		if (expression == null) {
 			synchronized (reference) { // reference lock
 				expression = (Expression) reference.get();
@@ -197,68 +197,68 @@ public class DefaultEngine extends Engine {
 		}
 		assert(expression != null);
 		return expression;
-    }
-    
-    /**
-     * Get template.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @param locale - template locale
-     * @param encoding - template encoding
-     * @return template instance
-     * @throws IOException - If an I/O error occurs
-     * @throws ParseException - If the template cannot be parsed
-     */
-    @SuppressWarnings("unchecked")
+	}
+	
+	/**
+	 * Get template.
+	 * 
+	 * @see #getEngine()
+	 * @param name - template name
+	 * @param locale - template locale
+	 * @param encoding - template encoding
+	 * @return template instance
+	 * @throws IOException - If an I/O error occurs
+	 * @throws ParseException - If the template cannot be parsed
+	 */
+	@SuppressWarnings("unchecked")
 	public Template getTemplate(String name, Locale locale, String encoding) throws IOException, ParseException {
 		name = UrlUtils.cleanName(name);
 		Map<Object, Object> cache = this.templateCache; // safe copy reference
 		if (cache == null) {
-		    return parseTemplate(name, locale, encoding, null);
+			return parseTemplate(name, locale, encoding, null);
 		}
 		Resource resource = null;
 		long lastModified;
-        if (reloadable) {
-        	resource = loadResource(name, locale, encoding);
-        	lastModified = resource.getLastModified();
-        } else {
-        	lastModified = Long.MIN_VALUE;
-        }
-        String key = name;
-        if (locale != null || encoding != null) {
-	        StringBuilder buf = new StringBuilder(name.length() + 20);
-	    	buf.append(name);
-	    	if (locale != null) {
-	    		buf.append("_");
-	    		buf.append(locale);
-	    	}
-	    	if (encoding != null) {
-	    		buf.append("_");
-	    		buf.append(encoding);
-	    	}
-	    	key = buf.toString();
-        }
-        VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(key);
-        if (reference == null) {
-        	if (cache instanceof ConcurrentMap) {
-        		reference = new VolatileReference<Template>(); // quickly
-        		VolatileReference<Template> old = (VolatileReference<Template>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(key, reference);
-        		if (old != null) { // duplicate
-        			reference = old;
-        		}
-        	} else {
-	        	synchronized (cache) { // cache lock
-	        		reference = (VolatileReference<Template>) cache.get(key);
-	                if (reference == null) { // double check
-	                	reference = new VolatileReference<Template>(); // quickly
-	                	cache.put(key, reference);
-	                }
+		if (reloadable) {
+			resource = loadResource(name, locale, encoding);
+			lastModified = resource.getLastModified();
+		} else {
+			lastModified = Long.MIN_VALUE;
+		}
+		String key = name;
+		if (locale != null || encoding != null) {
+			StringBuilder buf = new StringBuilder(name.length() + 20);
+			buf.append(name);
+			if (locale != null) {
+				buf.append("_");
+				buf.append(locale);
+			}
+			if (encoding != null) {
+				buf.append("_");
+				buf.append(encoding);
+			}
+			key = buf.toString();
+		}
+		VolatileReference<Template> reference = (VolatileReference<Template>) cache.get(key);
+		if (reference == null) {
+			if (cache instanceof ConcurrentMap) {
+				reference = new VolatileReference<Template>(); // quickly
+				VolatileReference<Template> old = (VolatileReference<Template>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(key, reference);
+				if (old != null) { // duplicate
+					reference = old;
 				}
-        	}
-        }
-        assert(reference != null);
-        Template template = (Template) reference.get();
+			} else {
+				synchronized (cache) { // cache lock
+					reference = (VolatileReference<Template>) cache.get(key);
+					if (reference == null) { // double check
+						reference = new VolatileReference<Template>(); // quickly
+						cache.put(key, reference);
+					}
+				}
+			}
+		}
+		assert(reference != null);
+		Template template = (Template) reference.get();
 		if (template == null || template.getLastModified() < lastModified) {
 			synchronized (reference) { // reference lock
 				template = (Template) reference.get();
@@ -272,77 +272,77 @@ public class DefaultEngine extends Engine {
 		return template;
 	}
 
-    // Parse the template. (No cache)
-    private Template parseTemplate(String name, Locale locale, String encoding, Resource resource) throws IOException, ParseException {
-    	if (resource == null) {
-    		resource = loadResource(name, locale, encoding);
-    	}
-        try {
-            return parser.parse(resource);
-        } catch (ParseException e) {
-            int offset = e.getErrorOffset();
-            if (offset <= 0) {
-                throw e;
-            }
-            String location = null;
-            try {
-                Reader reader = resource.getReader();
-                try {
-                    location = StringUtils.getLocationMessage(name, reader, offset);
-                } finally {
-                    reader.close();
-                }
-            } catch (Throwable t) {
-            }
-            throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
-                                     (location == null || location.length() == 0 ? "" : ", " + location) 
-                                     + ", stack: " + ClassUtils.toString(e), offset);
-        }
-    }
+	// Parse the template. (No cache)
+	private Template parseTemplate(String name, Locale locale, String encoding, Resource resource) throws IOException, ParseException {
+		if (resource == null) {
+			resource = loadResource(name, locale, encoding);
+		}
+		try {
+			return parser.parse(resource);
+		} catch (ParseException e) {
+			int offset = e.getErrorOffset();
+			if (offset <= 0) {
+				throw e;
+			}
+			String location = null;
+			try {
+				Reader reader = resource.getReader();
+				try {
+					location = StringUtils.getLocationMessage(name, reader, offset);
+				} finally {
+					reader.close();
+				}
+			} catch (Throwable t) {
+			}
+			throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
+									 (location == null || location.length() == 0 ? "" : ", " + location) 
+									 + ", stack: " + ClassUtils.toString(e), offset);
+		}
+	}
 
 	/**
-     * Get resource.
-     * 
-     * @see #getEngine()
-     * @param name - resource name
+	 * Get resource.
+	 * 
+	 * @see #getEngine()
+	 * @param name - resource name
 	 * @param locale - resource locale
 	 * @param encoding - resource encoding
-     * @return resource instance
-     * @throws IOException - If an I/O error occurs
-     */
-    public Resource getResource(String name, Locale locale, String encoding) throws IOException {
-    	name = UrlUtils.cleanName(name);
-    	return loadResource(name, locale, encoding);
-    }
+	 * @return resource instance
+	 * @throws IOException - If an I/O error occurs
+	 */
+	public Resource getResource(String name, Locale locale, String encoding) throws IOException {
+		name = UrlUtils.cleanName(name);
+		return loadResource(name, locale, encoding);
+	}
 
-    // Load the resource. (No url clean)
-    private Resource loadResource(String name, Locale locale, String encoding) throws IOException {
-    	Resource resource;
-    	if (stringLoader.exists(name, locale)) {
-    		resource = stringLoader.load(name, locale, encoding);
-    	} else {
-    		resource = loader.load(name, locale, encoding);
-    	}
-    	if (resource == null) {
-    		throw new FileNotFoundException("Not found resource " + name);
-    	}
-    	return resource;
-    }
+	// Load the resource. (No url clean)
+	private Resource loadResource(String name, Locale locale, String encoding) throws IOException {
+		Resource resource;
+		if (stringLoader.exists(name, locale)) {
+			resource = stringLoader.load(name, locale, encoding);
+		} else {
+			resource = loader.load(name, locale, encoding);
+		}
+		if (resource == null) {
+			throw new FileNotFoundException("Not found resource " + name);
+		}
+		return resource;
+	}
 
-    /**
-     * Parse string template.
-     * 
-     * @see #getEngine()
-     * @param source - template source
-     * @return template instance
-     * @throws IOException - If an I/O error occurs
-     * @throws ParseException - If the template cannot be parsed
-     */
+	/**
+	 * Parse string template.
+	 * 
+	 * @see #getEngine()
+	 * @param source - template source
+	 * @return template instance
+	 * @throws IOException - If an I/O error occurs
+	 * @throws ParseException - If the template cannot be parsed
+	 */
 	public Template parseTemplate(String source) throws ParseException {
 		String name = "/$" + Digest.getMD5(source);
-        if (! hasResource(name)) {
-        	stringLoader.add(name, source);
-        }
+		if (! hasResource(name)) {
+			stringLoader.add(name, source);
+		}
 		try {
 			return getTemplate(name);
 		} catch (IOException e) {
@@ -351,26 +351,26 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-     * Tests whether the resource denoted by this abstract pathname exists.
-     * 
-     * @see #getEngine()
-     * @param name - template name
-     * @param locale - resource locale
-     * @return exists
-     */
-    public boolean hasResource(String name, Locale locale) {
-    	name = UrlUtils.cleanName(name);
-    	return stringLoader.exists(name, locale) || loader.exists(name, locale);
-    }
+	 * Tests whether the resource denoted by this abstract pathname exists.
+	 * 
+	 * @see #getEngine()
+	 * @param name - template name
+	 * @param locale - resource locale
+	 * @return exists
+	 */
+	public boolean hasResource(String name, Locale locale) {
+		name = UrlUtils.cleanName(name);
+		return stringLoader.exists(name, locale) || loader.exists(name, locale);
+	}
 
-    /**
-     * Init the engine.
-     */
-    public void init() {
-    	if (logger != null && name != null && name.length() > 0) {
-    		if (logger.isWarnEnabled() && ! ConfigUtils.isFilePath(name)) {
-    			try {
-    				List<String> realPaths = new ArrayList<String>();
+	/**
+	 * Init the engine.
+	 */
+	public void init() {
+		if (logger != null && name != null && name.length() > 0) {
+			if (logger.isWarnEnabled() && ! ConfigUtils.isFilePath(name)) {
+				try {
+					List<String> realPaths = new ArrayList<String>();
 					Enumeration<URL> e = Thread.currentThread().getContextClassLoader().getResources(name);
 					while (e.hasMoreElements()) {
 						URL url = (URL) e.nextElement();
@@ -382,101 +382,101 @@ public class DefaultEngine extends Engine {
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
 				}
-    		}
-    		if (logger.isInfoEnabled()) {
-	    		String realPath = ConfigUtils.getRealPath(name);
-	            if (realPath != null && realPath.length() > 0) {
-	            	logger.info("Load httl config from " + realPath + " in " + (name.startsWith("/") ? "filesystem" : "classpath") + ".");
-	            }
-    		}
-    	}
-    }
+			}
+			if (logger.isInfoEnabled()) {
+				String realPath = ConfigUtils.getRealPath(name);
+				if (realPath != null && realPath.length() > 0) {
+					logger.info("Load httl config from " + realPath + " in " + (name.startsWith("/") ? "filesystem" : "classpath") + ".");
+				}
+			}
+		}
+	}
 
-    /**
-     * On all inited.
-     */
-    public void inited() {
-    	if (precompiled) {
-            try {
-                List<String> list = loader.list(templateSuffix);
-                for (String name : list) {
-                    try {
-                        getTemplate(name);
-                    } catch (Exception e) {
-                    	if (logger != null && logger.isErrorEnabled()) {
-                    		logger.error(e.getMessage(), e);
-                    	}
-                    }
-                }
-            } catch (Exception e) {
-            	if (logger != null && logger.isErrorEnabled()) {
-            		logger.error(e.getMessage(), e);
-            	}
-            }
-        }
-    }
+	/**
+	 * On all inited.
+	 */
+	public void inited() {
+		if (precompiled) {
+			try {
+				List<String> list = loader.list(templateSuffix);
+				for (String name : list) {
+					try {
+						getTemplate(name);
+					} catch (Exception e) {
+						if (logger != null && logger.isErrorEnabled()) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+				}
+			} catch (Exception e) {
+				if (logger != null && logger.isErrorEnabled()) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+		}
+	}
 
-    /**
+	/**
 	 * httl.properties: name
 	 */
-    public void setName(String name) {
-    	this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    /**
+	/**
 	 * httl.properties: instantiated content
 	 */
-    public void setProperties(Map<String, Object> properties) {
+	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
 	}
 
-    /**
+	/**
 	 * httl.properties: template.suffix=.httl
 	 */
-    public void setTemplateSuffix(String suffix) {
-    	this.templateSuffix = suffix;
-    }
+	public void setTemplateSuffix(String suffix) {
+		this.templateSuffix = suffix;
+	}
 
-    /**
+	/**
 	 * httl.properties: reloadable=true
 	 */
-    public void setReloadable(boolean reloadable) {
-    	this.reloadable = reloadable;
-    }
+	public void setReloadable(boolean reloadable) {
+		this.reloadable = reloadable;
+	}
 
-    /**
+	/**
 	 * httl.properties: precompiled=true
 	 */
-    public void setPrecompiled(boolean precompiled) {
-    	this.precompiled = precompiled;
-    }
+	public void setPrecompiled(boolean precompiled) {
+		this.precompiled = precompiled;
+	}
 
-    /**
+	/**
 	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
 	 */
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
 
-    /**
+	/**
 	 * httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
 	 */
-    public void setExpressionCache(Map<Object, Object> cache) {
-        this.expressionCache = cache;
+	public void setExpressionCache(Map<Object, Object> cache) {
+		this.expressionCache = cache;
 	}
-    
-    /**
+	
+	/**
 	 * httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
 	 */
-    public void setTemplateCache(Map<Object, Object> cache) {
-        this.templateCache = cache;
+	public void setTemplateCache(Map<Object, Object> cache) {
+		this.templateCache = cache;
 	}
-    
-    /**
+	
+	/**
 	 * httl.properties: loaders=httl.spi.loaders.ClasspathLoader
 	 */
 	public void setLoader(Loader loader) {
-	    this.loader = loader;
+		this.loader = loader;
 	}
 
 	/**
@@ -493,9 +493,9 @@ public class DefaultEngine extends Engine {
 		this.translator = translator;
 	}
 
-    /**
-     * httl.properties: resolver=httl.spi.resolvers.SystemResolver
-     */
+	/**
+	 * httl.properties: resolver=httl.spi.resolvers.SystemResolver
+	 */
 	public void setResolver(Resolver resolver) {
 		this.resolver = resolver;
 	}

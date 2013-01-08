@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,23 +49,23 @@ public class WebEngine {
 
 	private static final String CHARSET_KEY = "charset=";
 
-    private static final String CONFIG_KEY = "httl.properties";
+	private static final String CONFIG_KEY = "httl.properties";
 
-    private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
+	private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
 
-    private static final String OUTPUT_ENCODING_KEY = "output.encoding";
+	private static final String OUTPUT_ENCODING_KEY = "output.encoding";
 
-    private static final String OUTPUT_STREAM_KEY = "output.stream";
-    
-    private static final String LOCALIZED_KEY = "localized";
+	private static final String OUTPUT_STREAM_KEY = "output.stream";
+	
+	private static final String LOCALIZED_KEY = "localized";
 
 	private static volatile Engine ENGINE;
 
-    private static String OUTPUT_ENCODING;
+	private static String OUTPUT_ENCODING;
 
-    private static boolean OUTPUT_STREAM;
+	private static boolean OUTPUT_STREAM;
 
-    private static boolean LOCALIZED;
+	private static boolean LOCALIZED;
 
 	private WebEngine() {}
 
@@ -84,47 +84,47 @@ public class WebEngine {
 			synchronized (WebEngine.class) {
 				if (ENGINE == null) { // double check
 					String config = servletContext.getInitParameter(CONFIG_KEY);
-			        if (config != null && config.length() > 0) {
-			            if (config.startsWith("/")) {
-			                Properties properties = new Properties();
-			                InputStream in = servletContext.getResourceAsStream(config);
-			                if (in == null) {
-			                	throw new IllegalStateException("Not found httl config " + config + " in wepapp.");
-			                }
-			                try {
+					if (config != null && config.length() > 0) {
+						if (config.startsWith("/")) {
+							Properties properties = new Properties();
+							InputStream in = servletContext.getResourceAsStream(config);
+							if (in == null) {
+								throw new IllegalStateException("Not found httl config " + config + " in wepapp.");
+							}
+							try {
 								properties.load(in);
 							} catch (IOException e) {
 								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp. cause: " + e.getMessage(), e);
 							}
-			                addProperties(properties);
-			                ENGINE = Engine.getEngine(config, properties);
-			            } else {
-			            	Properties properties = new Properties();
-			        		addProperties(properties);
-			            	ENGINE = Engine.getEngine(config, properties);
-			            }
-			            logConfigPath(ENGINE, servletContext, config);
-			        } else {
-			        	InputStream in = servletContext.getResourceAsStream(WEBINF_CONFIG);
-			        	if (in != null) {
-			        		Properties properties = new Properties();
-			        		try {
-			        			properties.load(in);
-			        		} catch (IOException e) {
+							addProperties(properties);
+							ENGINE = Engine.getEngine(config, properties);
+						} else {
+							Properties properties = new Properties();
+							addProperties(properties);
+							ENGINE = Engine.getEngine(config, properties);
+						}
+						logConfigPath(ENGINE, servletContext, config);
+					} else {
+						InputStream in = servletContext.getResourceAsStream(WEBINF_CONFIG);
+						if (in != null) {
+							Properties properties = new Properties();
+							try {
+								properties.load(in);
+							} catch (IOException e) {
 								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp. cause: " + e.getMessage(), e);
 							}
-			        		addProperties(properties);
-			        		ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
-			        		logConfigPath(ENGINE, servletContext, WEBINF_CONFIG);
-			        	} else {
-			        		Properties properties = new Properties();
-			        		addProperties(properties);
-			        		ENGINE = Engine.getEngine(properties);
-			        	}
-			        }
-			        OUTPUT_ENCODING = ENGINE.getProperty(OUTPUT_ENCODING_KEY, String.class);
-			        OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
-			        LOCALIZED = ENGINE.getProperty(LOCALIZED_KEY, false);
+							addProperties(properties);
+							ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
+							logConfigPath(ENGINE, servletContext, WEBINF_CONFIG);
+						} else {
+							Properties properties = new Properties();
+							addProperties(properties);
+							ENGINE = Engine.getEngine(properties);
+						}
+					}
+					OUTPUT_ENCODING = ENGINE.getProperty(OUTPUT_ENCODING_KEY, String.class);
+					OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
+					LOCALIZED = ENGINE.getProperty(LOCALIZED_KEY, false);
 				}
 			}
 		}
@@ -133,9 +133,9 @@ public class WebEngine {
 	private static void logConfigPath(Engine engine, ServletContext servletContext, String path) {
 		if (engine != null && servletContext != null && path != null) {
 			Logger logger = engine.getProperty("logger", Logger.class);
-	    	if (logger != null && logger.isInfoEnabled()) {
-	    		String name = engine.getName();
-	    		try {
+			if (logger != null && logger.isInfoEnabled()) {
+				String name = engine.getName();
+				try {
 					if (name != null && name.startsWith("/")
 							&& servletContext.getResource(name) != null) {
 						logger.info("Load httl config form " + servletContext.getRealPath(name) + " in webapp.");
@@ -143,7 +143,7 @@ public class WebEngine {
 				} catch (IOException e) {
 					// ignore
 				}
-	    	}
+			}
 		}
 	}
 
@@ -158,32 +158,32 @@ public class WebEngine {
 			}
 		}
 		if (! properties.containsKey("loader") 
-        		&& ! properties.containsKey("loaders")) {
+				&& ! properties.containsKey("loaders")) {
 			String loaders = def.getProperty("loaders", "");
 			if (loaders.length() > 0) {
 				loaders = loaders + ",";
 			}
-        	properties.setProperty("loaders", loaders + ServletLoader.class.getName());
-        }
-        if (! properties.containsKey("resolver") 
-        		&& ! properties.containsKey("resolvers")) {
-        	String resolvers = def.getProperty("resolvers", "");
+			properties.setProperty("loaders", loaders + ServletLoader.class.getName());
+		}
+		if (! properties.containsKey("resolver") 
+				&& ! properties.containsKey("resolvers")) {
+			String resolvers = def.getProperty("resolvers", "");
 			if (resolvers.length() > 0) {
 				resolvers = resolvers + ",";
 			}
-        	properties.setProperty("resolvers", resolvers + ServletResolver.class.getName());
-        }
-        if (! properties.containsKey("import.variables")) {
-        	String variables = def.getProperty("import.variables", "");
+			properties.setProperty("resolvers", resolvers + ServletResolver.class.getName());
+		}
+		if (! properties.containsKey("import.variables")) {
+			String variables = def.getProperty("import.variables", "");
 			if (variables.length() > 0) {
 				variables = variables + ",";
 			}
-        	properties.setProperty("import.variables",  variables 
-        			+ HttpServletRequest.class.getName() + " request,"
-        			+ HttpServletResponse.class.getName() + " response,"
-        			+ HttpSession.class.getName() + " session,"
-        			+ ServletContext.class.getName() + " application");
-        }
+			properties.setProperty("import.variables",  variables 
+					+ HttpServletRequest.class.getName() + " request,"
+					+ HttpServletResponse.class.getName() + " response,"
+					+ HttpSession.class.getName() + " session,"
+					+ ServletContext.class.getName() + " application");
+		}
 	}
 
 	public static Engine getEngine() {

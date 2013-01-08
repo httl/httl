@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,14 +35,14 @@ import java.util.Locale;
  */
 public class FileLoader extends AbstractLoader {
 
-    public List<String> doList(String directory, String suffix) throws IOException {
-        File file = new File(directory);
-        return UrlUtils.listFile(file, suffix);
-    }
-    
-    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
-        return new FileResource(getEngine(), name, locale, encoding, path);
-    }
+	public List<String> doList(String directory, String suffix) throws IOException {
+		File file = new File(directory);
+		return UrlUtils.listFile(file, suffix);
+	}
+	
+	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+		return new FileResource(getEngine(), name, locale, encoding, path);
+	}
 
 	public boolean doExists(String name, Locale locale, String path) throws Exception {
 		return new File(path).exists();

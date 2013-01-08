@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,84 +30,84 @@ public class StringMethod {
 
 	public static String toUnderlineName(String name) {
 		if (name == null || name.length() == 0) {
-    		return name;
-    	}
-    	StringBuilder buf = new StringBuilder(name.length() * 2);
-    	buf.append(Character.toLowerCase(name.charAt(0)));
-    	for (int i = 1; i < name.length(); i ++) {
-    		char c = name.charAt(i);
-    		if (c >= 'A' && c <= 'Z') {
-    			buf.append('_');
-    			buf.append(Character.toLowerCase(c));
-    		} else {
-    			buf.append(c);
-    		}
-    	}
-    	return buf.toString();
+			return name;
+		}
+		StringBuilder buf = new StringBuilder(name.length() * 2);
+		buf.append(Character.toLowerCase(name.charAt(0)));
+		for (int i = 1; i < name.length(); i ++) {
+			char c = name.charAt(i);
+			if (c >= 'A' && c <= 'Z') {
+				buf.append('_');
+				buf.append(Character.toLowerCase(c));
+			} else {
+				buf.append(c);
+			}
+		}
+		return buf.toString();
 	}
 
-    public static String toCamelName(String name) {
-    	if (name == null || name.length() == 0) {
-    		return name;
-    	}
-    	StringBuilder buf = new StringBuilder(name.length());
-    	boolean upper = false;
-    	for (int i = 0; i < name.length(); i ++) {
-    		char c = name.charAt(i);
-    		if (c == '_') {
-    			upper = true;
-    		} else {
-    			if (upper) {
-    				upper = false;
-    				c = Character.toUpperCase(c);
-    			}
-    			buf.append(c);
-    		}
-    	}
-    	return buf.toString();
-    }
+	public static String toCamelName(String name) {
+		if (name == null || name.length() == 0) {
+			return name;
+		}
+		StringBuilder buf = new StringBuilder(name.length());
+		boolean upper = false;
+		for (int i = 0; i < name.length(); i ++) {
+			char c = name.charAt(i);
+			if (c == '_') {
+				upper = true;
+			} else {
+				if (upper) {
+					upper = false;
+					c = Character.toUpperCase(c);
+				}
+				buf.append(c);
+			}
+		}
+		return buf.toString();
+	}
 
-    public static String toCapitalName(String name) {
-    	if (name == null || name.length() == 0) {
-    		return name;
-    	}
-    	StringBuilder buf = new StringBuilder(name.length());
-    	boolean upper = true;
-    	for (int i = 0; i < name.length(); i ++) {
-    		char c = name.charAt(i);
-    		if (c == '_') {
-    			upper = true;
-    		} else {
-    			if (upper) {
-    				upper = false;
-    				c = Character.toUpperCase(c);
-    			}
-    			buf.append(c);
-    		}
-    	}
-    	return buf.toString();
-    }
-    
-    public static String clip(String value, int max) {
-    	if (value == null || value.length() == 0 || max < 1) {
-    		return value;
-    	}
-    	if (value.length() > max) {
-    		return value.substring(0, max) + "...";
-    	}
-    	return value;
-    }
+	public static String toCapitalName(String name) {
+		if (name == null || name.length() == 0) {
+			return name;
+		}
+		StringBuilder buf = new StringBuilder(name.length());
+		boolean upper = true;
+		for (int i = 0; i < name.length(); i ++) {
+			char c = name.charAt(i);
+			if (c == '_') {
+				upper = true;
+			} else {
+				if (upper) {
+					upper = false;
+					c = Character.toUpperCase(c);
+				}
+				buf.append(c);
+			}
+		}
+		return buf.toString();
+	}
+	
+	public static String clip(String value, int max) {
+		if (value == null || value.length() == 0 || max < 1) {
+			return value;
+		}
+		if (value.length() > max) {
+			return value.substring(0, max) + "...";
+		}
+		return value;
+	}
 
-    public static String repeat(String value, int count) {
-        if (value == null || value.length() == 0 || count <= 0) {
-            return value;
-        }
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < count; i ++) {
-            buf.append(value);
-        }
-        return buf.toString();
-    }
+	public static String repeat(String value, int count) {
+		if (value == null || value.length() == 0 || count <= 0) {
+			return value;
+		}
+		StringBuilder buf = new StringBuilder();
+		for (int i = 0; i < count; i ++) {
+			buf.append(value);
+		}
+		return buf.toString();
+	}
 
 	public static String[] split(String value, char separator) {
 		if (value == null || value.length() == 0) {

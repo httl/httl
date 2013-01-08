@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,89 +47,89 @@ public class CollectionMethod {
 	
 	private CollectionMethod() {}
 
-    public static <T> ListCycle<T> toCycle(Collection<T> values) {
-        return new ListCycle<T>(values);
-    }
+	public static <T> ListCycle<T> toCycle(Collection<T> values) {
+		return new ListCycle<T>(values);
+	}
 
-    public static <T> ArrayCycle<T> toCycle(T[] values) {
-        return new ArrayCycle<T>(values);
-    }
+	public static <T> ArrayCycle<T> toCycle(T[] values) {
+		return new ArrayCycle<T>(values);
+	}
 
-    public static BooleanArrayCycle toCycle(boolean[] values) {
-        return new BooleanArrayCycle(values);
-    }
+	public static BooleanArrayCycle toCycle(boolean[] values) {
+		return new BooleanArrayCycle(values);
+	}
 
-    public static CharArrayCycle toCycle(char[] values) {
-        return new CharArrayCycle(values);
-    }
+	public static CharArrayCycle toCycle(char[] values) {
+		return new CharArrayCycle(values);
+	}
 
-    public static ByteArrayCycle toCycle(byte[] values) {
-        return new ByteArrayCycle(values);
-    }
+	public static ByteArrayCycle toCycle(byte[] values) {
+		return new ByteArrayCycle(values);
+	}
 
-    public static ShortArrayCycle toCycle(short[] values) {
-        return new ShortArrayCycle(values);
-    }
+	public static ShortArrayCycle toCycle(short[] values) {
+		return new ShortArrayCycle(values);
+	}
 
-    public static IntArrayCycle toCycle(int[] values) {
-        return new IntArrayCycle(values);
-    }
+	public static IntArrayCycle toCycle(int[] values) {
+		return new IntArrayCycle(values);
+	}
 
-    public static LongArrayCycle toCycle(long[] values) {
-        return new LongArrayCycle(values);
-    }
+	public static LongArrayCycle toCycle(long[] values) {
+		return new LongArrayCycle(values);
+	}
 
-    public static FloatArrayCycle toCycle(float[] values) {
-        return new FloatArrayCycle(values);
-    }
+	public static FloatArrayCycle toCycle(float[] values) {
+		return new FloatArrayCycle(values);
+	}
 
-    public static DoubleArrayCycle toCycle(double[] values) {
-        return new DoubleArrayCycle(values);
-    }
+	public static DoubleArrayCycle toCycle(double[] values) {
+		return new DoubleArrayCycle(values);
+	}
 
-    public static int length(Map<?, ?> values) {
-        return values == null ? 0 : values.size();
-    }
+	public static int length(Map<?, ?> values) {
+		return values == null ? 0 : values.size();
+	}
 
-    public static int length(Collection<?> values) {
-        return values == null ? 0 : values.size();
-    }
+	public static int length(Collection<?> values) {
+		return values == null ? 0 : values.size();
+	}
 
-    public static int length(Object[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(Object[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(boolean[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(boolean[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(char[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(char[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(byte[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(byte[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(short[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(short[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(int[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(int[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(long[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(long[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(float[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(float[] values) {
+		return values == null ? 0 : values.length;
+	}
 
-    public static int length(double[] values) {
-        return values == null ? 0 : values.length;
-    }
+	public static int length(double[] values) {
+		return values == null ? 0 : values.length;
+	}
 
 	public static <K, V> Map<K, V> sort(Map<K, V> map) {
 		if (map == null) {

@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,32 +33,32 @@ import java.util.Locale;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class StringResource extends AbstractResource {
-    
-    private static final long serialVersionUID = 1L;
-    
-    private final String source;
-    
-    public StringResource(Engine engine, String name, Locale locale, String encoding, String source) {
-        super(engine, name, locale, encoding);
-        this.source = source;
-    }
-    
-    public StringResource(Engine engine, String name, Locale locale, String encoding, long lastModified, String source) {
-        super(engine, name, locale, encoding, lastModified);
-        this.source = source;
-    }
+	
+	private static final long serialVersionUID = 1L;
+	
+	private final String source;
+	
+	public StringResource(Engine engine, String name, Locale locale, String encoding, String source) {
+		super(engine, name, locale, encoding);
+		this.source = source;
+	}
+	
+	public StringResource(Engine engine, String name, Locale locale, String encoding, long lastModified, String source) {
+		super(engine, name, locale, encoding, lastModified);
+		this.source = source;
+	}
 
-    @Override
-    public long getLength() {
-    	return source.length();
-    }
-    
-    public Reader getReader() throws IOException {
-        return new StringReader(source);
-    }
+	@Override
+	public long getLength() {
+		return source.length();
+	}
+	
+	public Reader getReader() throws IOException {
+		return new StringReader(source);
+	}
 
-    public InputStream getInputStream() throws IOException {
-        return new ByteArrayInputStream(source.getBytes(getEncoding()));
-    }
+	public InputStream getInputStream() throws IOException {
+		return new ByteArrayInputStream(source.getBytes(getEncoding()));
+	}
 
 }

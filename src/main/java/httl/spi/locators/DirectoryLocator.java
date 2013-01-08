@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,41 +30,41 @@ import java.util.Locale;
  */
 public class DirectoryLocator implements Locator {
 
-    private String templateDirectory;
+	private String templateDirectory;
 
-    private String templateSuffix;
+	private String templateSuffix;
 
-    private String messageDirectory;
+	private String messageDirectory;
 
-    private String messageSuffix;
+	private String messageSuffix;
 
-    /**
+	/**
 	 * httl.properties: template.directory=/META-INF/templates
 	 */
-    public void setTemplateDirectory(String directory) {
-        this.templateDirectory = UrlUtils.cleanDirectory(directory);
-    }
+	public void setTemplateDirectory(String directory) {
+		this.templateDirectory = UrlUtils.cleanDirectory(directory);
+	}
 
-    /**
+	/**
 	 * httl.properties: template.suffix=.httl
 	 */
-    public void setTemplateSuffix(String suffix) {
-    	this.templateSuffix = suffix;
-    }
+	public void setTemplateSuffix(String suffix) {
+		this.templateSuffix = suffix;
+	}
 
-    /**
+	/**
 	 * httl.properties: message.directory=/META-INF/messages
 	 */
-    public void setMessageDirectory(String directory) {
-        this.messageDirectory = UrlUtils.cleanDirectory(directory);
-    }
+	public void setMessageDirectory(String directory) {
+		this.messageDirectory = UrlUtils.cleanDirectory(directory);
+	}
 
-    /**
+	/**
 	 * httl.properties: message.suffix=.properties
 	 */
-    public void setMessageSuffix(String suffix) {
-    	this.messageSuffix = suffix;
-    }
+	public void setMessageSuffix(String suffix) {
+		this.messageSuffix = suffix;
+	}
 
 	public String root(String suffix) {
 		if (templateDirectory != null && templateSuffix != null && templateSuffix.equals(suffix)) {
@@ -77,9 +77,9 @@ public class DirectoryLocator implements Locator {
 
 	public String relocate(String name, Locale locale) {
 		if (name == null || name.length() == 0) {
-    		throw new IllegalArgumentException("resource name == null");
-    	}
-    	if (templateDirectory != null && templateSuffix != null && name.endsWith(templateSuffix)) {
+			throw new IllegalArgumentException("resource name == null");
+		}
+		if (templateDirectory != null && templateSuffix != null && name.endsWith(templateSuffix)) {
 			return templateDirectory + name;
 		} else if (messageDirectory != null && messageSuffix != null && name.endsWith(messageSuffix)) {
 			return messageDirectory + name;

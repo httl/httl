@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,25 +32,25 @@ public class JclLogger implements Logger {
 
 	private final Log logger = LogFactory.getLog(NAME);
 
-    public void trace(String msg) {
-        logger.trace(msg);
-    }
+	public void trace(String msg) {
+		logger.trace(msg);
+	}
 
-    public void trace(Throwable e) {
-        logger.trace(e);
-    }
+	public void trace(Throwable e) {
+		logger.trace(e);
+	}
 
-    public void trace(String msg, Throwable e) {
-        logger.trace(msg, e);
-    }
+	public void trace(String msg, Throwable e) {
+		logger.trace(msg, e);
+	}
 
 	public void debug(String msg) {
 		logger.debug(msg);
 	}
 
-    public void debug(Throwable e) {
-        logger.debug(e);
-    }
+	public void debug(Throwable e) {
+		logger.debug(e);
+	}
 
 	public void debug(String msg, Throwable e) {
 		logger.debug(msg, e);
@@ -60,9 +60,9 @@ public class JclLogger implements Logger {
 		logger.info(msg);
 	}
 
-    public void info(Throwable e) {
-        logger.info(e);
-    }
+	public void info(Throwable e) {
+		logger.info(e);
+	}
 
 	public void info(String msg, Throwable e) {
 		logger.info(msg, e);
@@ -72,9 +72,9 @@ public class JclLogger implements Logger {
 		logger.warn(msg);
 	}
 
-    public void warn(Throwable e) {
-        logger.warn(e);
-    }
+	public void warn(Throwable e) {
+		logger.warn(e);
+	}
 
 	public void warn(String msg, Throwable e) {
 		logger.warn(msg, e);
@@ -84,17 +84,17 @@ public class JclLogger implements Logger {
 		logger.error(msg);
 	}
 
-    public void error(Throwable e) {
-        logger.error(e);
-    }
+	public void error(Throwable e) {
+		logger.error(e);
+	}
 
 	public void error(String msg, Throwable e) {
 		logger.error(msg, e);
 	}
 
-    public boolean isTraceEnabled() {
-        return logger.isTraceEnabled();
-    }
+	public boolean isTraceEnabled() {
+		return logger.isTraceEnabled();
+	}
 
 	public boolean isDebugEnabled() {
 		return logger.isDebugEnabled();

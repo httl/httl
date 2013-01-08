@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,7 +39,7 @@ public class JarLoader extends AbstractLoader {
 	private File file;
 	
 	public void setTemplateDirectory(String directory) {
-	    file = new File(directory);
+		file = new File(directory);
 	}
 
 	private File getAndCheckFile() {
@@ -51,12 +51,12 @@ public class JarLoader extends AbstractLoader {
 	
 	protected List<String> doList(String directory, String suffix) throws IOException {
 		JarFile jarFile = new JarFile(getAndCheckFile());
-        try {
-            return UrlUtils.listJar(jarFile, suffix);
-        } finally {
-            jarFile.close();
-        }
-    }
+		try {
+			return UrlUtils.listJar(jarFile, suffix);
+		} finally {
+			jarFile.close();
+		}
+	}
 	
 	public Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
 		return new JarResource(getEngine(), name, locale, encoding, getAndCheckFile());

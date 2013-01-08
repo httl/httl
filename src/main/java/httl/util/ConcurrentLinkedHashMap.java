@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -94,11 +94,11 @@ import java.util.concurrent.locks.ReentrantLock;
  * 
  * @author ben.manes@gmail.com (Ben Manes)
  * @param <K>
- *            the type of keys maintained by this map
+ *			the type of keys maintained by this map
  * @param <V>
- *            the type of mapped values
+ *			the type of mapped values
  * @see <a href="http://code.google.com/p/concurrentlinkedhashmap/">
- *      http://code.google.com/p/concurrentlinkedhashmap/</a>
+ *	  http://code.google.com/p/concurrentlinkedhashmap/</a>
  */
 public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		implements ConcurrentMap<K, V>, Serializable {
@@ -291,9 +291,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * until it shrinks to the appropriate size.
 	 * 
 	 * @param capacity
-	 *            the maximum weighted capacity of the map
+	 *			the maximum weighted capacity of the map
 	 * @throws IllegalArgumentException
-	 *             if the capacity is negative
+	 *			 if the capacity is negative
 	 */
 	public void setCapacity(long capacity) {
 		checkArgument(capacity >= 0);
@@ -348,7 +348,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Performs the post-processing work required after the map operation.
 	 * 
 	 * @param task
-	 *            the pending operation to be applied
+	 *			the pending operation to be applied
 	 */
 	void afterCompletion(Task task) {
 		boolean delayable = schedule(task);
@@ -363,7 +363,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Schedules the task to be applied to the page replacement policy.
 	 * 
 	 * @param task
-	 *            the pending operation
+	 *			the pending operation
 	 * @return if the draining of the buffers can be delayed
 	 */
 	boolean schedule(Task task) {
@@ -445,7 +445,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Moves the tasks from the buffers into the output array.
 	 * 
 	 * @param tasks
-	 *            the ordered array of the pending operations
+	 *			the ordered array of the pending operations
 	 * @return the highest index location of a task that was added to the array
 	 */
 	int moveTasksFromBuffers(Task[] tasks) {
@@ -461,9 +461,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Moves the tasks from the specified buffer into the output array.
 	 * 
 	 * @param tasks
-	 *            the ordered array of the pending operations
+	 *			the ordered array of the pending operations
 	 * @param bufferIndex
-	 *            the buffer to drain into the tasks array
+	 *			the buffer to drain into the tasks array
 	 * @return the highest index location of a task that was added to the array
 	 */
 	int moveTasksFromBuffer(Task[] tasks, int bufferIndex) {
@@ -511,11 +511,11 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Adds the task as the head of the chain at the index location.
 	 * 
 	 * @param tasks
-	 *            the ordered array of the pending operations
+	 *			the ordered array of the pending operations
 	 * @param task
-	 *            the pending operation to add
+	 *			the pending operation to add
 	 * @param index
-	 *            the array location
+	 *			the array location
 	 */
 	void addTaskToChain(Task[] tasks, Task task, int index) {
 		task.setNext(tasks[index]);
@@ -526,9 +526,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Runs the pending page replacement policy operations.
 	 * 
 	 * @param tasks
-	 *            the ordered array of the pending operations
+	 *			the ordered array of the pending operations
 	 * @param maxTaskIndex
-	 *            the maximum index of the array
+	 *			the maximum index of the array
 	 */
 	void runTasks(Task[] tasks, int maxTaskIndex) {
 		for (int i = 0; i <= maxTaskIndex; i++) {
@@ -541,7 +541,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Runs the pending operations on the linked chain.
 	 * 
 	 * @param task
-	 *            the first task in the chain of operations
+	 *			the first task in the chain of operations
 	 */
 	void runTasksInChain(Task task) {
 		while (task != null) {
@@ -556,9 +556,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * Updates the order to start the next drain from.
 	 * 
 	 * @param tasks
-	 *            the ordered array of operations
+	 *			the ordered array of operations
 	 * @param maxTaskIndex
-	 *            the maximum index of the array
+	 *			the maximum index of the array
 	 */
 	void updateDrainedOrder(Task[] tasks, int maxTaskIndex) {
 		if (maxTaskIndex >= 0) {
@@ -745,11 +745,11 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * page replacement policy.
 	 * 
 	 * @param key
-	 *            the key whose associated value is to be returned
+	 *			the key whose associated value is to be returned
 	 * @return the value to which the specified key is mapped, or {@code null}
-	 *         if this map contains no mapping for the key
+	 *		 if this map contains no mapping for the key
 	 * @throws NullPointerException
-	 *             if the specified key is null
+	 *			 if the specified key is null
 	 */
 	public V getQuietly(Object key) {
 		final Node node = data.get(key);
@@ -769,12 +769,12 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * then its value is updated if allowed.
 	 * 
 	 * @param key
-	 *            key with which the specified value is to be associated
+	 *			key with which the specified value is to be associated
 	 * @param value
-	 *            value to be associated with the specified key
+	 *			value to be associated with the specified key
 	 * @param onlyIfAbsent
-	 *            a write is performed only if the key is not already associated
-	 *            with a value
+	 *			a write is performed only if the key is not already associated
+	 *			with a value
 	 * @return the prior value in the data store or null if no mapping was found
 	 */
 	V put(K key, V value, boolean onlyIfAbsent) {
@@ -942,10 +942,10 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * requires a traversal of the keys.
 	 * 
 	 * @param limit
-	 *            the maximum size of the returned set
+	 *			the maximum size of the returned set
 	 * @return a ascending snapshot view of the keys in this map
 	 * @throws IllegalArgumentException
-	 *             if the limit is negative
+	 *			 if the limit is negative
 	 */
 	public Set<K> ascendingKeySetWithLimit(int limit) {
 		return orderedKeySet(true, limit);
@@ -980,10 +980,10 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * requires a traversal of the keys.
 	 * 
 	 * @param limit
-	 *            the maximum size of the returned set
+	 *			the maximum size of the returned set
 	 * @return a descending snapshot view of the keys in this map
 	 * @throws IllegalArgumentException
-	 *             if the limit is negative
+	 *			 if the limit is negative
 	 */
 	public Set<K> descendingKeySetWithLimit(int limit) {
 		return orderedKeySet(false, limit);
@@ -1050,10 +1050,10 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * entries.
 	 * 
 	 * @param limit
-	 *            the maximum size of the returned map
+	 *			the maximum size of the returned map
 	 * @return a ascending snapshot view of this map
 	 * @throws IllegalArgumentException
-	 *             if the limit is negative
+	 *			 if the limit is negative
 	 */
 	public Map<K, V> ascendingMapWithLimit(int limit) {
 		return orderedMap(true, limit);
@@ -1090,10 +1090,10 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	 * entries.
 	 * 
 	 * @param limit
-	 *            the maximum size of the returned map
+	 *			the maximum size of the returned map
 	 * @return a descending snapshot view of this map
 	 * @throws IllegalArgumentException
-	 *             if the limit is negative
+	 *			 if the limit is negative
 	 */
 	public Map<K, V> descendingMapWithLimit(int limit) {
 		return orderedMap(false, limit);
@@ -1151,7 +1151,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * Determines whether the buffers should be drained.
 		 * 
 		 * @param delayable
-		 *            if a drain should be delayed until required
+		 *			if a drain should be delayed until required
 		 * @return if a drain should be attempted
 		 */
 		abstract boolean shouldDrainBuffers(boolean delayable);
@@ -1241,7 +1241,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * <tt>retired</tt> state.
 		 * 
 		 * @param expect
-		 *            the expected weighted value
+		 *			the expected weighted value
 		 * @return if successful
 		 */
 		boolean tryToRetire(WeightedValue<V> expect) {
@@ -1456,18 +1456,18 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		}
 		
 		public K getKey() {
-		    return key;
+			return key;
 		}
 
 		public V getValue() {
-		    return value;
+			return value;
 		}
 
 		public V setValue(V value) {
 			put(getKey(), value);
 			V oldValue = this.value;
-		    this.value = value;
-		    return oldValue;
+			this.value = value;
+			return oldValue;
 		}
 
 		private ConcurrentLinkedHashMap<K, V> getOuterType() {
@@ -1510,7 +1510,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		}
 
 		public String toString() {
-		    return key + "=" + value;
+			return key + "=" + value;
 		}
 
 	}
@@ -1700,10 +1700,10 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * before a resize operation is required.
 		 * 
 		 * @param initialCapacity
-		 *            the initial capacity used to size the hash table to
-		 *            accommodate this many entries.
+		 *			the initial capacity used to size the hash table to
+		 *			accommodate this many entries.
 		 * @throws IllegalArgumentException
-		 *             if the initialCapacity is negative
+		 *			 if the initialCapacity is negative
 		 */
 		public Builder<K, V> initialCapacity(int initialCapacity) {
 			checkArgument(initialCapacity >= 0);
@@ -1716,9 +1716,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * exceed it temporarily.
 		 * 
 		 * @param capacity
-		 *            the weighted threshold to bound the map by
+		 *			the weighted threshold to bound the map by
 		 * @throws IllegalArgumentException
-		 *             if the maximumWeightedCapacity is negative
+		 *			 if the maximumWeightedCapacity is negative
 		 */
 		public Builder<K, V> maximumWeightedCapacity(long capacity) {
 			checkArgument(capacity >= 0);
@@ -1732,9 +1732,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * many threads (default <tt>16</tt>).
 		 * 
 		 * @param concurrencyLevel
-		 *            the estimated number of concurrently updating threads
+		 *			the estimated number of concurrently updating threads
 		 * @throws IllegalArgumentException
-		 *             if the concurrencyLevel is less than or equal to zero
+		 *			 if the concurrencyLevel is less than or equal to zero
 		 */
 		public Builder<K, V> concurrencyLevel(int concurrencyLevel) {
 			checkArgument(concurrencyLevel > 0);
@@ -1747,9 +1747,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * when an entry is evicted.
 		 * 
 		 * @param listener
-		 *            the object to forward evicted entries to
+		 *			the object to forward evicted entries to
 		 * @throws NullPointerException
-		 *             if the listener is null
+		 *			 if the listener is null
 		 */
 		public Builder<K, V> listener(EvictionListener<K, V> listener) {
 			checkNotNull(listener);
@@ -1763,9 +1763,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * key-value pairs by giving each entry a weight of <tt>1</tt>.
 		 * 
 		 * @param weigher
-		 *            the algorithm to determine a value's weight
+		 *			the algorithm to determine a value's weight
 		 * @throws NullPointerException
-		 *             if the weigher is null
+		 *			 if the weigher is null
 		 */
 		public Builder<K, V> weigher(Weigher<? super V> weigher) {
 			this.weigher = (weigher == Weighers.singleton()) ? Weighers
@@ -1780,9 +1780,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * key-value pairs by giving each entry a weight of <tt>1</tt>.
 		 * 
 		 * @param weigher
-		 *            the algorithm to determine a entry's weight
+		 *			the algorithm to determine a entry's weight
 		 * @throws NullPointerException
-		 *             if the weigher is null
+		 *			 if the weigher is null
 		 */
 		public Builder<K, V> weigher(EntryWeigher<? super K, ? super V> weigher) {
 			this.weigher = (weigher == Weighers.entrySingleton()) ? Weighers
@@ -1795,7 +1795,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * Creates a new {@link ConcurrentLinkedHashMap} instance.
 		 * 
 		 * @throws IllegalStateException
-		 *             if the maximum weighted capacity was not set
+		 *			 if the maximum weighted capacity was not set
 		 */
 		public ConcurrentLinkedHashMap<K, V> build() {
 			checkState(capacity >= 0);
@@ -1835,7 +1835,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * first element.
 		 * 
 		 * @param e
-		 *            the unlinked element
+		 *			the unlinked element
 		 */
 		void linkFirst(final E e) {
 			final E f = first;
@@ -1854,7 +1854,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * last element.
 		 * 
 		 * @param e
-		 *            the unlinked element
+		 *			the unlinked element
 		 */
 		void linkLast(final E e) {
 			final E l = last;
@@ -1966,7 +1966,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * first element.
 		 * 
 		 * @param e
-		 *            the linked element
+		 *			the linked element
 		 */
 		public void moveToFront(E e) {
 			if (e != first) {
@@ -1980,7 +1980,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * last element.
 		 * 
 		 * @param e
-		 *            the linked element
+		 *			the linked element
 		 */
 		public void moveToBack(E e) {
 			if (e != last) {
@@ -2140,7 +2140,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 			 * Creates an iterator that can can traverse the deque.
 			 * 
 			 * @param start
-			 *            the initial element to begin traversal from
+			 *			the initial element to begin traversal from
 			 */
 			AbstractLinkedIterator(E start) {
 				cursor = start;
@@ -2203,9 +2203,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * one unit.
 		 * 
 		 * @param key
-		 *            the key to weigh
+		 *			the key to weigh
 		 * @param value
-		 *            the value to weigh
+		 *			the value to weigh
 		 * @return the entry's weight
 		 */
 		int weightOf(K key, V value);
@@ -2217,9 +2217,9 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * A call-back notification that the entry was evicted.
 		 * 
 		 * @param key
-		 *            the entry's key
+		 *			the entry's key
 		 * @param value
-		 *            the entry's value
+		 *			the entry's value
 		 */
 		void onEviction(K key, V value);
 	}
@@ -2231,7 +2231,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * that the value consumes. A value must consume a minimum of one unit.
 		 * 
 		 * @param value
-		 *            the object to weigh
+		 *			the object to weigh
 		 * @return the object's weight
 		 */
 		int weightOf(V value);
@@ -2248,7 +2248,7 @@ public class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 		 * value determines the weight of the entry.
 		 * 
 		 * @param weigher
-		 *            the weigher to be "wrapped" in a entry weigher.
+		 *			the weigher to be "wrapped" in a entry weigher.
 		 * @return A entry weigher view of the specified weigher.
 		 */
 		public static <K, V> EntryWeigher<K, V> asEntryWeigher(

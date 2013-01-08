@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,14 +55,14 @@ public class LinkedStack<T> implements Serializable {
 
 	public T peek() {
 		if (isEmpty()) {
-		    return null;
+			return null;
 		}
  		return stack.getLast();
 	}
 
 	public void poke(T value) {
 		if (! isEmpty()) {
-		    stack.removeLast();
+			stack.removeLast();
 		}
 		push(value);
 	}
@@ -86,24 +86,24 @@ public class LinkedStack<T> implements Serializable {
 		return stack.toString();
 	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((stack == null) ? 0 : stack.hashCode());
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((stack == null) ? 0 : stack.hashCode());
+		return result;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        LinkedStack<?> other = (LinkedStack<?>) obj;
-        if (stack == null) {
-            if (other.stack != null) return false;
-        } else if (!stack.equals(other.stack)) return false;
-        return true;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		LinkedStack<?> other = (LinkedStack<?>) obj;
+		if (stack == null) {
+			if (other.stack != null) return false;
+		} else if (!stack.equals(other.stack)) return false;
+		return true;
+	}
 
 }

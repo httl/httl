@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,220 +37,220 @@ import java.util.Map;
  */
 public class FileMethod {
 
-    private Engine engine;
+	private Engine engine;
 
 	private String extendsDirectory;
 
-    /**
-     * httl.properties: engine=httl.spi.engines.DefaultEngine
-     */
-    public void setEngine(Engine engine) {
-        this.engine = engine;
-    }
+	/**
+	 * httl.properties: engine=httl.spi.engines.DefaultEngine
+	 */
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
 
 	/**
 	 * httl.properties: extends.directory=layouts
 	 */
-    public void setExtendsDirectory(String extendsDirectory) {
-    	this.extendsDirectory = UrlUtils.cleanDirectory(extendsDirectory);
+	public void setExtendsDirectory(String extendsDirectory) {
+		this.extendsDirectory = UrlUtils.cleanDirectory(extendsDirectory);
 		if ("/".equals(this.extendsDirectory)) {
 			this.extendsDirectory = null;
 		}
 	}
 
-    public Template $extends(String name) throws IOException, ParseException {
-    	return $extends(name, (Locale) null, (String) null);
-    }
+	public Template $extends(String name) throws IOException, ParseException {
+		return $extends(name, (Locale) null, (String) null);
+	}
 
-    public Template $extends(String name, String encoding) throws IOException, ParseException {
-    	return $extends(name, (Locale) null, encoding);
-    }
+	public Template $extends(String name, String encoding) throws IOException, ParseException {
+		return $extends(name, (Locale) null, encoding);
+	}
 
-    public Template $extends(String name, Locale locale) throws IOException, ParseException {
-    	return $extends(name, locale, (String) null);
-    }
+	public Template $extends(String name, Locale locale) throws IOException, ParseException {
+		return $extends(name, locale, (String) null);
+	}
 
-    public Template $extends(String name, Locale locale, String encoding) throws IOException, ParseException {
-    	if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("include template name == null");
-        }
-        String macro = null;
-		int i = name.indexOf('#');
-        if (i > 0) {
-        	macro = name.substring(i + 1);
-        	name = name.substring(0, i);
-        }
-    	Template template = Context.getContext().getTemplate();
-        if (template != null) {
-	        if (encoding == null || encoding.length() == 0) {
-	            encoding = template.getEncoding();
-	        }
-	        name = UrlUtils.relativeUrl(name, template.getName());
-	        if (locale == null) {
-	        	locale = template.getLocale();
-	        }
-        }
-        if (StringUtils.isNotEmpty(extendsDirectory)) {
-        	name = extendsDirectory + name;
-        }
-        Template extend = engine.getTemplate(name, locale, encoding);
-        if (macro != null && macro.length() > 0) {
-        	extend = extend.getMacros().get(macro);
+	public Template $extends(String name, Locale locale, String encoding) throws IOException, ParseException {
+		if (name == null || name.length() == 0) {
+			throw new IllegalArgumentException("include template name == null");
 		}
-        if (template != null) {
-        	if (template == extend) {
-            	throw new IllegalStateException("The template " + template.getName() + " can not be recursive extending the self template.");
-            }
-            Context.getContext().putAll(template.getMacros());
-        }
-        return extend;
-    }
-
-    public Template $extends(String name, Map<String, Object> parameters) throws IOException, ParseException {
-    	return $extends(name, null, null, parameters);
-    }
-
-    public Template $extends(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
-    	return $extends(name, null, encoding, parameters);
-    }
-
-    public Template $extends(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
-    	return $extends(name, locale, null, parameters);
-    }
-
-    public Template $extends(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
-        if (parameters != null) {
-        	Context.getContext().putAll(parameters);
-        }
-        return $extends(name, locale, encoding);
-    }
-
-    public Expression evaluate(byte[] source) throws IOException, ParseException {
-    	Template template = Context.getContext().getTemplate();
-        if (template == null) {
-            throw new IllegalArgumentException("display context template == null");
-        }
-        String encoding = template.getEncoding();
-    	return evaluate(encoding == null ? new String(source) : new String(source, encoding));
-    }
-
-    public Expression evaluate(String expr) throws ParseException {
-    	Template template = Context.getContext().getTemplate();
-        if (template == null) {
-            throw new IllegalArgumentException("display context template == null");
-        }
-    	return engine.getExpression(expr, template.getParameterTypes());
-    }
-
-    public Template render(Resource resource) throws IOException, ParseException {
-    	return render(IOUtils.readToString(resource.getReader()));
-    }
-
-    public Template render(byte[] source) throws IOException, ParseException {
-    	Template template = Context.getContext().getTemplate();
-        if (template == null) {
-            throw new IllegalArgumentException("display context template == null");
-        }
-        String encoding = template.getEncoding();
-    	return render(encoding == null ? new String(source) : new String(source, encoding));
-    }
-
-    public Template render(String source) throws IOException, ParseException {
-        Template template = Context.getContext().getTemplate();
-        if (template == null) {
-            throw new IllegalArgumentException("display context template == null");
-        }
-        return engine.parseTemplate(source);
-    }
-
-    public Template include(String name) throws IOException, ParseException {
-        return include(name, (Locale) null, (String) null);
-    }
-    
-    public Template include(String name, String encoding) throws IOException, ParseException {
-    	return include(name, (Locale) null, encoding);
-    }
-
-    public Template include(String name, Locale locale) throws IOException, ParseException {
-    	return include(name, locale, (String) null);
-    }
-
-    public Template include(String name, Locale locale, String encoding) throws IOException, ParseException {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("include template name == null");
-        }
-        String macro = null;
+		String macro = null;
 		int i = name.indexOf('#');
-        if (i > 0) {
-        	macro = name.substring(i + 1);
-        	name = name.substring(0, i);
-        }
-        Template template = Context.getContext().getTemplate();
-        if (template != null) {
-            if (encoding == null || encoding.length() == 0) {
-                encoding = template.getEncoding();
-            }
-            name = UrlUtils.relativeUrl(name, template.getName());
-            if (locale == null) {
-            	locale = template.getLocale();
-            }
-        }
-        Template include = engine.getTemplate(name, locale, encoding);
-        if (macro != null && macro.length() > 0) {
-        	include = include.getMacros().get(macro);
+		if (i > 0) {
+			macro = name.substring(i + 1);
+			name = name.substring(0, i);
 		}
-        if (template != null && template == include) {
-        	throw new IllegalStateException("The template " + template.getName() + " can not be recursive including the self template.");
-        }
-        return include;
-    }
+		Template template = Context.getContext().getTemplate();
+		if (template != null) {
+			if (encoding == null || encoding.length() == 0) {
+				encoding = template.getEncoding();
+			}
+			name = UrlUtils.relativeUrl(name, template.getName());
+			if (locale == null) {
+				locale = template.getLocale();
+			}
+		}
+		if (StringUtils.isNotEmpty(extendsDirectory)) {
+			name = extendsDirectory + name;
+		}
+		Template extend = engine.getTemplate(name, locale, encoding);
+		if (macro != null && macro.length() > 0) {
+			extend = extend.getMacros().get(macro);
+		}
+		if (template != null) {
+			if (template == extend) {
+				throw new IllegalStateException("The template " + template.getName() + " can not be recursive extending the self template.");
+			}
+			Context.getContext().putAll(template.getMacros());
+		}
+		return extend;
+	}
 
-    public Template include(String name, Map<String, Object> parameters) throws IOException, ParseException {
-    	return include(name, null, null, parameters);
-    }
-    
-    public Template include(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
-    	return include(name, null, encoding, parameters);
-    }
-    
-    public Template include(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
-    	return include(name, locale, null, parameters);
-    }
-    
-    public Template include(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
-    	if (parameters != null) {
-    		Context.getContext().putAll(parameters);
-    	}
-    	return include(name, locale, encoding);
-    }
+	public Template $extends(String name, Map<String, Object> parameters) throws IOException, ParseException {
+		return $extends(name, null, null, parameters);
+	}
 
-    public Resource read(String name) throws IOException, ParseException {
-        return read(name, null, null);
-    }
+	public Template $extends(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+		return $extends(name, null, encoding, parameters);
+	}
 
-    public Resource read(String name, String encoding) throws IOException {
-    	return read(name, null, encoding);
-    }
+	public Template $extends(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
+		return $extends(name, locale, null, parameters);
+	}
 
-    public Resource read(String name, Locale locale) throws IOException {
-    	return read(name, locale, null);
-    }
+	public Template $extends(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+		if (parameters != null) {
+			Context.getContext().putAll(parameters);
+		}
+		return $extends(name, locale, encoding);
+	}
 
-    public Resource read(String name, Locale locale, String encoding) throws IOException {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("display template name == null");
-        }
-        Template template = Context.getContext().getTemplate();
-        if (template != null) {
-            if (encoding == null || encoding.length() == 0) {
-                encoding = template.getEncoding();
-            }
-            name = UrlUtils.relativeUrl(name, template.getName());
-            if (locale == null) {
-            	locale = template.getLocale();
-            }
-        }
-        return engine.getResource(name, locale, encoding);
-    }
+	public Expression evaluate(byte[] source) throws IOException, ParseException {
+		Template template = Context.getContext().getTemplate();
+		if (template == null) {
+			throw new IllegalArgumentException("display context template == null");
+		}
+		String encoding = template.getEncoding();
+		return evaluate(encoding == null ? new String(source) : new String(source, encoding));
+	}
+
+	public Expression evaluate(String expr) throws ParseException {
+		Template template = Context.getContext().getTemplate();
+		if (template == null) {
+			throw new IllegalArgumentException("display context template == null");
+		}
+		return engine.getExpression(expr, template.getParameterTypes());
+	}
+
+	public Template render(Resource resource) throws IOException, ParseException {
+		return render(IOUtils.readToString(resource.getReader()));
+	}
+
+	public Template render(byte[] source) throws IOException, ParseException {
+		Template template = Context.getContext().getTemplate();
+		if (template == null) {
+			throw new IllegalArgumentException("display context template == null");
+		}
+		String encoding = template.getEncoding();
+		return render(encoding == null ? new String(source) : new String(source, encoding));
+	}
+
+	public Template render(String source) throws IOException, ParseException {
+		Template template = Context.getContext().getTemplate();
+		if (template == null) {
+			throw new IllegalArgumentException("display context template == null");
+		}
+		return engine.parseTemplate(source);
+	}
+
+	public Template include(String name) throws IOException, ParseException {
+		return include(name, (Locale) null, (String) null);
+	}
+	
+	public Template include(String name, String encoding) throws IOException, ParseException {
+		return include(name, (Locale) null, encoding);
+	}
+
+	public Template include(String name, Locale locale) throws IOException, ParseException {
+		return include(name, locale, (String) null);
+	}
+
+	public Template include(String name, Locale locale, String encoding) throws IOException, ParseException {
+		if (name == null || name.length() == 0) {
+			throw new IllegalArgumentException("include template name == null");
+		}
+		String macro = null;
+		int i = name.indexOf('#');
+		if (i > 0) {
+			macro = name.substring(i + 1);
+			name = name.substring(0, i);
+		}
+		Template template = Context.getContext().getTemplate();
+		if (template != null) {
+			if (encoding == null || encoding.length() == 0) {
+				encoding = template.getEncoding();
+			}
+			name = UrlUtils.relativeUrl(name, template.getName());
+			if (locale == null) {
+				locale = template.getLocale();
+			}
+		}
+		Template include = engine.getTemplate(name, locale, encoding);
+		if (macro != null && macro.length() > 0) {
+			include = include.getMacros().get(macro);
+		}
+		if (template != null && template == include) {
+			throw new IllegalStateException("The template " + template.getName() + " can not be recursive including the self template.");
+		}
+		return include;
+	}
+
+	public Template include(String name, Map<String, Object> parameters) throws IOException, ParseException {
+		return include(name, null, null, parameters);
+	}
+	
+	public Template include(String name, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+		return include(name, null, encoding, parameters);
+	}
+	
+	public Template include(String name, Locale locale, Map<String, Object> parameters) throws IOException, ParseException {
+		return include(name, locale, null, parameters);
+	}
+	
+	public Template include(String name, Locale locale, String encoding, Map<String, Object> parameters) throws IOException, ParseException {
+		if (parameters != null) {
+			Context.getContext().putAll(parameters);
+		}
+		return include(name, locale, encoding);
+	}
+
+	public Resource read(String name) throws IOException, ParseException {
+		return read(name, null, null);
+	}
+
+	public Resource read(String name, String encoding) throws IOException {
+		return read(name, null, encoding);
+	}
+
+	public Resource read(String name, Locale locale) throws IOException {
+		return read(name, locale, null);
+	}
+
+	public Resource read(String name, Locale locale, String encoding) throws IOException {
+		if (name == null || name.length() == 0) {
+			throw new IllegalArgumentException("display template name == null");
+		}
+		Template template = Context.getContext().getTemplate();
+		if (template != null) {
+			if (encoding == null || encoding.length() == 0) {
+				encoding = template.getEncoding();
+			}
+			name = UrlUtils.relativeUrl(name, template.getName());
+			if (locale == null) {
+				locale = template.getLocale();
+			}
+		}
+		return engine.getResource(name, locale, encoding);
+	}
 
 }

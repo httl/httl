@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,7 +44,7 @@ public class CharacterSequence implements List<Character>, Serializable {
 	private int size;
 	
 	public CharacterSequence(Character begin, Character end) {
-	    this(begin == null ? '\0' : begin.charValue(), end == null ? '\0' : end.charValue());
+		this(begin == null ? '\0' : begin.charValue(), end == null ? '\0' : end.charValue());
 	}
 	
 	public CharacterSequence(char begin, char end) {
@@ -100,7 +100,7 @@ public class CharacterSequence implements List<Character>, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-    public <T> T[] toArray(T[] arr) {
+	public <T> T[] toArray(T[] arr) {
 		return (T[]) toArray();
 	}
 
@@ -154,17 +154,17 @@ public class CharacterSequence implements List<Character>, Serializable {
 
 	public List<Character> subList(int fromIndex, int toIndex) {
 		if (fromIndex < 0)
-            throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
-        if (toIndex > size())
-            throw new IndexOutOfBoundsException("toIndex = " + toIndex);
-        if (fromIndex > toIndex)
-            throw new IllegalArgumentException("fromIndex(" + fromIndex +
-                                               ") > toIndex(" + toIndex + ")");
-        if(asc) {
-        	return new CharacterSequence((char)(begin + fromIndex), (char)(begin + fromIndex + toIndex));
-        }else {
-        	return new CharacterSequence((char)(begin - fromIndex), (char)(begin - fromIndex - toIndex));
-        }
+			throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
+		if (toIndex > size())
+			throw new IndexOutOfBoundsException("toIndex = " + toIndex);
+		if (fromIndex > toIndex)
+			throw new IllegalArgumentException("fromIndex(" + fromIndex +
+											   ") > toIndex(" + toIndex + ")");
+		if(asc) {
+			return new CharacterSequence((char)(begin + fromIndex), (char)(begin + fromIndex + toIndex));
+		}else {
+			return new CharacterSequence((char)(begin - fromIndex), (char)(begin - fromIndex - toIndex));
+		}
 	}
 
 	public boolean add(Character o) {

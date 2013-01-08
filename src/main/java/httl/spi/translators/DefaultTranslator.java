@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,81 +45,81 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class DefaultTranslator implements Translator {
 
-    private Engine engine;
+	private Engine engine;
 
-    private Compiler compiler;
-    
-    private Class<?> defaultParameterType;
-    
-    protected String[] importPackages;
+	private Compiler compiler;
+	
+	private Class<?> defaultParameterType;
+	
+	protected String[] importPackages;
 
-    private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
+	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
-    private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
+	private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
-    /**
-     * httl.properties: engine=httl.spi.engines.DefaultEngine
-     */
-    public void setEngine(Engine engine) {
-        this.engine = engine;
-    }
+	/**
+	 * httl.properties: engine=httl.spi.engines.DefaultEngine
+	 */
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
 
-    /**
-     * httl.properties: compiler=httl.spi.compilers.JdkCompiler
-     */
-    public void setCompiler(Compiler compiler) {
-        this.compiler = compiler;
-    }
+	/**
+	 * httl.properties: compiler=httl.spi.compilers.JdkCompiler
+	 */
+	public void setCompiler(Compiler compiler) {
+		this.compiler = compiler;
+	}
 
-    /**
-     * httl.properties: import.packages=java.util
-     */
-    public void setImportPackages(String[] importPackages) {
-    	this.importPackages = importPackages;
-    }
+	/**
+	 * httl.properties: import.packages=java.util
+	 */
+	public void setImportPackages(String[] importPackages) {
+		this.importPackages = importPackages;
+	}
 
-    /**
-     * httl.properties: default.parameter.type=java.lang.String
-     */
-    public void setDefaultParameterType(String defaultParameterType) {
-    	this.defaultParameterType = ClassUtils.forName(defaultParameterType);
-    }
+	/**
+	 * httl.properties: default.parameter.type=java.lang.String
+	 */
+	public void setDefaultParameterType(String defaultParameterType) {
+		this.defaultParameterType = ClassUtils.forName(defaultParameterType);
+	}
 
-    public void setImportMethods(Object[] importMethods) {
-    	for (Object function : importMethods) {
-    		if (function instanceof Class) {
-    			this.functions.put((Class<?>) function, function);
-    		} else {
-    			this.functions.put(function.getClass(), function);
-    		}
-    	}
-    }
+	public void setImportMethods(Object[] importMethods) {
+		for (Object function : importMethods) {
+			if (function instanceof Class) {
+				this.functions.put((Class<?>) function, function);
+			} else {
+				this.functions.put(function.getClass(), function);
+			}
+		}
+	}
 
-    /**
-     * httl.properties: sequences=Mon Tue Wed Thu Fri Sat Sun Mon
-     */
-    public void setSequences(String[] sequences) {
-    	for (String s : sequences) {
-            s = s.trim();
-            if (s.length() > 0) {
-                String[] ts = s.split("\\s+");
-                List<String> sequence = new ArrayList<String>();
-                for (String t : ts) {
-                    t = t.trim();
-                    if (t.length() > 0) {
-                        sequence.add(t);
-                    }
-                }
-                this.sequences.add(new StringSequence(sequence));
-            }
-        }
-    }
+	/**
+	 * httl.properties: sequences=Mon Tue Wed Thu Fri Sat Sun Mon
+	 */
+	public void setSequences(String[] sequences) {
+		for (String s : sequences) {
+			s = s.trim();
+			if (s.length() > 0) {
+				String[] ts = s.split("\\s+");
+				List<String> sequence = new ArrayList<String>();
+				for (String t : ts) {
+					t = t.trim();
+					if (t.length() > 0) {
+						sequence.add(t);
+					}
+				}
+				this.sequences.add(new StringSequence(sequence));
+			}
+		}
+	}
 
 	public Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
-	    source = StringUtils.unescapeHtml(source);
-	    Set<String> variables = new HashSet<String>();
-	    Node node = new DfaParser(this, parameterTypes, defaultParameterType, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
-        return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, importPackages, functions);
+		source = StringUtils.unescapeHtml(source);
+		Set<String> variables = new HashSet<String>();
+		Node node = new DfaParser(this, parameterTypes, defaultParameterType, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
+		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, importPackages, functions);
 	}
 
 }

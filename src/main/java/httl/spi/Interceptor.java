@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ public interface Interceptor {
 	 * @param context - render context
 	 * @param listener - render listener.
 	 * @throws IOException - If an I/O error occurs
-     * @throws ParseException - If the template cannot be parsed on runtime
+	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
 	void render(Context context, Listener listener) throws IOException, ParseException;
 

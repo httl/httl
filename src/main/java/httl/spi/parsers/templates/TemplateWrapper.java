@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,20 +53,20 @@ public class TemplateWrapper implements Template {
 			throws ParseException {
 		if (byte[].class.equals(getReturnType())) {
 			UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
-	        try {
-	            render(parameters, output);
-	        } catch (IOException e) {
-	            throw new RuntimeException(e.getMessage(), e);
-	        }
-	        return output.toByteArray();
+			try {
+				render(parameters, output);
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+			return output.toByteArray();
 		} else {
 			UnsafeStringWriter writer = new UnsafeStringWriter();
-	        try {
-	            render(parameters, writer);
-	        } catch (IOException e) {
-	            throw new RuntimeException(e.getMessage(), e);
-	        }
-	        return writer.toString();
+			try {
+				render(parameters, writer);
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+			return writer.toString();
 		}
 	}
 

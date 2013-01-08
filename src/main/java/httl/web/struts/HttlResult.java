@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,8 +41,8 @@ public class HttlResult extends StrutsResultSupport {
 	protected void doExecute(String location, ActionInvocation invocation)
 			throws Exception {
 		HttpServletRequest request = ServletActionContext.getRequest();
-        HttpServletResponse response = ServletActionContext.getResponse();
-        ValueStack stack = ActionContext.getContext().getValueStack();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		ValueStack stack = ActionContext.getContext().getValueStack();
 		ValueStackMap map = new ValueStackMap(stack);
 		WebEngine.render(request, response, location, map);
 	}

@@ -6,7 +6,7 @@
  *  (the "License"); you may not use this file except in compliance with
  *  the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,22 +32,22 @@ import java.util.Locale;
  */
 public class ClasspathResource extends InputStreamResource {
 
-    private static final long serialVersionUID = 2499229996487593996L;
-    
-    private final String path;
-    
-    public ClasspathResource(Engine engine, String name, String encoding, String path, Locale locale) {
-        super(engine, name, locale, encoding);
-        this.path = path;
-    }
+	private static final long serialVersionUID = 2499229996487593996L;
+	
+	private final String path;
+	
+	public ClasspathResource(Engine engine, String name, String encoding, String path, Locale locale) {
+		super(engine, name, locale, encoding);
+		this.path = path;
+	}
 
-    public InputStream getInputStream() throws IOException {
-    	return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-    }
+	public InputStream getInputStream() throws IOException {
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+	}
 
-    @Override
-    protected URL getUrl() {
+	@Override
+	protected URL getUrl() {
 		return Thread.currentThread().getContextClassLoader().getResource(path);
-    }
+	}
 
 }

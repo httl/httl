@@ -17,15 +17,15 @@ public class ScriptSwitcher implements Switcher {
 	private Filter scriptFilter;
 
 	/**
-     * httl.properties: script.locations=&lt;script,&lt;/script&gt;
-     */
+	 * httl.properties: script.locations=&lt;script,&lt;/script&gt;
+	 */
 	public void setScriptLocations(String[] locations) {
 		this.scriptLocations = Arrays.asList(locations);
 	}
 
 	/**
-     * httl.properties: script.filter=httl.spi.filters.ScriptFilter
-     */
+	 * httl.properties: script.filter=httl.spi.filters.ScriptFilter
+	 */
 	public void setScriptFilter(Filter filter) {
 		this.scriptFilter = filter;
 	}
