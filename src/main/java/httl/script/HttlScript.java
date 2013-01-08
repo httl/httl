@@ -31,12 +31,12 @@ import javax.script.ScriptException;
  */
 public class HttlScript extends CompiledScript {
 
-	private final ScriptEngine scriptEngine;
+	private final ScriptEngine engine;
 
 	private final Template template;
 
-	public HttlScript(ScriptEngine scriptEngine, Template template) {
-		this.scriptEngine = scriptEngine;
+	public HttlScript(ScriptEngine engine, Template template) {
+		this.engine = engine;
 		this.template = template;
 	}
 
@@ -51,7 +51,7 @@ public class HttlScript extends CompiledScript {
 
 	@Override
 	public ScriptEngine getEngine() {
-		return scriptEngine;
+		return engine;
 	}
 
 }

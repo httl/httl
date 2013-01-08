@@ -19,6 +19,7 @@ import httl.Engine;
 import httl.spi.Parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class HttlScriptEngineFactory implements ScriptEngineFactory {
 
-	private final List<String> names;
+	private final List<String> names = Arrays.asList(new String[] { "httl" });
 
 	private final List<String> extensions;
 
@@ -43,21 +44,28 @@ public class HttlScriptEngineFactory implements ScriptEngineFactory {
 	private final Engine engine;
 
 	public HttlScriptEngineFactory() {
-		List<String> names = new ArrayList<String>();
-		names.add("httl");
-		this.names = Collections.unmodifiableList(names);
+		String config = System.getProperty("httl.properties");
+		this.engine = StringUtils.isEmpty(config) ? Engine.getEngine() : Engine.getEngine(config);
+		
+		String suffix = engine.getProperty("template.suffix", ".httl");
+		if (suffix.startsWith(".")) {
+			suffix = suffix.substring(1);
+		}
 		
 		List<String> extensions = new ArrayList<String>();
 		extensions.add("httl");
+		if (! "httl".equals(suffix)) {
+			extensions.add(suffix);
+		}
 		this.extensions = Collections.unmodifiableList(extensions);
 		
 		List<String> mimeTypes = new ArrayList<String>();
 		mimeTypes.add("text/httl");
 		mimeTypes.add("text/html");
+		if (! "httl".equals(suffix) && ! "html".equals(suffix)) {
+			mimeTypes.add("text/" + suffix);
+		}
 		this.mimeTypes = Collections.unmodifiableList(mimeTypes);
-		
-		String config = System.getProperty("httl.properties");
-		this.engine = StringUtils.isEmpty(config) ? Engine.getEngine() : Engine.getEngine(config);
 	}
 
 	public ScriptEngine getScriptEngine() {
