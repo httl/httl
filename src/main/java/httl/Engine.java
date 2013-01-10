@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Engine. (API, Singleton, ThreadSafe)
+ * Engine. (API, Singleton, Immutable, ThreadSafe)
  * 
  * <pre>
  * Engine engine = Engine.getEngine();
@@ -50,6 +50,9 @@ public abstract class Engine {
 
 	// User default configuration name
 	private static final String HTTL_PROPERTIES = "httl.properties";
+
+	// The engine name config
+	private static final String ENGINE_NAME = "engine.name";
 
 	// The engine singletons cache
 	private static final ConcurrentMap<String, VolatileReference<Engine>> ENGINES = new ConcurrentHashMap<String, VolatileReference<Engine>>();
@@ -109,7 +112,7 @@ public abstract class Engine {
 				engine = reference.get();
 				if (engine == null) { // double check
 					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
-					properties.setProperty(BeanFactory.getPropertyKey(Engine.class, "name"), configPath);
+					properties.setProperty(ENGINE_NAME, configPath);
 					engine = BeanFactory.createBean(Engine.class, properties); // slowly
 					reference.set(engine);
 				}
@@ -182,7 +185,7 @@ public abstract class Engine {
 	 */
 	public boolean getProperty(String key, boolean defaultValue) {
 		String value = getProperty(key, String.class);
-		return value == null || value.length() == 0 ? defaultValue : "true".equalsIgnoreCase(value);
+		return value == null || value.length() == 0 ? defaultValue : Boolean.parseBoolean(value);
 	}
 
 	/**

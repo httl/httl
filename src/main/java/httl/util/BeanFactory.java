@@ -93,11 +93,7 @@ public class BeanFactory {
 	private static final String WRAPPER_KEY_SUFFIX = "^";
 
 	private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
-	
-	public static String getPropertyKey(Class<?> beanClass, String property) {
-		return StringUtils.splitCamelName(beanClass.getSimpleName(), ".") + "." + property;
-	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> T createBean(Class<T> beanClass, Properties properties) {
 		Map<String, Object> caches = new HashMap<String, Object>();
