@@ -17,6 +17,7 @@ package httl;
 
 import httl.util.BeanFactory;
 import httl.util.ConfigUtils;
+import httl.util.Version;
 import httl.util.VolatileReference;
 
 import java.io.IOException;
@@ -130,7 +131,9 @@ public abstract class Engine {
 	 * 
 	 * @return engine version
 	 */
-	public abstract String getVersion();
+	public String getVersion() {
+		return Version.getVersion();
+	}
 
 	/**
 	 * Get config value.

@@ -30,7 +30,6 @@ import httl.util.ConfigUtils;
 import httl.util.Digest;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
-import httl.util.Version;
 import httl.util.VolatileReference;
 
 import java.io.FileNotFoundException;
@@ -94,8 +93,6 @@ public class DefaultEngine extends Engine {
 	// httl.properties: instantiated content
 	private Map<String, Object> properties;
 
-	private final String version = Version.getVersion(DefaultEngine.class, "1.0.0");
-	
 	public DefaultEngine() {
 		this.stringLoader = new StringLoader(this);
 	}
@@ -105,13 +102,6 @@ public class DefaultEngine extends Engine {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Get engine version.
-	 */
-	public String getVersion() {
-		return version;
 	}
 
 	/**
