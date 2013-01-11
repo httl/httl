@@ -82,48 +82,30 @@ public class WebEngine {
 		if (ENGINE == null) {
 			synchronized (WebEngine.class) {
 				if (ENGINE == null) { // double check
+					Properties properties = new Properties();
 					String config = servletContext.getInitParameter(CONFIG_KEY);
-					if (config != null && config.length() > 0) {
-						if (config.startsWith("/")) {
-							Properties properties = new Properties();
-							InputStream in = servletContext.getResourceAsStream(config);
-							if (in == null) {
-								throw new IllegalStateException("Not found httl config " + config + " in wepapp.");
-							}
-							try {
-								properties.load(in);
-							} catch (IOException e) {
-								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp. cause: " + e.getMessage(), e);
-							}
-							addProperties(properties);
-							ENGINE = Engine.getEngine(config, properties);
-						} else {
-							Properties properties = new Properties();
-							addProperties(properties);
-							ENGINE = Engine.getEngine(config, properties);
-						}
-						logConfigPath(ENGINE, servletContext, config);
-					} else {
-						InputStream in = servletContext.getResourceAsStream(WEBINF_CONFIG);
+					if (config == null || config.length() == 0) {
+						config = WEBINF_CONFIG;
+					}
+					if (config.startsWith("/")) {
+						InputStream in = servletContext.getResourceAsStream(config);
 						if (in != null) {
-							Properties properties = new Properties();
 							try {
 								properties.load(in);
 							} catch (IOException e) {
 								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp. cause: " + e.getMessage(), e);
 							}
-							addProperties(properties);
-							ENGINE = Engine.getEngine(WEBINF_CONFIG, properties);
-							logConfigPath(ENGINE, servletContext, WEBINF_CONFIG);
+						} else if (servletContext.getInitParameter(CONFIG_KEY) != null) { // 用户主动配置错误提醒
+							throw new IllegalStateException("Not found httl config " + config + " in wepapp.");
 						} else {
-							Properties properties = new Properties();
-							addProperties(properties);
-							ENGINE = Engine.getEngine(properties);
+							config = null;
 						}
 					}
+					ENGINE = Engine.getEngine(config == null ? CONFIG_KEY : config , addProperties(properties));
 					OUTPUT_ENCODING = ENGINE.getProperty(OUTPUT_ENCODING_KEY, String.class);
 					OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
 					LOCALIZED = ENGINE.getProperty(LOCALIZED_KEY, false);
+					logConfigPath(ENGINE, servletContext, config);
 				}
 			}
 		}
@@ -146,7 +128,7 @@ public class WebEngine {
 		}
 	}
 
-	private static void addProperties(Properties properties) {
+	private static Properties addProperties(Properties properties) {
 		Properties def = new Properties();
 		InputStream in = Engine.class.getClassLoader().getResourceAsStream("httl-default.properties");
 		if (in != null) {
@@ -183,6 +165,7 @@ public class WebEngine {
 					+ HttpSession.class.getName() + " session,"
 					+ ServletContext.class.getName() + " application");
 		}
+		return properties;
 	}
 
 	public static Engine getEngine() {
