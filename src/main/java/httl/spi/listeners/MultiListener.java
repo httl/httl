@@ -25,8 +25,8 @@ import java.text.ParseException;
 /**
  * MultiListener. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Interceptor)
- * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Interceptor)
+ * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Listener)
+ * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Listener)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

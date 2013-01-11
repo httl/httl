@@ -20,7 +20,7 @@ import httl.spi.Listener;
 /**
  * MultiListener. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Interceptor)
+ * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Listener)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

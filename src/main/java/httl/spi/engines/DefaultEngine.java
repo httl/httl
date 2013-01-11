@@ -290,6 +290,27 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
+	 * Parse string template.
+	 * 
+	 * @see #getEngine()
+	 * @param source - template source
+	 * @return template instance
+	 * @throws IOException - If an I/O error occurs
+	 * @throws ParseException - If the template cannot be parsed
+	 */
+	public Template parseTemplate(String source) throws ParseException {
+		String name = "/$" + Digest.getMD5(source);
+		if (! hasResource(name)) {
+			stringLoader.add(name, source);
+		}
+		try {
+			return getTemplate(name);
+		} catch (IOException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		}
+	}
+
+	/**
 	 * Get resource.
 	 * 
 	 * @see #getEngine()
@@ -316,27 +337,6 @@ public class DefaultEngine extends Engine {
 			throw new FileNotFoundException("Not found resource " + name);
 		}
 		return resource;
-	}
-
-	/**
-	 * Parse string template.
-	 * 
-	 * @see #getEngine()
-	 * @param source - template source
-	 * @return template instance
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed
-	 */
-	public Template parseTemplate(String source) throws ParseException {
-		String name = "/$" + Digest.getMD5(source);
-		if (! hasResource(name)) {
-			stringLoader.add(name, source);
-		}
-		try {
-			return getTemplate(name);
-		} catch (IOException e) {
-			throw new IllegalStateException(e.getMessage(), e);
-		}
 	}
 
 	/**
