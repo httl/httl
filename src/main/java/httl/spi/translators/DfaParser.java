@@ -254,7 +254,7 @@ public class DfaParser {
 		StringBuilder remain = new StringBuilder(); // 残存字符
 		int state = 0; // 当前状态
 		char ch; // 当前字符
-		int offset = -1;
+		int offset = 0;
 
 		// 逐字解析 ----
 		int i = 0;
@@ -280,7 +280,7 @@ public class DfaParser {
 						throw new ParseException("DFAScanner.accepter.error", offset - buffer.length());
 					if (acceptLength != 0) {
 						String message = buffer.substring(0, acceptLength);
-						Token token = new Token(message, offset - message.length(), state);
+						Token token = new Token(message, offset - buffer.length(), state);
 						tokens.add(token);// 完成接收
 					}
 					if (acceptLength != buffer.length())

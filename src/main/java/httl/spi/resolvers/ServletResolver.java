@@ -52,6 +52,16 @@ public class ServletResolver implements Resolver, Filter {
 	private static final ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
 
 	public static void set(HttpServletRequest request, HttpServletResponse response) {
+		setRequest(request);
+		setResponse(response);
+	}
+
+	public static void remove() {
+		REQUEST_LOCAL.remove();
+		RESPONSE_LOCAL.remove();
+	}
+
+	public static void setRequest(HttpServletRequest request) {
 		if (request != null) {
 			if (ServletLoader.getServletContext() == null) {
 				ServletLoader.setServletContext(request.getSession().getServletContext());
@@ -60,16 +70,14 @@ public class ServletResolver implements Resolver, Filter {
 		} else {
 			REQUEST_LOCAL.remove();
 		}
+	}
+
+	public static void setResponse(HttpServletResponse response) {
 		if (response != null) {
 			RESPONSE_LOCAL.set(response);
 		} else {
 			RESPONSE_LOCAL.remove();
 		}
-	}
-
-	public static void remove() {
-		REQUEST_LOCAL.remove();
-		RESPONSE_LOCAL.remove();
 	}
 
 	public static HttpServletRequest getRequest() {
