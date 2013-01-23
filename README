@@ -18,4 +18,4 @@ mvn eclipse:eclipse -DdownloadSources
 
 Eclipse -> File -> Import -> Existing Projects into Workspace -> Browse -> Finished
 
-Eclipse -> Window -> Preferences -> General -> Content Types -> Text -> HTML -> Add -> .httl
+Eclipse -> Window -> Preferences -> General -> Content Types -> Text -> HTML -> Add -> *.httl
