@@ -60,10 +60,10 @@ import javax.tools.ToolProvider;
  */
 public class JdkCompiler extends AbstractCompiler {
 
-	private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+	private final JavaCompiler compiler;
 
-	private final DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
-	
+	private final DiagnosticCollector<JavaFileObject> diagnosticCollector;
+
 	private final ClassLoaderImpl classLoader;
 	
 	private final JavaFileManagerImpl javaFileManager;
@@ -74,19 +74,25 @@ public class JdkCompiler extends AbstractCompiler {
 
 	@SuppressWarnings("resource")
 	public JdkCompiler(){
+		compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
 			throw new IllegalStateException("Can not get system java compiler. Please add jdk tools.jar to your classpath.");
 		}
+		diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
 		StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		if (loader instanceof URLClassLoader 
+		final ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader loader = contextLoader;
+		List<File> files = new ArrayList<File>();
+		while (loader instanceof URLClassLoader 
 				&& (! loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
+			URLClassLoader urlClassLoader = (URLClassLoader) loader;
+			for (URL url : urlClassLoader.getURLs()) {
+				files.add(new File(url.getFile()));
+			}
+			loader = loader.getParent();
+		}
+		if (files.size() > 0) {
 			try {
-				URLClassLoader urlClassLoader = (URLClassLoader) loader;
-				List<File> files = new ArrayList<File>();
-				for (URL url : urlClassLoader.getURLs()) {
-					files.add(new File(url.getFile()));
-				}
 				manager.setLocation(StandardLocation.CLASS_PATH, files);
 			} catch (IOException e) {
 				throw new IllegalStateException(e.getMessage(), e);
@@ -94,7 +100,7 @@ public class JdkCompiler extends AbstractCompiler {
 		}
 		classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
 			public ClassLoaderImpl run() {
-				return new ClassLoaderImpl(loader);
+				return new ClassLoaderImpl(contextLoader);
 			}
 		});
 		javaFileManager = new JavaFileManagerImpl(manager, classLoader);

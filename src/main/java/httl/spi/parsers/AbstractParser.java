@@ -762,7 +762,8 @@ public abstract class AbstractParser implements Parser {
 	}
 	
 	private String getTypeName(Class<?> type) {
-		String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
+		Class<?> pkgClass = type.isArray() ? type.getComponentType() : type;
+		String pkgName = pkgClass.getPackage() == null ? null : pkgClass.getPackage().getName();
 		String typeName;
 		if (pkgName != null && ("java.lang".equals(pkgName) 
 				|| (importPackageSet != null && importPackageSet.contains(pkgName)))) {
