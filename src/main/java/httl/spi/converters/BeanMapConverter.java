@@ -19,6 +19,7 @@ import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.util.MapSupport;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.ParseException;
@@ -48,7 +49,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> convert(Object bean) throws Exception {
+	public Map<String, Object> convert(Object bean) throws IOException, ParseException {
 		if (bean == null) {
 			return null;
 		}

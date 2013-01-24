@@ -19,6 +19,8 @@ import httl.spi.Converter;
 import httl.util.ClassComparator;
 import httl.util.ClassUtils;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -55,7 +57,7 @@ public class MultiConverter implements Converter<Object, Object> {
 		}
 	}
 
-	public Object convert(Object value) throws Exception {
+	public Object convert(Object value) throws IOException, ParseException {
 		if (value != null && converters != null) {
 			Class<?> cls = value.getClass();
 			Converter<Object, Object> converter = (Converter<Object, Object>) converters.get(cls);

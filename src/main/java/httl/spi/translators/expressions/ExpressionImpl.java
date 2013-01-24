@@ -23,6 +23,7 @@ import httl.spi.Converter;
 import httl.util.ClassUtils;
 import httl.util.Digest;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -125,13 +126,11 @@ public class ExpressionImpl implements Expression, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertMap(Object context) {
+	private Map<String, Object> convertMap(Object context) throws ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
 			try {
 				context = mapConverter.convert(context);
-			} catch (RuntimeException e) {
-				throw (RuntimeException) e;
-			} catch (Exception e) {
+			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
 		}

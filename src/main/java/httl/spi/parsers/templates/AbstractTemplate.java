@@ -159,40 +159,32 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		} else if (out instanceof Writer) {
 			render(convertMap(context), (Writer) out);
 		} else {
-			throw new RuntimeException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
+			throw new IllegalArgumentException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
 		}
 	}
 	
-	private Object convertOut(Object out) {
+	private Object convertOut(Object out) throws IOException, ParseException {
 		if (outConverter != null && out != null
 				&& ! (out instanceof OutputStream) 
 				&& ! (out instanceof Writer)) {
-			try {
-				return outConverter.convert(out);
-			} catch (RuntimeException e) {
-				throw (RuntimeException) e;
-			} catch (Exception e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
+			return outConverter.convert(out);
 		}
 		return out;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertMap(Object context) {
+	private Map<String, Object> convertMap(Object context) throws ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
 			try {
 				context = mapConverter.convert(context);
-			} catch (RuntimeException e) {
-				throw (RuntimeException) e;
-			} catch (Exception e) {
+			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
 		}
 		if (context == null || context instanceof Map) {
 			return (Map<String, Object>) context;
 		} else {
-			throw new RuntimeException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
+			throw new IllegalArgumentException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
 		}
 	}
 
