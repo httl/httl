@@ -611,9 +611,18 @@ public abstract class AbstractParser implements Parser {
 			}
 			for (String var : setVariables) {
 				if (! defined.contains(var)) {
+					defined.add(var);
 					Class<?> type = types.get(var);
 					String typeName = getTypeName(type);
 					declare.append("	" + typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
+				}
+			}
+			if (defaultParameterType != null) {
+				for (String var : getVariables) {
+					if (! defined.contains(var) && ! types.containsKey(var)) {
+						defined.add(var);
+						declare.append(getTypeCode(defaultParameterType, var));
+					}
 				}
 			}
 			StringBuilder funtionFileds = new StringBuilder();
@@ -958,33 +967,11 @@ public abstract class AbstractParser implements Parser {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
 				returnType = String.class;
 			}
-			String pre = "";
-			boolean direct = false;
-			if (nofilter) {
-				if (stream) {
-					direct = byte[].class.equals(returnType);
-				} else {
-					direct = String.class.equals(returnType);
-				}
+			code = "$formatter." + (stream ? "toBytes" : "toChars") + "(" + code + ")";
+			if (! nofilter) {
+				getVariables.add(filterVariable);
+				code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
 			}
-			if (! direct) {
-				if (nofilter && stream && Object.class.equals(returnType)) {
-					String var = "__obj" + TMP_VAR_SEQ.getAndIncrement();
-					pre = "	Object " + var + " = " + code + ";\n";
-					// 如果是byte[]类型，防止先format()成String，再serialize()回byte[]，浪费转换性能。
-					code = var + " instanceof byte[] ? (byte[]) " + var + " : getFormatter().serialize(getFormatter().format(" + var + "))";
-				} else {
-					code = "getFormatter().format(" + code + ")";
-					if (! nofilter) {
-						getVariables.add(filterVariable);
-						code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
-					}
-					if (stream) {
-						code = "getFormatter().serialize(" + code + ")";
-					}
-				}
-			}
-			buf.append(pre);
 			buf.append("	$output.write(");
 			buf.append(code);
 			buf.append(");\n");
@@ -1034,7 +1021,7 @@ public abstract class AbstractParser implements Parser {
 					} else if (value instanceof Resource) {
 						value = IOUtils.readToString(((Resource)value).getReader());
 					}
-					String str = templateFormatter.format(value);
+					String str = templateFormatter.toString(value);
 					if (! nofilter && valueFilter != null) {
 						str = valueFilter.filter(str, str);
 					}

@@ -117,7 +117,7 @@ public final class Context extends DelegateMap<String, Object> {
 	private final Object out;
 
 	// The context level.
-	private final int level;
+	private int level;
 
 	// The current engine.
 	private Engine engine;
@@ -127,7 +127,6 @@ public final class Context extends DelegateMap<String, Object> {
 		this.parent = parent;
 		this.template = template;
 		this.out = out;
-		this.level = parent == null ? 0 : parent.getLevel() + 1;
 	}
 
 	/**
@@ -189,6 +188,8 @@ public final class Context extends DelegateMap<String, Object> {
 	 * @return context level
 	 */
 	public int getLevel() {
+		if (level == -1)
+			this.level = parent == null ? 0 : parent.getLevel() + 1;
 		return level;
 	}
 
@@ -237,9 +238,8 @@ public final class Context extends DelegateMap<String, Object> {
 			return getParent();
 		} else if (CONTEXT_KEY.equals(key) || CURRENT_KEY.equals(key)) {
 			return this;
-		} else if (getParent() == null) {
-			Engine engine = getEngine();
-			return engine == null ? null : engine.getProperty((String) key);
+		} else if (getParent() == null && getEngine() != null) {
+			return getEngine().getProperty((String) key);
 		} else {
 			return null;
 		}

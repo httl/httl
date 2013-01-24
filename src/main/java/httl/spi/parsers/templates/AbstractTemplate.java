@@ -60,7 +60,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private transient final Converter<Object, Object> outConverter;
 	
-	private final TemplateFormatter formatter;
+	protected final TemplateFormatter $formatter;
 	
 	private final Map<String, Template> importMacros;
 
@@ -76,7 +76,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.filter = filter;
 		this.mapConverter = mapConverter;
 		this.outConverter = outConverter;
-		this.formatter = new TemplateFormatter(engine, formatter);
+		this.$formatter = new TemplateFormatter(engine, formatter);
 		this.importMacros = importMacros;
 		this.macros = initMacros(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
 	}
@@ -127,7 +127,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	}
 
 	protected TemplateFormatter getFormatter() {
-		return formatter;
+		return $formatter;
 	}
 
 	public Reader getReader() throws IOException {

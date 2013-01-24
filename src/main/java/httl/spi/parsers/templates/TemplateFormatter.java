@@ -21,8 +21,11 @@ import httl.Resource;
 import httl.Template;
 import httl.spi.Formatter;
 import httl.spi.formatters.MultiFormatter;
+import httl.util.DateUtils;
+import httl.util.IOUtils;
 import httl.util.StringUtils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Date;
@@ -70,11 +73,24 @@ public class TemplateFormatter {
 
 	private transient final String falseValue;
 
+	private transient final char[] nullValueChars;
+
+	private transient final char[] trueValueChars;
+
+	private transient final char[] falseValueChars;
+
+	private transient final byte[] nullValueBytes;
+
+	private transient final byte[] trueValueBytes;
+
+	private transient final byte[] falseValueBytes;
+
 	private transient final String outputEncoding;
 	
 	@SuppressWarnings("unchecked")
 	public TemplateFormatter(Engine engine, Formatter<?> formatter) {
 		this.formatter = (Formatter<Object>) formatter;
+		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING, String.class);
 		if (formatter instanceof MultiFormatter) {
 			MultiFormatter multi = (MultiFormatter) formatter;
 			this.numberFormatter = multi.get(Number.class);
@@ -102,9 +118,14 @@ public class TemplateFormatter {
 		this.nullValue = engine.getProperty(NULL_VALUE, "");
 		this.trueValue = engine.getProperty(TRUE_VALUE, "true");
 		this.falseValue = engine.getProperty(FALSE_VALUE, "false");
-		this.outputEncoding = engine.getProperty(OUTPUT_ENCODING, String.class);
+		this.nullValueChars = this.nullValue.toCharArray();
+		this.trueValueChars = this.trueValue.toCharArray();
+		this.falseValueChars = this.falseValue.toCharArray();
+		this.nullValueBytes = toBytes(this.nullValue);
+		this.trueValueBytes = toBytes(this.trueValue);
+		this.falseValueBytes = toBytes(this.falseValue);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private static Formatter<Number> getFormatter(MultiFormatter multi, Class<? extends Number> type, Formatter<Number> defaultFormatter) {
 		Formatter<Number> formatter = multi.get((Class<Number>)type);
@@ -114,55 +135,55 @@ public class TemplateFormatter {
 		return formatter;
 	}
 	
-	public String format(boolean value) {
+	public String toString(boolean value) {
 		if (booleanFormatter != null)
 			return booleanFormatter.toString(value);
 		return value ? trueValue : falseValue;
 	}
 	
-	public String format(byte value) {
+	public String toString(byte value) {
 		if (byteFormatter != null)
 			return byteFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
-	public String format(char value) {
+	public String toString(char value) {
 		if (charFormatter != null)
 			return charFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
-	public String format(short value) {
+	public String toString(short value) {
 		if (shortFormatter != null)
 			return shortFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
-	public String format(int value) {
+	public String toString(int value) {
 		if (intFormatter != null)
 			return intFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
-	public String format(long value) {
+	public String toString(long value) {
 		if (longFormatter != null)
 			return longFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
-	public String format(float value) {
+	public String toString(float value) {
 		if (floatFormatter != null)
 			return floatFormatter.toString(value);
 		return String.valueOf(value);
 	}
 	
-	public String format(double value) {
+	public String toString(double value) {
 		if (doubleFormatter != null)
 			return doubleFormatter.toString(value);
 		return String.valueOf(value);
 	}
 	
-	public String format(Boolean value) {
+	public String toString(Boolean value) {
 		if (value == null)
 			return nullValue;
 		if (booleanFormatter != null) 
@@ -170,7 +191,7 @@ public class TemplateFormatter {
 		return value.booleanValue() ? trueValue : falseValue;
 	}
 	
-	public String format(Byte value) {
+	public String toString(Byte value) {
 		if (value == null)
 			return nullValue;
 		if (byteFormatter != null) 
@@ -178,7 +199,7 @@ public class TemplateFormatter {
 		return value.toString();
 	}
 
-	public String format(Character value) {
+	public String toString(Character value) {
 		if (value == null)
 			return nullValue;
 		if (charFormatter != null) 
@@ -186,7 +207,7 @@ public class TemplateFormatter {
 		return value.toString();
 	}
 
-	public String format(Short value) {
+	public String toString(Short value) {
 		if (value == null)
 			return nullValue;
 		if (shortFormatter != null) 
@@ -194,7 +215,7 @@ public class TemplateFormatter {
 		return value.toString();
 	}
 
-	public String format(Integer value) {
+	public String toString(Integer value) {
 		if (value == null)
 			return nullValue;
 		if (intFormatter != null) 
@@ -202,7 +223,7 @@ public class TemplateFormatter {
 		return value.toString();
 	}
 	
-	public String format(Long value) {
+	public String toString(Long value) {
 		if (value == null)
 			return nullValue;
 		if (longFormatter != null) 
@@ -210,7 +231,7 @@ public class TemplateFormatter {
 		return value.toString();
 	}
 	
-	public String format(Double value) {
+	public String toString(Double value) {
 		if (value == null)
 			return nullValue;
 		if (doubleFormatter != null) 
@@ -218,27 +239,27 @@ public class TemplateFormatter {
 		return value.toString();
 	}
 	
-	public String format(Number value) {
+	public String toString(Number value) {
 		if (value == null)
 			return nullValue;
 		if (value instanceof Byte)
-			return format((Byte) value);
+			return toString((Byte) value);
 		if (value instanceof Short)
-			return format((Short) value);
+			return toString((Short) value);
 		if (value instanceof Integer)
-			return format((Integer) value);
+			return toString((Integer) value);
 		if (value instanceof Long)
-			return format((Long) value);
+			return toString((Long) value);
 		if (value instanceof Float)
-			return format((Float) value);
+			return toString((Float) value);
 		if (value instanceof Double)
-			return format((Double) value);
+			return toString((Double) value);
 		if (numberFormatter != null) 
 			return numberFormatter.toString(value);
 		return value.toString();
 	}
 
-	public String format(Date value) {
+	public String toString(Date value) {
 		if (value == null)
 			return nullValue;
 		if (dateFormatter != null) 
@@ -246,7 +267,7 @@ public class TemplateFormatter {
 		return value.toString();
 	}
 
-	public String format(byte[] value) {
+	public String toString(byte[] value) {
 		if (value == null)
 			return nullValue;
 		if (value.length == 0)
@@ -260,53 +281,399 @@ public class TemplateFormatter {
 		}
 	}
 
-	public String format(String value) {
+	public String toString(char[] value) {
+		if (value == null)
+			return nullValue;
+		return String.valueOf(value);
+	}
+
+	public String toString(String value) {
 		if (value == null)
 			return nullValue;
 		return value;
 	}
 
-	public String format(Template e) throws ParseException {
-		return format(e.evaluate());
+	public String toString(Template e) throws ParseException, IOException {
+		return toString(e.evaluate());
 	}
 
-	public String format(Expression e) throws ParseException {
-		return format(e.evaluate());
+	public String toString(Expression e) throws ParseException, IOException {
+		return toString(e.evaluate());
 	}
 
-	public String format(Resource e) {
-		return e.getSource();
+	public String toString(Resource e) throws IOException {
+		return IOUtils.readToString(e.getReader());
 	}
 
-	public String format(Object value) throws ParseException {
+	public String toString(Object value) throws ParseException, IOException {
 		if (value == null)
 			return nullValue;
 		if (value instanceof String)
 			return (String) value;
 		if (value instanceof Boolean)
-			return format((Boolean) value);
+			return toString((Boolean) value);
 		if (value instanceof Character)
-			return format((Character) value);
+			return toString((Character) value);
 		if (value instanceof Number)
-			return format((Number) value);
+			return toString((Number) value);
 		if (value instanceof Date)
-			return format((Date) value);
+			return toString((Date) value);
 		if (value instanceof byte[])
-			return format((byte[]) value);
+			return toString((byte[]) value);
 		if (value instanceof Template)
-			return format((Template) value);
+			return toString((Template) value);
 		if (value instanceof Expression)
-			return format((Expression) value);
+			return toString((Expression) value);
 		if (value instanceof Resource)
-			return format((Resource) value);
+			return toString((Resource) value);
 		if (formatter != null)
 			return formatter.toString(value);
 		return StringUtils.toString(value);
 	}
 
-	public byte[] serialize(String value) {
+	public char[] toChars(boolean value) {
+		if (booleanFormatter != null)
+			return booleanFormatter.toChars(value);
+		return value ? trueValueChars : falseValueChars;
+	}
+	
+	public char[] toChars(byte value) {
+		if (byteFormatter != null)
+			return byteFormatter.toChars(value);
+		return String.valueOf(value).toCharArray();
+	}
+
+	public char[] toChars(char value) {
+		if (charFormatter != null)
+			return charFormatter.toChars(value);
+		return String.valueOf(value).toCharArray();
+	}
+
+	public char[] toChars(short value) {
+		if (shortFormatter != null)
+			return shortFormatter.toChars(value);
+		return String.valueOf(value).toCharArray();
+	}
+
+	public char[] toChars(int value) {
+		if (intFormatter != null)
+			return intFormatter.toChars(value);
+		return String.valueOf(value).toCharArray();
+	}
+
+	public char[] toChars(long value) {
+		if (longFormatter != null)
+			return longFormatter.toChars(value);
+		return String.valueOf(value).toCharArray();
+	}
+
+	public char[] toChars(float value) {
+		if (floatFormatter != null)
+			return floatFormatter.toChars(value);
+		return String.valueOf(value).toCharArray();
+	}
+	
+	public char[] toChars(double value) {
+		if (doubleFormatter != null)
+			return doubleFormatter.toChars(value);
+		return String.valueOf(value).toCharArray();
+	}
+	
+	public char[] toChars(Boolean value) {
 		if (value == null)
-			return null;
+			return nullValueChars;
+		if (booleanFormatter != null) 
+			return booleanFormatter.toChars(value);
+		return value.booleanValue() ? trueValueChars : falseValueChars;
+	}
+	
+	public char[] toChars(Byte value) {
+		if (value == null)
+			return nullValueChars;
+		if (byteFormatter != null) 
+			return byteFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+
+	public char[] toChars(Character value) {
+		if (value == null)
+			return nullValueChars;
+		if (charFormatter != null) 
+			return charFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+
+	public char[] toChars(Short value) {
+		if (value == null)
+			return nullValueChars;
+		if (shortFormatter != null) 
+			return shortFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+
+	public char[] toChars(Integer value) {
+		if (value == null)
+			return nullValueChars;
+		if (intFormatter != null) 
+			return intFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+	
+	public char[] toChars(Long value) {
+		if (value == null)
+			return nullValueChars;
+		if (longFormatter != null) 
+			return longFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+	
+	public char[] toChars(Double value) {
+		if (value == null)
+			return nullValueChars;
+		if (doubleFormatter != null) 
+			return doubleFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+	
+	public char[] toChars(Number value) {
+		if (value == null)
+			return nullValueChars;
+		if (value instanceof Byte)
+			return toChars((Byte) value);
+		if (value instanceof Short)
+			return toChars((Short) value);
+		if (value instanceof Integer)
+			return toChars((Integer) value);
+		if (value instanceof Long)
+			return toChars((Long) value);
+		if (value instanceof Float)
+			return toChars((Float) value);
+		if (value instanceof Double)
+			return toChars((Double) value);
+		if (numberFormatter != null) 
+			return numberFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+
+	public char[] toChars(Date value) {
+		if (value == null)
+			return nullValueChars;
+		if (dateFormatter != null) 
+			return dateFormatter.toChars(value);
+		return value.toString().toCharArray();
+	}
+
+	public char[] toChars(byte[] value) {
+		if (value == null)
+			return nullValueChars;
+		if (value.length == 0)
+			return new char[0];
+		if (outputEncoding == null)
+			return new String(value).toCharArray();
+		try {
+			return new String(value, outputEncoding).toCharArray();
+		} catch (UnsupportedEncodingException e) {
+			return new String(value).toCharArray();
+		}
+	}
+
+	public char[] toChars(char[] value) {
+		if (value == null)
+			return nullValueChars;
+		return value;
+	}
+
+	public char[] toChars(String value) {
+		if (value == null)
+			return nullValueChars;
+		return value.toCharArray();
+	}
+
+	public char[] toChars(Template e) throws ParseException, IOException {
+		return toChars(e.evaluate());
+	}
+
+	public char[] toChars(Expression e) throws ParseException, IOException {
+		return toChars(e.evaluate());
+	}
+
+	public char[] toChars(Resource e) throws IOException {
+		return IOUtils.readToChars(e.getReader());
+	}
+
+	public char[] toChars(Object value) throws ParseException, IOException {
+		if (value == null)
+			return nullValueChars;
+		if (value instanceof char[])
+			return (char[]) value;
+		if (value instanceof Boolean)
+			return toChars((Boolean) value);
+		if (value instanceof Character)
+			return toChars((Character) value);
+		if (value instanceof Number)
+			return toChars((Number) value);
+		if (value instanceof Date)
+			return toChars((Date) value);
+		if (value instanceof String)
+			return toChars((String) value);
+		if (value instanceof Template)
+			return toChars((Template) value);
+		if (value instanceof Expression)
+			return toChars((Expression) value);
+		if (value instanceof Resource)
+			return toChars((Resource) value);
+		if (formatter != null)
+			return formatter.toChars(value);
+		return toChars(StringUtils.toString(value));
+	}
+
+	public byte[] toBytes(boolean value) {
+		if (booleanFormatter != null)
+			return booleanFormatter.toBytes(value);
+		return value ? trueValueBytes : falseValueBytes;
+	}
+	
+	public byte[] toBytes(byte value) {
+		if (byteFormatter != null)
+			return byteFormatter.toBytes(value);
+		return toBytes(String.valueOf(value));
+	}
+
+	public byte[] toBytes(char value) {
+		if (charFormatter != null)
+			return charFormatter.toBytes(value);
+		return toBytes(String.valueOf(value));
+	}
+
+	public byte[] toBytes(short value) {
+		if (shortFormatter != null)
+			return shortFormatter.toBytes(value);
+		return toBytes(String.valueOf(value));
+	}
+
+	public byte[] toBytes(int value) {
+		if (intFormatter != null)
+			return intFormatter.toBytes(value);
+		return toBytes(String.valueOf(value));
+	}
+
+	public byte[] toBytes(long value) {
+		if (longFormatter != null)
+			return longFormatter.toBytes(value);
+		return toBytes(String.valueOf(value));
+	}
+
+	public byte[] toBytes(float value) {
+		if (floatFormatter != null)
+			return floatFormatter.toBytes(value);
+		return toBytes(String.valueOf(value));
+	}
+	
+	public byte[] toBytes(double value) {
+		if (doubleFormatter != null)
+			return doubleFormatter.toBytes(value);
+		return toBytes(String.valueOf(value));
+	}
+	
+	public byte[] toBytes(Boolean value) {
+		if (value == null)
+			return nullValueBytes;
+		if (booleanFormatter != null) 
+			return booleanFormatter.toBytes(value);
+		return value.booleanValue() ? trueValueBytes : falseValueBytes;
+	}
+	
+	public byte[] toBytes(Byte value) {
+		if (value == null)
+			return nullValueBytes;
+		if (byteFormatter != null) 
+			return byteFormatter.toBytes(value);
+		return toBytes(value.toString());
+	}
+
+	public byte[] toBytes(Character value) {
+		if (value == null)
+			return nullValueBytes;
+		if (charFormatter != null) 
+			return charFormatter.toBytes(value);
+		return toBytes(value.toString());
+	}
+
+	public byte[] toBytes(Short value) {
+		if (value == null)
+			return nullValueBytes;
+		if (shortFormatter != null) 
+			return shortFormatter.toBytes(value);
+		return toBytes(value.toString());
+	}
+
+	public byte[] toBytes(Integer value) {
+		if (value == null)
+			return nullValueBytes;
+		if (intFormatter != null) 
+			return intFormatter.toBytes(value);
+		return toBytes(value.toString());
+	}
+	
+	public byte[] toBytes(Long value) {
+		if (value == null)
+			return nullValueBytes;
+		if (longFormatter != null) 
+			return longFormatter.toBytes(value);
+		return toBytes(value.toString());
+	}
+	
+	public byte[] toBytes(Double value) {
+		if (value == null)
+			return nullValueBytes;
+		if (doubleFormatter != null) 
+			return doubleFormatter.toBytes(value);
+		return toBytes(value.toString());
+	}
+	
+	public byte[] toBytes(Number value) {
+		if (value == null)
+			return nullValueBytes;
+		if (value instanceof Byte)
+			return toBytes((Byte) value);
+		if (value instanceof Short)
+			return toBytes((Short) value);
+		if (value instanceof Integer)
+			return toBytes((Integer) value);
+		if (value instanceof Long)
+			return toBytes((Long) value);
+		if (value instanceof Float)
+			return toBytes((Float) value);
+		if (value instanceof Double)
+			return toBytes((Double) value);
+		if (numberFormatter != null) 
+			return numberFormatter.toBytes(value);
+		return toBytes(value.toString());
+	}
+
+	public byte[] toBytes(Date value) {
+		if (value == null)
+			return nullValueBytes;
+		if (dateFormatter != null) 
+			return dateFormatter.toBytes(value);
+		return toBytes(DateUtils.format(value));
+	}
+
+	public byte[] toBytes(byte[] value) {
+		if (value == null)
+			return nullValueBytes;
+		return value;
+	}
+
+	public byte[] toBytes(char[] value) {
+		if (value == null)
+			return nullValueBytes;
+		return toBytes(String.valueOf(value));
+	}
+
+	public byte[] toBytes(String value) {
+		if (value == null)
+			return nullValueBytes;
 		if (value.length() == 0)
 			return new byte[0];
 		if (outputEncoding == null)
@@ -316,6 +683,44 @@ public class TemplateFormatter {
 		} catch (UnsupportedEncodingException e) {
 			return value.getBytes();
 		}
+	}
+
+	public byte[] toBytes(Template e) throws ParseException, IOException {
+		return toBytes(e.evaluate());
+	}
+
+	public byte[] toBytes(Expression e) throws ParseException, IOException {
+		return toBytes(e.evaluate());
+	}
+
+	public byte[] toBytes(Resource e) throws IOException {
+		return IOUtils.readToBytes(e.getInputStream());
+	}
+
+	public byte[] toBytes(Object value) throws ParseException, IOException {
+		if (value == null)
+			return nullValueBytes;
+		if (value instanceof byte[])
+			return (byte[]) value;
+		if (value instanceof Boolean)
+			return toBytes((Boolean) value);
+		if (value instanceof Character)
+			return toBytes((Character) value);
+		if (value instanceof Number)
+			return toBytes((Number) value);
+		if (value instanceof Date)
+			return toBytes((Date) value);
+		if (value instanceof String)
+			return toBytes((String) value);
+		if (value instanceof Template)
+			return toBytes((Template) value);
+		if (value instanceof Expression)
+			return toBytes((Expression) value);
+		if (value instanceof Resource)
+			return toBytes((Resource) value);
+		if (formatter != null)
+			return formatter.toBytes(value);
+		return toBytes(StringUtils.toString(value));
 	}
 
 }

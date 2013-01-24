@@ -49,6 +49,22 @@ public class IOUtils {
 		}
 	}
 
+	public static char[] readToChars(Reader reader) throws IOException {
+		try {
+			StringBuilder buffer = new StringBuilder();
+			char[] buf = new char[8192];
+			int len = 0;
+			while ((len = reader.read(buf)) != -1) {
+				buffer.append(buf, 0, len);
+			}
+			char[] result = new char[buffer.length()];
+			buffer.getChars(0, buffer.length(), result, 0);
+			return result;
+		} finally {
+			reader.close();
+		}
+	}
+
 	public static String readToString(Reader reader) throws IOException {
 		try {
 			StringBuilder buffer = new StringBuilder();

@@ -12,5 +12,5 @@ e,
 f,
 
 b
-[c, d, e]
-[c, d, e, f]
+cde
+cdef
