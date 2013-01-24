@@ -230,7 +230,15 @@ public class TemplateFormatter {
 			return longFormatter.toString(value);
 		return value.toString();
 	}
-	
+
+	public String toString(Float value) {
+		if (value == null)
+			return nullValue;
+		if (floatFormatter != null) 
+			return floatFormatter.toString(value);
+		return value.toString();
+	}
+
 	public String toString(Double value) {
 		if (value == null)
 			return nullValue;

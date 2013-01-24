@@ -962,10 +962,8 @@ public abstract class AbstractParser implements Parser {
 		} else {
 			if (Expression.class.isAssignableFrom(returnType)) {
 				code = "(" + code + ").evaluate()";
-				returnType = Object.class;
 			} else if (Resource.class.isAssignableFrom(returnType)) {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
-				returnType = String.class;
 			}
 			code = "$formatter." + (stream ? "toBytes" : "toChars") + "(" + code + ")";
 			if (! nofilter) {
