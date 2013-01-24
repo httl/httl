@@ -15,9 +15,7 @@
  */
 package httl.spi.translators.expressions;
 
-import httl.Engine;
 import httl.Template;
-import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
@@ -153,17 +151,15 @@ public final class BinaryOperator extends Operator {
 				}
 			}
 			Class<?>[] rightTypes = rightParameter.getReturnTypes();
-			if (Template.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
-				if (! hasMethod(leftType, name, rightTypes)) {
+			if (rightTypes.length == 0 && ! hasMethod(leftType, name, rightTypes)) {
+				if (Template.class.isAssignableFrom(leftType)) {
 					return getNotNullCode(leftCode, "((" + Template.class.getName() + ")" + leftCode + ".getMacros().get(\"" + name + "\"))");
-				}
-			} else if (Engine.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
-				if (! hasMethod(leftType, name, rightTypes)) {
-					return getNotNullCode(leftCode, leftCode + ".getProperty(\"" + name + "\")");
-				}
-			} else if (Resolver.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
-				if (! hasMethod(leftType, name, rightTypes)) {
+				} else if (hasMethod(leftType, "get", new Class<?>[] { String.class })) {
 					return getNotNullCode(leftCode, leftCode + ".get(\"" + name + "\")");
+				} else if (hasMethod(leftType, "getProperty", new Class<?>[] { String.class })) {
+					return getNotNullCode(leftCode, leftCode + ".getProperty(\"" + name + "\")");
+				} else if (hasMethod(leftType, "getAttribute", new Class<?>[] { String.class })) {
+					return getNotNullCode(leftCode, leftCode + ".getAttribute(\"" + name + "\")");
 				}
 			}
 			name = ClassUtils.filterJavaKeyword(name);
@@ -416,16 +412,14 @@ public final class BinaryOperator extends Operator {
 				}
 			}
 			Class<?>[] rightTypes = rightParameter.getReturnTypes();
-			if (Template.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
-				if (! hasMethod(leftType, name, rightTypes)) {
+			if (rightTypes.length == 0 && ! hasMethod(leftType, name, rightTypes)) {
+				if (Template.class.isAssignableFrom(leftType)) {
 					return Template.class;
-				}
-			} else if (Engine.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
-				if (! hasMethod(leftType, name, rightTypes)) {
+				} else if (hasMethod(leftType, "get", new Class<?>[] { String.class })) {
 					return Object.class;
-				}
-			} else if (Resolver.class.isAssignableFrom(leftType) && rightTypes.length == 0) {
-				if (! hasMethod(leftType, name, rightTypes)) {
+				} else if (hasMethod(leftType, "getProperty", new Class<?>[] { String.class })) {
+					return Object.class;
+				} else if (hasMethod(leftType, "getAttribute", new Class<?>[] { String.class })) {
 					return Object.class;
 				}
 			}

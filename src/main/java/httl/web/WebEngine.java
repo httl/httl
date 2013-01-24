@@ -59,7 +59,10 @@ public class WebEngine {
 		addProperty("import.variables", HttpServletRequest.class.getName() + " request,"
 				+ HttpServletResponse.class.getName() + " response,"
 				+ HttpSession.class.getName() + " session,"
-				+ ServletContext.class.getName() + " application");
+				+ ServletContext.class.getName() + " application,"
+				+ Map.class.getName() + " cookie,"
+				+ Map.class.getName() + " parameter,"
+				+ Map.class.getName() + " header");
 	}
 
 	private WebEngine() {}

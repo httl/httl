@@ -28,6 +28,9 @@ public class MultiLogger implements Logger {
 
 	private Logger[] loggers;
 
+	/**
+	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
+	 */
 	public void setLoggers(Logger[] loggers) {
 		this.loggers = loggers;
 	}

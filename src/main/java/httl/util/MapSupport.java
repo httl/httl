@@ -32,11 +32,14 @@ import java.util.Set;
 public abstract class MapSupport<K, V> implements Map<K, V> {
 
 	private final Set<K> keySet;
+	
+	public MapSupport() {
+		this(null);
+	}
 
-	protected MapSupport(K[] keys) {
-		if (keys == null)
-			throw new IllegalArgumentException("bean keys == null");
-		this.keySet = Collections.unmodifiableSet(new HashSet<K>(Arrays.asList(keys)));
+	@SuppressWarnings("unchecked")
+	public MapSupport(K[] keys) {
+		this.keySet = keys == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(new HashSet<K>(Arrays.asList(keys)));
 	}
 
 	public Set<K> keySet() {

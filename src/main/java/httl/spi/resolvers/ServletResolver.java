@@ -18,6 +18,7 @@ package httl.spi.resolvers;
 import httl.spi.Resolver;
 import httl.spi.loaders.ServletLoader;
 import httl.util.ClassUtils;
+import httl.util.MapSupport;
 import httl.util.StringUtils;
 
 import java.io.IOException;
@@ -46,6 +47,12 @@ public class ServletResolver implements Resolver, Filter {
 	private static final String SESSION_KEY = "session";
 
 	private static final String APPLICATION_KEY = "application";
+
+	private static final String COOKIE_KEY = "cookie";
+
+	private static final String PARAMETER_KEY = "parameter";
+
+	private static final String HEADER_KEY = "header";
 
 	private static final String DEFAULT_CONTENT_TYPE = "text/html";
 
@@ -126,6 +133,14 @@ public class ServletResolver implements Resolver, Filter {
 		return object;
 	}
 
+	private Object getHeaderValue(HttpServletRequest request, String key) {
+		Object value = request.getHeader(key);
+		if (value != null) {
+			return value;
+		}
+		return request.getHeader(StringUtils.splitCamelName(key, "-", true));
+	}
+	
 	private Object getParameterValue(HttpServletRequest request, String key) {
 		String[] values = request.getParameterValues(key);
 		if (values == null || values.length == 0) {
@@ -150,7 +165,7 @@ public class ServletResolver implements Resolver, Filter {
 	}
 
 	public Object get(String key) {
-		HttpServletRequest request = getRequest();
+		final HttpServletRequest request = getRequest();
 		if (request == null) {
 			return null;
 		}
@@ -169,11 +184,7 @@ public class ServletResolver implements Resolver, Filter {
 		if (value != null) {
 			return value;
 		}
-		value = request.getHeader(key);
-		if (value != null) {
-			return value;
-		}
-		value = request.getHeader(StringUtils.splitCamelName(key, "-", true));
+		value = getHeaderValue(request, key);
 		if (value != null) {
 			return value;
 		}
@@ -208,6 +219,27 @@ public class ServletResolver implements Resolver, Filter {
 		}
 		if (APPLICATION_KEY.equals(key)) {
 			return request.getSession().getServletContext();
+		}
+		if (COOKIE_KEY.equals(key)) {
+			return new MapSupport<String, Object>() {
+				public Object get(Object key) {
+					return ServletResolver.this.getCookieValue(request, (String) key);
+				}
+			};
+		}
+		if (PARAMETER_KEY.equals(key)) {
+			return new MapSupport<String, Object>() {
+				public Object get(Object key) {
+					return ServletResolver.this.getParameterValue(request, (String) key);
+				}
+			};
+		}
+		if (HEADER_KEY.equals(key)) {
+			return new MapSupport<String, Object>() {
+				public Object get(Object key) {
+					return ServletResolver.this.getHeaderValue(request, (String) key);
+				}
+			};
 		}
 		return value;
 	}

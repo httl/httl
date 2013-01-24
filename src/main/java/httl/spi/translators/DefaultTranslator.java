@@ -53,7 +53,7 @@ public class DefaultTranslator implements Translator {
 
 	private Filter expressionFilter;
 
-	private Class<?> defaultParameterType;
+	private Class<?> defaultVariableType;
 	
 	protected String[] importPackages;
 
@@ -97,10 +97,10 @@ public class DefaultTranslator implements Translator {
 	}
 
 	/**
-	 * httl.properties: default.parameter.type=java.lang.String
+	 * httl.properties: default.variable.type=java.lang.String
 	 */
-	public void setDefaultParameterType(String defaultParameterType) {
-		this.defaultParameterType = ClassUtils.forName(defaultParameterType);
+	public void setDefaultVariableType(String defaultVariableType) {
+		this.defaultVariableType = ClassUtils.forName(defaultVariableType);
 	}
 
 	public void setImportMethods(Object[] importMethods) {
@@ -138,7 +138,7 @@ public class DefaultTranslator implements Translator {
 			source = expressionFilter.filter(source, source);
 		}
 		Set<String> variables = new HashSet<String>();
-		Node node = new DfaParser(this, parameterTypes, defaultParameterType, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
+		Node node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
 		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, mapConverter, importPackages, functions);
 	}
 

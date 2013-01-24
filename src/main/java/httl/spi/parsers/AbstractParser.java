@@ -217,13 +217,13 @@ public abstract class AbstractParser implements Parser {
 	
 	protected Logger logger;
 	
-	protected Class<?> defaultParameterType;
+	protected Class<?> defaultVariableType;
 
 	/**
-	 * httl.properties: default.parameter.type=java.lang.String
+	 * httl.properties: default.variable.type=java.lang.String
 	 */
-	public void setDefaultParameterType(String defaultParameterType) {
-		this.defaultParameterType = ClassUtils.forName(defaultParameterType);
+	public void setDefaultVariableType(String defaultVariableType) {
+		this.defaultVariableType = ClassUtils.forName(defaultVariableType);
 	}
 
 	/**
@@ -617,11 +617,11 @@ public abstract class AbstractParser implements Parser {
 					declare.append("	" + typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
 				}
 			}
-			if (defaultParameterType != null) {
+			if (defaultVariableType != null) {
 				for (String var : getVariables) {
 					if (! defined.contains(var) && ! types.containsKey(var)) {
 						defined.add(var);
-						declare.append(getTypeCode(defaultParameterType, var));
+						declare.append(getTypeCode(defaultVariableType, var));
 					}
 				}
 			}
@@ -1334,7 +1334,7 @@ public abstract class AbstractParser implements Parser {
 				String type;
 				int i = v.lastIndexOf(' ');
 				if (i <= 0) {
-					type = defaultParameterType == null ? Object.class.getSimpleName() : defaultParameterType.getCanonicalName();
+					type = defaultVariableType == null ? Object.class.getSimpleName() : defaultVariableType.getCanonicalName();
 					var = v;
 				} else {
 					type = v.substring(0, i).trim();

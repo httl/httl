@@ -98,7 +98,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		}
 		StringBuilder code = new StringBuilder();
 		String className = "BeanMap_" + beanClass.getCanonicalName().replace('.', '_');
-		code.append("package " + MapSupport.class.getPackage().getName() + ";\n");
+		code.append("package " + BeanMapConverter.class.getPackage().getName() + ";\n");
 		code.append("public class " + className + " extends " + MapSupport.class.getName() + " {\n");
 		code.append("private " + beanClass.getCanonicalName() + " bean;\n");
 		code.append("public " + className + "(" + beanClass.getCanonicalName() + " bean) {\n");
