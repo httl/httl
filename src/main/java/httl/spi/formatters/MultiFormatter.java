@@ -19,6 +19,7 @@ import httl.spi.Formatter;
 import httl.util.ClassUtils;
 import httl.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,7 +33,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MultiFormatter implements Formatter<Object> {
 	
 	private final Map<Class<?>, Formatter<?>> formatters = new ConcurrentHashMap<Class<?>, Formatter<?>>();
-	
+
+	private String outputEncoding;
+
+	/**
+	 * httl.properties: output.encoding=UTF-8
+	 */
+	public void setOutputEncoding(String outputEncoding) {
+		this.outputEncoding = outputEncoding;
+	}
+
 	public void setFormatters(Formatter<?>[] formatters) {
 		if (formatters != null && formatters.length > 0) {
 			for (Formatter<?> formatter : formatters) {
@@ -58,7 +68,7 @@ public class MultiFormatter implements Formatter<Object> {
 			if (formatter != null) {
 				return formatter.toString(null);
 			}
-			return null;
+			return "";
 		} else {
 			Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
 			if (formatter != null) {
@@ -75,7 +85,7 @@ public class MultiFormatter implements Formatter<Object> {
 			if (formatter != null) {
 				return formatter.toChars(null);
 			}
-			return null;
+			return new char[0];
 		} else {
 			Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
 			if (formatter != null) {
@@ -92,13 +102,24 @@ public class MultiFormatter implements Formatter<Object> {
 			if (formatter != null) {
 				return formatter.toBytes(null);
 			}
-			return null;
+			return new byte[0];
 		} else {
 			Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
 			if (formatter != null) {
 				return formatter.toBytes(value);
 			}
-			return StringUtils.toString(value).getBytes();
+			String str = StringUtils.toString(value);
+			if (str == null) {
+				return new byte[0];
+			}
+			if (outputEncoding == null) {
+				return str.getBytes();
+			}
+			try {
+				return str.getBytes(outputEncoding);
+			} catch (UnsupportedEncodingException e) {
+				return str.getBytes();
+			}
 		}
 	}
 
