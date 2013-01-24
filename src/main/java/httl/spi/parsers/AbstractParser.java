@@ -965,7 +965,7 @@ public abstract class AbstractParser implements Parser {
 			} else if (Resource.class.isAssignableFrom(returnType)) {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
 			}
-			code = "$formatter." + (stream ? "toBytes" : "toChars") + "(" + code + ")";
+			code = "$formatter." + (stream ? "toBytes" : "toString") + "(" + code + ")";
 			if (! nofilter) {
 				getVariables.add(filterVariable);
 				code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";

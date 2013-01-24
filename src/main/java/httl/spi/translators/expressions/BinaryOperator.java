@@ -151,7 +151,7 @@ public final class BinaryOperator extends Operator {
 				}
 			}
 			Class<?>[] rightTypes = rightParameter.getReturnTypes();
-			if (rightTypes.length == 0 && ! hasMethod(leftType, name, rightTypes)) {
+			if (rightTypes != null && rightTypes.length == 0 && ! hasMethod(leftType, name, rightTypes)) {
 				if (Template.class.isAssignableFrom(leftType)) {
 					return getNotNullCode(leftCode, "((" + Template.class.getName() + ")" + leftCode + ".getMacros().get(\"" + name + "\"))");
 				} else if (hasMethod(leftType, "get", new Class<?>[] { String.class })) {
