@@ -23,9 +23,8 @@ import httl.spi.loaders.ClasspathLoader;
 import httl.spi.loaders.MultiLoader;
 import httl.spi.parsers.templates.AdaptiveTemplate;
 import httl.test.model.Book;
+import httl.test.model.Model;
 import httl.test.model.User;
-import httl.test.util.DiscardOutputStream;
-import httl.test.util.DiscardWriter;
 import httl.util.ClassUtils;
 import httl.util.IOUtils;
 import httl.util.StringUtils;
@@ -62,6 +61,7 @@ import org.junit.Test;
  */
 public class TemplateTest extends TestCase {
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testTemplate() throws Exception {
 		boolean profile = "true".equals(System.getProperty("profile"));
@@ -118,134 +118,122 @@ public class TemplateTest extends TestCase {
 		context.put("books2", books2);
 		context.put("booklist2", Arrays.asList(books2));
 		context.put("bookmap2", bookmap2);
+		Model model = new Model();
+		model.setChinese("中文");
+		model.setImpvar("abcxyz");
+		model.setHtml("<a href=\"foo.html\">foo</a>");
+		model.setUser(user);
+		model.setBooks(books);
+		model.setBooklist(Arrays.asList(books));
+		model.setBookmap(bookmap);
+		model.setMapbookmap(mapbookmap);
+		model.setMapbooklist(mapbooklist);
+		model.setEmptybooks(new Book[0]);
+		model.setBooks2(books2);
+		model.setBooklist2(Arrays.asList(books2));
+		model.setBookmap2(bookmap2);
+		Object[] maps = new Object[] {context, model, null};
 		String[] configs = new String[] { "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
 		for (String config : configs) {
-			if (! profile) 
-				System.out.println("========" + config + "========");
-			Engine engine = Engine.getEngine(config);
-			if (! profile) {
-				Loader loader = engine.getProperty("loader", Loader.class);
-				assertEquals(MultiLoader.class, loader.getClass());
-				Loader[] loaders = engine.getProperty("loaders", Loader[].class);
-				assertEquals(ClasspathLoader.class, loaders[0].getClass());
-				loader = engine.getProperty("loaders", ClasspathLoader.class);
-				assertEquals(ClasspathLoader.class, loader.getClass());
-				String suffix = engine.getProperty("template.suffix", ".httl");
-				List<String> list = loader.list(suffix);
-				assertTrue(list.size() > 0);
-			}
-			String dir = engine.getProperty("template.directory", "");
-			if (dir.length() > 0 && dir.startsWith("/")) {
-				dir = dir.substring(1);
-			}
-			if (dir.length() > 0 && ! dir.endsWith("/")) {
-				dir += "/";
-			}
-			File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-			assertTrue(directory.isDirectory());
-			File[] files = directory.listFiles();
-			long max = profile ? Long.MAX_VALUE : 1;
-			for (long m = 0; m < max; m ++) {
-				for (int i = 0, n = files.length; i < n; i ++) {
-					File file = files[i];
-					//if (! "extends_var.httl".equals(file.getName())) {
-					//	continue;
-					//}
-					if (! profile)
-						System.out.println(file.getName());
-					if (excludes.contains(file.getName()) || 
-							(includes.size() > 0 && ! includes.contains(file.getName()))) {
-						continue;
-					}
-					String encoding = "UTF-8";
-					if ("gbk.httl".equals(file.getName())) {
-						encoding = "GBK";
-					}
-					Engine _engine = engine;
-					if ("extends_default.httl".equals(file.getName())) {
-						_engine = Engine.getEngine("httl-extends.properties");
-					}
-					Template template = _engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
-					if (! profile) {
-						super.assertEquals(AdaptiveTemplate.class, template.getClass());
-						super.assertEquals(Locale.CHINA, template.getLocale());
-					}
-					UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
-					StringWriter actualWriter = new StringWriter();
-					if ("extends_var.httl".equals(file.getName())) {
-						context.put("extends", "default.httl");
-					}
-					try {
-						template.render(context, actualWriter);
-						template.render(context, actualStream);
-					} catch (Exception e) {
-						throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
-					}
-					if ("extends_var.httl".equals(file.getName())) {
-						context.remove("extends");
-					}
-					if (! profile) {
-						URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
-						if (url == null) {
-							throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName() + ".txt");
-						}
-						File result = new File(url.getFile());
-						if (! result.exists()) {
-							throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
-						}
-						String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
-						expected = expected.replace("\r", "");
-						super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
-						super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
-						if ("set_parameters.httl".equals(file.getName())) {
-							super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
-						}
-					}
+			for (Object map : maps) {
+				if (! profile) 
+					System.out.println("========" + config + " (" + (map == null ? "null" : map.getClass().getSimpleName()) + " parameters)========");
+				Engine engine = Engine.getEngine(config);
+				if (! profile) {
+					Loader loader = engine.getProperty("loader", Loader.class);
+					assertEquals(MultiLoader.class, loader.getClass());
+					Loader[] loaders = engine.getProperty("loaders", Loader[].class);
+					assertEquals(ClasspathLoader.class, loaders[0].getClass());
+					loader = engine.getProperty("loaders", ClasspathLoader.class);
+					assertEquals(ClasspathLoader.class, loader.getClass());
+					String suffix = engine.getProperty("template.suffix", ".httl");
+					List<String> list = loader.list(suffix);
+					assertTrue(list.size() > 0);
 				}
-				if (profile) {
-					synchronized (TemplateTest.class) {
+				String dir = engine.getProperty("template.directory", "");
+				if (dir.length() > 0 && dir.startsWith("/")) {
+					dir = dir.substring(1);
+				}
+				if (dir.length() > 0 && ! dir.endsWith("/")) {
+					dir += "/";
+				}
+				File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
+				assertTrue(directory.isDirectory());
+				File[] files = directory.listFiles();
+				long max = profile ? Long.MAX_VALUE : 1;
+				for (long m = 0; m < max; m ++) {
+					for (int i = 0, n = files.length; i < n; i ++) {
+						File file = files[i];
+						//if (! "extends_var.httl".equals(file.getName())) {
+						//	continue;
+						//}
+						if (! profile)
+							System.out.println(file.getName());
+						if (excludes.contains(file.getName()) || 
+								(includes.size() > 0 && ! includes.contains(file.getName()))) {
+							continue;
+						}
+						String encoding = "UTF-8";
+						if ("gbk.httl".equals(file.getName())) {
+							encoding = "GBK";
+						}
+						Engine _engine = engine;
+						if ("extends_default.httl".equals(file.getName())) {
+							_engine = Engine.getEngine("httl-extends.properties");
+						}
+						Template template = _engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
+						if (! profile) {
+							super.assertEquals(AdaptiveTemplate.class, template.getClass());
+							super.assertEquals(Locale.CHINA, template.getLocale());
+						}
+						UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
+						StringWriter actualWriter = new StringWriter();
+						if ("extends_var.httl".equals(file.getName())) {
+							if (map instanceof Map) {
+								((Map<String, Object>) map).put("extends", "default.httl");
+							} else if (map instanceof Model) {
+								((Model) map).setExtends("default.httl");
+							}
+						}
 						try {
-							TemplateTest.class.wait(20);
-						} catch (InterruptedException e) {
+							template.render(map, actualWriter);
+							template.render(map, actualStream);
+						} catch (Exception e) {
+							throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
+						}
+						if ("extends_var.httl".equals(file.getName())) {
+							if (map instanceof Map) {
+								((Map<String, Object>) map).remove("extends");
+							} else if (map instanceof Model) {
+								((Model) map).setExtends(null);
+							}
+						}
+						if (! profile && map != null) {
+							URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
+							if (url == null) {
+								throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName() + ".txt");
+							}
+							File result = new File(url.getFile());
+							if (! result.exists()) {
+								throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
+							}
+							String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
+							expected = expected.replace("\r", "");
+							super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
+							super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
+							if ("set_parameters.httl".equals(file.getName())) {
+								super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
+							}
 						}
 					}
-				}
-			}
-		}
-		context = null;
-		for (String config : configs) {
-			if (! profile)
-				System.out.println("========" + config + " (null parameters)========");
-			Engine engine = Engine.getEngine(config);
-			String dir = engine.getProperty("template.directory", "");
-			if (dir.length() > 0 && dir.startsWith("/")) {
-				dir = dir.substring(1);
-			}
-			if (dir.length() > 0 && ! dir.endsWith("/")) {
-				dir += "/";
-			}
-			File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-			super.assertTrue(directory.isDirectory());
-			File[] files = directory.listFiles();
-			for (int i = 0, n = files.length; i < n; i ++) {
-				File file = files[i];
-				if (! profile)
-					System.out.println(file.getName());
-				URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
-				if (url == null) {
-					throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName() + ".txt");
-				}
-				File result = new File(url.getFile());
-				if (! result.exists()) {
-					throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
-				}
-				Template template = engine.getTemplate("/templates/" + file.getName());
-				super.assertEquals(AdaptiveTemplate.class, template.getClass());
-				try {
-					template.render(context, new DiscardWriter());
-					template.render(context, new DiscardOutputStream());
-				} catch (Exception e) {
-					throw new IllegalStateException("\n================================\n" + template.getCode() + "\n================================\n" + e.getMessage(), e);
+					if (profile) {
+						synchronized (TemplateTest.class) {
+							try {
+								TemplateTest.class.wait(20);
+							} catch (InterruptedException e) {
+							}
+						}
+					}
 				}
 			}
 		}

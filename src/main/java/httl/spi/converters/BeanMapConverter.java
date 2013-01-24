@@ -15,8 +15,8 @@
  */
 package httl.spi.converters;
 
+import httl.spi.Compiler;
 import httl.spi.Converter;
-import httl.util.BeanMap;
 
 import java.util.Map;
 
@@ -29,9 +29,18 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class BeanMapConverter implements Converter<Object, Map<String, Object>> {
+	
+	private Compiler compiler;
+
+	/**
+	 * httl.properties: compiler=httl.spi.compilers.JdkCompiler
+	 */
+	public void setCompiler(Compiler compiler) {
+		this.compiler = compiler;
+	}
 
 	public Map<String, Object> convert(Object value) throws Exception {
-		return new BeanMap(value);
+		return BeanMap.convert(value, compiler);
 	}
 
 }
