@@ -15,6 +15,8 @@
  */
 package httl.spi.filters;
 
+import java.io.UnsupportedEncodingException;
+
 import httl.spi.Filter;
 
 /**
@@ -28,12 +30,42 @@ import httl.spi.Filter;
  */
 public abstract class AbstractFilter implements Filter {
 
-	public char[] filter(String key, char[] value) {
-		return filter(key, new String(value)).toCharArray(); // slowly
+	private String outputEncoding;
+
+	/**
+	 * httl.properties: output.encoding=UTF-8
+	 */
+	public void setOutputEncoding(String outputEncoding) {
+		this.outputEncoding = outputEncoding;
 	}
 
-	public byte[] filter(String key, byte[] value) {
-		return filter(key, new String(value)).getBytes(); // slowly
+	public char[] filter(String key, char[] value) { // slowly
+		if (value == null) {
+			return new char[0];
+		}
+		String str = filter(key, String.valueOf(value));
+		if (str == null) {
+			return new char[0];
+		}
+		return str.toCharArray();
+	}
+
+	public byte[] filter(String key, byte[] value) { // slowly
+		if (value == null) {
+			return new byte[0];
+		}
+		String str = filter(key, new String(value));
+		if (str == null) {
+			return new byte[0];
+		}
+		if (outputEncoding == null) {
+			return str.getBytes();
+		}
+		try {
+			return str.getBytes(outputEncoding);
+		} catch (UnsupportedEncodingException e) {
+			return str.getBytes();
+		}
 	}
 
 }

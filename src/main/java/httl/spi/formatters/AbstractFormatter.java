@@ -2,14 +2,46 @@ package httl.spi.formatters;
 
 import httl.spi.Formatter;
 
+import java.io.UnsupportedEncodingException;
+
 public abstract class AbstractFormatter<T> implements Formatter<T> {
 
-	public char[] toChars(T value) {
-		return toString(value).toCharArray(); // slowly
+	private String outputEncoding;
+
+	/**
+	 * httl.properties: output.encoding=UTF-8
+	 */
+	public void setOutputEncoding(String outputEncoding) {
+		this.outputEncoding = outputEncoding;
 	}
 
-	public byte[] toBytes(T value) {
-		return toString(value).getBytes(); // slowly
+	public char[] toChars(T value) { // slowly
+		if (value == null) {
+			return new char[0];
+		}
+		String str = toString(value);
+		if (str == null) {
+			return new char[0];
+		}
+		return str.toCharArray();
+	}
+
+	public byte[] toBytes(T value) { // slowly
+		if (value == null) {
+			return new byte[0];
+		}
+		String str = toString(value);
+		if (str == null) {
+			return new byte[0];
+		}
+		if (outputEncoding == null) {
+			return str.getBytes();
+		}
+		try {
+			return str.getBytes(outputEncoding);
+		} catch (UnsupportedEncodingException e) {
+			return str.getBytes();
+		}
 	}
 
 }
