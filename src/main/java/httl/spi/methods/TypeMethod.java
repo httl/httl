@@ -291,7 +291,7 @@ public class TypeMethod {
 		if (value instanceof byte[])
 			return toString((byte[]) value);
 		if (formatter != null)
-			return formatter.format(value);
+			return formatter.toString(value);
 		return StringUtils.toString(value);
 	}
 

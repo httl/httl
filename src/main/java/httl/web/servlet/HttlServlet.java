@@ -15,6 +15,7 @@
  */
 package httl.web.servlet;
 
+import httl.Context;
 import httl.web.WebEngine;
 
 import java.io.IOException;
@@ -47,7 +48,10 @@ public class HttlServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			WebEngine.render(request, response, getTemplatePath(request));
+			Context context = Context.getContext();
+			context.put("request", request);
+			context.put("response", response);
+			WebEngine.getEngine().getTemplate(getTemplatePath(request), request.getLocale()).render(response);
 		} catch (ParseException e) {
 			throw new ServletException(e.getMessage(), e);
 		}

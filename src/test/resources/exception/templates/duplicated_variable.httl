@@ -1,3 +1,0 @@
-<!--#var(User user)-->
-<!--#var(User user)-->
-${user.name}

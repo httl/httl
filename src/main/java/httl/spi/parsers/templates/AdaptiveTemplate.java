@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
-import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -107,30 +106,29 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
 	}
 
-	public Object evaluate(Map<String, Object> parameters) throws ParseException {
+	public Object evaluate(Object context) throws ParseException {
 		if (Context.getContext().getOut() instanceof OutputStream) {
-			return streamTemplate.evaluate(parameters);
+			return streamTemplate.evaluate(context);
 		} else {
-			return writerTemplate.evaluate(parameters);
+			return writerTemplate.evaluate(context);
 		}
 	}
 
-	public void render(OutputStream stream) throws IOException, ParseException {
-		streamTemplate.render(stream);
+	public void render(Object out) throws IOException, ParseException {
+		if (out  instanceof OutputStream) {
+			streamTemplate.render(out);
+		} else {
+			writerTemplate.render(out);
+		}
 	}
 
-	public void render(Map<String, Object> parameters, OutputStream stream)
+	public void render(Object context, Object out)
 			throws IOException, ParseException {
-		streamTemplate.render(parameters, stream);
-	}
-
-	public void render(Writer writer) throws IOException, ParseException {
-		writerTemplate.render(writer);
-	}
-
-	public void render(Map<String, Object> parameters, Writer writer)
-			throws IOException, ParseException {
-		writerTemplate.render(parameters, writer);
+		if (out instanceof OutputStream) {
+			streamTemplate.render(context, out);
+		} else {
+			writerTemplate.render(context, out);
+		}
 	}
 
 	public Map<String, Class<?>> getParameterTypes() {

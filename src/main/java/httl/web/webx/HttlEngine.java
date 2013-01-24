@@ -15,6 +15,7 @@
  */
 package httl.web.webx;
 
+import httl.Context;
 import httl.util.UrlUtils;
 import httl.web.WebEngine;
 
@@ -25,6 +26,9 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.citrus.service.template.TemplateContext;
 import com.alibaba.citrus.service.template.TemplateEngine;
@@ -91,31 +95,29 @@ public class HttlEngine implements TemplateEngine {
 		return writer.toString();
 	}
 
-	public void writeTo(String templateName, TemplateContext context, OutputStream ostream) throws TemplateException, IOException {
-		try {
-			TurbineRunData rundata = (TurbineRunData) context.get("rundata");
-			if (rundata != null && rundata.getRequest() != null && rundata.getResponse() != null) {
-				WebEngine.render(rundata.getRequest(), rundata.getResponse(), 
-						getTemplatePath(templateName), new ContextMap(context), ostream);
-			} else {
-				WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), ostream);
-			}
-		} catch (ParseException e) {
-			throw new TemplateException(e.getMessage(), e);
-		}
+	public void writeTo(String templateName, TemplateContext templateContext, OutputStream ostream) throws TemplateException, IOException {
+		doWriteTo(templateName, templateContext, ostream);
+	}
+	
+	public void writeTo(String templateName, TemplateContext templateContext, Writer writer) throws TemplateException, IOException {
+		doWriteTo(templateName, templateContext, writer);
 	}
 
-	public void writeTo(String templateName, TemplateContext context,
-			Writer writer) throws TemplateException, IOException {
+	private void doWriteTo(String templateName, TemplateContext templateContext, Object out) throws TemplateException, IOException {
 		try {
-			TurbineRunData rundata = (TurbineRunData) context.get("rundata");
-			if (rundata != null && rundata.getRequest() != null
-					&& rundata.getResponse() != null) {
-				WebEngine.render(rundata.getRequest(), rundata.getResponse(), 
-						getTemplatePath(templateName), new ContextMap(context), writer);
-			} else {
-				WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(context), writer);
+			TurbineRunData rundata = (TurbineRunData) templateContext.get("rundata");
+			if (rundata != null) {
+				HttpServletRequest request = rundata.getRequest();
+				HttpServletResponse response = rundata.getResponse();
+				if (rundata.getRequest() != null && rundata.getResponse() != null) {
+					Context context = Context.getContext();
+					context.put("request", request);
+					context.put("response", response);
+					WebEngine.getEngine().getTemplate(getTemplatePath(templateName), request.getLocale(), templateEncoding).render(new ContextMap(templateContext), out);
+					return;
+				}
 			}
+			WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(templateContext), out);
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}

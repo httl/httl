@@ -20,6 +20,7 @@ import httl.Template;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
 
 /**
  * Template Parser. (SPI, Singleton, ThreadSafe)
@@ -36,6 +37,6 @@ public interface Parser {
 	 * @param resource - template resource.
 	 * @return template instance
 	 */
-	Template parse(Resource resource) throws IOException, ParseException;
+	Template parse(Resource resource, Map<String, Class<?>> parameterTypes) throws IOException, ParseException;
 
 }

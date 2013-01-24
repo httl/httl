@@ -17,6 +17,7 @@ package httl.script;
 
 import httl.Engine;
 import httl.spi.Parser;
+import httl.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +26,6 @@ import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * HttlScriptEngineFactory (Integration, Singleton, ThreadSafe)
@@ -113,7 +112,7 @@ public class HttlScriptEngineFactory implements ScriptEngineFactory {
 		return "1.0.0";
 	}
 
-	public String getMethodCallSyntax(String obj, String m, String[] args) {
+	public String getMethodCallSyntax(String obj, String m, String... args) {
 		StringBuilder buf = new StringBuilder();
 		if (args != null && args.length > 0) {
 			boolean first = true;
@@ -132,7 +131,7 @@ public class HttlScriptEngineFactory implements ScriptEngineFactory {
 		return "${" + toDisplay + "}";
 	}
 
-	public String getProgram(String[] statements) {
+	public String getProgram(String... statements) {
 		StringBuilder buf = new StringBuilder();
 		for (String stat : statements) {
 			buf.append(stat);

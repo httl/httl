@@ -15,19 +15,17 @@
  */
 package httl.spi.parsers.templates;
 
+import httl.Engine;
+import httl.Resource;
+import httl.Template;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
-import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
-
-import httl.Engine;
-import httl.Resource;
-import httl.Template;
 
 /**
  * ResourceTemplate. (SPI, Prototype, ThreadSafe)
@@ -115,25 +113,15 @@ public class ResourceTemplate implements Template {
 		throw new UnsupportedOperationException();
 	}
 
-	public Object evaluate(Map<String, Object> parameters) throws ParseException {
+	public Object evaluate(Object context) throws ParseException {
 		throw new UnsupportedOperationException();
 	}
 
-	public void render(OutputStream stream) throws IOException {
+	public void render(Object out) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
-	public void render(Map<String, Object> parameters, OutputStream stream)
-			throws IOException {
-		throw new UnsupportedOperationException();
-	}
-
-	public void render(Writer writer) throws IOException {
-		throw new UnsupportedOperationException();
-	}
-
-	public void render(Map<String, Object> parameters, Writer writer)
-			throws IOException {
+	public void render(Object context, Object out) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 

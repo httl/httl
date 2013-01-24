@@ -19,6 +19,7 @@ import httl.Context;
 import httl.Engine;
 import httl.Expression;
 import httl.spi.Compiler;
+import httl.spi.Converter;
 import httl.util.ClassUtils;
 import httl.util.Digest;
 
@@ -46,7 +47,9 @@ public class ExpressionImpl implements Expression, Serializable {
 	private final Engine engine;
 
 	private final Compiler compiler;
-	
+
+	private final Converter<Object, Object> mapConverter;
+
 	private final String source;
 	
 	private final int offset;
@@ -69,9 +72,10 @@ public class ExpressionImpl implements Expression, Serializable {
 	
 	private volatile Evaluator evaluator;
 	
-	public ExpressionImpl(String source, Set<String> variables, Map<String, Class<?>> parameterTypes, int offset, Node node, String code, Class<?> returnType, Engine engine, Compiler compiler, String[] importPackages, Map<Class<?>, Object> functions){
+	public ExpressionImpl(String source, Set<String> variables, Map<String, Class<?>> parameterTypes, int offset, Node node, String code, Class<?> returnType, Engine engine, Compiler compiler, Converter<Object, Object> mapConverter, String[] importPackages, Map<Class<?>, Object> functions){
 		this.engine = engine;
 		this.compiler = compiler;
+		this.mapConverter = mapConverter;
 		this.source = source;
 		this.offset = offset;
 		this.node = node;
@@ -103,7 +107,7 @@ public class ExpressionImpl implements Expression, Serializable {
 		return evaluate(Context.getContext());
 	}
 
-	public Object evaluate(Map<String, Object> parameters) throws ParseException {
+	public Object evaluate(Object parameters) throws ParseException {
 		if (evaluator == null) {
 			synchronized (this) {
 				if (evaluator == null) { // double check
@@ -112,14 +116,32 @@ public class ExpressionImpl implements Expression, Serializable {
 			}
 		}
 		try {
-			return evaluator.evaluate(parameters);
+			return evaluator.evaluate(convertMap(parameters));
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertMap(Object context) {
+		if (mapConverter != null && context != null && ! (context instanceof Map)) {
+			try {
+				context = mapConverter.convert(context);
+			} catch (RuntimeException e) {
+				throw (RuntimeException) e;
+			} catch (Exception e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+		if (context == null || context instanceof Map) {
+			return (Map<String, Object>) context;
+		} else {
+			throw new RuntimeException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
+		}
+	}
+
 	@Override
 	public String toString() {
 		return getSource();

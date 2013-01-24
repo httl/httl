@@ -110,7 +110,7 @@ public class StringUtils {
 	}
 	
 	public static String toByteString(byte[] bytes) {
-		StringBuilder buf = new StringBuilder();
+		StringBuilder buf = new StringBuilder(bytes.length * 5);
 		for (byte b : bytes) {
 			if (buf.length() > 0) {
 				buf.append(", ");
@@ -120,52 +120,87 @@ public class StringUtils {
 		return buf.toString();
 	}
 
-	public static String escapeString(String value) {
-		if (value == null || value.length() == 0) {
-			return value;
-		}
-		int len = value.length();
-		StringBuilder buf = null;
-		for (int i = 0; i < len; i ++) {
-			char ch = value.charAt(i);
-			String str;
-			switch (ch) {
-				case '\\':
-					str = "\\\\";
-					break;
-				case '\"':
-					str = "\\\"";
-					break;
+	public static String toCharString(char[] chars) {
+		StringBuilder buf = new StringBuilder(chars.length * 4);
+		for (char c : chars) {
+			if (buf.length() > 0) {
+				buf.append(", ");
+			}
+			buf.append('\'');
+			switch (c) {
 				case '\'':
-					str = "\\\'";
+					buf.append("\\'");
 					break;
 				case '\t':
-					str = "\\t";
+					buf.append("\\t");
 					break;
 				case '\n':
-					str = "\\n";
+					buf.append("\\n");
 					break;
 				case '\r':
-					str = "\\r";
-					break;
-				case '\b':
-					str = "\\b";
+					buf.append("\\r");
 					break;
 				case '\f':
-					str = "\\f";
+					buf.append("\\f");
+					break;
+				case '\b':
+					buf.append("\b");
 					break;
 				default:
-					str = null;
+					buf.append(c);
 					break;
 			}
-			if (str != null) {
+			buf.append('\'');
+		}
+		return buf.toString();
+	}
+
+	public static String escapeString(String src) {
+		if (src == null || src.length() == 0) {
+			return src;
+		}
+		int len = src.length();
+		StringBuilder buf = null;
+		for (int i = 0; i < len; i ++) {
+			char ch = src.charAt(i);
+			String rep;
+			switch (ch) {
+				case '\\':
+					rep = "\\\\";
+					break;
+				case '\"':
+					rep = "\\\"";
+					break;
+				case '\'':
+					rep = "\\\'";
+					break;
+				case '\t':
+					rep = "\\t";
+					break;
+				case '\n':
+					rep = "\\n";
+					break;
+				case '\r':
+					rep = "\\r";
+					break;
+				case '\b':
+					rep = "\\b";
+					break;
+				case '\f':
+					rep = "\\f";
+					break;
+				default:
+					rep = null;
+					break;
+			}
+			if (rep != null) {
 				if (buf == null) {
 					buf = new StringBuilder(len * 2);
 					if(i > 0) {
-						buf.append(value.substring(0, i));
+						buf.append(src.substring(0, i));
 					}
 				}
-				buf.append(str);
+				buf.append(rep);
 			} else {
 				if (buf != null) {
 					buf.append(ch);
@@ -175,9 +210,135 @@ public class StringUtils {
 		if (buf != null) {
 			return buf.toString();
 		}
-		return value;
+		return src;
 	}
-	
+
+	public static char[] escapeString(char[] src) {
+		if (src == null || src.length == 0) {
+			return src;
+		}
+		int len = src.length;
+		int off = 0;
+		char[] buf = null;
+		for (int i = 0; i < len; i ++) {
+			char ch = src[i];
+			char rep;
+			switch (ch) {
+				case '\\':
+					rep = '\\';
+					break;
+				case '\"':
+					rep = '\"';
+					break;
+				case '\'':
+					rep = '\'';
+					break;
+				case '\t':
+					rep = 't';
+					break;
+				case '\n':
+					rep = 'n';
+					break;
+				case '\r':
+					rep = 'r';
+					break;
+				case '\b':
+					rep = 'b';
+					break;
+				case '\f':
+					rep = 'f';
+					break;
+				default:
+					rep = 0;
+					break;
+			}
+			if (rep != 0) {
+				if (buf == null) {
+					buf = expand(src, off = i, 2);
+				}
+				buf[off ++] = '\\';
+				buf[off ++] = rep;
+			} else {
+				if (buf != null) {
+					buf[off ++] = ch;
+				}
+			}
+		}
+		if (buf != null) {
+			if (buf.length > off) {
+				char[] newBuf = new char[off];
+				System.arraycopy(buf, 0, newBuf, 0, off);
+				return newBuf;
+			}
+			return buf;
+		}
+		return src;
+	}
+
+	public static byte[] escapeString(byte[] src) {
+		if (src == null || src.length == 0) {
+			return src;
+		}
+		int len = src.length;
+		int off = 0;
+		byte[] buf = null;
+		byte pre = 0;
+		for (int i = 0; i < len; i ++) {
+			byte ch = src[i];
+			byte rep;
+			switch (ch) {
+				case 92:
+					rep = '\\';
+					break;
+				case 34:
+					rep = '\"';
+					break;
+				case 39:
+					rep = '\'';
+					break;
+				case 9:
+					rep = 't';
+					break;
+				case 10:
+					rep = 'n';
+					break;
+				case 13:
+					rep = 'r';
+					break;
+				case 8:
+					rep = 'b';
+					break;
+				case 12:
+					rep = 'f';
+					break;
+				default:
+					rep = 0;
+					break;
+			}
+			if (rep != 0 && pre >= 0) {
+				if (buf == null) {
+					buf = expand(src, off = i, 2);
+				}
+				buf[off ++] = '\\';
+				buf[off ++] = rep;
+			} else {
+				if (buf != null) {
+					buf[off ++] = ch;
+				}
+			}
+			pre = ch;
+		}
+		if (buf != null) {
+			if (buf.length > off) {
+				byte[] newBuf = new byte[off];
+				System.arraycopy(buf, 0, newBuf, 0, off);
+				return newBuf;
+			}
+			return buf;
+		}
+		return src;
+	}
+
 	public static String unescapeString(String value) {
 		if (value == null || value.length() == 0) {
 			return value;
@@ -236,16 +397,6 @@ public class StringUtils {
 		return value;
 	}
 
-	/**
-	 * HTML特殊符转义。
-	 * 
-	 * @param value 可能带HTML特殊符的串
-	 * @return 不带HTML特殊符的串
-	 */
-	public static String escapeHtml(String value) {
-		return escapeXml(value);
-	}
-	
 	public static String escapeXml(String value) {
 		if (value == null || value.length() == 0) {
 			return value;
@@ -255,15 +406,6 @@ public class StringUtils {
 		for (int i = 0; i < len; i ++) {
 			char ch = value.charAt(i);
 			switch (ch) {
-				case '&':
-					if (buf == null) {
-						buf = new StringBuilder(len * 2);
-						if(i > 0) {
-							buf.append(value.substring(0, i));
-						}
-					}
-					buf.append("&amp;");
-					break;
 				case '<':
 					if (buf == null) {
 						buf = new StringBuilder(len * 2);
@@ -300,6 +442,15 @@ public class StringUtils {
 					}
 					buf.append("&apos;");
 					break;
+				case '&':
+					if (buf == null) {
+						buf = new StringBuilder(len * 2);
+						if(i > 0) {
+							buf.append(value.substring(0, i));
+						}
+					}
+					buf.append("&amp;");
+					break;
 				default:
 					if (buf != null) {
 						buf.append(ch);
@@ -313,16 +464,218 @@ public class StringUtils {
 		return value;
 	}
 
-	/**
-	 * HTML特殊符转义还原。
-	 * 
-	 * @param value 被转义HTML特殊符的串
-	 * @return 还原后带HTML特殊符的串
-	 */
-	public static String unescapeHtml(String value) {
-		return unescapeXml(value);
+	public static char[] escapeXml(char[] src) {
+		if (src == null || src.length == 0) {
+			return src;
+		}
+		int len = src.length;
+		int off = 0;
+		char[] buf = null;
+		for (int i = 0; i < len; i ++) {
+			char ch = src[i];
+			switch (ch) {
+				case '<':
+					if (buf == null) {
+						buf = expand(src, off = i, 4);
+					} else if (buf.length < off + 4) {
+						buf = expand(buf, off, 4);
+					}
+					buf[off ++] = '&';
+					buf[off ++] = 'l';
+					buf[off ++] = 't';
+					buf[off ++] = ';';
+					break;
+				case '>':
+					if (buf == null) {
+						buf = expand(src, off = i, 4);
+					} else if (buf.length < off + 4) {
+						buf = expand(buf, off, 4);
+					}
+					buf[off ++] = '&';
+					buf[off ++] = 'g';
+					buf[off ++] = 't';
+					buf[off ++] = ';';
+					break;
+				case '\"':
+					if (buf == null) {
+						buf = expand(src, off = i, 6);
+					} else if (buf.length < off + 6) {
+						buf = expand(buf, off, 6);
+					}
+					buf[off ++] = '&';
+					buf[off ++] = 'q';
+					buf[off ++] = 'u';
+					buf[off ++] = 'o';
+					buf[off ++] = 't';
+					buf[off ++] = ';';
+					break;
+				case '\'':
+					if (buf == null) {
+						buf = expand(src, off = i, 6);
+					} else if (buf.length < off + 6) {
+						buf = expand(buf, off, 6);
+					}
+					buf[off ++] = '&';
+					buf[off ++] = 'a';
+					buf[off ++] = 'p';
+					buf[off ++] = 'o';
+					buf[off ++] = 's';
+					buf[off ++] = ';';
+					break;
+				case '&':
+					if (buf == null) {
+						buf = expand(src, off = i, 5);
+					} else if (buf.length < off + 5) {
+						buf = expand(buf, off, 5);
+					}
+					buf[off ++] = '&';
+					buf[off ++] = 'a';
+					buf[off ++] = 'm';
+					buf[off ++] = 'p';
+					buf[off ++] = ';';
+					break;
+				default:
+					if (buf != null) {
+						if (buf.length < off + 1) {
+							buf = expand(buf, off, 1);
+						}
+						buf[off ++] = ch;
+					}
+					break;
+			}
+		}
+		if (buf != null) {
+			if (buf.length > off) {
+				char[] newBuf = new char[off];
+				System.arraycopy(buf, 0, newBuf, 0, off);
+				return newBuf;
+			}
+			return buf;
+		}
+		return src;
 	}
-	
+
+	public static byte[] escapeXml(byte[] src) {
+		if (src == null || src.length == 0) {
+			return src;
+		}
+		int len = src.length;
+		int off = 0;
+		byte[] buf = null;
+		byte pre = 0;
+		for (int i = 0; i < len; i ++) {
+			byte ch = src[i];
+			switch (ch) {
+				case 60:
+					if (pre >= 0) {
+						if (buf == null) {
+							buf = expand(src, off = i, 4);
+						} else if (buf.length < off + 4) {
+							buf = expand(buf, off, 4);
+						}
+						buf[off ++] = '&';
+						buf[off ++] = 'l';
+						buf[off ++] = 't';
+						buf[off ++] = ';';
+						break;
+					}
+				case 62:
+					if (pre >= 0) {
+						if (buf == null) {
+							buf = expand(src, off = i, 4);
+						} else if (buf.length < off + 4) {
+							buf = expand(buf, off, 4);
+						}
+						buf[off ++] = '&';
+						buf[off ++] = 'g';
+						buf[off ++] = 't';
+						buf[off ++] = ';';
+						break;
+					}
+				case 34:
+					if (pre >= 0) {
+						if (buf == null) {
+							buf = expand(src, off = i, 6);
+						} else if (buf.length < off + 6) {
+							buf = expand(buf, off, 6);
+						}
+						buf[off ++] = '&';
+						buf[off ++] = 'q';
+						buf[off ++] = 'u';
+						buf[off ++] = 'o';
+						buf[off ++] = 't';
+						buf[off ++] = ';';
+						break;
+					}
+				case 39:
+					if (pre >= 0) {
+						if (buf == null) {
+							buf = expand(src, off = i, 6);
+						} else if (buf.length < off + 6) {
+							buf = expand(buf, off, 6);
+						}
+						buf[off ++] = '&';
+						buf[off ++] = 'a';
+						buf[off ++] = 'p';
+						buf[off ++] = 'o';
+						buf[off ++] = 's';
+						buf[off ++] = ';';
+						break;
+					}
+				case 38:
+					if (pre >= 0) {
+						if (buf == null) {
+							buf = expand(src, off = i, 5);
+						} else if (buf.length < off + 5) {
+							buf = expand(buf, off, 5);
+						}
+						buf[off ++] = '&';
+						buf[off ++] = 'a';
+						buf[off ++] = 'm';
+						buf[off ++] = 'p';
+						buf[off ++] = ';';
+						break;
+					}
+				default:
+					if (buf != null) {
+						if (buf.length < off + 1) {
+							buf = expand(buf, off, 1);
+						}
+						buf[off ++] = ch;
+					}
+					break;
+			}
+			pre = ch;
+		}
+		if (buf != null) {
+			if (buf.length > off) {
+				byte[] newBuf = new byte[off];
+				System.arraycopy(buf, 0, newBuf, 0, off);
+				return newBuf;
+			}
+			return buf;
+		}
+		return src;
+	}
+
+	private static char[] expand(char[] src, int off, int inc) {
+		int len = Math.max(src.length * 2, off + inc);
+		char[] dest = new char[len];
+		if (off > 0) {
+			System.arraycopy(src, 0, dest, 0, off);
+		}
+		return dest;
+	}
+
+	private static byte[] expand(byte[] src, int off, int inc) {
+		int len = Math.max(src.length * 2, off + inc);
+		byte[] dest = new byte[len];
+		if (off > 0) {
+			System.arraycopy(src, 0, dest, 0, off);
+		}
+		return dest;
+	}
+
 	public static String unescapeXml(String value) {
 		if (value == null || value.length() == 0) {
 			return value;

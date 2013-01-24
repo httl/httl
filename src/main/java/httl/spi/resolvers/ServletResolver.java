@@ -47,9 +47,28 @@ public class ServletResolver implements Resolver, Filter {
 
 	private static final String APPLICATION_KEY = "application";
 
+	private static final String DEFAULT_CONTENT_TYPE = "text/html";
+
+	private static final String CHARSET_SEPARATOR = "; ";
+
+	private static final String CHARSET_KEY = "charset=";
+
 	private static final ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
 
 	private static final ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
+
+	private static String RESPONSE_ENCODING;
+
+	private static void _setResponseEncoding(String responseEncoding) {
+		RESPONSE_ENCODING = responseEncoding;
+	}
+
+	/**
+	 * httl.properties: response.encoding=UTF-8
+	 */
+	public void setResponseEncoding(String responseEncoding) {
+		_setResponseEncoding(responseEncoding);
+	}
 
 	public static void set(HttpServletRequest request, HttpServletResponse response) {
 		setRequest(request);
@@ -74,6 +93,7 @@ public class ServletResolver implements Resolver, Filter {
 
 	public static void setResponse(HttpServletResponse response) {
 		if (response != null) {
+			setResponseEncoding(response);
 			RESPONSE_LOCAL.set(response);
 		} else {
 			RESPONSE_LOCAL.remove();
@@ -190,6 +210,23 @@ public class ServletResolver implements Resolver, Filter {
 			return request.getSession().getServletContext();
 		}
 		return value;
+	}
+
+	private static void setResponseEncoding(HttpServletResponse response) {
+		if (StringUtils.isNotEmpty(RESPONSE_ENCODING)) {
+			response.setCharacterEncoding(RESPONSE_ENCODING);
+			String contentType = response.getContentType();
+			if (StringUtils.isEmpty(contentType)) {
+				response.setContentType(DEFAULT_CONTENT_TYPE + CHARSET_SEPARATOR + CHARSET_KEY + RESPONSE_ENCODING);
+			} else {
+				int i = contentType.indexOf(CHARSET_KEY);
+				if (i > 0) {
+					response.setContentType(contentType.substring(0, i + CHARSET_KEY.length()) + RESPONSE_ENCODING);
+				} else {
+					response.setContentType(contentType + CHARSET_SEPARATOR + CHARSET_KEY + RESPONSE_ENCODING);
+				}
+			}
+		}
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {

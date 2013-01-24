@@ -16,19 +16,17 @@
 package httl.web;
 
 import httl.Engine;
-import httl.Template;
 import httl.spi.Logger;
+import httl.spi.converters.ResponseOutConverter;
+import httl.spi.interceptors.ServletInterceptor;
 import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.ServletResolver;
-import httl.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.text.ParseException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -42,31 +40,40 @@ import javax.servlet.http.HttpSession;
  */
 public class WebEngine {
 
-	private static final String DEFAULT_CONTENT_TYPE = "text/html";
-
-	private static final String CHARSET_SEPARATOR = "; ";
-
-	private static final String CHARSET_KEY = "charset=";
-
 	private static final String CONFIG_KEY = "httl.properties";
 
 	private static final String WEBINF_CONFIG = "/WEB-INF/httl.properties";
 
-	private static final String OUTPUT_ENCODING_KEY = "output.encoding";
-
-	private static final String OUTPUT_STREAM_KEY = "output.stream";
-	
-	private static final String LOCALIZED_KEY = "localized";
-
 	private static volatile Engine ENGINE;
 
-	private static String OUTPUT_ENCODING;
+	private static final Map<String, String> addProperties = new ConcurrentHashMap<String, String>();
 
-	private static boolean OUTPUT_STREAM;
+	private static final Map<String, String> setProperties = new ConcurrentHashMap<String, String>();
 
-	private static boolean LOCALIZED;
+	static {
+		addProperty("loaders", ServletLoader.class.getName());
+		addProperty("resolvers", ServletResolver.class.getName());
+		addProperty("interceptors", ServletInterceptor.class.getName());
+		addProperty("out.converters", ResponseOutConverter.class.getName());
+		addProperty("import.variables", HttpServletRequest.class.getName() + " request,"
+				+ HttpServletResponse.class.getName() + " response,"
+				+ HttpSession.class.getName() + " session,"
+				+ ServletContext.class.getName() + " application");
+	}
 
 	private WebEngine() {}
+
+	public static void addProperty(String key, String value) {
+		String old = addProperties.get(key);
+		if (old != null && old.length() > 0) {
+			value = old + "," + value;
+		}
+		addProperties.put(key, value);
+	}
+
+	public static void setProperty(String key, String value) {
+		setProperties.put(key, value);
+	}
 
 	public static ServletContext getServletContext() {
 		return ServletLoader.getServletContext();
@@ -101,10 +108,7 @@ public class WebEngine {
 							config = null;
 						}
 					}
-					ENGINE = Engine.getEngine(config == null ? CONFIG_KEY : config , addProperties(properties));
-					OUTPUT_ENCODING = ENGINE.getProperty(OUTPUT_ENCODING_KEY, String.class);
-					OUTPUT_STREAM = ENGINE.getProperty(OUTPUT_STREAM_KEY, false);
-					LOCALIZED = ENGINE.getProperty(LOCALIZED_KEY, false);
+					ENGINE = Engine.getEngine(config, addProperties(properties));
 					logConfigPath(ENGINE, servletContext, config);
 				}
 			}
@@ -138,32 +142,21 @@ public class WebEngine {
 				throw new IllegalStateException("Failed to load httl-default.properties. cause: " + e.getMessage());
 			}
 		}
-		if (! properties.containsKey("loader") 
-				&& ! properties.containsKey("loaders")) {
-			String loaders = def.getProperty("loaders", "");
-			if (loaders.length() > 0) {
-				loaders = loaders + ",";
+		for (Map.Entry<String, String> entry : addProperties.entrySet()) {
+			String key = entry.getKey();
+			if (! properties.containsKey(key)) {
+				String values = def.getProperty(key, "");
+				if (values.length() > 0) {
+					values = values + ",";
+				}
+				properties.setProperty(key, values + entry.getValue());
 			}
-			properties.setProperty("loaders", loaders + ServletLoader.class.getName());
 		}
-		if (! properties.containsKey("resolver") 
-				&& ! properties.containsKey("resolvers")) {
-			String resolvers = def.getProperty("resolvers", "");
-			if (resolvers.length() > 0) {
-				resolvers = resolvers + ",";
+		for (Map.Entry<String, String> entry : setProperties.entrySet()) {
+			String key = entry.getKey();
+			if (! properties.containsKey(key)) {
+				properties.setProperty(key, entry.getValue());
 			}
-			properties.setProperty("resolvers", resolvers + ServletResolver.class.getName());
-		}
-		if (! properties.containsKey("import.variables")) {
-			String variables = def.getProperty("import.variables", "");
-			if (variables.length() > 0) {
-				variables = variables + ",";
-			}
-			properties.setProperty("import.variables",  variables 
-					+ HttpServletRequest.class.getName() + " request,"
-					+ HttpServletResponse.class.getName() + " response,"
-					+ HttpSession.class.getName() + " session,"
-					+ ServletContext.class.getName() + " application");
 		}
 		return properties;
 	}
@@ -173,47 +166,6 @@ public class WebEngine {
 			setServletContext(ServletLoader.getAndCheckServletContext());
 		}
 		return ENGINE;
-	}
-
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path) throws IOException, ParseException {
-		render(request, response, path, null);
-	}
-
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> parameters) throws IOException, ParseException {
-		render(request, response, path, parameters, OUTPUT_STREAM ? response.getOutputStream() : response.getWriter());
-	}
-
-	public static void render(HttpServletRequest request, HttpServletResponse response, String path, Map<String, Object> parameters, Object out) throws IOException, ParseException {
-		ServletResolver.set(request, response);
-		try {
-			setResponseEncoding(response);
-			Template template = LOCALIZED ? getEngine().getTemplate(path, request.getLocale()) : getEngine().getTemplate(path);
-			if (out instanceof OutputStream) {
-				template.render(parameters, (OutputStream) out);
-			} else {
-				template.render(parameters, (Writer) out);
-			}
-		} finally {
-			ServletResolver.remove();
-		}
-	}
-	
-	public static void setResponseEncoding(HttpServletResponse response) {
-		getEngine();
-		if (StringUtils.isNotEmpty(OUTPUT_ENCODING)) {
-			response.setCharacterEncoding(OUTPUT_ENCODING);
-			String contentType = response.getContentType();
-			if (StringUtils.isEmpty(contentType)) {
-				response.setContentType(DEFAULT_CONTENT_TYPE + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
-			} else {
-				int i = contentType.indexOf(CHARSET_KEY);
-				if (i > 0) {
-					response.setContentType(contentType.substring(0, i + CHARSET_KEY.length()) + OUTPUT_ENCODING);
-				} else {
-					response.setContentType(contentType + CHARSET_SEPARATOR + CHARSET_KEY + OUTPUT_ENCODING);
-				}
-			}
-		}
 	}
 
 }

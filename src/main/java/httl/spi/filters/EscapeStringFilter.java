@@ -27,7 +27,15 @@ import httl.util.StringUtils;
  */
 public class EscapeStringFilter implements Filter {
 
-	public String filter(String value) {
+	public String filter(String key, String value) {
+		return StringUtils.escapeString(value);
+	}
+
+	public char[] filter(String key, char[] value) {
+		return StringUtils.escapeString(value);
+	}
+
+	public byte[] filter(String key, byte[] value) {
 		return StringUtils.escapeString(value);
 	}
 

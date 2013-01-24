@@ -16,8 +16,6 @@
 package httl;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -42,75 +40,38 @@ public interface Template extends Resource, Expression {
 	 * Render the template to output stream.
 	 * 
 	 * <pre>
-	 * OutputStream stream = ...;
+	 * Writer/OutputStream out = ...;
 	 * Context context = Context.getContext();
 	 * context.put("foo", foo);
-	 * template.render(stream);
+	 * template.render(out);
 	 * </pre>
 	 * 
 	 * @see httl.Context#getContext()
 	 * @see httl.Context#getOut()
-	 * @param stream - output stream
+	 * @param out - output
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	void render(OutputStream stream) throws IOException, ParseException;
+	void render(Object out) throws IOException, ParseException;
 
 	/**
 	 * Render the template to output stream.
 	 * 
 	 * <pre>
-	 * OutputStream stream = ...;
-	 * Map&lt;String, Object&gt; parameters = new HashMap&lt;String, Object&gt;();
-	 * parameters.put("foo", foo);
-	 * template.render(parameters, stream);
-	 * </pre>
-	 * 
-	 * @see httl.Context#getContext()
-	 * @see httl.Context#getOut()
-	 * @param parameters - render parameters
-	 * @param stream - output stream
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed on runtime
-	 */
-	void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException;
-
-	/**
-	 * Render the template to writer.
-	 * 
-	 * <pre>
-	 * Writer writer = ...;
-	 * Context context = Context.getContext();
+	 * Writer/OutputStream out = ...;
+	 * Map&lt;String, Object&gt; context = new HashMap&lt;String, Object&gt;();
 	 * context.put("foo", foo);
-	 * template.render(writer);
+	 * template.render(context, out);
 	 * </pre>
 	 * 
 	 * @see httl.Context#getContext()
 	 * @see httl.Context#getOut()
-	 * @param writer - output writer
+	 * @param context - render context
+	 * @param out - output
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	void render(Writer writer) throws IOException, ParseException;
-
-	/**
-	 * Render the template to writer.
-	 * 
-	 * <pre>
-	 * Writer writer = ...;
-	 * Map&lt;String, Object&gt; parameters = new HashMap&lt;String, Object&gt;();
-	 * parameters.put("foo", foo);
-	 * template.render(parameters, writer);
-	 * </pre>
-	 * 
-	 * @see httl.Context#getContext()
-	 * @see httl.Context#getOut()
-	 * @param parameters - render parameters
-	 * @param writer - output writer
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed on runtime
-	 */
-	void render(Map<String, Object> parameters, Writer writer) throws IOException, ParseException;
+	void render(Object context, Object out) throws IOException, ParseException;
 
 	/**
 	 * Get the template set to context types.

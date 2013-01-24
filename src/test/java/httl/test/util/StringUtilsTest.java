@@ -15,6 +15,8 @@
  */
 package httl.test.util;
 
+import java.text.DecimalFormat;
+
 import httl.util.StringUtils;
 import junit.framework.Assert;
 
@@ -33,13 +35,35 @@ public class StringUtilsTest {
 	}
 
 	@Test
-	public void testEscapeHtml() {
-		Assert.assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", StringUtils.escapeHtml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d"));
+	public void testEscapeXmlPerformance() {
+		String html = "a<table border=\"0\" color=\'red\'>b&lt;c</table>d";
+		//char[] html = "a<table border=\"0\" color=\'red\'>b&lt;c</table>d".toCharArray();
+		int count = 10000000;
+		long start = System.nanoTime();
+		for (int i = 0; i < count; i ++) {
+			StringUtils.escapeXml(html);
+		}
+		long elapsed = System.nanoTime() - start;
+		DecimalFormat format = new DecimalFormat("###,##0.###");
+		System.out.println("elapsed: " + format.format(elapsed) + "ns, tps: " + format.format(1000L * 1000L * 1000L * (long) count / elapsed));
 	}
 
 	@Test
-	public void testUnescapeHtml() {
-		Assert.assertEquals("a<table border=\"0\" color=\'red\'>b&lt;c</table>d", StringUtils.unescapeHtml("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d"));
+	public void testEscapeXmlChar() {
+		Assert.assertEquals("abcd", new String(StringUtils.escapeXml("abcd".toCharArray())));
+		Assert.assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", new String(StringUtils.escapeXml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d".toCharArray())));
+	}
+
+	@Test
+	public void testEscapeXml() {
+		Assert.assertEquals("abcd", StringUtils.escapeXml("abcd"));
+		Assert.assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", StringUtils.escapeXml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d"));
+	}
+
+	@Test
+	public void testUnescapeXml() {
+		Assert.assertEquals("abcd", StringUtils.unescapeXml("abcd"));
+		Assert.assertEquals("a<table border=\"0\" color=\'red\'>b&lt;c</table>d", StringUtils.unescapeXml("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d"));
 	}
 
 	@Test

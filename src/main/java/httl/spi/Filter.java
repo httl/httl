@@ -18,19 +18,40 @@ package httl.spi;
 /**
  * Text Filter. (SPI, Singleton, ThreadSafe)
  * 
+ * @see httl.spi.parsers.AbstractParser#setTemplateFilter(Filter)
  * @see httl.spi.parsers.AbstractParser#setTextFilter(Filter)
  * @see httl.spi.parsers.AbstractParser#setValueFilter(Filter)
+ * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Filter {
 
 	/**
-	 * Filter the variable value.
+	 * Filter the string value.
 	 * 
-	 * @param value - original variable value
-	 * @return filtered variable value
+	 * @param key - source key
+	 * @param value - original string value
+	 * @return filtered string value
 	 */
-	String filter(String value);
+	String filter(String key, String value);
+
+	/**
+	 * Filter the char array value.
+	 * 
+	 * @param key - source key
+	 * @param value - original char array value
+	 * @return filtered char array value
+	 */
+	char[] filter(String key, char[] value);
+
+	/**
+	 * Filter the byte array value.
+	 * 
+	 * @param key - source key
+	 * @param value - original byte array value
+	 * @return filtered byte array value
+	 */
+	byte[] filter(String key, byte[] value);
 
 }

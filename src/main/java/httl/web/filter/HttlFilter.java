@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.web.servlet;
+package httl.web.filter;
 
+import httl.Context;
 import httl.web.WebEngine;
 
 import java.io.IOException;
@@ -51,7 +52,10 @@ public class HttlFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		chain.doFilter(request, response);
 		try {
-			WebEngine.render(request, response, getTemplatePath(request));
+			Context context = Context.getContext();
+			context.put("request", request);
+			context.put("response", response);
+			WebEngine.getEngine().getTemplate(getTemplatePath(request), request.getLocale()).render(response);
 		} catch (ParseException e) {
 			throw new ServletException(e.getMessage(), e);
 		}

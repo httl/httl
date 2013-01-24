@@ -21,14 +21,14 @@ import httl.util.StringUtils;
 /**
  * CompressBlankFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTextFilter(Filter)
+ * @see httl.spi.parsers.AbstractParser#setTemplateFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ClearBlankLineFilter implements Filter {
+public class ClearBlankLineFilter extends AbstractFilter {
 	
-	public String filter(String text) {
+	public String filter(String key, String text) {
 		return StringUtils.clearBlankLine(text);
 	}
-	
+
 }

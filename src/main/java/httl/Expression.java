@@ -52,16 +52,16 @@ public interface Expression {
 	 * Evaluate the expression.
 	 * 
 	 * <pre>
-	 * Map&lt;String, Object&gt; parameters = new HashMap&lt;String, Object&gt;();
-	 * parameters.put("foo", foo);
-	 * Object result = expression.evaluate(parameters);
+	 * Map&lt;String, Object&gt; context = new HashMap&lt;String, Object&gt;();
+	 * context.put("foo", foo);
+	 * Object result = expression.evaluate(context);
 	 * </pre>
 	 * 
-	 * @param parameters - evaluate parameters
+	 * @param context - evaluate context
 	 * @return evaluate result
 	 * @throws ParseException - If the expression cannot be parsed on runtime
 	 */
-	Object evaluate(Map<String, Object> parameters) throws ParseException;
+	Object evaluate(Object context) throws ParseException;
 
 	/**
 	 * Get the expression parameter types. (Ordered)

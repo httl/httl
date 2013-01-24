@@ -15,19 +15,20 @@
  */
 package httl.spi.filters;
 
+import httl.spi.Filter;
 import httl.util.StringUtils;
 
 /**
- * CompressBlankFilter. (SPI, Singleton, ThreadSafe)
+ * UnescapeXmlFilter. (SPI, Singleton, ThreadSafe)
  * 
- * httl.spi.parsers.AbstractParser#setTextFilter(Filter)
+ * @see httl.spi.parsers.AbstractParser#setExpressionFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class CompressBlankFilter extends AbstractFilter {
-	
-	public String filter(String key, String text) {
-		return StringUtils.compressBlank(text);
+public class UnescapeXmlFilter extends AbstractFilter {
+
+	public String filter(String key, String value) {
+		return StringUtils.unescapeXml(value);
 	}
 
 }

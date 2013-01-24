@@ -15,6 +15,7 @@
  */
 package httl.web.struts;
 
+import httl.Context;
 import httl.web.WebEngine;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +44,10 @@ public class HttlResult extends StrutsResultSupport {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		ValueStack stack = ActionContext.getContext().getValueStack();
 		ValueStackMap map = new ValueStackMap(stack);
-		WebEngine.render(request, response, location, map);
+		Context context = Context.getContext();
+		context.put("request", request);
+		context.put("response", response);
+		WebEngine.getEngine().getTemplate(location, request.getLocale()).render(map, response);
 	}
 
 }

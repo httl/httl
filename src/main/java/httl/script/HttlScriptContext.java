@@ -73,7 +73,6 @@ public class HttlScriptContext implements ScriptContext {
 		return new SimpleBindings(getContext(scope));
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setBindings(Bindings bindings, int scope) {
 		getContext(scope).putAll(bindings);
 	}

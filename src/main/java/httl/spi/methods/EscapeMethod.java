@@ -38,14 +38,6 @@ public class EscapeMethod {
 		return StringUtils.unescapeString(value);
 	}
 
-	public static String escapeHtml(String value) {
-		return StringUtils.escapeHtml(value);
-	}
-
-	public static String unescapeHtml(String value) {
-		return StringUtils.unescapeHtml(value);
-	}
-
 	public static String escapeXml(String value) {
 		return StringUtils.escapeXml(value);
 	}

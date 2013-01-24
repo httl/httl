@@ -20,10 +20,7 @@ import httl.Template;
 import httl.spi.Listener;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.text.ParseException;
-import java.util.Map;
 
 /**
  * ListenerTemplate. (SPI, Prototype, ThreadSafe)
@@ -42,27 +39,11 @@ public class ListenerTemplate extends TemplateWrapper {
 	}
 
 	@Override
-	public void render(Map<String, Object> parameters, OutputStream stream)
+	public void render(Object parameters, Object out)
 			throws IOException, ParseException {
 		Context context = Context.getContext();
-		if (context.getOut() != stream) {
-			context = Context.pushContext(this, parameters, stream);
-			try {
-				listener.render(context);
-			} finally {
-				Context.popContext();
-			}
-		} else {
-			listener.render(context);
-		}
-	}
-
-	@Override
-	public void render(Map<String, Object> parameters, Writer writer)
-			throws IOException, ParseException {
-		Context context = Context.getContext();
-		if (context.getOut() != writer) {
-			context = Context.pushContext(this, parameters, writer);
+		if (context.getOut() != out) {
+			context = Context.pushContext(this, null, out);
 			try {
 				listener.render(context);
 			} finally {

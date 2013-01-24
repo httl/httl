@@ -18,12 +18,13 @@ package httl.spi.translators;
 import httl.Engine;
 import httl.Expression;
 import httl.spi.Compiler;
+import httl.spi.Converter;
+import httl.spi.Filter;
 import httl.spi.Translator;
 import httl.spi.sequences.StringSequence;
 import httl.spi.translators.expressions.ExpressionImpl;
 import httl.spi.translators.expressions.Node;
 import httl.util.ClassUtils;
-import httl.util.StringUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -47,7 +48,11 @@ public class DefaultTranslator implements Translator {
 	private Engine engine;
 
 	private Compiler compiler;
-	
+
+	private Converter<Object, Object> mapConverter;
+
+	private Filter expressionFilter;
+
 	private Class<?> defaultParameterType;
 	
 	protected String[] importPackages;
@@ -68,6 +73,20 @@ public class DefaultTranslator implements Translator {
 	 */
 	public void setCompiler(Compiler compiler) {
 		this.compiler = compiler;
+	}
+
+	/**
+	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
+	 */
+	public void setMapConverter(Converter<Object, Object> mapConverter) {
+		this.mapConverter = mapConverter;
+	}
+
+	/**
+	 * httl.properties: expression.filters=httl.spi.filters.UnescapeXmlFilter
+	 */
+	public void setExpressionFilter(Filter expressionFilter) {
+		this.expressionFilter = expressionFilter;
 	}
 
 	/**
@@ -115,10 +134,12 @@ public class DefaultTranslator implements Translator {
 	}
 
 	public Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
-		source = StringUtils.unescapeHtml(source);
+		if (expressionFilter != null) {
+			source = expressionFilter.filter(source, source);
+		}
 		Set<String> variables = new HashSet<String>();
 		Node node = new DfaParser(this, parameterTypes, defaultParameterType, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
-		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, importPackages, functions);
+		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, mapConverter, importPackages, functions);
 	}
 
 }

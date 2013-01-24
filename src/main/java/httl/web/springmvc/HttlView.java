@@ -15,6 +15,7 @@
  */
 package httl.web.springmvc;
 
+import httl.Context;
 import httl.web.WebEngine;
 
 import java.util.Locale;
@@ -36,7 +37,10 @@ public class HttlView extends AbstractTemplateView {
 	protected void renderMergedTemplateModel(Map<String, Object> model,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		WebEngine.render(request, response, getUrl(), model);
+		Context context = Context.getContext();
+		context.put("request", request);
+		context.put("response", response);
+		WebEngine.getEngine().getTemplate(getUrl(), request.getLocale()).render(model, response);
 	}
 
 	@Override

@@ -30,6 +30,22 @@ public interface Formatter<T> {
 	 * @param value - object value.
 	 * @return string value
 	 */
-	String format(T value);
+	String toString(T value);
+
+	/**
+	 * Format the value to a char array.
+	 * 
+	 * @param value - object value.
+	 * @return string value
+	 */
+	char[] toChars(T value);
+
+	/**
+	 * Format the value to a byte array.
+	 * 
+	 * @param value - object value.
+	 * @return string value
+	 */
+	byte[] toBytes(T value);
 
 }

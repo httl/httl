@@ -27,7 +27,7 @@ import java.text.DecimalFormat;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class NumberFormatter implements Formatter<Number> {
+public class NumberFormatter extends AbstractFormatter<Number> {
 	
 	private String numberFormat;
 	
@@ -39,7 +39,7 @@ public class NumberFormatter implements Formatter<Number> {
 		this.numberFormat = numberFormat;
 	}
 
-	public String format(Number value) {
+	public String toString(Number value) {
 		return NumberUtils.format(value, numberFormat);
 	}
 

@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +140,7 @@ public class JdkCompiler extends AbstractCompiler {
 
 	private Class<?> doCompile(String name, String sourceCode, List<String> options) throws Exception {
 		try {
-			return classLoader.findClass(name);
+			return classLoader.loadClass(name);
 		} catch (ClassNotFoundException e) {
 			int i = name.lastIndexOf('.');
 			String packageName = i < 0 ? "" : name.substring(0, i);
@@ -172,30 +171,25 @@ public class JdkCompiler extends AbstractCompiler {
 
 		@Override
 		protected Class<?> findClass(final String qualifiedClassName) throws ClassNotFoundException {
-			JavaFileObject file = classes.get(qualifiedClassName);
-			if (file != null) {
-				byte[] bytes = ((JavaFileObjectImpl) file).getByteCode();
-				try {
-					saveBytecode(qualifiedClassName, bytes);
-				} catch (IOException e) {
-					throw new IllegalStateException(e.getMessage(), e);
-				}
-				return defineClass(qualifiedClassName, bytes, 0, bytes.length);
-			}
 			try {
-				return Class.forName(qualifiedClassName);
-			} catch (ClassNotFoundException nf) {
 				return super.findClass(qualifiedClassName);
+			} catch (ClassNotFoundException e) {
+				JavaFileObject file = classes.get(qualifiedClassName);
+				if (file != null) {
+					byte[] bytes = ((JavaFileObjectImpl) file).getByteCode();
+					try {
+						saveBytecode(qualifiedClassName, bytes);
+					} catch (IOException e2) {
+						throw new IllegalStateException(e2.getMessage(), e2);
+					}
+					return defineClass(qualifiedClassName, bytes, 0, bytes.length);
+				}
+				throw e;
 			}
 		}
 
 		void add(final String qualifiedClassName, final JavaFileObject javaFile) {
 			classes.put(qualifiedClassName, javaFile);
-		}
-
-		@Override
-		protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-			return super.loadClass(name, resolve);
 		}
 
 		@Override
@@ -305,24 +299,13 @@ public class JdkCompiler extends AbstractCompiler {
 		@Override
 		public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse)
 				throws IOException {
-			Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
-
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			List<URL> urlList = new ArrayList<URL>();
-			Enumeration<URL> e = contextClassLoader.getResources("httl");
-			while (e.hasMoreElements()) {
-				urlList.add(e.nextElement());
-			}
-
 			ArrayList<JavaFileObject> files = new ArrayList<JavaFileObject>();
-
 			if (location == StandardLocation.CLASS_PATH && kinds.contains(JavaFileObject.Kind.CLASS)) {
 				for (JavaFileObject file : fileObjects.values()) {
 					if (file.getKind() == Kind.CLASS && file.getName().startsWith(packageName)) {
 						files.add(file);
 					}
 				}
-
 				files.addAll(classLoader.files());
 			} else if (location == StandardLocation.SOURCE_PATH && kinds.contains(JavaFileObject.Kind.SOURCE)) {
 				for (JavaFileObject file : fileObjects.values()) {
@@ -331,11 +314,10 @@ public class JdkCompiler extends AbstractCompiler {
 					}
 				}
 			}
-
+			Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
 			for (JavaFileObject file : result) {
 				files.add(file);
 			}
-
 			return files;
 		}
 	}

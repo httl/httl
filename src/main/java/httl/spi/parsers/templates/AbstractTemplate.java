@@ -18,10 +18,11 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
-import httl.spi.Interceptor;
-import httl.spi.Switcher;
+import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
+import httl.spi.Interceptor;
+import httl.spi.Switcher;
 import httl.util.UnsafeByteArrayInputStream;
 
 import java.io.IOException;
@@ -54,6 +55,10 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	private transient final Switcher switcher;
 
 	private transient final Filter filter;
+
+	private transient final Converter<Object, Object> mapConverter;
+
+	private transient final Converter<Object, Object> outConverter;
 	
 	private final TemplateFormatter formatter;
 	
@@ -62,16 +67,18 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	private final Map<String, Template> macros;
 
 	public AbstractTemplate(Engine engine, Interceptor interceptor, 
-			Switcher switcher, Filter filter, 
-			Formatter<?> formatter, Map<Class<?>, Object> functions,
-			Map<String, Template> importMacros) {
+			Switcher switcher, Filter filter, Formatter<?> formatter, 
+			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
+			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
 		this.engine = engine;
 		this.interceptor = interceptor;
 		this.switcher = switcher;
 		this.filter = filter;
+		this.mapConverter = mapConverter;
+		this.outConverter = outConverter;
 		this.formatter = new TemplateFormatter(engine, formatter);
 		this.importMacros = importMacros;
-		this.macros = initMacros(engine, filter, formatter, functions, importMacros);
+		this.macros = initMacros(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
 	}
 
 	protected Interceptor getInterceptor() {
@@ -85,9 +92,21 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return defaultFilter;
 	}
 
-	protected String doFilter(Filter filter, String value) {
+	protected String doFilter(Filter filter, String key, String value) {
 		if (filter != null)
-			return filter.filter(value);
+			return filter.filter(key, value);
+		return value;
+	}
+
+	protected char[] doFilter(Filter filter, String key, char[] value) {
+		if (filter != null)
+			return filter.filter(key, value);
+		return value;
+	}
+
+	protected byte[] doFilter(Filter filter, String key, byte[] value) {
+		if (filter != null)
+			return filter.filter(key, value);
 		return value;
 	}
 
@@ -123,21 +142,74 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return evaluate(null);
 	}
 
-	public void render(OutputStream stream) throws IOException, ParseException {
-		render(null, stream);
+	public void render(Object out) throws IOException, ParseException {
+		render(null, out);
 	}
 
-	public void render(Writer writer) throws IOException, ParseException {
-		render(null, writer);
+	public Object evaluate(Object context) throws ParseException {
+		return evaluate(convertMap(context));
 	}
 
+	public void render(Object context, Object out) throws IOException, ParseException {
+		out = convertOut(out);
+		if (out == null) {
+			throw new IllegalArgumentException("out == null");
+		} else if (out instanceof OutputStream) {
+			render(convertMap(context), (OutputStream) out);
+		} else if (out instanceof Writer) {
+			render(convertMap(context), (Writer) out);
+		} else {
+			throw new RuntimeException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
+		}
+	}
+	
+	private Object convertOut(Object out) {
+		if (outConverter != null && out != null
+				&& ! (out instanceof OutputStream) 
+				&& ! (out instanceof Writer)) {
+			try {
+				return outConverter.convert(out);
+			} catch (RuntimeException e) {
+				throw (RuntimeException) e;
+			} catch (Exception e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+		return out;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertMap(Object context) {
+		if (mapConverter != null && context != null && ! (context instanceof Map)) {
+			try {
+				context = mapConverter.convert(context);
+			} catch (RuntimeException e) {
+				throw (RuntimeException) e;
+			} catch (Exception e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+		if (context == null || context instanceof Map) {
+			return (Map<String, Object>) context;
+		} else {
+			throw new RuntimeException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
+		}
+	}
+
+	protected abstract Object evaluate(Map<String, Object> parameters) throws ParseException;
+	
+	protected abstract void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException;
+	
+	protected abstract void render(Map<String, Object> parameters, Writer writer) throws IOException, ParseException;
+	
 	protected Map<String, Template> getImportMacros() {
 		return importMacros;
 	}
 
-	private Map<String, Template> initMacros(Engine engine, Filter filter, 
-			Formatter<?> formatter, Map<Class<?>, Object> functions,
-			Map<String, Template> importMacros) {
+	private Map<String, Template> initMacros(Engine engine, Interceptor interceptor, 
+			Switcher switcher, Filter filter, Formatter<?> formatter, 
+			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
+			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
 		Map<String, Template> macros = new HashMap<String, Template>();
 		Map<String, Class<?>> macroTypes = getMacroTypes();
 		if (macroTypes == null || macroTypes.size() == 0) {
@@ -146,8 +218,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
 			try {
 				Template macro = (Template) entry.getValue()
-						.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, switcher, filter, formatter, functions, importMacros);
+						.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
 				macros.put(entry.getKey(), macro);
 			} catch (Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);

@@ -21,6 +21,7 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Compiler;
+import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
@@ -36,6 +37,7 @@ import httl.spi.parsers.templates.TemplateFormatter;
 import httl.spi.parsers.templates.WriterTemplate;
 import httl.spi.translators.expressions.ExpressionImpl;
 import httl.util.ByteCache;
+import httl.util.CharCache;
 import httl.util.ClassUtils;
 import httl.util.ForeachStatus;
 import httl.util.IOUtils;
@@ -169,9 +171,15 @@ public abstract class AbstractParser implements Parser {
 
 	protected Switcher valueSwitcher;
 
+	protected Filter templateFilter;
+
 	protected Filter textFilter;
 
 	protected Filter valueFilter;
+	
+	protected Converter<Object, Object> mapConverter;
+
+	protected Converter<Object, Object> outConverter;
 
 	protected Formatter<?> formatter;
 
@@ -282,6 +290,13 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	/**
+	 * httl.properties: template.filters=httl.spi.filters.CleanBlankLineFilter
+	 */
+	public void setTemplateFilter(Filter templateFilter) {
+		this.templateFilter = templateFilter;
+	}
+
+	/**
 	 * httl.properties: text.filters=httl.spi.filters.CompressBlankFilter
 	 */
 	public void setTextFilter(Filter filter) {
@@ -293,6 +308,20 @@ public abstract class AbstractParser implements Parser {
 	 */
 	public void setValueFilter(Filter filter) {
 		this.valueFilter = filter;
+	}
+
+	/**
+	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
+	 */
+	public void setMapConverter(Converter<Object, Object> mapConverter) {
+		this.mapConverter = mapConverter;
+	}
+
+	/**
+	 * httl.properties: out.converters=httl.spi.converters.ResponseOutConverter
+	 */
+	public void setOutConverter(Converter<Object, Object> outConverter) {
+		this.outConverter = outConverter;
 	}
 
 	/**
@@ -427,19 +456,19 @@ public abstract class AbstractParser implements Parser {
 									  List<String> parameters, List<Class<?>> parameterTypes, 
 									  Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException;
 
-	public Template parse(Resource resource) throws IOException, ParseException {
+	public Template parse(Resource resource, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
 		try {
 			Template writerTemplate = null;
 			Template streamTemplate = null;
 			if (isOutputWriter || ! isOutputStream) {
-				Class<?> clazz = parseClass(resource, false, 0);
-				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
+				Class<?> clazz = parseClass(resource, parameterTypes, false, 0);
+				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (isOutputStream) {
-				Class<?> clazz = parseClass(resource, true, 0);
-				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, functions, importMacroTemplates);
+				Class<?> clazz = parseClass(resource, parameterTypes, true, 0);
+				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (writerTemplate != null && streamTemplate != null) {
 				return new AdaptiveTemplate(writerTemplate, streamTemplate);
@@ -480,14 +509,16 @@ public abstract class AbstractParser implements Parser {
 		return TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(buf.toString()).replaceAll("_");
 	}
 	
-	protected Class<?> parseClass(Resource resource, boolean stream, int offset) throws IOException, ParseException {
+	protected Class<?> parseClass(Resource resource, Map<String, Class<?>> types, boolean stream, int offset) throws IOException, ParseException {
 		String name = getTemplateClassName(resource, stream);
 		try {
 			return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
 		} catch (ClassNotFoundException e) {
 			Set<String> getVariables = new HashSet<String>();
 			Set<String> setVariables = new HashSet<String>();
-			Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+			if (types == null) {
+				types = new HashMap<String, Class<?>>();
+			}
 			if (importTypes != null && importTypes.size() > 0) {
 				types.putAll(importTypes);
 			}
@@ -508,6 +539,9 @@ public abstract class AbstractParser implements Parser {
 			Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
 			StringBuilder textFields = new StringBuilder();
 			String source = IOUtils.readToString(resource.getReader());
+			if (templateFilter != null) {
+				source = templateFilter.filter(resource.getName(), source);
+			}
 			String src = source;
 			src = filterCData(src);
 			src = filterComment(src);
@@ -645,9 +679,11 @@ public abstract class AbstractParser implements Parser {
 					+ Switcher.class.getName() + " switcher, " 
 					+ Filter.class.getName() + " filter, "
 					+ Formatter.class.getName() + " formatter, "
+					+ Converter.class.getName() + " mapConverter, "
+					+ Converter.class.getName() + " outConverter, "
 					+ Map.class.getName() + " functions, " 
 					+ Map.class.getName() + " importMacros) {\n" 
-					+ "	super(engine, interceptor, switcher, filter, formatter, functions, importMacros);\n"
+					+ "	super(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);\n"
 					+ functionInits
 					+ macroInits
 					+ "}\n"
@@ -894,7 +930,7 @@ public abstract class AbstractParser implements Parser {
 		return buf.toString().replace("	$output.write();\n", "");
 	}
 	
-	protected String getExpressionCode(String symbol, String code, Class<?> returnType, boolean stream, Set<String> getVariables) {
+	protected String getExpressionCode(String symbol, String expr, String code, Class<?> returnType, boolean stream, Set<String> getVariables) {
 		StringBuilder buf = new StringBuilder();
 		boolean nofilter = "$!".equals(symbol);
 		if (nofilter && Template.class.isAssignableFrom(returnType)) {
@@ -940,7 +976,7 @@ public abstract class AbstractParser implements Parser {
 					code = "getFormatter().format(" + code + ")";
 					if (! nofilter) {
 						getVariables.add(filterVariable);
-						code = "doFilter(" + filterVariable + ", " + code + ")";
+						code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
 					}
 					if (stream) {
 						code = "getFormatter().serialize(" + code + ")";
@@ -982,7 +1018,7 @@ public abstract class AbstractParser implements Parser {
 				getVariables.addAll(expr.getParameterTypes().keySet());
 				String code = expr.getCode();
 				Class<?> returnType = expr.getReturnType();
-				buf.append(getExpressionCode(symbol, code, returnType, stream, getVariables));
+				buf.append(getExpressionCode(symbol, expression, code, returnType, stream, getVariables));
 			} else {
 				boolean nofilter = "#!".equals(symbol);
 				Expression expr = translator.translate(expression, Collections.EMPTY_MAP, off);
@@ -999,7 +1035,7 @@ public abstract class AbstractParser implements Parser {
 					}
 					String str = templateFormatter.format(value);
 					if (! nofilter && valueFilter != null) {
-						str = valueFilter.filter(str);
+						str = valueFilter.filter(str, str);
 					}
 					buf.append("	$output.write(");
 					appendSwitcher(buf, str, textFields, seq, stream, getVariables);
@@ -1091,7 +1127,7 @@ public abstract class AbstractParser implements Parser {
 		txt = txt.replace(POUND_SPECIAL, POUND);
 		txt = txt.replace(DOLLAR_SPECIAL, DOLLAR);
 		if (filter != null) {
-			txt = filter.filter(txt);
+			txt = filter.filter(txt, txt);
 		}
 		if (txt != null && txt.length() > 0) {
 			String var = "$TXT" + seq.incrementAndGet();
@@ -1104,10 +1140,10 @@ public abstract class AbstractParser implements Parser {
 				}
 			} else {
 				if (textInClass) {
-					textFields.append("private static final String " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
+					textFields.append("private static final char[] " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
 				} else {
-					String txtId = StringCache.put(txt);
-					textFields.append("private static final String " + var + " = " + StringCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
+					String txtId = CharCache.put(txt.toCharArray());
+					textFields.append("private static final char[] " + var + " = " + CharCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
 				}
 			}
 			buf.append(var);
@@ -1319,12 +1355,8 @@ public abstract class AbstractParser implements Parser {
 				type = parseGenericType(type, var, types, o);
 				Class<?> clazz = ClassUtils.forName(importPackages, type);
 				Class<?> cls = types.get(var);
-				if (cls != null) {
-					if (! cls.equals(clazz)) {
-						throw new ParseException("Defined different type to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), o);
-					} else {
-						throw new ParseException("Defined duplicate variable " + cls.getName() + " " + var, o);
-					}
+				if (cls != null && ! cls.equals(clazz)) {
+					throw new ParseException("Defined different type to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), o);
 				}
 				types.put(var, clazz);
 				parameters.add(var);

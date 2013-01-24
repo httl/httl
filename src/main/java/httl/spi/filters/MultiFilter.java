@@ -20,8 +20,10 @@ import httl.spi.Filter;
 /**
  * MultiFilter. (SPI, Singleton, ThreadSafe)
  * 
+ * @see httl.spi.parsers.AbstractParser#setTemplateFilter(Filter)
  * @see httl.spi.parsers.AbstractParser#setTextFilter(Filter)
  * @see httl.spi.parsers.AbstractParser#setValueFilter(Filter)
+ * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -44,15 +46,41 @@ public abstract class MultiFilter implements Filter {
 		}
 	}
 
-	public String filter(String value) {
+	public String filter(String key, String value) {
 		if (filters == null || filters.length == 0) {
 			return value;
 		}
 		if (filters.length == 1) {
-			return filters[0].filter(value);
+			return filters[0].filter(key, value);
 		}
 		for (Filter filter : filters) {
-			value = filter.filter(value);
+			value = filter.filter(key, value);
+		}
+		return value;
+	}
+
+	public char[] filter(String key, char[] value) {
+		if (filters == null || filters.length == 0) {
+			return value;
+		}
+		if (filters.length == 1) {
+			return filters[0].filter(key, value);
+		}
+		for (Filter filter : filters) {
+			value = filter.filter(key, value);
+		}
+		return value;
+	}
+
+	public byte[] filter(String key, byte[] value) {
+		if (filters == null || filters.length == 0) {
+			return value;
+		}
+		if (filters.length == 1) {
+			return filters[0].filter(key, value);
+		}
+		for (Filter filter : filters) {
+			value = filter.filter(key, value);
 		}
 		return value;
 	}

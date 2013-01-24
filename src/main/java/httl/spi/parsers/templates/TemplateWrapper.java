@@ -15,19 +15,18 @@
  */
 package httl.spi.parsers.templates;
 
+import httl.Engine;
+import httl.Template;
+import httl.util.UnsafeByteArrayOutputStream;
+import httl.util.UnsafeStringWriter;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Map;
-
-import httl.Engine;
-import httl.Template;
-import httl.util.UnsafeByteArrayOutputStream;
-import httl.util.UnsafeStringWriter;
 
 /**
  * TemplateWrapper. (SPI, Prototype, ThreadSafe)
@@ -48,7 +47,7 @@ public class TemplateWrapper implements Template {
 		return evaluate(null);
 	}
 
-	public Object evaluate(Map<String, Object> parameters)
+	public Object evaluate(Object parameters)
 			throws ParseException {
 		if (byte[].class.equals(getReturnType())) {
 			UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
@@ -69,15 +68,11 @@ public class TemplateWrapper implements Template {
 		}
 	}
 
-	public void render(OutputStream stream) throws IOException, ParseException {
+	public void render(Object stream) throws IOException, ParseException {
 		render(null, stream);
 	}
 
-	public void render(Writer writer) throws IOException, ParseException {
-		render(null, writer);
-	}
-
-	public void render(Map<String, Object> parameters, OutputStream stream)
+	public void render(Object parameters, Object stream)
 			throws IOException, ParseException {
 		template.render(parameters, stream);
 	}

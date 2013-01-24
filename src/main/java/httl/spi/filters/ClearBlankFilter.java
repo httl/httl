@@ -25,10 +25,10 @@ import httl.util.StringUtils;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ClearBlankFilter implements Filter {
+public class ClearBlankFilter extends AbstractFilter {
 	
-	public String filter(String text) {
+	public String filter(String key, String text) {
 		return StringUtils.clearBlank(text);
 	}
-	
+
 }

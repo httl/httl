@@ -26,8 +26,6 @@ import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.text.ParseException;
 
 /**
@@ -37,7 +35,7 @@ import java.text.ParseException;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ExtendsInterceptor implements Interceptor {
+public class ExtendsInterceptor extends FirstInterceptor {
 
 	private final FileMethod fileMethod = new FileMethod();
 	
@@ -91,7 +89,7 @@ public class ExtendsInterceptor implements Interceptor {
 		this.extendsNested = extendsNested;
 	}
 
-	public void render(Context context, Listener rendition) throws IOException, ParseException {
+	public void doRender(Context context, Listener rendition) throws IOException, ParseException {
 		if ((extendsVariable == null && extendsDefault == null)
 				|| context.getLevel() > 1 // 只处理一级自动布局，防止递归
 				|| context.getTemplate().isMacro()) { 
@@ -127,12 +125,7 @@ public class ExtendsInterceptor implements Interceptor {
 			}
 			try {
 				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
-				Object output = Context.getContext().getOut();
-				if (output instanceof OutputStream) {
-					extend.render((OutputStream) output);
-				} else {
-					extend.render((Writer) output);
-				}
+				extend.render(null, Context.getContext().getOut());
 			} finally {
 				if (StringUtils.isNotEmpty(extendsNested)) {
 					if (oldNested != null) {

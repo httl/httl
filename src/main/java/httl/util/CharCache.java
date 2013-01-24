@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.filters;
+package httl.util;
 
-import httl.spi.Filter;
-import httl.util.StringUtils;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * EscapeHtmlFilter. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.parsers.AbstractParser#setValueFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
- */
-public class EscapeHtmlFilter implements Filter {
+public class CharCache {
+	
+	private static final AtomicLong IDS = new AtomicLong();
+	
+	private static final ConcurrentMap<String, char[]> cache = new ConcurrentHashMap<String, char[]>();
 
-	public String filter(String value) {
-		return StringUtils.escapeHtml(value);
+	public static String put(char[] source) {
+		String id = String.valueOf(IDS.incrementAndGet());
+		cache.putIfAbsent(id, source);
+		return id;
+	}
+
+	public static char[] getAndRemove(String id) {
+		return cache.remove(id);
 	}
 
 }

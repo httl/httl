@@ -86,6 +86,9 @@ public class DefaultEngine extends Engine {
 	
 	// httl.properties: precompiled=true
 	private boolean precompiled;
+	
+	// httl.properties: localized=true
+	private boolean localized;
 
 	// httl.properties: name
 	private String name;
@@ -200,11 +203,12 @@ public class DefaultEngine extends Engine {
 	 * @throws ParseException - If the template cannot be parsed
 	 */
 	@SuppressWarnings("unchecked")
-	public Template getTemplate(String name, Locale locale, String encoding) throws IOException, ParseException {
+	public Template getTemplate(String name, Locale locale, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
 		name = UrlUtils.cleanName(name);
+		locale = cleanLocale(locale);
 		Map<Object, Object> cache = this.templateCache; // safe copy reference
 		if (cache == null) {
-			return parseTemplate(name, locale, encoding, null);
+			return parseTemplate(null, name, locale, encoding, parameterTypes);
 		}
 		Resource resource = null;
 		long lastModified;
@@ -252,7 +256,7 @@ public class DefaultEngine extends Engine {
 			synchronized (reference) { // reference lock
 				template = (Template) reference.get();
 				if (template == null || template.getLastModified() < lastModified) { // double check
-					template = parseTemplate(name, locale, encoding, resource); // slowly
+					template = parseTemplate(resource, name, locale, encoding, parameterTypes); // slowly
 					reference.set(template);
 				}
 			}
@@ -262,12 +266,12 @@ public class DefaultEngine extends Engine {
 	}
 
 	// Parse the template. (No cache)
-	private Template parseTemplate(String name, Locale locale, String encoding, Resource resource) throws IOException, ParseException {
+	private Template parseTemplate(Resource resource, String name, Locale locale, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
 		try {
-			return parser.parse(resource);
+			return parser.parse(resource, parameterTypes);
 		} catch (ParseException e) {
 			int offset = e.getErrorOffset();
 			if (offset <= 0) {
@@ -298,7 +302,7 @@ public class DefaultEngine extends Engine {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public Template parseTemplate(String source) throws ParseException {
+	public Template parseTemplate(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
 		String name = "/$" + Digest.getMD5(source);
 		if (! hasResource(name)) {
 			stringLoader.add(name, source);
@@ -322,6 +326,7 @@ public class DefaultEngine extends Engine {
 	 */
 	public Resource getResource(String name, Locale locale, String encoding) throws IOException {
 		name = UrlUtils.cleanName(name);
+		locale = cleanLocale(locale);
 		return loadResource(name, locale, encoding);
 	}
 
@@ -349,7 +354,15 @@ public class DefaultEngine extends Engine {
 	 */
 	public boolean hasResource(String name, Locale locale) {
 		name = UrlUtils.cleanName(name);
+		locale = cleanLocale(locale);
 		return stringLoader.exists(name, locale) || loader.exists(name, locale);
+	}
+	
+	private Locale cleanLocale(Locale locale) {
+		if (localized) {
+			return locale;
+		}
+		return null;
 	}
 
 	/**
@@ -438,6 +451,13 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setPrecompiled(boolean precompiled) {
 		this.precompiled = precompiled;
+	}
+
+	/**
+	 * httl.properties: localized=true
+	 */
+	public void setLocalized(boolean localized) {
+		this.localized = localized;
 	}
 
 	/**

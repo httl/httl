@@ -52,19 +52,53 @@ public class MultiFormatter implements Formatter<Object> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public String format(Object value) {
+	public String toString(Object value) {
 		if (value == null) {
 			Formatter<?> formatter = formatters.get(Void.class);
 			if (formatter != null) {
-				return formatter.format(null);
+				return formatter.toString(null);
 			}
 			return null;
 		} else {
 			Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
 			if (formatter != null) {
-				return formatter.format(value);
+				return formatter.toString(value);
 			}
 			return StringUtils.toString(value);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public char[] toChars(Object value) {
+		if (value == null) {
+			Formatter<?> formatter = formatters.get(Void.class);
+			if (formatter != null) {
+				return formatter.toChars(null);
+			}
+			return null;
+		} else {
+			Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
+			if (formatter != null) {
+				return formatter.toChars(value);
+			}
+			return StringUtils.toString(value).toCharArray();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public byte[] toBytes(Object value) {
+		if (value == null) {
+			Formatter<?> formatter = formatters.get(Void.class);
+			if (formatter != null) {
+				return formatter.toBytes(null);
+			}
+			return null;
+		} else {
+			Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
+			if (formatter != null) {
+				return formatter.toBytes(value);
+			}
+			return StringUtils.toString(value).getBytes();
 		}
 	}
 

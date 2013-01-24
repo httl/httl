@@ -29,7 +29,7 @@ import java.util.TimeZone;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DateFormatter implements Formatter<Date> {
+public class DateFormatter extends AbstractFormatter<Date> {
 
 	private String dateFormat;
 
@@ -47,7 +47,7 @@ public class DateFormatter implements Formatter<Date> {
 		this.timeZone = TimeZone.getTimeZone(timeZone);
 	}
 
-	public String format(Date value) {
+	public String toString(Date value) {
 		return DateUtils.format(value, dateFormat, timeZone);
 	}
 

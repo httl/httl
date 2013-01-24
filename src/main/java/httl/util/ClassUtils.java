@@ -217,7 +217,7 @@ public class ClassUtils {
 					sb.append('L').append(name).append(';');
 				name = sb.toString();
 			}
-			clazz = Class.forName(name);
+			clazz = Class.forName(name, true, Thread.currentThread().getContextClassLoader());
 			Class<?> old = CLASS_CACHE.putIfAbsent(key, clazz);
 			if (old != null) {
 				clazz = old;

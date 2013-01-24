@@ -165,7 +165,7 @@ public class AttributeParser extends AbstractParser {
 							}
 							es.append(source.subSequence(macro.getEnd(), element.getBegin()));
 							document.remove(new Segment(source, macro.getEnd(), element.getBegin())); // 移除宏块
-							macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es.toString()), stream, macro.getBegin()));
+							macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es.toString()), types, stream, macro.getBegin()));
 							Class<?> cls = types.get(var);
 							if (cls != null && ! cls.equals(Template.class)) {
 								throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macro.getBegin());
@@ -177,7 +177,7 @@ public class AttributeParser extends AbstractParser {
 							buf.append(element.getEnd() - macro.getBegin());
 							if (out != null && out.length() > 0) {
 								getVariables.add(var);
-								String code = getExpressionCode(out, var, Template.class, stream, getVariables);
+								String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
 								buf.append(code);
 							} else if (set != null && set.length() > 0) {
 								getVariables.add(var);
@@ -296,7 +296,7 @@ public class AttributeParser extends AbstractParser {
 				es = es.substring(0, macro.getBegin() - 1 - element.getBegin()) 
 					+ (param == null || param.length() == 0 ? "" : " var=\"" + param + "\"")
 					+ es.substring(macro.getEnd() - element.getBegin()); // 去掉macro属性
-				macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), stream, macro.getBegin()));
+				macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), types, stream, macro.getBegin()));
 				Class<?> cls = types.get(var);
 				if (cls != null && ! cls.equals(Template.class)) {
 					throw new ParseException("Duplicate macro variable " + var + ", conflict types: " + cls.getName() + ", " + Template.class.getName(), macro.getBegin());
@@ -307,7 +307,7 @@ public class AttributeParser extends AbstractParser {
 				buf.append(element.length());
 				if (out != null && out.length() > 0) {
 					getVariables.add(var);
-					String code = getExpressionCode(out, var, Template.class, stream, getVariables);
+					String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
 					buf.append(code);
 				} else if (set != null && set.length() > 0) {
 					getVariables.add(var);

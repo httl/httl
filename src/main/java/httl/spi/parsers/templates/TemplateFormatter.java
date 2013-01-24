@@ -116,49 +116,49 @@ public class TemplateFormatter {
 	
 	public String format(boolean value) {
 		if (booleanFormatter != null)
-			return booleanFormatter.format(value);
+			return booleanFormatter.toString(value);
 		return value ? trueValue : falseValue;
 	}
 	
 	public String format(byte value) {
 		if (byteFormatter != null)
-			return byteFormatter.format(value);
+			return byteFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
 	public String format(char value) {
 		if (charFormatter != null)
-			return charFormatter.format(value);
+			return charFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
 	public String format(short value) {
 		if (shortFormatter != null)
-			return shortFormatter.format(value);
+			return shortFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
 	public String format(int value) {
 		if (intFormatter != null)
-			return intFormatter.format(value);
+			return intFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
 	public String format(long value) {
 		if (longFormatter != null)
-			return longFormatter.format(value);
+			return longFormatter.toString(value);
 		return String.valueOf(value);
 	}
 
 	public String format(float value) {
 		if (floatFormatter != null)
-			return floatFormatter.format(value);
+			return floatFormatter.toString(value);
 		return String.valueOf(value);
 	}
 	
 	public String format(double value) {
 		if (doubleFormatter != null)
-			return doubleFormatter.format(value);
+			return doubleFormatter.toString(value);
 		return String.valueOf(value);
 	}
 	
@@ -166,7 +166,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (booleanFormatter != null) 
-			return booleanFormatter.format(value);
+			return booleanFormatter.toString(value);
 		return value.booleanValue() ? trueValue : falseValue;
 	}
 	
@@ -174,7 +174,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (byteFormatter != null) 
-			return byteFormatter.format(value);
+			return byteFormatter.toString(value);
 		return value.toString();
 	}
 
@@ -182,7 +182,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (charFormatter != null) 
-			return charFormatter.format(value);
+			return charFormatter.toString(value);
 		return value.toString();
 	}
 
@@ -190,7 +190,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (shortFormatter != null) 
-			return shortFormatter.format(value);
+			return shortFormatter.toString(value);
 		return value.toString();
 	}
 
@@ -198,7 +198,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (intFormatter != null) 
-			return intFormatter.format(value);
+			return intFormatter.toString(value);
 		return value.toString();
 	}
 	
@@ -206,7 +206,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (longFormatter != null) 
-			return longFormatter.format(value);
+			return longFormatter.toString(value);
 		return value.toString();
 	}
 	
@@ -214,7 +214,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (doubleFormatter != null) 
-			return doubleFormatter.format(value);
+			return doubleFormatter.toString(value);
 		return value.toString();
 	}
 	
@@ -234,7 +234,7 @@ public class TemplateFormatter {
 		if (value instanceof Double)
 			return format((Double) value);
 		if (numberFormatter != null) 
-			return numberFormatter.format(value);
+			return numberFormatter.toString(value);
 		return value.toString();
 	}
 
@@ -242,7 +242,7 @@ public class TemplateFormatter {
 		if (value == null)
 			return nullValue;
 		if (dateFormatter != null) 
-			return dateFormatter.format(value);
+			return dateFormatter.toString(value);
 		return value.toString();
 	}
 
@@ -300,7 +300,7 @@ public class TemplateFormatter {
 		if (value instanceof Resource)
 			return format((Resource) value);
 		if (formatter != null)
-			return formatter.format(value);
+			return formatter.toString(value);
 		return StringUtils.toString(value);
 	}
 
