@@ -68,7 +68,6 @@ public class WebEngine {
 	private WebEngine() {}
 
 	public static void addProperty(String key, String value) {
-		key = key + "+";
 		String old = addProperties.get(key);
 		if (StringUtils.isNotEmpty(old)) {
 			value = old + "," + value;
