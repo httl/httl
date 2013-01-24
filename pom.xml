@@ -23,7 +23,7 @@
 	<packaging>jar</packaging>
 	<name>HTTL</name>
 	<description>Hyper Text Template Language and Engine.</description>
-	<url>http://httl.github.com</url>
+	<url>http://httl.oskpi.com</url>
 	<inceptionYear>2012</inceptionYear>
 	<licenses>
 		<license>
@@ -137,11 +137,11 @@
 		<repository>
 			<id>httl-repository</id>
 			<name>Httl Repository</name>
-			<url>http://httl.github.com/maven</url>
+			<url>http://httl.oskpi.com/maven</url>
 		</repository>
 	</repositories>
 	<scm>
-		<url>http://httl.github.com</url>
+		<url>http://httl.oskpi.com</url>
 		<connection>scm:git:https://github.com/httl/httl.git</connection>
 		<developerConnection>scm:git:git@github.com:httl/httl.git</developerConnection>
 	</scm>
