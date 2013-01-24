@@ -42,7 +42,7 @@ public class DateUtils {
 	private static final ThreadLocal<Map<String, SimpleDateFormat>> LOCAL = new ThreadLocal<Map<String, SimpleDateFormat>>();
 
 	public static DateFormat getDateFormat(String format, TimeZone timeZone) {
-		if (format == null || format.length() == 0 || DEFAULT_FORMAT.equals(format)) {
+		if (StringUtils.isEmpty(format) || DEFAULT_FORMAT.equals(format)) {
 			if (timeZone == null) {
 				return DEFAULT_LOCAL.get();
 			} else {

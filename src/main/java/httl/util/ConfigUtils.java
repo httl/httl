@@ -53,7 +53,7 @@ public final class ConfigUtils {
 	private static final String COMMA = ",";
 
 	public static boolean isInteger(String value) {
-		return value != null && value.length() > 0 
+		return StringUtils.isNotEmpty(value) 
 				&& INTEGER_PATTERN.matcher(value).matches();
 	}
 	
@@ -73,7 +73,7 @@ public final class ConfigUtils {
 	}
 	
 	public static Properties loadProperties(Properties properties, String path, boolean required) {
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			throw new IllegalArgumentException("path == null");
 		}
 		try {
@@ -114,7 +114,7 @@ public final class ConfigUtils {
 	}
 	
 	public static String getRealPath(String path) {
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			return null;
 		}
 		if (isFilePath(path)) {
@@ -171,7 +171,7 @@ public final class ConfigUtils {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
 				if (key.endsWith(PLUS)) {
-					if (value != null && value.length() > 0) {
+					if (StringUtils.isNotEmpty(value)) {
 						plusConfigs.put(key, value);
 					}
 				} else {
@@ -183,7 +183,7 @@ public final class ConfigUtils {
 				String value = (String) entry.getValue();
 				String k = key.substring(0, key.length() - PLUS.length());
 				String v = result.getProperty(k);
-				if (v != null && v.length() > 0) {
+				if (StringUtils.isNotEmpty(v)) {
 					result.setProperty(k, v + COMMA + value);
 				} else {
 					result.setProperty(k, value);
@@ -193,7 +193,7 @@ public final class ConfigUtils {
 		for (Map.Entry<Object, Object> entry : new HashMap<Object, Object>(result).entrySet()) {
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
-			while (value != null && value.length() > 0 && value.startsWith(REF)) {
+			while (StringUtils.isNotEmpty(value) && value.startsWith(REF)) {
 				String ref = value.substring(1);
 				value = result.getProperty(ref);
 				if (value == null) {

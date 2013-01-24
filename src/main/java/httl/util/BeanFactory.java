@@ -143,10 +143,10 @@ public class BeanFactory {
 						String property = name.substring(3, 4).toLowerCase() + name.substring(4);
 						String key = StringUtils.splitCamelName(property, ".");
 						String value = null;
-						if (parent != null && parent.length() > 0) {
+						if (StringUtils.isNotEmpty(parent)) {
 							value = properties.getProperty(parent + "." + key);
 						}
-						if (value == null || value.length() == 0) {
+						if (StringUtils.isEmpty(value)) {
 							value = properties.getProperty(key);
 						}
 						if (value != null && value.trim().length() > 0) {
@@ -190,7 +190,7 @@ public class BeanFactory {
 
 	@SuppressWarnings("unchecked")
 	private static <T> T getInstance(String property, String key, String value, Class<T> type, Properties properties, Map<String, Object> caches, Map<String, Object> instances, List<Object> inits) {
-		if (value == null || value.length() == 0 || "null".equals(value)) {
+		if (StringUtils.isEmpty(value) || "null".equals(value)) {
 			return null;
 		}
 		Class<?> cls = ClassUtils.forName(value);

@@ -38,7 +38,7 @@ public class NumberUtils {
 	private static final ThreadLocal<Map<String, DecimalFormat>> LOCAL = new ThreadLocal<Map<String, DecimalFormat>>();
 
 	public static DecimalFormat getDecimalFormat(String format) {
-		if (format == null || format.length() == 0 || DEFAULT_FORMAT.equals(format)) {
+		if (StringUtils.isEmpty(format) || DEFAULT_FORMAT.equals(format)) {
 			return DEFAULT_LOCAL.get();
 		}
 		Map<String, DecimalFormat> formatters = LOCAL.get();

@@ -17,6 +17,7 @@ package httl.spi.compilers;
 
 import httl.spi.Compiler;
 import httl.util.ClassUtils;
+import httl.util.StringUtils;
 import httl.util.UnsafeByteArrayInputStream;
 import httl.util.UnsafeByteArrayOutputStream;
 
@@ -104,7 +105,7 @@ public class JdkCompiler extends AbstractCompiler {
 	 * httl.properties: java.version=1.7
 	 */
 	public void setJavaVersion(String version) {
-		if (version != null && version.length() > 0
+		if (StringUtils.isNotEmpty(version)
 				&& ! version.equals(ClassUtils.getJavaVersion())) {
 			options.add("-target");
 			options.add(version);

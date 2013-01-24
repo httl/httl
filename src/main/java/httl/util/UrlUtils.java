@@ -49,8 +49,8 @@ public class UrlUtils {
 	public static final char WINDOWS_PATH_SEPARATOR_CHAR = '\\';
 
 	public static String relativeUrl(String name , String relativeName) throws MalformedURLException {
-		if (name == null || name.length() == 0 
-				|| relativeName == null || relativeName.length() == 0)
+		if (StringUtils.isEmpty(name) 
+				|| StringUtils.isEmpty(relativeName))
 			return name;
 		if (name.charAt(0) == PATH_SEPARATOR_CHAR
 				|| name.charAt(0) == WINDOWS_PATH_SEPARATOR_CHAR)
@@ -79,7 +79,7 @@ public class UrlUtils {
 	}
 	
 	public static String cleanName(String name) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("name == null");
 		}
 		int len = name.length();
@@ -107,7 +107,7 @@ public class UrlUtils {
 	}
 
 	public static String cleanDirectory(String name) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("directory == null");
 		}
 		int last = name.length() - 1;
@@ -189,7 +189,7 @@ public class UrlUtils {
 	}
 	
 	private static boolean isMatch(String name, String suffix) {
-		if (suffix == null || suffix.length() == 0) {
+		if (StringUtils.isEmpty(suffix)) {
 			return true;
 		}
 		return name.endsWith(suffix);

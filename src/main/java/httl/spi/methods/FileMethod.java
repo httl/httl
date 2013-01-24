@@ -70,7 +70,7 @@ public class FileMethod {
 	}
 
 	public Template $extends(String name, Locale locale, String encoding) throws IOException, ParseException {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("include template name == null");
 		}
 		String macro = null;
@@ -81,7 +81,7 @@ public class FileMethod {
 		}
 		Template template = Context.getContext().getTemplate();
 		if (template != null) {
-			if (encoding == null || encoding.length() == 0) {
+			if (StringUtils.isEmpty(encoding)) {
 				encoding = template.getEncoding();
 			}
 			name = UrlUtils.relativeUrl(name, template.getName());
@@ -93,7 +93,7 @@ public class FileMethod {
 			name = extendsDirectory + name;
 		}
 		Template extend = engine.getTemplate(name, locale, encoding);
-		if (macro != null && macro.length() > 0) {
+		if (StringUtils.isNotEmpty(macro)) {
 			extend = extend.getMacros().get(macro);
 		}
 		if (template != null) {
@@ -175,7 +175,7 @@ public class FileMethod {
 	}
 
 	public Template include(String name, Locale locale, String encoding) throws IOException, ParseException {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("include template name == null");
 		}
 		String macro = null;
@@ -186,7 +186,7 @@ public class FileMethod {
 		}
 		Template template = Context.getContext().getTemplate();
 		if (template != null) {
-			if (encoding == null || encoding.length() == 0) {
+			if (StringUtils.isEmpty(encoding)) {
 				encoding = template.getEncoding();
 			}
 			name = UrlUtils.relativeUrl(name, template.getName());
@@ -195,7 +195,7 @@ public class FileMethod {
 			}
 		}
 		Template include = engine.getTemplate(name, locale, encoding);
-		if (macro != null && macro.length() > 0) {
+		if (StringUtils.isNotEmpty(macro)) {
 			include = include.getMacros().get(macro);
 		}
 		if (template != null && template == include) {
@@ -236,12 +236,12 @@ public class FileMethod {
 	}
 
 	public Resource read(String name, Locale locale, String encoding) throws IOException {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("display template name == null");
 		}
 		Template template = Context.getContext().getTemplate();
 		if (template != null) {
-			if (encoding == null || encoding.length() == 0) {
+			if (StringUtils.isEmpty(encoding)) {
 				encoding = template.getEncoding();
 			}
 			name = UrlUtils.relativeUrl(name, template.getName());

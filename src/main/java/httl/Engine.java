@@ -17,6 +17,7 @@ package httl;
 
 import httl.util.BeanFactory;
 import httl.util.ConfigUtils;
+import httl.util.StringUtils;
 import httl.util.Version;
 import httl.util.VolatileReference;
 
@@ -94,7 +95,7 @@ public abstract class Engine {
 	 * @return template engine
 	 */
 	public static Engine getEngine(String configPath, Properties configProperties) {
-		if (configPath == null || configPath.length() == 0) {
+		if (StringUtils.isEmpty(configPath)) {
 			configPath = HTTL_PROPERTIES;
 		}
 		VolatileReference<Engine> reference = ENGINES.get(configPath);
@@ -159,7 +160,7 @@ public abstract class Engine {
 	 */
 	public String getProperty(String key, String defaultValue) {
 		String value = getProperty(key, String.class);
-		return value == null || value.length() == 0 ? defaultValue : value;
+		return StringUtils.isEmpty(value) ? defaultValue : value;
 	}
 
 	/**
@@ -172,7 +173,7 @@ public abstract class Engine {
 	 */
 	public int getProperty(String key, int defaultValue) {
 		String value = getProperty(key, String.class);
-		return value == null || value.length() == 0 ? defaultValue : Integer.parseInt(value);
+		return StringUtils.isEmpty(value) ? defaultValue : Integer.parseInt(value);
 	}
 
 	/**
@@ -185,7 +186,7 @@ public abstract class Engine {
 	 */
 	public boolean getProperty(String key, boolean defaultValue) {
 		String value = getProperty(key, String.class);
-		return value == null || value.length() == 0 ? defaultValue : Boolean.parseBoolean(value);
+		return StringUtils.isEmpty(value) ? defaultValue : Boolean.parseBoolean(value);
 	}
 
 	/**

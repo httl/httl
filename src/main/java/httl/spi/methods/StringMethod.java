@@ -15,6 +15,8 @@
  */
 package httl.spi.methods;
 
+import httl.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class StringMethod {
 	private StringMethod() {}
 
 	public static String toUnderlineName(String name) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			return name;
 		}
 		StringBuilder buf = new StringBuilder(name.length() * 2);
@@ -46,7 +48,7 @@ public class StringMethod {
 	}
 
 	public static String toCamelName(String name) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			return name;
 		}
 		StringBuilder buf = new StringBuilder(name.length());
@@ -67,7 +69,7 @@ public class StringMethod {
 	}
 
 	public static String toCapitalName(String name) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			return name;
 		}
 		StringBuilder buf = new StringBuilder(name.length());
@@ -88,7 +90,7 @@ public class StringMethod {
 	}
 	
 	public static String clip(String value, int max) {
-		if (value == null || value.length() == 0 || max < 1) {
+		if (StringUtils.isEmpty(value) || max < 1) {
 			return value;
 		}
 		if (value.length() > max) {
@@ -98,7 +100,7 @@ public class StringMethod {
 	}
 
 	public static String repeat(String value, int count) {
-		if (value == null || value.length() == 0 || count <= 0) {
+		if (StringUtils.isEmpty(value) || count <= 0) {
 			return value;
 		}
 		StringBuilder buf = new StringBuilder();
@@ -109,7 +111,7 @@ public class StringMethod {
 	}
 
 	public static String[] split(String value, char separator) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return new String[0];
 		}
 		List<String> list = new ArrayList<String>();

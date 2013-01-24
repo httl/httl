@@ -69,9 +69,9 @@ public class TemplateTest extends TestCase {
 		String exclude = System.getProperty("excludes");
 		Set<String> includes = new HashSet<String>();
 		Set<String> excludes = new HashSet<String>();
-		if (include != null && include.length() > 0 && ! include.startsWith("$")) {
+		if (StringUtils.isNotEmpty(include) && ! include.startsWith("$")) {
 			includes.addAll(Arrays.asList(include.split("\\,")));
-		} else if (exclude != null && exclude.length() > 0 && ! exclude.startsWith("$")) {
+		} else if (StringUtils.isNotEmpty(exclude) && ! exclude.startsWith("$")) {
 			excludes.addAll(Arrays.asList(exclude.split("\\,")));
 		}
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -284,11 +284,11 @@ public class TemplateTest extends TestCase {
 			} catch (ParseException e) {
 				if (! profile) {
 					String message = e.getMessage();
-					assertTrue(message != null && message.length() > 0);
+					assertTrue(StringUtils.isNotEmpty(message));
 					List<String> expected = IOUtils.readLines(new FileReader(result));
 					assertTrue(expected != null && expected.size() > 0);
 					for (String part : expected)  {
-						assertTrue(part != null && part.length() > 0);
+						assertTrue(StringUtils.isNotEmpty(part));
 						part = StringUtils.unescapeString(part).trim();
 						super.assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
 					}

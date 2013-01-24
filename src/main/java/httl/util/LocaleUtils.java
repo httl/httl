@@ -58,7 +58,7 @@ public class LocaleUtils {
 	}
 
 	public static Locale getLocale(String name) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			return null;
 		}
 		Locale locale = LOCALE_CACHE.get(name);

@@ -22,6 +22,7 @@ import httl.spi.Locator;
 import httl.spi.Logger;
 import httl.spi.loaders.resources.InputStreamResource;
 import httl.util.LocaleUtils;
+import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
 import java.io.File;
@@ -84,7 +85,7 @@ public abstract class AbstractLoader implements Loader {
 	 * httl.properties: input.encoding=UTF-8
 	 */
 	public void setInputEncoding(String encoding) {
-		if (encoding != null && encoding.length() > 0) {
+		if (StringUtils.isNotEmpty(encoding)) {
 			Charset.forName(encoding);
 			this.encoding = encoding;
 		}
@@ -108,7 +109,7 @@ public abstract class AbstractLoader implements Loader {
 
 	public List<String> list(String suffix) throws IOException {
 		String directory = locator.root(suffix);
-		if (directory == null || directory.length() == 0) {
+		if (StringUtils.isEmpty(directory)) {
 			directory = "/";
 		}
 		List<String> list = doList(directory, suffix);
@@ -117,7 +118,7 @@ public abstract class AbstractLoader implements Loader {
 		} else {
 			List<String> result = new ArrayList<String>(list.size());
 			for (String name : list) {
-				if (name != null && name.length() > 0) {
+				if (StringUtils.isNotEmpty(name)) {
 					result.add(UrlUtils.cleanName(name));
 				}
 			}
@@ -145,7 +146,7 @@ public abstract class AbstractLoader implements Loader {
 	}
 
 	public Resource load(String name, Locale locale, String encoding) throws IOException {
-		if (encoding == null || encoding.length() == 0) {
+		if (StringUtils.isEmpty(encoding)) {
 			encoding = this.encoding;
 		}
 		Locale cur = locale;

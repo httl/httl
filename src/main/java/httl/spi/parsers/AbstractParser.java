@@ -907,7 +907,7 @@ public abstract class AbstractParser implements Parser {
 			String len = matcher.group(2);
 			String next = matcher.group(3);
 			int length = 0;
-			if (len != null && len.length() > 0) {
+			if (StringUtils.isNotEmpty(len)) {
 				length = Integer.parseInt(len);
 			}
 			if (next == null) {
@@ -993,12 +993,12 @@ public abstract class AbstractParser implements Parser {
 	
 	@SuppressWarnings("unchecked")
 	protected String filterExpression(String message, Translator translator, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
-		if (message == null || message.length() == 0) {
+		if (StringUtils.isEmpty(message)) {
 			return "";
 		}
 		if (removeDirectiveBlank) {
 			message = StringUtils.trimBlankLine(message);
-			if (message == null || message.length() == 0) {
+			if (StringUtils.isEmpty(message)) {
 				return "";
 			}
 		}
@@ -1041,7 +1041,7 @@ public abstract class AbstractParser implements Parser {
 					appendSwitcher(buf, str, textFields, seq, stream, getVariables);
 					buf.append(");\n");
 					String msg = writer.getBuffer().toString();
-					if (msg != null && msg.length() > 0) {
+					if (StringUtils.isNotEmpty(msg)) {
 						buf.append("	$output.write(");
 						appendSwitcher(buf, msg, textFields, seq, stream, getVariables);
 						buf.append(");\n");
@@ -1067,7 +1067,7 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	private void appendSwitcher(StringBuffer buf, String txt, StringBuilder textFields, AtomicInteger seq, boolean stream, Set<String> getVariables) {
-		if (txt == null || txt.length() == 0) {
+		if (StringUtils.isEmpty(txt)) {
 			return;
 		}
 		Filter filter = textFilter;
@@ -1121,7 +1121,7 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder textFields, AtomicInteger seq, boolean stream) {
-		if (txt == null || txt.length() == 0) {
+		if (StringUtils.isEmpty(txt)) {
 			return;
 		}
 		txt = txt.replace(POUND_SPECIAL, POUND);
@@ -1129,7 +1129,7 @@ public abstract class AbstractParser implements Parser {
 		if (filter != null) {
 			txt = filter.filter(txt, txt);
 		}
-		if (txt != null && txt.length() > 0) {
+		if (StringUtils.isNotEmpty(txt)) {
 			String var = "$TXT" + seq.incrementAndGet();
 			if (stream) {
 				if (textInClass) {
@@ -1166,7 +1166,7 @@ public abstract class AbstractParser implements Parser {
 		value = value == null ? null : value.trim();
 		StringBuilder buf = new StringBuilder();
 		if (ifDirective.equals(name)) {
-			if (value == null || value.length() == 0) {
+			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The if expression == null!", begin);
 			}
 			Expression expr = translator.translate(value, types, offset);
@@ -1175,7 +1175,7 @@ public abstract class AbstractParser implements Parser {
 			buf.append(getConditionCode(expr));
 			buf.append(") {\n");
 		} else if (elseifDirective.equals(name)) {
-			if (value == null || value.length() == 0) {
+			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The elseif expression == null!", begin);
 			}
 			Expression expr = translator.translate(value, types, offset);
@@ -1187,7 +1187,7 @@ public abstract class AbstractParser implements Parser {
 			buf.append(getConditionCode(expr));
 			buf.append(") {\n");
 		} else if (elseDirective.equals(name)) {
-			if (value != null && value.length() > 0) {
+			if (StringUtils.isNotEmpty(value)) {
 				throw new ParseException("Unsupported else expression " + value, offset);
 			}
 			if (comment) {
@@ -1195,7 +1195,7 @@ public abstract class AbstractParser implements Parser {
 			}
 			buf.append("else {\n");
 		} else if (foreachDirective.equals(name)) {
-			if (value == null || value.length() == 0) {
+			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The foreach expression == null!", begin);
 			}
 			Matcher matcher = IN_PATTERN.matcher(value);
@@ -1253,7 +1253,7 @@ public abstract class AbstractParser implements Parser {
 			setVariables.add(foreachVariable);
 			buf.append(getForeachCode(type, clazz, var, code));
 		} else if (breakifDirective.equals(name)) {
-			if (value == null || value.length() == 0) {
+			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The breakif expression == null!", begin);
 			}
 			Expression expr = translator.translate(value, types, offset);
@@ -1298,7 +1298,7 @@ public abstract class AbstractParser implements Parser {
 				int start = (Integer) item[5];
 				Expression expression = translator.translate(expr, types, offset + end);
 				getVariables.addAll(expression.getParameterTypes().keySet());
-				if (type == null || type.length() == 0) {
+				if (StringUtils.isEmpty(type)) {
 					type = expression.getReturnType().getCanonicalName();
 				}
 				Class<?> clazz = ClassUtils.forName(importPackages, type);
@@ -1316,7 +1316,7 @@ public abstract class AbstractParser implements Parser {
 				} else if (! ".=".equals(oper)) {
 					ctx = "$context";
 				}
-				if (ctx != null && ctx.length() > 0) {
+				if (StringUtils.isNotEmpty(ctx)) {
 					buf.append("	" + ctx + ".put(\"");
 					buf.append(var);
 					buf.append("\", ");
@@ -1325,7 +1325,7 @@ public abstract class AbstractParser implements Parser {
 				}
 			}
 		} else if (varDirective.equals(name)) {
-			if (value == null || value.length() == 0) {
+			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The in parameters == null!", begin);
 			}
 			value = BLANK_PATTERN.matcher(value).replaceAll(" ");

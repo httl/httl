@@ -21,6 +21,7 @@ import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.spi.loaders.resources.StringResource;
 import httl.util.LinkedStack;
+import httl.util.StringUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -121,7 +122,7 @@ public class CommentParser extends AbstractParser {
 						matcher.appendReplacement(macro, "");
 						String key = getMacroPath(resource.getName(), var);
 						String es = macro.toString();
-						if (param != null && param.length() > 0) {
+						if (StringUtils.isNotEmpty(param)) {
 							es = getDiretive(varDirective, param) + es;
 						}
 						macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), types, stream, macroParameterStart));
@@ -132,11 +133,11 @@ public class CommentParser extends AbstractParser {
 						types.put(var, Template.class);
 						buf.append(LEFT);
 						buf.append(matcher.end() - macroStart);
-						if (out != null && out.length() > 0) {
+						if (StringUtils.isNotEmpty(out)) {
 							getVariables.add(var);
 							String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
 							buf.append(code);
-						} else if (set != null && set.length() > 0) {
+						} else if (StringUtils.isNotEmpty(set)) {
 							getVariables.add(var);
 							String setValue = set + " " + var + ".evaluate()";
 							String code = getStatementCode(setDirective, setValue, matcher.start(1), offset, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
@@ -151,7 +152,7 @@ public class CommentParser extends AbstractParser {
 					}
 				} else {
 					String end = getStatementEndCode(startName);
-					if (end != null && end.length() > 0) {
+					if (StringUtils.isNotEmpty(end)) {
 						matcher.appendReplacement(buf, "");
 						buf.append(LEFT);
 						buf.append(matcher.group().length());

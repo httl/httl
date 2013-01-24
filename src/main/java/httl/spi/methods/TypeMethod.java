@@ -158,39 +158,39 @@ public class TypeMethod {
 	}
 
 	public static boolean toBoolean(String value) {
-		return value == null || value.length() == 0 ? false : Boolean.parseBoolean(value);
+		return StringUtils.isEmpty(value) ? false : Boolean.parseBoolean(value);
 	}
 
 	public static char toChar(String value) {
-		return value == null || value.length() == 0 ? '\0' : value.charAt(0);
+		return StringUtils.isEmpty(value) ? '\0' : value.charAt(0);
 	}
 
 	public static byte toByte(String value) {
-		return value == null || value.length() == 0 ? 0 : Byte.parseByte(value);
+		return StringUtils.isEmpty(value) ? 0 : Byte.parseByte(value);
 	}
 
 	public static short toShort(String value) {
-		return value == null || value.length() == 0 ? 0 : Short.parseShort(value);
+		return StringUtils.isEmpty(value) ? 0 : Short.parseShort(value);
 	}
 
 	public static int toInt(String value) {
-		return value == null || value.length() == 0 ? 0 : Integer.parseInt(value);
+		return StringUtils.isEmpty(value) ? 0 : Integer.parseInt(value);
 	}
 
 	public static long toLong(String value) {
-		return value == null || value.length() == 0 ? 0 : Long.parseLong(value);
+		return StringUtils.isEmpty(value) ? 0 : Long.parseLong(value);
 	}
 
 	public static float toFloat(String value) {
-		return value == null || value.length() == 0 ? 0 : Float.parseFloat(value);
+		return StringUtils.isEmpty(value) ? 0 : Float.parseFloat(value);
 	}
 
 	public static double toDouble(String value) {
-		return value == null || value.length() == 0 ? 0 : Double.parseDouble(value);
+		return StringUtils.isEmpty(value) ? 0 : Double.parseDouble(value);
 	}
 
 	public static Class<?> toClass(String value) {
-		return value == null || value.length() == 0 ? null : ClassUtils.forName(value);
+		return StringUtils.isEmpty(value) ? null : ClassUtils.forName(value);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -204,7 +204,7 @@ public class TypeMethod {
 
 	public Date toDate(String value) {
 		try {
-			return value == null || value.length() == 0 ? null : DateUtils.parse(value, dateFormat, timeZone);
+			return StringUtils.isEmpty(value) ? null : DateUtils.parse(value, dateFormat, timeZone);
 		} catch (Exception e) {
 			try {
 				return DateUtils.parse(value, "yyyy-MM-dd");
@@ -215,11 +215,11 @@ public class TypeMethod {
 	}
 
 	public Date toDate(String value, String format) {
-		return value == null || value.length() == 0 ? null : DateUtils.parse(value, format, timeZone);
+		return StringUtils.isEmpty(value) ? null : DateUtils.parse(value, format, timeZone);
 	}
 
 	public static Date toDate(String value, String format, String timeZone) {
-		return value == null || value.length() == 0 ? null : DateUtils.parse(value, format, timeZone == null ? null : TimeZone.getTimeZone(timeZone));
+		return StringUtils.isEmpty(value) ? null : DateUtils.parse(value, format, timeZone == null ? null : TimeZone.getTimeZone(timeZone));
 	}
 
 	public String toString(Date value) {

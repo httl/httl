@@ -23,6 +23,7 @@ import httl.spi.Logger;
 import httl.spi.Resolver;
 import httl.util.EncodingProperties;
 import httl.util.LocaleUtils;
+import httl.util.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -173,14 +174,14 @@ public class MessageMethod {
 	}
 
 	public String message(String key, Locale locale, Object[] args) {
-		if (key == null || key.length() == 0 || messageBasename == null) {
+		if (StringUtils.isEmpty(key) || messageBasename == null) {
 			return key;
 		}
 		if (locale == null) {
 			locale = getLocale();
 		}
 		String value = findMessageByLocale(key, locale);
-		if (value != null && value.length() > 0) {
+		if (StringUtils.isNotEmpty(value)) {
 			if (args != null && args.length > 0) {
 				if ("string".equals(messageFormat)) {
 					return String.format(value, args);
@@ -210,7 +211,7 @@ public class MessageMethod {
 			try {
 				Resource resource = engine.getResource(file);
 				if (properties.getLastModified() < resource.getLastModified()) {
-					String encoding = (messageEncoding == null || messageEncoding.length() == 0 ? "UTF-8" : messageEncoding);
+					String encoding = (StringUtils.isEmpty(messageEncoding) ? "UTF-8" : messageEncoding);
 					properties.load(resource.getInputStream(), encoding, resource.getLastModified());
 				}
 			} catch (IOException e) {
@@ -221,7 +222,7 @@ public class MessageMethod {
 		}
 		if (properties != null) {
 			String value = properties.getProperty(key);
-			if (value != null && value.length() > 0) {
+			if (StringUtils.isNotEmpty(value)) {
 				return value;
 			}
 		}

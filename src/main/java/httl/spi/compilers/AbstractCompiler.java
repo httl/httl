@@ -18,6 +18,7 @@ package httl.spi.compilers;
 import httl.spi.Compiler;
 import httl.spi.Logger;
 import httl.util.ClassUtils;
+import httl.util.StringUtils;
 import httl.util.VolatileReference;
 
 import java.io.File;
@@ -109,7 +110,7 @@ public abstract class AbstractCompiler implements Compiler {
 			} else {
 				throw new ParseException("No such class name in java code.", 0);
 			}
-			className = pkg != null && pkg.length() > 0 ? pkg + "." + classSimpleName : classSimpleName;
+			className = StringUtils.isNotEmpty(pkg) ? pkg + "." + classSimpleName : classSimpleName;
 			VolatileReference<Class<?>> ref = CLASS_CACHE.get(className);
 			if (ref == null) {
 				ref = new VolatileReference<Class<?>>();

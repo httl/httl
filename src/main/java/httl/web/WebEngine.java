@@ -21,6 +21,7 @@ import httl.spi.converters.ResponseOutConverter;
 import httl.spi.interceptors.ServletInterceptor;
 import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.ServletResolver;
+import httl.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +66,7 @@ public class WebEngine {
 
 	public static void addProperty(String key, String value) {
 		String old = addProperties.get(key);
-		if (old != null && old.length() > 0) {
+		if (StringUtils.isNotEmpty(old)) {
 			value = old + "," + value;
 		}
 		addProperties.put(key, value);
@@ -91,7 +92,7 @@ public class WebEngine {
 				if (ENGINE == null) { // double check
 					Properties properties = new Properties();
 					String config = servletContext.getInitParameter(CONFIG_KEY);
-					if (config == null || config.length() == 0) {
+					if (StringUtils.isEmpty(config)) {
 						config = WEBINF_CONFIG;
 					}
 					if (config.startsWith("/")) {

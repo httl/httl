@@ -54,16 +54,16 @@ public class StringUtils {
 		return FUNCTION_PATTERN.matcher(value).matches();
 	}
 
-	public static boolean isNotEmpty(String value) {
-		return value != null && value.length() > 0;
-	}
-
 	public static boolean isEmpty(String value) {
 		return value == null || value.length() == 0;
 	}
 
+	public static boolean isNotEmpty(String value) {
+		return ! isEmpty(value);
+	}
+
 	public static boolean isBlank(String value) {
-		if (value != null && value.length() > 0) {
+		if (StringUtils.isNotEmpty(value)) {
 			int len = value.length();
 			for (int i = 0; i < len; i ++) {
 				char ch = value.charAt(i);
@@ -156,7 +156,7 @@ public class StringUtils {
 	}
 
 	public static String escapeString(String src) {
-		if (src == null || src.length() == 0) {
+		if (StringUtils.isEmpty(src)) {
 			return src;
 		}
 		int len = src.length();
@@ -340,7 +340,7 @@ public class StringUtils {
 	}
 
 	public static String unescapeString(String value) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return value;
 		}
 		StringBuilder buf = null;
@@ -398,7 +398,7 @@ public class StringUtils {
 	}
 
 	public static String escapeXml(String value) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return value;
 		}
 		int len = value.length();
@@ -677,7 +677,7 @@ public class StringUtils {
 	}
 
 	public static String unescapeXml(String value) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return value;
 		}
 		StringBuilder buf = null;
@@ -783,7 +783,7 @@ public class StringUtils {
 	}
 
 	public static String clearBlank(String value) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return value;
 		}
 		int len = value.length();
@@ -825,7 +825,7 @@ public class StringUtils {
 	}
 
 	public static String compressBlank(String value) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return value;
 		}
 		int len = value.length();
@@ -868,7 +868,7 @@ public class StringUtils {
 	}
 
 	public static String trimBlankLine(String value) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return value;
 		}
 		int len = value.length();
@@ -921,7 +921,7 @@ public class StringUtils {
 	}
 
 	public static String clearBlankLine(String value) {
-		if (value == null || value.length() == 0) {
+		if (StringUtils.isEmpty(value)) {
 			return value;
 		}
 		int len = value.length();
@@ -994,7 +994,7 @@ public class StringUtils {
 				code = "(" + code + ") != null && (" + code + ").size() > 0";
 			} else {
 				String method = ClassUtils.getSizeMethod(type);
-				if (method != null && method.length() > 0) {
+				if (StringUtils.isNotEmpty(method)) {
 					code = "(" + code + ") != null && (" + code + ")." + method + " > 0";
 				} else {
 					code = "(" + code + ") != null";
@@ -1094,7 +1094,7 @@ public class StringUtils {
 	}
 	
 	public static String splitCamelName(String name, String split, boolean upper) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			return name;
 		}
 		StringBuilder buf = new StringBuilder(name.length() * 2);

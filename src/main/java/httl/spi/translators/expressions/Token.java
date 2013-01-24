@@ -15,6 +15,8 @@
  */
 package httl.spi.translators.expressions;
 
+import httl.util.StringUtils;
+
 /**
  * Token. (Tool, Prototype, NotThreadsafe)
  * 
@@ -48,7 +50,7 @@ public final class Token {
 	 * @param type type
 	 */
 	public Token(String message, int offset, int type) {
-		if (message == null || message.length() == 0)
+		if (StringUtils.isEmpty(message))
 			throw new IllegalArgumentException("message == null");
 		this.message = message;
 		this.offset = offset;

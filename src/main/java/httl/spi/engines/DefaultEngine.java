@@ -151,7 +151,7 @@ public class DefaultEngine extends Engine {
 	 */
 	@SuppressWarnings("unchecked")
 	public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
-		if (source == null || source.length() == 0) {
+		if (StringUtils.isEmpty(source)) {
 			throw new IllegalArgumentException("expression source == null");
 		}
 		Map<Object, Object> cache = this.expressionCache; // safe copy reference
@@ -288,7 +288,7 @@ public class DefaultEngine extends Engine {
 			} catch (Throwable t) {
 			}
 			throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
-									 (location == null || location.length() == 0 ? "" : ", " + location) 
+									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
 									 + ", stack: " + ClassUtils.toString(e), offset);
 		}
 	}
@@ -369,7 +369,7 @@ public class DefaultEngine extends Engine {
 	 * Init the engine.
 	 */
 	public void init() {
-		if (logger != null && name != null && name.length() > 0) {
+		if (logger != null && StringUtils.isNotEmpty(name)) {
 			if (logger.isWarnEnabled() && ! ConfigUtils.isFilePath(name)) {
 				try {
 					List<String> realPaths = new ArrayList<String>();
@@ -387,7 +387,7 @@ public class DefaultEngine extends Engine {
 			}
 			if (logger.isInfoEnabled()) {
 				String realPath = ConfigUtils.getRealPath(name);
-				if (realPath != null && realPath.length() > 0) {
+				if (StringUtils.isNotEmpty(realPath)) {
 					logger.info("Load httl config from " + realPath + " in " + (name.startsWith("/") ? "filesystem" : "classpath") + ".");
 				}
 			}

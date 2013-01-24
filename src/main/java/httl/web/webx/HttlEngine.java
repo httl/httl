@@ -16,6 +16,7 @@
 package httl.web.webx;
 
 import httl.Context;
+import httl.util.StringUtils;
 import httl.util.UrlUtils;
 import httl.web.WebEngine;
 
@@ -49,7 +50,7 @@ public class HttlEngine implements TemplateEngine {
 	private String templateEncoding;
 
 	public void setPath(String path) {
-		if (path != null && path.length() > 0) {
+		if (StringUtils.isNotEmpty(path)) {
 			this.path = UrlUtils.cleanDirectory(path);
 		}
 	}
@@ -70,7 +71,7 @@ public class HttlEngine implements TemplateEngine {
 	}
 	
 	private String getTemplatePath(String name) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("template name == null");
 		}
 		name = UrlUtils.cleanName(name);

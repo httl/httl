@@ -16,6 +16,7 @@
 package httl.web.filter;
 
 import httl.Context;
+import httl.util.StringUtils;
 import httl.web.WebEngine;
 
 import java.io.IOException;
@@ -66,10 +67,10 @@ public class HttlFilter implements Filter {
 	
 	protected String getTemplatePath(HttpServletRequest request) {
 		String path = request.getPathInfo();
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			path = request.getServletPath();
 		}
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			path = request.getRequestURI();
 			String contextPath = request.getContextPath();
 			if (contextPath != null && ! "/".equals(contextPath)
@@ -77,11 +78,11 @@ public class HttlFilter implements Filter {
 				path = path.substring(contextPath.length());
 			}
 		}
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			path = getRootPath();
 		}
 		String suffix = WebEngine.getEngine().getProperty(TEMPLATE_SUFFIX, ".httl");
-		if (suffix != null && suffix.length() > 0 && ! path.endsWith(suffix)) {
+		if (StringUtils.isNotEmpty(suffix) && ! path.endsWith(suffix)) {
 			path += suffix;
 		}
 		return path;

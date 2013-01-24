@@ -183,7 +183,7 @@ public class ClassUtils {
 	}
 
 	private static Class<?> _forName(String name) throws ClassNotFoundException {
-		if (name == null || name.length() == 0)
+		if (StringUtils.isEmpty(name))
 			return null;
 		String key = name;
 		Class<?> clazz = CLASS_CACHE.get(key);
@@ -386,7 +386,7 @@ public class ClassUtils {
 	}
 
 	public static Object getProperty(Object bean, String property) {
-		if (bean == null || property == null || property.length() == 0) {
+		if (bean == null || StringUtils.isEmpty(property)) {
 			return null;
 		}
 		try {
@@ -534,16 +534,26 @@ public class ClassUtils {
 
 	public static Class<?> getGenericClass(Class<?> cls, int i) {
 		try {
-			ParameterizedType parameterizedType = ((ParameterizedType) cls.getGenericInterfaces()[0]);
-			Object genericClass = parameterizedType.getActualTypeArguments()[i];
-			if (genericClass instanceof ParameterizedType) { // 处理多级泛型
-				return (Class<?>) ((ParameterizedType) genericClass).getRawType();
-			} else if (genericClass instanceof GenericArrayType) { // 处理数组泛型
-				return (Class<?>) ((GenericArrayType) genericClass).getGenericComponentType();
-			} else if (genericClass != null) {
-				return (Class<?>) genericClass;
+			ParameterizedType parameterizedType;
+			if (cls.getGenericInterfaces().length > 0
+					&& cls.getGenericInterfaces()[0] instanceof ParameterizedType) {
+				parameterizedType = ((ParameterizedType) cls.getGenericInterfaces()[0]);
+			} else if (cls.getGenericSuperclass() instanceof ParameterizedType) {
+				parameterizedType = (ParameterizedType) cls.getGenericSuperclass();
+			} else {
+				parameterizedType = null;
 			}
-		} catch (Throwable e) {
+			if (parameterizedType != null) {
+				Object genericClass = parameterizedType.getActualTypeArguments()[i];
+				if (genericClass instanceof ParameterizedType) { // 处理多级泛型
+					return (Class<?>) ((ParameterizedType) genericClass).getRawType();
+				} else if (genericClass instanceof GenericArrayType) { // 处理数组泛型
+					return (Class<?>) ((GenericArrayType) genericClass).getGenericComponentType();
+				} else if (genericClass != null) {
+					return (Class<?>) genericClass;
+				}
+			}
+		} catch (Exception e) {
 		}
 		if (cls.getSuperclass() != null) {
 			return getGenericClass(cls.getSuperclass(), i);
@@ -557,7 +567,7 @@ public class ClassUtils {
 	}
 	
 	public static boolean isBeforeJava5(String javaVersion) {
-		return (javaVersion == null || javaVersion.length() == 0 || "1.0".equals(javaVersion) 
+		return (StringUtils.isEmpty(javaVersion) || "1.0".equals(javaVersion) 
 				|| "1.1".equals(javaVersion) || "1.2".equals(javaVersion) 
 				|| "1.3".equals(javaVersion) || "1.4".equals(javaVersion));
 	}
@@ -762,39 +772,39 @@ public class ClassUtils {
 	}
 
 	public static boolean toBoolean(String value) {
-		return value == null || value.length() == 0 ? false : Boolean.parseBoolean(value);
+		return StringUtils.isEmpty(value) ? false : Boolean.parseBoolean(value);
 	}
 
 	public static char toChar(String value) {
-		return value == null || value.length() == 0 ? '\0' : value.charAt(0);
+		return StringUtils.isEmpty(value) ? '\0' : value.charAt(0);
 	}
 
 	public static byte toByte(String value) {
-		return value == null || value.length() == 0 ? 0 : Byte.parseByte(value);
+		return StringUtils.isEmpty(value) ? 0 : Byte.parseByte(value);
 	}
 
 	public static short toShort(String value) {
-		return value == null || value.length() == 0 ? 0 : Short.parseShort(value);
+		return StringUtils.isEmpty(value) ? 0 : Short.parseShort(value);
 	}
 
 	public static int toInt(String value) {
-		return value == null || value.length() == 0 ? 0 : Integer.parseInt(value);
+		return StringUtils.isEmpty(value) ? 0 : Integer.parseInt(value);
 	}
 
 	public static long toLong(String value) {
-		return value == null || value.length() == 0 ? 0 : Long.parseLong(value);
+		return StringUtils.isEmpty(value) ? 0 : Long.parseLong(value);
 	}
 
 	public static float toFloat(String value) {
-		return value == null || value.length() == 0 ? 0 : Float.parseFloat(value);
+		return StringUtils.isEmpty(value) ? 0 : Float.parseFloat(value);
 	}
 
 	public static double toDouble(String value) {
-		return value == null || value.length() == 0 ? 0 : Double.parseDouble(value);
+		return StringUtils.isEmpty(value) ? 0 : Double.parseDouble(value);
 	}
 
 	public static Class<?> toClass(String value) {
-		return value == null || value.length() == 0 ? null : ClassUtils.forName(value);
+		return StringUtils.isEmpty(value) ? null : ClassUtils.forName(value);
 	}
 
 	public static boolean[] subArray(boolean[] array, IntegerSequence sequence) {

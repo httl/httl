@@ -17,6 +17,7 @@ package httl.spi.locators;
 
 import httl.spi.Locator;
 import httl.util.LocaleUtils;
+import httl.util.StringUtils;
 
 import java.util.Locale;
 
@@ -34,7 +35,7 @@ public class LocaleLocator implements Locator {
 	}
 
 	public String relocate(String name, Locale locale) {
-		if (name == null || name.length() == 0) {
+		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("resource name == null");
 		}
 		return LocaleUtils.appendLocale(name, locale);

@@ -16,6 +16,7 @@
 package httl.web.servlet;
 
 import httl.Context;
+import httl.util.StringUtils;
 import httl.web.WebEngine;
 
 import java.io.IOException;
@@ -59,10 +60,10 @@ public class HttlServlet extends HttpServlet {
 
 	protected String getTemplatePath(HttpServletRequest request) {
 		String path = request.getPathInfo();
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			path = request.getServletPath();
 		}
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			path = request.getRequestURI();
 			String contextPath = request.getContextPath();
 			if (contextPath != null && ! "/".equals(contextPath)
@@ -70,7 +71,7 @@ public class HttlServlet extends HttpServlet {
 				path = path.substring(contextPath.length());
 			}
 		}
-		if (path == null || path.length() == 0) {
+		if (StringUtils.isEmpty(path)) {
 			path = getRootPath();
 		}
 		return path;

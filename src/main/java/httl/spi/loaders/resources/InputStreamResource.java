@@ -16,6 +16,7 @@
 package httl.spi.loaders.resources;
 
 import httl.Engine;
+import httl.util.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,7 +56,7 @@ public abstract class InputStreamResource extends AbstractResource {
 			throw new FileNotFoundException("Not found template " + getName() + " in " + getClass().getSimpleName());
 		}
 		String encoding = getEncoding();
-		return encoding == null || encoding.length() == 0 
+		return StringUtils.isEmpty(encoding) 
 			? new InputStreamReader(in) : new InputStreamReader(in, encoding);
 	}
 

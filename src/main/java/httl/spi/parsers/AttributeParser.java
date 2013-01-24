@@ -60,7 +60,7 @@ public class AttributeParser extends AbstractParser {
 	 * httl.properties: attribute.namespace=httl
 	 */
 	public void setAttributeNamespace(String namespace) {
-		if (namespace != null && namespace.length() > 0) {
+		if (StringUtils.isNotEmpty(namespace)) {
 			namespace = namespace + ":";
 			ifDirective = namespace + IF;
 			elseifDirective = namespace + ELSEIF;
@@ -160,7 +160,7 @@ public class AttributeParser extends AbstractParser {
 							}
 							String key = getMacroPath(resource.getName(), var);
 							StringBuilder es = new StringBuilder();
-							if (param != null && param.length() > 0) {
+							if (StringUtils.isNotEmpty(param)) {
 								es.append("<!--var=\"" + param + "\"-->");
 							}
 							es.append(source.subSequence(macro.getEnd(), element.getBegin()));
@@ -175,11 +175,11 @@ public class AttributeParser extends AbstractParser {
 							StringBuilder buf = new StringBuilder();
 							buf.append(LEFT);
 							buf.append(element.getEnd() - macro.getBegin());
-							if (out != null && out.length() > 0) {
+							if (StringUtils.isNotEmpty(out)) {
 								getVariables.add(var);
 								String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
 								buf.append(code);
-							} else if (set != null && set.length() > 0) {
+							} else if (StringUtils.isNotEmpty(set)) {
 								getVariables.add(var);
 								String setValue = set + " " + var + ".evaluate()";
 								String code = getStatementCode(setDirective, setValue, matcher.start(2), matcher.start(3), translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
@@ -294,7 +294,7 @@ public class AttributeParser extends AbstractParser {
 				String key = getMacroPath(resource.getName(), var);
 				String es = element.toString();
 				es = es.substring(0, macro.getBegin() - 1 - element.getBegin()) 
-					+ (param == null || param.length() == 0 ? "" : " var=\"" + param + "\"")
+					+ (StringUtils.isEmpty(param) ? "" : " var=\"" + param + "\"")
 					+ es.substring(macro.getEnd() - element.getBegin()); // 去掉macro属性
 				macros.put(var, parseClass(new StringResource(engine, key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), types, stream, macro.getBegin()));
 				Class<?> cls = types.get(var);
@@ -305,11 +305,11 @@ public class AttributeParser extends AbstractParser {
 				StringBuilder buf = new StringBuilder();
 				buf.append(LEFT);
 				buf.append(element.length());
-				if (out != null && out.length() > 0) {
+				if (StringUtils.isNotEmpty(out)) {
 					getVariables.add(var);
 					String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
 					buf.append(code);
-				} else if (set != null && set.length() > 0) {
+				} else if (StringUtils.isNotEmpty(set)) {
 					getVariables.add(var);
 					String setValue = set + " " + var + ".evaluate()";
 					String code = getStatementCode(setDirective, setValue, macro.getBegin(), macro.getBegin() + macro.getName().length() + 2, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
@@ -343,7 +343,7 @@ public class AttributeParser extends AbstractParser {
 				document.insert(element.getBegin(), buf.toString()); // 插入块指令
 				document.remove(new Segment(source, attribute.getBegin() - 1, attribute.getEnd())); // 移除属性
 				String end = getStatementEndCode(name);
-				if (end != null && end.length() > 0) {
+				if (StringUtils.isNotEmpty(end)) {
 					ends.push(end); // 插入结束指令
 				}
 			}
