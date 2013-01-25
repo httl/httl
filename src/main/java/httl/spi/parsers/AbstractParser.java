@@ -480,7 +480,7 @@ public abstract class AbstractParser implements Parser {
 						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (writerTemplate != null && streamTemplate != null) {
-				return new AdaptiveTemplate(writerTemplate, streamTemplate);
+				return new AdaptiveTemplate(writerTemplate, streamTemplate, outConverter);
 			} else if (streamTemplate != null) {
 				return streamTemplate;
 			} else {

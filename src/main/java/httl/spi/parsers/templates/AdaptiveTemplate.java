@@ -18,12 +18,14 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.spi.Converter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,14 +46,17 @@ public class AdaptiveTemplate implements Template, Serializable {
 	private final Template writerTemplate;
 
 	private final Template streamTemplate;
+	
+	private final Converter<Object, Object> outConverter;
 
-	public AdaptiveTemplate(Template writerTemplate, Template streamTemplate) {
+	public AdaptiveTemplate(Template writerTemplate, Template streamTemplate, Converter<Object, Object> outConverter) {
 		if (writerTemplate == null)
 			throw new IllegalArgumentException("writer template == null");
 		if (streamTemplate == null)
 			throw new IllegalArgumentException("stream template == null");
 		this.writerTemplate = writerTemplate;
 		this.streamTemplate = streamTemplate;
+		this.outConverter = outConverter;
 	}
 
 	public String getName() {
@@ -91,6 +96,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 	}
 
 	public Class<?> getReturnType() {
+		// Context.getOut() only OutputStream or Writer
 		if (Context.getContext().getOut() instanceof OutputStream) {
 			return streamTemplate.getReturnType();
 		} else {
@@ -99,6 +105,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 	}
 
 	public Object evaluate() throws ParseException {
+		// Context.getOut() only OutputStream or Writer
 		if (Context.getContext().getOut() instanceof OutputStream) {
 			return streamTemplate.evaluate();
 		} else {
@@ -107,6 +114,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 	}
 
 	public Object evaluate(Object context) throws ParseException {
+		// Context.getOut() only OutputStream or Writer
 		if (Context.getContext().getOut() instanceof OutputStream) {
 			return streamTemplate.evaluate(context);
 		} else {
@@ -115,10 +123,17 @@ public class AdaptiveTemplate implements Template, Serializable {
 	}
 
 	public void render(Object out) throws IOException, ParseException {
-		if (out  instanceof OutputStream) {
+		if (out instanceof OutputStream) {
 			streamTemplate.render(out);
-		} else {
+		} else if (out instanceof Writer) {
 			writerTemplate.render(out);
+		} else {
+			out = outConverter.convert(out);
+			if (out instanceof OutputStream) {
+				streamTemplate.render(out);
+			} else {
+				writerTemplate.render(out);
+			}
 		}
 	}
 
@@ -126,8 +141,15 @@ public class AdaptiveTemplate implements Template, Serializable {
 			throws IOException, ParseException {
 		if (out instanceof OutputStream) {
 			streamTemplate.render(context, out);
-		} else {
+		} else if (out instanceof Writer) {
 			writerTemplate.render(context, out);
+		} else {
+			out = outConverter.convert(out);
+			if (out instanceof OutputStream) {
+				streamTemplate.render(context, out);
+			} else {
+				writerTemplate.render(context, out);
+			}
 		}
 	}
 
@@ -147,7 +169,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 			Map<String, Template> writerMacros = writerTemplate.getMacros();
 			Map<String, Template> streamMacros = streamTemplate.getMacros();
 			for (Map.Entry<String, Template> entry : writerMacros.entrySet()) {
-				map.put(entry.getKey(), new AdaptiveTemplate(entry.getValue(), streamMacros.get(entry.getKey())));
+				map.put(entry.getKey(), new AdaptiveTemplate(entry.getValue(), streamMacros.get(entry.getKey()), outConverter));
 			}
 			macros = Collections.unmodifiableMap(map);
 		}
