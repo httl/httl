@@ -47,6 +47,7 @@ public class HttlResult extends StrutsResultSupport {
 		Context context = Context.getContext();
 		context.put("request", request);
 		context.put("response", response);
+		WebEngine.setServletContext(ServletActionContext.getServletContext());
 		WebEngine.getEngine().getTemplate(location, request.getLocale()).render(map, response);
 	}
 

@@ -38,6 +38,9 @@ public class ValueStackMap implements Map<String, Object> {
 	}
 
 	public Object get(Object key) {
+		if ("request".equals(key) || "response".equals(key)) {
+			return null;
+		}
 		return valueStack.findValue((String) key);
 	}
 

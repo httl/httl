@@ -16,10 +16,11 @@ public class ServletInterceptor extends FirstInterceptor {
 	protected void doRender(Context context, Listener listener)
 			throws IOException, ParseException {
 		if (ServletResolver.getRequest() == null) {
-			HttpServletRequest request = (HttpServletRequest) context.get("request");
-			HttpServletResponse response = (HttpServletResponse) context.get("response");
-			if (request != null) {
-				ServletResolver.set(request, response);
+			Object request = context.get("request");
+			Object response = context.get("response");
+			if (request instanceof HttpServletRequest
+					&& response instanceof HttpServletResponse) {
+				ServletResolver.set((HttpServletRequest) request, (HttpServletResponse) response);
 				try {
 					listener.render(context);
 				} finally {

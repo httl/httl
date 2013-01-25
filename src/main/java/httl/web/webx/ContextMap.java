@@ -61,6 +61,9 @@ public class ContextMap implements Map<String, Object> {
 	}
 
 	public Object get(Object key) {
+		if ("request".equals(key) || "response".equals(key)) {
+			return null;
+		}
 		return templateContext.get((String)key);
 	}
 
