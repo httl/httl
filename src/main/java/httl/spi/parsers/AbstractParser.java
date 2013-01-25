@@ -211,6 +211,8 @@ public abstract class AbstractParser implements Parser {
 
 	protected boolean textInClass;
 	
+	protected boolean stringToChars;
+
 	protected boolean removeDirectiveBlank;
 	
 	protected String outputEncoding;
@@ -357,6 +359,13 @@ public abstract class AbstractParser implements Parser {
 	 */
 	public void setTextInClass(boolean textInClass) {
 		this.textInClass = textInClass;
+	}
+
+	/**
+	 * httl.properties: string.to.chars=true
+	 */
+	public void setStringToChars(boolean stringToChars) {
+		this.stringToChars = stringToChars;
 	}
 
 	/**
@@ -965,7 +974,7 @@ public abstract class AbstractParser implements Parser {
 			} else if (Resource.class.isAssignableFrom(returnType)) {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
 			}
-			code = "$formatter." + (stream ? "toBytes" : "toString") + "(" + code + ")";
+			code = "$formatter." + (stream ? "toBytes" : stringToChars ? "toChars" : "toString") + "(" + code + ")";
 			if (! nofilter) {
 				getVariables.add(filterVariable);
 				code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
