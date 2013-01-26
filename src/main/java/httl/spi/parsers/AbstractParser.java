@@ -96,69 +96,61 @@ public abstract class AbstractParser implements Parser {
 	
 	private static final Pattern EXPRESSION_PATTERN = Pattern.compile("([$#][!]?)\\{([^}]*)\\}");
 
-	private static final Pattern IN_PATTERN = Pattern.compile("(\\s+in\\s+)");
-
 	private static final Pattern ASSIGN_PATTERN = Pattern.compile(";\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)");
 
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("(\\\\+)([#$])");
-	
-	private static final Pattern COMMENT_PATTERN = Pattern.compile("<!--##.*?-->", Pattern.DOTALL);
 
-	private static final Pattern CDATA_PATTERN = Pattern.compile("<!\\[CDATA\\[##(.*?)\\]\\]>", Pattern.DOTALL);
-	
 	private static final Pattern VAR_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
 
 	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
-	
-	private static final String CDATA_LEFT = LEFT + "11" + RIGHT;
-	
-	private static final String CDATA_RIGHT = LEFT + "3" + RIGHT;
 
-	protected static final String VAR = "var";
+	protected String varDirective = "var";
 
-	protected static final String SET = "set";
+	protected String setDirective = "set";
 
-	protected static final String IF = "if";
+	protected String ifDirective = "if";
 
-	protected static final String ELSEIF = "elseif";
+	protected String elseifDirective = "elseif";
 
-	protected static final String ELSE = "else";
+	protected String elseDirective = "else";
 
-	protected static final String FOREACH = "foreach";
+	protected String foreachDirective = "foreach";
 
-	protected static final String BREAKIF = "breakif";
+	protected String breakifDirective = "breakif";
 
-	protected static final String MACRO = "macro";
+	protected String macroDirective = "macro";
 
-	protected static final String END = "end";
+	protected String endDirective = "end";
 
-	protected String varDirective = VAR;
+	protected String commentLeft = "<!--";
 
-	protected String setDirective = SET;
+	protected String commentRight = "-->";
 
-	protected String ifDirective = IF;
+	protected String literalLeft = "<![CDATA[";
 
-	protected String elseifDirective = ELSEIF;
+	protected String literalRight = "]]>";
 
-	protected String elseDirective = ELSE;
+	private String foreachVariable = "foreach";
 
-	protected String foreachDirective = FOREACH;
-
-	protected String breakifDirective = BREAKIF;
-
-	protected String macroDirective = MACRO;
-
-	protected String endDirective = END;
-
-	private String foreachVariable = FOREACH;
+	private String foreachSeparator = "in";
 
 	private String filterVariable = "filter";
 
-	private String defaultFilterVariable = "$" + filterVariable;
-
 	private String formatterVariable = "formatter";
 
-	private String defaultFormatterVariable = "$" + formatterVariable;
+	private String defaultFilterVariable;
+	
+	private String defaultFormatterVariable;
+
+	private Pattern foreachSeparatorPattern;
+
+	private Pattern commentPattern;
+
+	private Pattern literalPattern;
+
+	private String literalLeftSpecial;
+
+	private String literalRightSpecial;
 
 	private Engine engine;
 	
@@ -221,6 +213,69 @@ public abstract class AbstractParser implements Parser {
 	private Logger logger;
 	
 	private Class<?> defaultVariableType;
+
+	/**
+	 * httl.properties: var.directive=var
+	 */
+	public void setVarDirective(String varDirective) {
+		this.varDirective = varDirective;
+	}
+
+	/**
+	 * httl.properties: set.directive=set
+	 */
+	public void setSetDirective(String setDirective) {
+		this.setDirective = setDirective;
+	}
+
+	/**
+	 * httl.properties: if.directive=if
+	 */
+	public void setIfDirective(String ifDirective) {
+		this.ifDirective = ifDirective;
+	}
+
+	/**
+	 * httl.properties: elseif.directive=elseif
+	 */
+	public void setElseifDirective(String elseifDirective) {
+		this.elseifDirective = elseifDirective;
+	}
+
+	/**
+	 * httl.properties: else.directive=else
+	 */
+	public void setElseDirective(String elseDirective) {
+		this.elseDirective = elseDirective;
+	}
+
+	/**
+	 * httl.properties: foreach.directive=foreach
+	 */
+	public void setForeachDirective(String foreachDirective) {
+		this.foreachDirective = foreachDirective;
+	}
+
+	/**
+	 * httl.properties: breakif.directive=breakif
+	 */
+	public void setBreakifDirective(String breakifDirective) {
+		this.breakifDirective = breakifDirective;
+	}
+
+	/**
+	 * httl.properties: macro.directive=macro
+	 */
+	public void setMacroDirective(String macroDirective) {
+		this.macroDirective = macroDirective;
+	}
+
+	/**
+	 * httl.properties: end.directive=end
+	 */
+	public void setEndDirective(String endDirective) {
+		this.endDirective = endDirective;
+	}
 
 	/**
 	 * httl.properties: default.variable.type=java.lang.String
@@ -381,6 +436,13 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	/**
+	 * httl.properties: foreach.separator=in
+	 */
+	public void setForeachSeparator(String foreachSeparator) {
+		this.foreachSeparator = foreachSeparator;
+	}
+
+	/**
 	 * httl.properties: foreach.variable=foreach
 	 */
 	public void setForeachVariable(String foreachVariable) {
@@ -392,7 +454,6 @@ public abstract class AbstractParser implements Parser {
 	 */
 	public void setFilterVariable(String filterVariable) {
 		this.filterVariable = filterVariable;
-		this.defaultFilterVariable = "$" + filterVariable;
 	}
 
 	/**
@@ -400,7 +461,6 @@ public abstract class AbstractParser implements Parser {
 	 */
 	public void setFormatterVariable(String formatterVariable) {
 		this.formatterVariable = formatterVariable;
-		this.defaultFormatterVariable = "$" + formatterVariable;
 	}
 
 	/**
@@ -435,6 +495,13 @@ public abstract class AbstractParser implements Parser {
 	 * init.
 	 */
 	public void init() {
+		commentPattern = Pattern.compile(Pattern.quote(commentLeft) + "\\s*##.*?" + Pattern.quote(commentRight), Pattern.DOTALL);
+		literalPattern = Pattern.compile(Pattern.quote(literalLeft) + "\\s*##(.*?)" + Pattern.quote(literalRight), Pattern.DOTALL);
+		literalLeftSpecial = LEFT + String.valueOf(literalLeft.length() + 2) + RIGHT;
+		literalRightSpecial = LEFT + String.valueOf(literalRight.length()) + RIGHT;
+		foreachSeparatorPattern = Pattern.compile("(\\s+" + Pattern.quote(foreachSeparator) + "\\s+)");
+		defaultFilterVariable = "$" + filterVariable;
+		defaultFormatterVariable = "$" + formatterVariable;
 		if (importVariables != null && importVariables.length > 0) {
 			this.importTypes = new HashMap<String, Class<?>>();
 			for (String var : importVariables) {
@@ -890,7 +957,7 @@ public abstract class AbstractParser implements Parser {
 
 	protected String filterComment(String source) {
 		StringBuffer buf = new StringBuffer();
-		Matcher matcher = COMMENT_PATTERN.matcher(source);
+		Matcher matcher = commentPattern.matcher(source);
 		while(matcher.find()) {
 			matcher.appendReplacement(buf, LEFT + matcher.group().length() + RIGHT);
 		}
@@ -900,10 +967,10 @@ public abstract class AbstractParser implements Parser {
 	
 	protected String filterCData(String source) {
 		StringBuffer buf = new StringBuffer();
-		Matcher matcher = CDATA_PATTERN.matcher(source);
+		Matcher matcher = literalPattern.matcher(source);
 		while(matcher.find()) {
 			String target = matcher.group(1).replace(POUND, POUND_SPECIAL).replace(DOLLAR, DOLLAR_SPECIAL);
-			matcher.appendReplacement(buf, CDATA_LEFT + Matcher.quoteReplacement(target) + CDATA_RIGHT);
+			matcher.appendReplacement(buf, literalLeftSpecial + Matcher.quoteReplacement(target) + literalRightSpecial);
 		}
 		matcher.appendTail(buf);
 		return buf.toString();
@@ -1240,7 +1307,7 @@ public abstract class AbstractParser implements Parser {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The foreach expression == null!", begin);
 			}
-			Matcher matcher = IN_PATTERN.matcher(value);
+			Matcher matcher = foreachSeparatorPattern.matcher(value);
 			if (! matcher.find()) {
 				throw new ParseException("Not found \"in\" in foreach", offset);
 			}

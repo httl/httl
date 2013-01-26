@@ -39,13 +39,15 @@ import java.util.regex.Pattern;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class CommentParser extends AbstractParser {
-	
-	protected static final Pattern STATEMENT_PATTERN = Pattern.compile("<!--\\s*#\\s*([a-z]+)\\s*\\(?(.*?)\\)?\\s*-->", Pattern.DOTALL);
-	
-	protected Pattern getPattern() {
-		return STATEMENT_PATTERN;
+
+	private Pattern commentDirectivePattern;
+
+	@Override
+	public void init() {
+		super.init();
+		commentDirectivePattern = Pattern.compile(Pattern.quote(commentLeft) + "\\s*#\\s*([a-z]+)\\s*(.*?)\\s*" + Pattern.quote(commentRight), Pattern.DOTALL);
 	}
-	
+
 	@Override
 	protected String getDiretive(String name, String value) {
 		return "<!--#" + name + "(" + value + ")-->";
@@ -61,7 +63,7 @@ public class CommentParser extends AbstractParser {
 		int macroStart = 0;
 		int macroParameterStart = 0;
 		StringBuffer buf = new StringBuffer();
-		Matcher matcher = getPattern().matcher(source);
+		Matcher matcher = commentDirectivePattern.matcher(source);
 		while (matcher.find()) {
 			String name = matcher.group(1);
 			String value = matcher.group(2);
@@ -70,6 +72,16 @@ public class CommentParser extends AbstractParser {
 				offset = matcher.end(1);
 			} else {
 				offset = matcher.start(2);
+			}
+			if (value.startsWith("(")
+					&& (varDirective.equals(name) || setDirective.equals(name)
+							|| elseDirective.equals(name) || foreachDirective.equals(name) 
+							|| macroDirective.equals(name) || endDirective.equals(name))) {
+				if (! value.endsWith(")")) {
+					throw new ParseException("The #" + name + " directive mismatch right parentheses.", matcher.end(2));
+				}
+				value = value.substring(1, value.length() - 1);
+				offset ++;
 			}
 			if (endDirective.equals(name)) {
 				if (nameStack.isEmpty()) {

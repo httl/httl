@@ -55,21 +55,31 @@ public class AttributeParser extends AbstractParser {
 	protected String getDiretive(String name, String value) {
 		return name + "=\"" + value + "\"";
 	}
+	
+	private String attributeNamespace;
 
 	/**
 	 * httl.properties: attribute.namespace=httl
 	 */
-	public void setAttributeNamespace(String namespace) {
-		if (StringUtils.isNotEmpty(namespace)) {
-			namespace = namespace + ":";
-			ifDirective = namespace + IF;
-			elseifDirective = namespace + ELSEIF;
-			elseDirective = namespace + ELSE;
-			foreachDirective = namespace + FOREACH;
-			breakifDirective = namespace + BREAKIF;
-			setDirective = namespace + SET;
-			varDirective = namespace + VAR;
-			macroDirective = namespace + MACRO;
+	public void setAttributeNamespace(String attributeNamespace) {
+		if (! attributeNamespace.endsWith(":")) {
+			attributeNamespace = attributeNamespace + ":";
+		}
+		this.attributeNamespace = attributeNamespace;
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		if (StringUtils.isNotEmpty(attributeNamespace)) {
+			varDirective = attributeNamespace + varDirective;
+			setDirective = attributeNamespace + setDirective;
+			ifDirective = attributeNamespace + ifDirective;
+			elseifDirective = attributeNamespace + elseifDirective;
+			elseDirective = attributeNamespace + elseDirective;
+			foreachDirective = attributeNamespace + foreachDirective;
+			breakifDirective = attributeNamespace + breakifDirective;
+			macroDirective = attributeNamespace + macroDirective;
 		}
 	}
 
