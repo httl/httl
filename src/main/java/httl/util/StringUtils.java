@@ -1088,7 +1088,13 @@ public class StringUtils {
 		}
 		return location;
 	}
-	
+
+	private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
+
+	public static String[] splitByComma(String name) {
+		return name == null ? new String[0] : COMMA_SPLIT_PATTERN.split(name);
+	}
+
 	public static String splitCamelName(String name, String split) {
 		return splitCamelName(name, split, false);
 	}
@@ -1117,6 +1123,28 @@ public class StringUtils {
 		} catch (UnsupportedEncodingException e) {
 			return src.getBytes();
 		}
+	}
+
+	public static boolean endsWith(String value, String[] suffixes) {
+		if (value != null && suffixes != null) {
+			for (String suffix : suffixes) {
+				if (value.endsWith(suffix)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean inArray(String value, String[] values) {
+		if (value != null && values != null) {
+			for (String v : values) {
+				if (value.equals(v)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

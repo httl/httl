@@ -164,6 +164,19 @@ public abstract class Engine {
 	}
 
 	/**
+	 * Get config value.
+	 * 
+	 * @see #getEngine()
+	 * @param key - config key
+	 * @param defaultValue - default value
+	 * @return config value
+	 */
+	public String[] getProperty(String key, String[] defaultValue) {
+		String value = getProperty(key, String.class);
+		return StringUtils.isEmpty(value) ? defaultValue : StringUtils.splitByComma(value);
+	}
+
+	/**
 	 * Get config int value.
 	 * 
 	 * @see #getEngine()

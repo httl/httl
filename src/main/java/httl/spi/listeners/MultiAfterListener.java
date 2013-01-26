@@ -16,6 +16,7 @@
 package httl.spi.listeners;
 
 import httl.spi.Listener;
+import httl.util.Reqiured;
 
 /**
  * MultiListener. (SPI, Singleton, ThreadSafe)
@@ -29,6 +30,7 @@ public class MultiAfterListener extends MultiListener {
 	/**
 	 * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
 	 */
+	@Reqiured
 	public void setAfterListeners(Listener[] listeners) {
 		super.setListeners(listeners);
 	}

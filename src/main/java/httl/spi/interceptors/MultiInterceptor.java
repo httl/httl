@@ -18,16 +18,28 @@ package httl.spi.interceptors;
 import httl.Context;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
+import httl.util.Reqiured;
 
 import java.io.IOException;
 import java.text.ParseException;
 
+/**
+ * MultiInterceptor. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.parsers.AbstractParser#setInterceptor(Interceptor)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class MultiInterceptor implements Interceptor {
 
-	private static final String RENDITION_KEY = "__rendition__";
+	private static final String LISTENER_KEY = "__listener__";
 
-	private Listener interceptorRendition;
+	private Listener chain;
 
+	/**
+	 * httl.properties: interceptors=httl.spi.interceptors.ExtendsInterceptor
+	 */
+	@Reqiured
 	public void setInterceptors(Interceptor[] interceptors) {
 		Listener last = null;
 		for (int i = interceptors.length - 1; i >= 0; i--) {
@@ -36,9 +48,9 @@ public class MultiInterceptor implements Interceptor {
 			last = new Listener() {
 				public void render(Context context) throws IOException, ParseException {
 					if (next == null) {
-						Listener rendition = (Listener) context.get(RENDITION_KEY);
-						if (rendition != null) {
-							current.render(context, rendition);
+						Listener listener = (Listener) context.get(LISTENER_KEY);
+						if (listener != null) {
+							current.render(context, listener);
 						}
 					} else {
 						current.render(context, next);
@@ -46,24 +58,24 @@ public class MultiInterceptor implements Interceptor {
 				}
 			};
 		}
-		this.interceptorRendition = last;
+		this.chain = last;
 	}
 
-	public void render(Context context, Listener rendition)
+	public void render(Context context, Listener listener)
 			throws IOException, ParseException {
-		if (interceptorRendition != null) {
-			Object old = context.put(RENDITION_KEY, rendition);
+		if (chain != null) {
+			Object old = context.put(LISTENER_KEY, listener);
 			try {
-				interceptorRendition.render(context);
+				chain.render(context);
 			} finally {
 				if ( old != null) {
-					context.put(RENDITION_KEY, old);
+					context.put(LISTENER_KEY, old);
 				} else {
-					context.remove(RENDITION_KEY);
+					context.remove(LISTENER_KEY);
 				}
 			}
 		} else {
-			rendition.render(context);
+			listener.render(context);
 		}
 	}
 

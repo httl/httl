@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.interceptors;
+package httl.util;
 
-import httl.Context;
-import httl.spi.Interceptor;
-import httl.spi.Listener;
-
-import java.io.IOException;
-import java.text.ParseException;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * FirstInterceptor. (SPI, Singleton, ThreadSafe)
+ * Reqiured. (SPI, Annotation, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setInterceptor(Interceptor)
+ * @see httl.util.BeanFactory
+ * @see httl.util.Optional
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class FirstInterceptor extends TemplateInterceptor {
-
-	public void render(Context context, Listener listener)
-			throws IOException, ParseException {
-		if (context.getLevel() > 1) { 
-			listener.render(context);
-			return;
-		}
-		super.render(context, listener);
-	}
-
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface Reqiured {
 }

@@ -29,7 +29,7 @@ import java.text.ParseException;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ListenerTemplate extends TemplateWrapper {
+public class ListenerTemplate extends ProxyTemplate {
 
 	private final Listener listener;
 

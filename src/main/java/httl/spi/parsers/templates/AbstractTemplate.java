@@ -23,6 +23,7 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Switcher;
+import httl.spi.formatters.MultiFormatter;
 import httl.util.UnsafeByteArrayInputStream;
 
 import java.io.IOException;
@@ -52,7 +53,9 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private transient final Interceptor interceptor;
 
-	private transient final Switcher<Filter> switcher;
+	private transient final Switcher<Filter> filterSwitcher;
+	
+	private transient final Switcher<Formatter<Object>> formatterSwitcher;
 
 	private transient final Filter filter;
 
@@ -60,34 +63,67 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private transient final Converter<Object, Object> outConverter;
 	
-	protected final TemplateFormatter $formatter;
-	
+	private final MultiFormatter formatter;
+
 	private final Map<String, Template> importMacros;
 
 	private final Map<String, Template> macros;
 
 	public AbstractTemplate(Engine engine, Interceptor interceptor, 
-			Switcher<Filter> switcher, Filter filter, Formatter<?> formatter, 
+			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
+			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
 		this.engine = engine;
 		this.interceptor = interceptor;
-		this.switcher = switcher;
+		this.filterSwitcher = filterSwitcher;
+		this.formatterSwitcher = formatterSwitcher;
 		this.filter = filter;
 		this.mapConverter = mapConverter;
 		this.outConverter = outConverter;
-		this.$formatter = new TemplateFormatter(engine, formatter);
+		this.formatter = toMultiFormatter(formatter);
 		this.importMacros = importMacros;
-		this.macros = initMacros(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
+		this.macros = initMacros(engine, interceptor, filterSwitcher, formatterSwitcher, 
+				filter, formatter, mapConverter, outConverter, functions, importMacros);
 	}
 
 	protected Interceptor getInterceptor() {
 		return interceptor;
 	}
 
-	protected Filter enter(String location, Filter defaultFilter) {
-		if (switcher != null) {
-			return switcher.enter(location, defaultFilter);
+	protected MultiFormatter getFormatter(Context context, String key) {
+		Object value = context.get(key);
+		if (value instanceof Formatter) {
+			return toMultiFormatter((Formatter<?>) value);
+		}
+		return formatter;
+	}
+	
+	private MultiFormatter toMultiFormatter(Formatter<?> formatter) {
+		if (formatter instanceof MultiFormatter) {
+			return (MultiFormatter) formatter;
+		}
+		return new MultiFormatter(formatter);
+	}
+
+	protected MultiFormatter switchFormatter(String location, MultiFormatter defaultFormatter) {
+		if (formatterSwitcher != null) {
+			return toMultiFormatter(formatterSwitcher.enter(location, defaultFormatter));
+		}
+		return defaultFormatter;
+	}
+
+	protected Filter getFilter(Context context, String key) {
+		Object value = context.get(key);
+		if (value instanceof Filter) {
+			return (Filter) value;
+		}
+		return filter;
+	}
+
+	protected Filter switchFilter(String location, Filter defaultFilter) {
+		if (filterSwitcher != null) {
+			return filterSwitcher.enter(location, defaultFilter);
 		}
 		return defaultFilter;
 	}
@@ -110,24 +146,12 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return value;
 	}
 
-	protected Filter getFilter(Context context, String key) {
-		Object value = context.get(key);
-		if (value instanceof Filter) {
-			return (Filter) value;
-		}
-		return filter;
-	}
-
 	protected Template getMacro(Context context, String key, Template defaultValue) {
 		Object value = context.get(key);
 		if (value instanceof Template) {
 			return (Template) value;
 		}
 		return defaultValue;
-	}
-
-	protected TemplateFormatter getFormatter() {
-		return $formatter;
 	}
 
 	public Reader getReader() throws IOException {
@@ -199,7 +223,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	}
 
 	private Map<String, Template> initMacros(Engine engine, Interceptor interceptor, 
-			Switcher<Filter> switcher, Filter filter, Formatter<?> formatter, 
+			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
+			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
 		Map<String, Template> macros = new HashMap<String, Template>();
@@ -210,8 +235,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
 			try {
 				Template macro = (Template) entry.getValue()
-						.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
+						.getConstructor(Engine.class, Interceptor.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
 				macros.put(entry.getKey(), macro);
 			} catch (Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);

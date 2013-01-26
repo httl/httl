@@ -46,24 +46,26 @@ public class HttlScriptEngineFactory implements ScriptEngineFactory {
 		String config = System.getProperty("httl.properties");
 		this.engine = StringUtils.isEmpty(config) ? Engine.getEngine() : Engine.getEngine(config);
 		
-		String suffix = engine.getProperty("template.suffix", ".httl");
-		if (suffix.startsWith(".")) {
-			suffix = suffix.substring(1);
-		}
-		
 		List<String> extensions = new ArrayList<String>();
 		extensions.add("httl");
-		if (! "httl".equals(suffix)) {
-			extensions.add(suffix);
-		}
-		this.extensions = Collections.unmodifiableList(extensions);
 		
 		List<String> mimeTypes = new ArrayList<String>();
 		mimeTypes.add("text/httl");
 		mimeTypes.add("text/html");
-		if (! "httl".equals(suffix) && ! "html".equals(suffix)) {
-			mimeTypes.add("text/" + suffix);
+		
+		for (String suffix : engine.getProperty("template.suffix", new String[] { ".httl" })) {
+			if (suffix.startsWith(".")) {
+				suffix = suffix.substring(1);
+			}
+			if (! "httl".equals(suffix)) {
+				extensions.add(suffix);
+			}
+			if (! "httl".equals(suffix) && ! "html".equals(suffix)) {
+				mimeTypes.add("text/" + suffix);
+			}
 		}
+		
+		this.extensions = Collections.unmodifiableList(extensions);
 		this.mimeTypes = Collections.unmodifiableList(mimeTypes);
 	}
 

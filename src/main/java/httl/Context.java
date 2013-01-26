@@ -74,6 +74,7 @@ public final class Context extends DelegateMap<String, Object> {
 	 * 
 	 * @param template - current template
 	 * @param parameters - current parameters
+	 * @param out - current out
 	 */
 	public static Context pushContext(Template template, Map<String, Object> parameters, Object out) {
 		Context parent = getContext();
@@ -117,7 +118,7 @@ public final class Context extends DelegateMap<String, Object> {
 	private final Object out;
 
 	// The context level.
-	private int level;
+	private final int level;
 
 	// The current engine.
 	private Engine engine;
@@ -127,6 +128,7 @@ public final class Context extends DelegateMap<String, Object> {
 		this.parent = parent;
 		this.template = template;
 		this.out = out;
+		this.level = parent == null ? 0 : parent.getLevel() + 1;
 	}
 
 	/**
@@ -188,8 +190,6 @@ public final class Context extends DelegateMap<String, Object> {
 	 * @return context level
 	 */
 	public int getLevel() {
-		if (level == -1)
-			this.level = parent == null ? 0 : parent.getLevel() + 1;
 		return level;
 	}
 

@@ -71,6 +71,8 @@ public class JdkCompiler extends AbstractCompiler {
 	private final List<String> options = new ArrayList<String>();
 
 	private final List<String> lintOptions = new ArrayList<String>();
+	
+	private boolean lintUnchecked;
 
 	@SuppressWarnings("resource")
 	public JdkCompiler(){
@@ -123,10 +125,8 @@ public class JdkCompiler extends AbstractCompiler {
 	/**
 	 * httl.properties: lint.unchecked=true
 	 */
-	public void setLintUnchecked(boolean unchecked) {
-		if (unchecked) {
-			options.add("-Xlint:unchecked");
-		}
+	public void setLintUnchecked(boolean lintUnchecked) {
+		this.lintUnchecked = lintUnchecked;
 	}
 	
 	@Override
@@ -134,7 +134,8 @@ public class JdkCompiler extends AbstractCompiler {
 		try {
 			return doCompile(name, sourceCode, options);
 		} catch (Exception e) {
-			if (e.getMessage().contains("-Xlint:unchecked")) {
+			if (lintUnchecked && e.getMessage() != null
+					&& e.getMessage().contains("-Xlint:unchecked")) {
 				try {
 					return doCompile(name, sourceCode, lintOptions);
 				} catch (Exception e2) {
@@ -216,7 +217,7 @@ public class JdkCompiler extends AbstractCompiler {
 
 		private UnsafeByteArrayOutputStream bytecode;
 
-		private final CharSequence	source;
+		private final CharSequence source;
 
 		public JavaFileObjectImpl(final String baseName, final CharSequence source){
 			super(ClassUtils.toURI(baseName + ClassUtils.JAVA_EXTENSION), Kind.SOURCE);

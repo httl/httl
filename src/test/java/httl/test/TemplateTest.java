@@ -134,7 +134,7 @@ public class TemplateTest extends TestCase {
 		model.setBooks2(books2);
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
-		Object[] maps = new Object[] {/*context, model,*/ null};
+		Object[] maps = new Object[] {context, model, null};
 		String[] configs = new String[] { "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
 		for (String config : configs) {
 			for (Object map : maps) {
@@ -166,7 +166,7 @@ public class TemplateTest extends TestCase {
 				for (long m = 0; m < max; m ++) {
 					for (int i = 0, n = files.length; i < n; i ++) {
 						File file = files[i];
-						// if (! "include_hide.httl".equals(file.getName())) continue;
+						// if (! "list.httl".equals(file.getName())) continue;
 						if (! profile)
 							System.out.println(file.getName());
 						if (excludes.contains(file.getName()) || 
@@ -198,7 +198,7 @@ public class TemplateTest extends TestCase {
 						try {
 							template.render(map, actualWriter);
 							template.render(map, actualStream);
-						} catch (Exception e) {
+						} catch (Throwable e) {
 							System.out.println("\n================================\n" + template.getCode() + "\n================================\n");
 							e.printStackTrace();
 							throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);

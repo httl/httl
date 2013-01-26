@@ -22,6 +22,7 @@ import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.methods.FileMethod;
 import httl.spi.parsers.templates.ListenerTemplate;
+import httl.util.Optional;
 import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
@@ -71,6 +72,7 @@ public class ExtendsInterceptor extends FirstInterceptor {
 	/**
 	 * httl.properties: extends.default=default.httl
 	 */
+	@Optional
 	public void setExtendsDefault(String extendsDefault) {
 		this.extendsDefault = extendsDefault;
 	}
@@ -78,6 +80,7 @@ public class ExtendsInterceptor extends FirstInterceptor {
 	/**
 	 * httl.properties: extends.variable=layout
 	 */
+	@Optional
 	public void setExtendsVariable(String extendsVariable) {
 		this.extendsVariable = extendsVariable;
 	}
@@ -89,13 +92,7 @@ public class ExtendsInterceptor extends FirstInterceptor {
 		this.extendsNested = extendsNested;
 	}
 
-	public void doRender(Context context, Listener rendition) throws IOException, ParseException {
-		if ((extendsVariable == null && extendsDefault == null)
-				|| context.getLevel() > 1 // 只处理一级自动布局，防止递归
-				|| context.getTemplate().isMacro()) { 
-			rendition.render(context);
-			return;
-		}
+	public void doRender(Context context, Listener listener) throws IOException, ParseException {
 		String extendsName = null;
 		// extends.varibale=layout
 		// 如果上下文中有指定要继承的模板，则自动继承它。
@@ -121,7 +118,7 @@ public class ExtendsInterceptor extends FirstInterceptor {
 			// extends.nested=nested
 			Object oldNested = null;
 			if (StringUtils.isNotEmpty(extendsNested)) {
-				oldNested = context.put(extendsNested, new ListenerTemplate(template, rendition));
+				oldNested = context.put(extendsNested, new ListenerTemplate(template, listener));
 			}
 			try {
 				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
@@ -136,7 +133,7 @@ public class ExtendsInterceptor extends FirstInterceptor {
 				}
 			}
 		} else {
-			rendition.render(context);
+			listener.render(context);
 		}
 	}
 

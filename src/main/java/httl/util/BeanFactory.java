@@ -17,6 +17,7 @@ package httl.util;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -24,10 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 /**
- * 该BeanFactory是一个仿Spring的轻量级“IoC + AOP”容器。
+ * 该BeanFactory是一个仿Spring的轻量级“IoC+AOP”容器。
  * 
  * IoC: 基于Setter递归注入属性，如：
  * 
@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
  * 
  *	 // 配置：intput.encoding=UTF-8
  *	 // 将点号转为大写驼峰命名注入。
- *	 // 可以注入数组，如String[]或Parser[]，多全值用逗号分隔。
  *	 public void setInputEncoding(String inputEncoding) {
  *		 this.inputEncoding = inputEncoding;
  *	 }
@@ -46,6 +45,12 @@ import java.util.regex.Pattern;
  *	 // 其中，Parser对象的Setter同样会被递归注入属性
  *	 public void setParser(Parser parser) {
  *		 this.parser = parser;
+ *	 }
+ * 
+ *	 // 配置 packages=java.util,httl.util
+ *   // 可以注入数组，如String[]或Loader[]，多个值用逗号分隔。
+ *	 public void setPackages(String[] packages) {
+ *		 this.packages = packages;
  *	 }
  * 
  *	 // 所有属性注入完成后，会执行init()方法。
@@ -78,6 +83,30 @@ import java.util.regex.Pattern;
  * }
  * </pre>
  * 
+ * DEP: 基于注解\@Reqiured和\@Optional判断必需和可选依赖，如：
+ * 
+ * <pre>
+ * public class MultiInterceptor {
+ * 
+ *	 // 当必需属性interceptors实例为空时，不初始化当前类，以null返回。
+ *	 \@Reqiured
+ *   public void setInterceptors(Interceptor[] interceptors) {
+ *		 this.interceptors = interceptors;
+ *	 }
+ * 
+ *	 // 当所有可选属性aaa和bbb同时为空时，不初始化当前类，以null返回。
+ *	 \@Optional
+ *   public void setAaa(String aaa) {
+ *		 this.aaa = aaa;
+ *	 }
+ *   \@Optional
+ *   public void setBbb(String bbb) {
+ *		 this.bbb = bbb;
+ *	 }
+ * 
+ * }
+ * </pre>
+ * 
  * @author liangfei
  */
 public class BeanFactory {
@@ -92,7 +121,7 @@ public class BeanFactory {
 
 	private static final String WRAPPER_KEY_SUFFIX = "^";
 
-	private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
+	private static final Object NULL = new Object();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> T createBean(Class<T> beanClass, Properties properties) {
@@ -118,17 +147,28 @@ public class BeanFactory {
 				}
 			}
 			inits.clear();
-		} catch (Exception e) {
+		} catch (Throwable e) {
+			if (e instanceof InvocationTargetException) {
+				e = e.getCause();
+			}
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException) e;
+			}
+			if (e instanceof Error) {
+				throw (Error) e;
+			}
 			throw new IllegalStateException(e.getMessage(), e);
 		}
 		return instance;
 	}
 
-	private static void injectInstance(Object object, Properties properties, String parent, Map<String, Object> caches, Map<String, Object> instances, List<Object> inits) {
+	private static boolean injectInstance(Object object, Properties properties, String parent, Map<String, Object> caches, Map<String, Object> instances, List<Object> inits) {
 		try {
 			if (! inits.contains(object)) {
 				inits.add(object);
 			}
+			boolean useOptional = false;
+			boolean hasOptional = false;
 			Method[] methods = object.getClass().getMethods();
 			for (Method method : methods) {
 				String name = method.getName();
@@ -149,31 +189,58 @@ public class BeanFactory {
 						if (StringUtils.isEmpty(value)) {
 							value = properties.getProperty(key);
 						}
+						Object obj = null;
 						if (value != null && value.trim().length() > 0) {
 							value = value.trim();
-							Object obj;
 							if (parameterType.isArray()) {
 								Class<?> componentType = parameterType.getComponentType();
-								String[] values = COMMA_SPLIT_PATTERN.split(value);
+								String[] values = StringUtils.splitByComma(value);
 								Object[] objs = (Object[]) Array.newInstance(componentType, values.length);
+								int idx = 0;
 								for (int i = 0; i < values.length; i++) {
-									objs[i] = parseValue(property, key, values[i], componentType, properties, caches, instances, inits);
+									Object o = parseValue(property, key, values[i], componentType, properties, caches, instances, inits);
+									if (o != null) {
+										objs[idx ++] = o;
+									}
 								}
-								obj = objs;
-								if (! componentType.isPrimitive() 
+								if (idx == 0) {
+									obj = null;
+								} else if (idx < values.length) {
+									obj = (Object[]) Array.newInstance(componentType, idx);
+									System.arraycopy(objs, 0, obj, 0, idx);
+								} else {
+									obj = objs;
+								}
+								if (obj != null && ! componentType.isPrimitive() 
 										&& componentType != String.class
 										&& componentType != Boolean.class
 										&& componentType != Character.class
 										&& ! Number.class.isAssignableFrom(componentType)) {
-									instances.put(property, objs);
+									instances.put(property, obj);
 								}
 							} else {
 								obj = parseValue(property, key, value, parameterType, properties, caches, instances, inits);
 							}
+						}
+						if (obj != null) {
 							method.invoke(object, new Object[] { obj });
+							if (method.isAnnotationPresent(Optional.class)) {
+								useOptional = true;
+								hasOptional = true;
+							}
+						} else {
+							if (method.isAnnotationPresent(Reqiured.class)) {
+								return false;
+							}
+							if (method.isAnnotationPresent(Optional.class)) {
+								useOptional = true;
+							}
 						}
 					}
 				}
+			}
+			if (useOptional && ! hasOptional) {
+				return false;
 			}
 			try {
 				Method method = object.getClass().getMethod(INIT_METHOD, new Class<?>[0]);
@@ -183,6 +250,7 @@ public class BeanFactory {
 				}
 			} catch (NoSuchMethodException e) {
 			}
+			return true;
 		} catch (Exception e) {
 			throw new IllegalStateException(e.getMessage(), e);
 		}
@@ -202,40 +270,48 @@ public class BeanFactory {
 			Object instance = caches.get(index);
 			if (instance == null) {
 				try {
-					Constructor<?> constructor = cls.getConstructor(new Class<?>[0]);
-					if (Modifier.isPublic(constructor.getModifiers())) {
-						instance = constructor.newInstance();
-					}
-				} catch (NoSuchMethodException e) {
-				}
-				if (instance == null) {
-					if (type.isAssignableFrom(Class.class)) {
-						instance = cls;
+					instance = cls.getConstructor(new Class<?>[0]).newInstance();
+					caches.put(index, instance);
+					boolean valid = injectInstance(instance, properties, key, caches, instances, inits);
+					if (! valid) {
+						instance = NULL;
+						caches.put(index, instance);
 					} else {
-						throw new NoSuchMethodException("No such public empty constructor in " + cls.getName());
-					}
-				}
-				if (cls.getInterfaces().length > 0) {
-					Class<?> face = cls.getInterfaces()[0];
-					String insert = properties.getProperty(key + WRAPPER_KEY_SUFFIX);
-					if (insert != null && insert.trim().length() > 0) {
-						insert = insert.trim();
-						String[] wrappers = COMMA_SPLIT_PATTERN.split(insert);
-						for (String wrapper : wrappers) {
-							Class<?> wrapperClass = ClassUtils.forName(wrapper);
-							if (! face.isAssignableFrom(wrapperClass)) {
-								throw new IllegalStateException("The wrapper class " + wrapperClass.getName() + " must be implements interface " + face.getName() + ", config key: " + key + WRAPPER_KEY_SUFFIX);
-							}
-							Constructor<?> constructor = wrapperClass.getConstructor(new Class<?>[] { face });
-							if (Modifier.isPublic(constructor.getModifiers())) {
-								injectInstance(instance, properties, key, caches, instances, inits);
-								instance = constructor.newInstance(new Object[] {instance});
+						if (cls.getInterfaces().length > 0) {
+							Class<?> face = cls.getInterfaces()[0];
+							String insert = properties.getProperty(key + WRAPPER_KEY_SUFFIX);
+							if (insert != null && insert.trim().length() > 0) {
+								insert = insert.trim();
+								String[] wrappers = StringUtils.splitByComma(insert);
+								for (String wrapper : wrappers) {
+									Class<?> wrapperClass = ClassUtils.forName(wrapper);
+									if (! face.isAssignableFrom(wrapperClass)) {
+										throw new IllegalStateException("The wrapper class " + wrapperClass.getName() + " must be implements interface " + face.getName() + ", config key: " + key + WRAPPER_KEY_SUFFIX);
+									}
+									Constructor<?> constructor = wrapperClass.getConstructor(new Class<?>[] { face });
+									if (Modifier.isPublic(constructor.getModifiers())) {
+										Object wrapperInstance = constructor.newInstance(new Object[] {instance});
+										boolean wrapperValid = injectInstance(wrapperInstance, properties, key, caches, instances, inits);
+										if (wrapperValid) {
+											instance = wrapperInstance;
+											caches.put(index, instance);
+										}
+									}
+								}
 							}
 						}
 					}
+				} catch (NoSuchMethodException e) {
+					if (type.isAssignableFrom(Class.class)) {
+						instance = cls;
+						caches.put(index, instance);
+					} else {
+						throw e;
+					}
 				}
-				caches.put(index, instance);
-				injectInstance(instance, properties, key, caches, instances, inits);
+			}
+			if (instance == NULL) {
+				return null;
 			}
 			instances.put(property + "=" + value, instance);
 			instances.put(property, instance);

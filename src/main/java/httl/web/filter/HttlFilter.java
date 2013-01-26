@@ -39,11 +39,14 @@ import javax.servlet.http.HttpServletResponse;
 public class HttlFilter implements Filter {
 
 	private static final String TEMPLATE_SUFFIX = "template.suffix";
+	
+	private String suffix;
 
 	public void init(FilterConfig config) throws ServletException {
 		WebEngine.setServletContext(config.getServletContext());
+		suffix = WebEngine.getEngine().getProperty(TEMPLATE_SUFFIX, new String[] { ".httl" })[0];
 	}
-	
+
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
@@ -81,7 +84,6 @@ public class HttlFilter implements Filter {
 		if (StringUtils.isEmpty(path)) {
 			path = getRootPath();
 		}
-		String suffix = WebEngine.getEngine().getProperty(TEMPLATE_SUFFIX, ".httl");
 		if (StringUtils.isNotEmpty(suffix) && ! path.endsWith(suffix)) {
 			path += suffix;
 		}

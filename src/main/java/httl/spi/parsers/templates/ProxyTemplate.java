@@ -29,17 +29,17 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * TemplateWrapper. (SPI, Prototype, ThreadSafe)
+ * ProxyTemplate. (SPI, Prototype, ThreadSafe)
  * 
  * @see httl.Engine#getTemplate(String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class TemplateWrapper implements Template {
+public class ProxyTemplate implements Template {
 
 	private final Template template;
 
-	public TemplateWrapper(Template template) {
+	public ProxyTemplate(Template template) {
 		this.template = template;
 	}
 

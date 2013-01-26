@@ -31,7 +31,7 @@ import java.text.ParseException;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiListener implements Listener {
-	
+
 	private Listener[] listeners;
 
 	private Logger logger;
@@ -40,7 +40,15 @@ public class MultiListener implements Listener {
 	 * httl.properties: listeners=httl.spi.listeners.ExtendsListener
 	 */
 	public void setListeners(Listener[] listeners) {
-		this.listeners = listeners;
+		if (listeners != null && listeners.length > 0 
+				&& this.listeners != null && this.listeners.length > 0) {
+			Listener[] oldListeners = this.listeners;
+			this.listeners = new Listener[oldListeners.length + listeners.length];
+			System.arraycopy(oldListeners, 0, this.listeners, 0, oldListeners.length);
+			System.arraycopy(listeners, 0, this.listeners, oldListeners.length, listeners.length);
+		} else {
+			this.listeners = listeners;
+		}
 	}
 
 	/**

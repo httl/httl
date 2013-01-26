@@ -55,7 +55,9 @@ public class DefaultTranslator implements Translator {
 
 	private Class<?> defaultVariableType;
 	
-	protected String[] importPackages;
+	private String[] importGetters;
+
+	private String[] importPackages;
 
 	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
@@ -87,6 +89,13 @@ public class DefaultTranslator implements Translator {
 	 */
 	public void setExpressionFilter(Filter expressionFilter) {
 		this.expressionFilter = expressionFilter;
+	}
+
+	/**
+	 * httl.properties: import.getters=get,getProperty,getAttribute
+	 */
+	public void setImportGetters(String[] importGetters) {
+		this.importGetters = importGetters;
 	}
 
 	/**
@@ -138,7 +147,7 @@ public class DefaultTranslator implements Translator {
 			source = expressionFilter.filter(source, source);
 		}
 		Set<String> variables = new HashSet<String>();
-		Node node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importPackages, offset).parse(source, variables);
+		Node node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importPackages, offset).parse(source, variables);
 		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, mapConverter, importPackages, functions);
 	}
 

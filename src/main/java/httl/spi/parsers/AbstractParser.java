@@ -29,16 +29,17 @@ import httl.spi.Logger;
 import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
+import httl.spi.formatters.MultiFormatter;
 import httl.spi.parsers.templates.AbstractTemplate;
 import httl.spi.parsers.templates.AdaptiveTemplate;
 import httl.spi.parsers.templates.OutputStreamTemplate;
 import httl.spi.parsers.templates.ResourceTemplate;
-import httl.spi.parsers.templates.TemplateFormatter;
 import httl.spi.parsers.templates.WriterTemplate;
 import httl.spi.translators.expressions.ExpressionImpl;
 import httl.util.ByteCache;
 import httl.util.CharCache;
 import httl.util.ClassUtils;
+import httl.util.CollectionUtils;
 import httl.util.ForeachStatus;
 import httl.util.IOUtils;
 import httl.util.LocaleUtils;
@@ -155,6 +156,10 @@ public abstract class AbstractParser implements Parser {
 
 	private String defaultFilterVariable = "$" + filterVariable;
 
+	private String formatterVariable = "formatter";
+
+	private String defaultFormatterVariable = "$" + formatterVariable;
+
 	private Engine engine;
 	
 	private Compiler compiler;
@@ -167,6 +172,8 @@ public abstract class AbstractParser implements Parser {
 
 	private Switcher<Filter> valueFilterSwitcher;
 
+	private Switcher<Formatter<Object>> formatterSwitcher;
+
 	private Filter templateFilter;
 
 	private Filter textFilter;
@@ -177,7 +184,7 @@ public abstract class AbstractParser implements Parser {
 
 	private Converter<Object, Object> outConverter;
 
-	private Formatter<?> formatter;
+	private Formatter<Object> formatter;
 
 	private String[] importMacros;
    
@@ -290,6 +297,13 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	/**
+	 * httl.properties: formatter.switchers=httl.spi.switchers.NumberFormatterSwitcher
+	 */
+	public void setFormatterSwitcher(Switcher<Formatter<Object>> formatterSwitcher) {
+		this.formatterSwitcher = formatterSwitcher;
+	}
+
+	/**
 	 * httl.properties: template.filters=httl.spi.filters.CleanBlankLineFilter
 	 */
 	public void setTemplateFilter(Filter templateFilter) {
@@ -327,7 +341,7 @@ public abstract class AbstractParser implements Parser {
 	/**
 	 * httl.properties: formatters=httl.spi.formatters.DateFormatter
 	 */
-	public void setFormatter(Formatter<?> formatter) {
+	public void setFormatter(Formatter<Object> formatter) {
 		this.formatter = formatter;
 	}
 
@@ -379,6 +393,14 @@ public abstract class AbstractParser implements Parser {
 	public void setFilterVariable(String filterVariable) {
 		this.filterVariable = filterVariable;
 		this.defaultFilterVariable = "$" + filterVariable;
+	}
+
+	/**
+	 * httl.properties: formatter.variable=formatter
+	 */
+	public void setFormatterVariable(String formatterVariable) {
+		this.formatterVariable = formatterVariable;
+		this.defaultFormatterVariable = "$" + formatterVariable;
 	}
 
 	/**
@@ -455,13 +477,13 @@ public abstract class AbstractParser implements Parser {
 			Template streamTemplate = null;
 			if (isOutputWriter || ! isOutputStream) {
 				Class<?> clazz = parseClass(resource, parameterTypes, false, 0);
-				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueFilterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (isOutputStream) {
 				Class<?> clazz = parseClass(resource, parameterTypes, true, 0);
-				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueFilterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (writerTemplate != null && streamTemplate != null) {
 				return new AdaptiveTemplate(writerTemplate, streamTemplate, outConverter);
@@ -521,6 +543,8 @@ public abstract class AbstractParser implements Parser {
 			types.put("super", Template.class);
 			types.put(defaultFilterVariable, Filter.class);
 			types.put(filterVariable, Filter.class);
+			types.put(defaultFormatterVariable, Formatter.class);
+			types.put(formatterVariable, Formatter.class);
 			types.put(foreachVariable, ForeachStatus.class);
 			StringBuilder macroFields = new StringBuilder();
 			StringBuilder macroInits = new StringBuilder();
@@ -568,6 +592,12 @@ public abstract class AbstractParser implements Parser {
 				defined.add(defaultFilterVariable);
 				declare.append("	" + Filter.class.getName() + " " + defaultFilterVariable + " = getFilter($context, \"" + filterVariable + "\");\n");
 				declare.append("	" + Filter.class.getName() + " " + filterVariable + " = " + defaultFilterVariable + ";\n");
+			}
+			if (getVariables.contains(formatterVariable)) {
+				defined.add(formatterVariable);
+				defined.add(defaultFormatterVariable);
+				declare.append("	" + MultiFormatter.class.getName() + " " + defaultFormatterVariable + " = getFormatter($context, \"" + formatterVariable + "\");\n");
+				declare.append("	" + MultiFormatter.class.getName() + " " + formatterVariable + " = " + defaultFormatterVariable + ";\n");
 			}
 			for (String var : parameters) {
 				if (getVariables.contains(var) && ! defined.contains(var)) {
@@ -678,14 +708,15 @@ public abstract class AbstractParser implements Parser {
 					+ "public " + className + "("
 					+ Engine.class.getName() + " engine, " 
 					+ Interceptor.class.getName() + " interceptor, " 
-					+ Switcher.class.getName() + " switcher, " 
+					+ Switcher.class.getName() + " filterSwitcher, " 
+					+ Switcher.class.getName() + " formatterSwitcher, " 
 					+ Filter.class.getName() + " filter, "
 					+ Formatter.class.getName() + " formatter, "
 					+ Converter.class.getName() + " mapConverter, "
 					+ Converter.class.getName() + " outConverter, "
 					+ Map.class.getName() + " functions, " 
 					+ Map.class.getName() + " importMacros) {\n" 
-					+ "	super(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);\n"
+					+ "	super(engine, interceptor, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);\n"
 					+ functionInits
 					+ macroInits
 					+ "}\n"
@@ -958,12 +989,13 @@ public abstract class AbstractParser implements Parser {
 			} else if (Resource.class.isAssignableFrom(returnType)) {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
 			}
+			getVariables.add(formatterVariable);
 			if (! stream && Object.class.equals(returnType)) {
 				String pre = "";
 				String var = "$obj" + TMP_VAR_SEQ.getAndIncrement();
 				pre = "	Object " + var + " = " + code + ";\n";
-				String charsCode = "(char[]) " + var;
-				code = "$formatter.toString(" + var + ")";
+				String charsCode = "formatter.toChars(" + var + ")";
+				code = "formatter.toString(" + var + ")";
 				if (! nofilter) {
 					getVariables.add(filterVariable);
 					charsCode = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + charsCode + ")";
@@ -977,11 +1009,11 @@ public abstract class AbstractParser implements Parser {
 				buf.append(");\n");
 			} else {
 				if (stream) {
-					code = "$formatter.toBytes(" + code + ")";
+					code = "formatter.toBytes(" + code + ")";
 				} else if (char[].class.equals(returnType)) {
-					code = "$formatter.toChars(" + code + ")";
+					code = "formatter.toChars(" + code + ")";
 				} else {
-					code = "$formatter.toString(" + code + ")";
+					code = "formatter.toString(" + code + ")";
 				}
 				if (! nofilter) {
 					getVariables.add(filterVariable);
@@ -1006,7 +1038,6 @@ public abstract class AbstractParser implements Parser {
 				return "";
 			}
 		}
-		TemplateFormatter templateFormatter = new TemplateFormatter(engine, formatter);
 		StringBuffer buf = new StringBuffer();
 		Matcher matcher = EXPRESSION_PATTERN.matcher(message);
 		int last = 0;
@@ -1037,7 +1068,7 @@ public abstract class AbstractParser implements Parser {
 					} else if (value instanceof Resource) {
 						value = IOUtils.readToString(((Resource)value).getReader());
 					}
-					String str = templateFormatter.toString(value);
+					String str = formatter.toString(value);
 					if (! nofilter && valueFilter != null) {
 						str = valueFilter.filter(str, str);
 					}
@@ -1075,15 +1106,19 @@ public abstract class AbstractParser implements Parser {
 			return;
 		}
 		Filter filter = textFilter;
-		if (valueFilterSwitcher != null || textFilterSwitcher != null) {
+		if (textFilterSwitcher != null || valueFilterSwitcher != null || formatterSwitcher != null) {
 			Set<String> locations = new HashSet<String>();
+			List<String> textLocations = textFilterSwitcher == null ? null : textFilterSwitcher.locations();
+			if (textLocations != null) {
+				locations.addAll(textLocations);
+			}
 			List<String> valueLocations = valueFilterSwitcher == null ? null : valueFilterSwitcher.locations();
 			if (valueLocations != null) {
 				locations.addAll(valueLocations);
 			}
-			List<String> textLocations = textFilterSwitcher == null ? null : textFilterSwitcher.locations();
-			if (textLocations != null) {
-				locations.addAll(textLocations);
+			List<String> formatterLocations = formatterSwitcher == null ? null : formatterSwitcher.locations();
+			if (formatterLocations != null) {
+				locations.addAll(formatterLocations);
 			}
 			if (locations != null && locations.size() > 0) {
 				Map<Integer, Set<String>> switchesd = new TreeMap<Integer, Set<String>>();
@@ -1112,7 +1147,10 @@ public abstract class AbstractParser implements Parser {
 								filter = textFilterSwitcher.enter(location, textFilter);
 							}
 							if (valueLocations != null && valueLocations.contains(location)) {
-								buf.append("	" + filterVariable + " = enter(\"" + StringUtils.escapeString(location) + "\", " + defaultFilterVariable + ");\n");
+								buf.append("	" + filterVariable + " = switchFilter(\"" + StringUtils.escapeString(location) + "\", " + defaultFilterVariable + ");\n");
+							}
+							if (formatterLocations != null && formatterLocations.contains(location)) {
+								buf.append("	" + formatterVariable + " = switchFormatter(\"" + StringUtils.escapeString(location) + "\", " + defaultFormatterVariable + ");\n");
 							}
 						}
 						buf.append("	$output.write(");
@@ -1432,7 +1470,7 @@ public abstract class AbstractParser implements Parser {
 	protected String getForeachCode(String type, Class<?> clazz, String var, String code) {
 		StringBuilder buf = new StringBuilder();
 		String name = "_i_" + var;
-		buf.append("	for (" + Iterator.class.getName() + " " + name + " = " + ClassUtils.class.getName() + ".toIterator((" + foreachVariable + " = new " + ForeachStatus.class.getName() + "(" + foreachVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
+		buf.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator((" + foreachVariable + " = new " + ForeachStatus.class.getName() + "(" + foreachVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
 		if (clazz.isPrimitive()) {
 			buf.append("	" + type + " " + var + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next());\n");
 		} else {

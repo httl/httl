@@ -18,6 +18,7 @@ package httl.spi.translators.expressions;
 import httl.Expression;
 import httl.spi.Translator;
 import httl.util.ClassUtils;
+import httl.util.CollectionUtils;
 import httl.util.StringUtils;
 
 import java.lang.reflect.Array;
@@ -85,6 +86,9 @@ public final class UnaryOperator extends Operator {
 			Class<?>[] types = parameter.getReturnTypes();
 			if (Map.Entry.class.isAssignableFrom(types[0])) {
 				return Map.class;
+			} else if (types.length == 1 && parameter instanceof BinaryOperator
+					&& "..".equals(((BinaryOperator) parameter).getName())) {
+				return parameter.getReturnType();
 			} else {
 				Object array = Array.newInstance(types[0], 0);
 				return array.getClass();
@@ -106,7 +110,7 @@ public final class UnaryOperator extends Operator {
 			String name = getName().substring(1);
 			Class<?> t = getParameterTypes().get(name);
 			if (t != null && Expression.class.isAssignableFrom(t)) {
-				return "(" + name + " == null ? null : " + name + ".evaluate(" + ClassUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " )))";
+				return "(" + name + " == null ? null : " + name + ".evaluate(" + CollectionUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " )))";
 			} else {
 				name = ClassUtils.filterJavaKeyword(name);
 				Collection<Class<?>> functions = getFunctions();
@@ -129,7 +133,10 @@ public final class UnaryOperator extends Operator {
 			}
 		} else if (getName().equals("[")) {
 			if (Map.Entry.class.isAssignableFrom(types[0])) {
-				return ClassUtils.class.getName() + ".toMap(new " + Map.Entry.class.getCanonicalName() + "[] {" + parameter.getCode() + "})";
+				return CollectionUtils.class.getName() + ".toMap(new " + Map.Entry.class.getCanonicalName() + "[] {" + parameter.getCode() + "})";
+			} else if (types.length == 1 && parameter instanceof BinaryOperator
+					&& "..".equals(((BinaryOperator) parameter).getName())) {
+				return parameter.getCode();
 			} else {
 				return "new " + types[0].getCanonicalName() + "[] {" + parameter.getCode() + "}";
 			}

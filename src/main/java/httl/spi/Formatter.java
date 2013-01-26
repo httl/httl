@@ -16,7 +16,7 @@
 package httl.spi;
 
 /**
- * Value Formatter. (SPI, Singleton, ThreadSafe)
+ * Type Formatter. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.parsers.AbstractParser#setFormatter(Formatter)
  * 

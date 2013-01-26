@@ -101,6 +101,8 @@ public class DfaParser {
 
 	private final List<StringSequence> sequences;
 
+	private final String[] getters;
+
 	private final String[] packages;
 
 	private final int offset;
@@ -111,12 +113,13 @@ public class DfaParser {
 	
 	private final Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
 
-	public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] packages, int offset) {
+	public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] packages, int offset) {
 		this.translator = translator;
 		this.parameterTypes = parameterTypes;
 		this.defaultType = defaultType;
 		this.functions = functions;
 		this.sequences = sequences;
+		this.getters = getters;
 		this.packages = packages;
 		this.offset = offset;
 	}
@@ -429,7 +432,7 @@ public class DfaParser {
 					if (! StringUtils.isFunction(msg) && ! BINARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
 					}
-					BinaryOperator operator = new BinaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sequences, packages, msg, getPriority(msg, false));
+					BinaryOperator operator = new BinaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sequences, getters, packages, msg, getPriority(msg, false));
 					operatorTokens.put(operator, token);
 					while (! operatorStack.isEmpty() && ! (operatorStack.peek() instanceof Bracket)
 							&& operatorStack.peek().getPriority() >= operator.getPriority()) {

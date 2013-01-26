@@ -133,6 +133,10 @@ public class FileMethod {
 		return evaluate(encoding == null ? new String(source) : new String(source, encoding));
 	}
 
+	public Expression evaluate(char[] source) throws IOException, ParseException {
+		return evaluate(new String(source));
+	}
+
 	public Expression evaluate(String expr) throws ParseException {
 		Template template = Context.getContext().getTemplate();
 		if (template == null) {
@@ -152,6 +156,10 @@ public class FileMethod {
 		}
 		String encoding = template.getEncoding();
 		return render(encoding == null ? new String(source) : new String(source, encoding));
+	}
+
+	public Template render(char[] source) throws IOException, ParseException {
+		return render(new String(source));
 	}
 
 	public Template render(String source) throws IOException, ParseException {

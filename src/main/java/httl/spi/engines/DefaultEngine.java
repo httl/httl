@@ -38,6 +38,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -78,8 +79,11 @@ public class DefaultEngine extends Engine {
 	// httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
 	private Map<Object, Object> expressionCache;
 
+	// httl.properties: template.directory=/META-INF/templates
+	private String templateDirectory;
+
 	// httl.properties: template.suffix=.httl
-	private String templateSuffix;
+	private String[] templateSuffix;
 
 	// httl.properties: reloadable=true
 	private boolean reloadable;
@@ -273,6 +277,10 @@ public class DefaultEngine extends Engine {
 		try {
 			return parser.parse(resource, parameterTypes);
 		} catch (ParseException e) {
+			if (e.getMessage() != null 
+					&& e.getMessage().contains("Occur to offset:")) {
+				throw e;
+			}
 			int offset = e.getErrorOffset();
 			if (offset <= 0) {
 				throw e;
@@ -400,15 +408,31 @@ public class DefaultEngine extends Engine {
 	public void inited() {
 		if (precompiled) {
 			try {
-				List<String> list = loader.list(templateSuffix);
-				for (String name : list) {
-					try {
-						getTemplate(name);
-					} catch (Exception e) {
-						if (logger != null && logger.isErrorEnabled()) {
-							logger.error(e.getMessage(), e);
+				int count = 0;
+				if (templateSuffix == null) {
+					templateSuffix = new String[] { ".httl" };
+				}
+				for (String suffix : templateSuffix) {
+					List<String> list = loader.list(suffix);
+					if (list == null) {
+						continue;
+					}
+					count += list.size();
+					for (String name : list) {
+						try {
+							if (logger != null && logger.isDebugEnabled()) {
+								logger.debug("Precompiled the template: " + name);
+							}
+							getTemplate(name);
+						} catch (Exception e) {
+							if (logger != null && logger.isErrorEnabled()) {
+								logger.error(e.getMessage(), e);
+							}
 						}
 					}
+				}
+				if (logger != null && logger.isInfoEnabled()) {
+					logger.info("Precompiled " + count + " templates from directory " + (templateDirectory == null ? "/" : templateDirectory) + " with suffix " + Arrays.toString(templateSuffix));
 				}
 			} catch (Exception e) {
 				if (logger != null && logger.isErrorEnabled()) {
@@ -433,9 +457,16 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
+	 * httl.properties: template.directory=/META-INF/templates
+	 */
+	public void setTemplateDirectory(String templateDirectory) {
+		this.templateDirectory = templateDirectory;
+	}
+
+	/**
 	 * httl.properties: template.suffix=.httl
 	 */
-	public void setTemplateSuffix(String suffix) {
+	public void setTemplateSuffix(String[] suffix) {
 		this.templateSuffix = suffix;
 	}
 

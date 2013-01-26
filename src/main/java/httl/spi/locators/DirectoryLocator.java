@@ -32,11 +32,11 @@ public class DirectoryLocator implements Locator {
 
 	private String templateDirectory;
 
-	private String templateSuffix;
+	private String[] templateSuffix;
 
 	private String messageDirectory;
 
-	private String messageSuffix;
+	private String[] messageSuffix;
 
 	/**
 	 * httl.properties: template.directory=/META-INF/templates
@@ -48,7 +48,7 @@ public class DirectoryLocator implements Locator {
 	/**
 	 * httl.properties: template.suffix=.httl
 	 */
-	public void setTemplateSuffix(String suffix) {
+	public void setTemplateSuffix(String[] suffix) {
 		this.templateSuffix = suffix;
 	}
 
@@ -62,14 +62,14 @@ public class DirectoryLocator implements Locator {
 	/**
 	 * httl.properties: message.suffix=.properties
 	 */
-	public void setMessageSuffix(String suffix) {
+	public void setMessageSuffix(String[] suffix) {
 		this.messageSuffix = suffix;
 	}
 
 	public String root(String suffix) {
-		if (templateDirectory != null && templateSuffix != null && templateSuffix.equals(suffix)) {
+		if (templateDirectory != null && StringUtils.endsWith(suffix, templateSuffix)) {
 			return templateDirectory;
-		} else if (messageDirectory != null && messageSuffix != null && messageSuffix.equals(suffix)) {
+		} else if (messageDirectory != null && StringUtils.endsWith(suffix, messageSuffix)) {
 			return templateDirectory;
 		}
 		return null;
@@ -79,9 +79,9 @@ public class DirectoryLocator implements Locator {
 		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("resource name == null");
 		}
-		if (templateDirectory != null && templateSuffix != null && name.endsWith(templateSuffix)) {
+		if (templateDirectory != null && StringUtils.endsWith(name, templateSuffix)) {
 			return templateDirectory + name;
-		} else if (messageDirectory != null && messageSuffix != null && name.endsWith(messageSuffix)) {
+		} else if (messageDirectory != null && StringUtils.endsWith(name, messageSuffix)) {
 			return messageDirectory + name;
 		} else {
 			return name;

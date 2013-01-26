@@ -19,6 +19,7 @@ import httl.Context;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.Logger;
+import httl.util.Optional;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -41,6 +42,7 @@ public class ListenerInterceptor implements Interceptor {
 	/**
 	 * httl.properties: before.listeners=httl.spi.listeners.ExtendsListener
 	 */
+	@Optional
 	public void setBeforeListener(Listener listener) {
 		this.beforeListener = listener;
 	}
@@ -48,6 +50,7 @@ public class ListenerInterceptor implements Interceptor {
 	/**
 	 * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
 	 */
+	@Optional
 	public void setAfterListener(Listener listener) {
 		this.afterListener = listener;
 	}
@@ -59,7 +62,7 @@ public class ListenerInterceptor implements Interceptor {
 		this.logger = logger;
 	}
 
-	public void render(Context context, Listener rendition) throws IOException, ParseException {
+	public void render(Context context, Listener listener) throws IOException, ParseException {
 		if (beforeListener != null) {
 			try {
 				beforeListener.render(context);
@@ -70,7 +73,7 @@ public class ListenerInterceptor implements Interceptor {
 			}
 		}
 		try {
-			rendition.render(context);
+			listener.render(context);
 		} finally {
 			if (afterListener != null) {
 				try {

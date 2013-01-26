@@ -45,10 +45,11 @@ public abstract class WriterTemplate extends AbstractTemplate {
 	private static final long serialVersionUID = 7127901461769617745L;
 
 	public WriterTemplate(Engine engine, Interceptor interceptor, 
-			Switcher<Filter> switcher, Filter filter, Formatter<?> formatter, 
+			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
+			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros){
-		super(engine, interceptor, switcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
+		super(engine, interceptor, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
 	}
 
 	public Class<?> getReturnType() {

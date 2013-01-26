@@ -48,12 +48,15 @@ public final class BinaryOperator extends Operator {
 	private Node rightParameter;
 	
 	private List<StringSequence> sequences;
+
+	private String[] getters;
 	
 	public BinaryOperator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, 
-						  Collection<Class<?>> functions, List<StringSequence> sequences,
+						  Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters,
 						  String[] packages, String name, int priority){
 		super(translator, source, offset, parameterTypes, functions, packages, name, priority);
 		this.sequences = sequences;
+		this.getters = getters;
 	}
 
 	public Node getLeftParameter() {
@@ -154,12 +157,13 @@ public final class BinaryOperator extends Operator {
 			if (rightTypes != null && rightTypes.length == 0 && ! hasMethod(leftType, name, rightTypes)) {
 				if (Template.class.isAssignableFrom(leftType)) {
 					return getNotNullCode(leftCode, "((" + Template.class.getName() + ")" + leftCode + ".getMacros().get(\"" + name + "\"))");
-				} else if (hasMethod(leftType, "get", new Class<?>[] { String.class })) {
-					return getNotNullCode(leftCode, leftCode + ".get(\"" + name + "\")");
-				} else if (hasMethod(leftType, "getProperty", new Class<?>[] { String.class })) {
-					return getNotNullCode(leftCode, leftCode + ".getProperty(\"" + name + "\")");
-				} else if (hasMethod(leftType, "getAttribute", new Class<?>[] { String.class })) {
-					return getNotNullCode(leftCode, leftCode + ".getAttribute(\"" + name + "\")");
+				} if (getters != null && getters.length > 0) {
+					for (String getter : getters) {
+						if (hasMethod(leftType, getter, new Class<?>[] { String.class })
+								|| hasMethod(leftType, getter, new Class<?>[] { Object.class })) {
+							return getNotNullCode(leftCode, leftCode + "." + getter + "(\"" + name + "\")");
+						}
+					}
 				}
 			}
 			name = ClassUtils.filterJavaKeyword(name);
@@ -204,7 +208,7 @@ public final class BinaryOperator extends Operator {
 			Class<?> rightType = rightParameter.getReturnType();
 			if (List.class.isAssignableFrom(leftType)) {
 				if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
-					return ClassUtils.class.getName() + ".subList(" + leftCode + ", " + rightCode + ")";
+					return CollectionUtils.class.getName() + ".subList(" + leftCode + ", " + rightCode + ")";
 				} else if (int.class.equals(rightType)) {
 					if (leftParameter instanceof Variable) {
 						String var = ((Variable)leftParameter).getName();
@@ -219,7 +223,7 @@ public final class BinaryOperator extends Operator {
 				}
 			} else if (leftType.isArray()) {
 				if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
-					return ClassUtils.class.getName() + ".subArray(" + leftCode + ", " + rightCode + ")";
+					return CollectionUtils.class.getName() + ".subArray(" + leftCode + ", " + rightCode + ")";
 				} else if (int.class.equals(rightType)) {
 					return getNotNullCode(leftCode, leftCode + "[" + rightCode + "]");
 				} else {
@@ -415,12 +419,13 @@ public final class BinaryOperator extends Operator {
 			if (rightTypes != null && rightTypes.length == 0 && ! hasMethod(leftType, name, rightTypes)) {
 				if (Template.class.isAssignableFrom(leftType)) {
 					return Template.class;
-				} else if (hasMethod(leftType, "get", new Class<?>[] { String.class })) {
-					return Object.class;
-				} else if (hasMethod(leftType, "getProperty", new Class<?>[] { String.class })) {
-					return Object.class;
-				} else if (hasMethod(leftType, "getAttribute", new Class<?>[] { String.class })) {
-					return Object.class;
+				} else if (getters != null && getters.length > 0) {
+					for (String getter : getters) {
+						if (hasMethod(leftType, getter, new Class<?>[] { String.class })
+								|| hasMethod(leftType, getter, new Class<?>[] { Object.class })) {
+							return Object.class;
+						}
+					}
 				}
 			}
 			name = ClassUtils.filterJavaKeyword(name);
