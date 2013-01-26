@@ -17,13 +17,13 @@ package httl.spi.switchers;
 
 import httl.spi.Filter;
 
-public class StyleValueSwitcher extends StyleSwitcher {
+public class ScriptValueFilterSwitcher extends ScriptFilterSwitcher {
 
 	/**
-	 * httl.properties: style.value.filter=httl.spi.filters.StyleValueFilter
+	 * httl.properties: script.value.filter=httl.spi.filters.ScriptValueFilter
 	 */
-	public void setStyleValueFilter(Filter filter) {
-		setStyleFilter(filter);
+	public void setScriptValueFilter(Filter filter) {
+		setScriptFilter(filter);
 	}
 
 }

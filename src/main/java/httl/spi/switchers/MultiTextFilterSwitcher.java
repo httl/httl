@@ -16,14 +16,15 @@
 package httl.spi.switchers;
 
 import httl.spi.Filter;
+import httl.spi.Switcher;
 
-public class ScriptValueSwitcher extends ScriptSwitcher {
+public class MultiTextFilterSwitcher extends MultiSwitcher<Filter> {
 
 	/**
-	 * httl.properties: script.value.filter=httl.spi.filters.ScriptValueFilter
+	 * httl.properties: text.filter.switchers=httl.spi.switchers.JavascriptFilterSwitcher
 	 */
-	public void setScriptValueFilter(Filter filter) {
-		setScriptFilter(filter);
+	public void setTextFilterSwitchers(Switcher<Filter>[] switchers) {
+		setSwitchers(switchers);
 	}
 
 }

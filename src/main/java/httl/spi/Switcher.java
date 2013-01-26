@@ -18,14 +18,14 @@ package httl.spi;
 import java.util.List;
 
 /**
- * Filter Switcher. (SPI, Singleton, ThreadSafe)
+ * Location Switcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTextSwitcher(Switcher)
- * @see httl.spi.parsers.AbstractParser#setValueSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setValueFilterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Switcher {
+public interface Switcher<T> {
 
 	/**
 	 * Switch's locations.
@@ -49,8 +49,10 @@ public interface Switcher {
 	 * &lt;script&gt;
 	 * </pre>
 	 * 
-	 * @return locations
+	 * @param location - the entered location
+	 * @param origin - the origin value
+	 * @return the location value
 	 */
-	Filter enter(String location, Filter defaultFilter);
+	T enter(String location, T origin);
 
 }

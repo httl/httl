@@ -21,37 +21,37 @@ import java.util.List;
 import httl.spi.Switcher;
 import httl.spi.Filter;
 
-public class ScriptSwitcher implements Switcher {
+public class StyleFilterSwitcher implements Switcher<Filter> {
 
-	private static final String START_TAG = "<script";
+	private static final String START_TAG = "<style";
 
-	private static final String END_TAG = "</script>";
+	private static final String END_TAG = "</style>";
 
-	private List<String> scriptLocations = Arrays.asList(new String[] {START_TAG, END_TAG});
+	private List<String> styleLocations = Arrays.asList(new String[] {START_TAG, END_TAG});
 
-	private Filter scriptFilter;
+	private Filter styleFilter;
 
 	/**
-	 * httl.properties: script.locations=&lt;script,&lt;/script&gt;
+	 * httl.properties: style.locations=&lt;style,&lt;/style&gt;
 	 */
-	public void setScriptLocations(String[] locations) {
-		this.scriptLocations = Arrays.asList(locations);
+	public void setStyleLocations(String[] locations) {
+		this.styleLocations = Arrays.asList(locations);
 	}
 
 	/**
-	 * httl.properties: script.filter=httl.spi.filters.ScriptFilter
+	 * httl.properties: style.filter=httl.spi.filters.StyleFilter
 	 */
-	public void setScriptFilter(Filter filter) {
-		this.scriptFilter = filter;
+	public void setStyleFilter(Filter filter) {
+		this.styleFilter = filter;
 	}
 
 	public List<String> locations() {
-		return scriptLocations;
+		return styleLocations;
 	}
 
 	public Filter enter(String location, Filter defaultFilter) {
 		if (START_TAG.equals(location)) {
-			return scriptFilter;
+			return styleFilter;
 		}
 		return defaultFilter;
 	}

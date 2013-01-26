@@ -15,14 +15,15 @@
  */
 package httl.spi.switchers;
 
+import httl.spi.Filter;
 import httl.spi.Switcher;
 
-public class MultiValueSwitcher extends MultiSwitcher {
+public class MultiValueFilterSwitcher extends MultiSwitcher<Filter> {
 
 	/**
-	 * httl.properties: value.switchers=httl.spi.switchers.JavascriptSwitcher
+	 * httl.properties: value.filter.switchers=httl.spi.switchers.JavascriptFilterSwitcher
 	 */
-	public void setValueSwitchers(Switcher[] switchers) {
+	public void setValueFilterSwitchers(Switcher<Filter>[] switchers) {
 		setSwitchers(switchers);
 	}
 

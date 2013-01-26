@@ -191,11 +191,11 @@ public class ExpressionImpl implements Expression, Serializable {
 			}
 			funtionFileds.append("private final ");
 			funtionFileds.append(typeName);
-			funtionFileds.append(" _");
+			funtionFileds.append(" $");
 			funtionFileds.append(functionType.getName().replace('.','_'));
 			funtionFileds.append(";\n");
 			
-			functionInits.append("this._");
+			functionInits.append("this.$");
 			functionInits.append(functionType.getName().replace('.','_'));
 			functionInits.append(" = (");
 			functionInits.append(typeName);

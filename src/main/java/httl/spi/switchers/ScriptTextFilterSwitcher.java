@@ -17,7 +17,7 @@ package httl.spi.switchers;
 
 import httl.spi.Filter;
 
-public class ScriptTextSwitcher extends ScriptSwitcher {
+public class ScriptTextFilterSwitcher extends ScriptFilterSwitcher {
 
 	/**
 	 * httl.properties: script.text.filter=httl.spi.filters.ScriptTextFilter

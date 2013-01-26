@@ -120,7 +120,7 @@ public final class UnaryOperator extends Operator {
 							if (Modifier.isStatic(method.getModifiers())) {
 								return function.getName() + "." + method.getName() + "(" + parameter.getCode() + ")";
 							}
-							return "_" + function.getName().replace('.', '_') + "." + method.getName() + "(" + parameter.getCode() + ")";
+							return "$" + function.getName().replace('.', '_') + "." + method.getName() + "(" + parameter.getCode() + ")";
 						} catch (NoSuchMethodException e) {
 						}
 					}

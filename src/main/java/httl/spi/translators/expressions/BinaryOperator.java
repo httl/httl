@@ -183,7 +183,7 @@ public final class BinaryOperator extends Operator {
 							if (Modifier.isStatic(method.getModifiers())) {
 								return function.getName() + "." + method.getName() + "(" + allCode + ")";
 							}
-							return "_" + function.getName().replace('.', '_') + "." + method.getName() + "(" + allCode + ")";
+							return "$" + function.getName().replace('.', '_') + "." + method.getName() + "(" + allCode + ")";
 						}
 					} catch (NoSuchMethodException e) {
 					}

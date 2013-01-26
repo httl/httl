@@ -15,15 +15,15 @@
  */
 package httl.spi.switchers;
 
-import httl.spi.Switcher;
+import httl.spi.Filter;
 
-public class MultiTextSwitcher extends MultiSwitcher {
+public class StyleValueFilterSwitcher extends StyleFilterSwitcher {
 
 	/**
-	 * httl.properties: text.switchers=httl.spi.switchers.JavascriptSwitcher
+	 * httl.properties: style.value.filter=httl.spi.filters.StyleValueFilter
 	 */
-	public void setTextSwitchers(Switcher[] switchers) {
-		setSwitchers(switchers);
+	public void setStyleValueFilter(Filter filter) {
+		setStyleFilter(filter);
 	}
 
 }

@@ -52,7 +52,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private transient final Interceptor interceptor;
 
-	private transient final Switcher switcher;
+	private transient final Switcher<Filter> switcher;
 
 	private transient final Filter filter;
 
@@ -67,7 +67,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	private final Map<String, Template> macros;
 
 	public AbstractTemplate(Engine engine, Interceptor interceptor, 
-			Switcher switcher, Filter filter, Formatter<?> formatter, 
+			Switcher<Filter> switcher, Filter filter, Formatter<?> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
 		this.engine = engine;
@@ -199,7 +199,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	}
 
 	private Map<String, Template> initMacros(Engine engine, Interceptor interceptor, 
-			Switcher switcher, Filter filter, Formatter<?> formatter, 
+			Switcher<Filter> switcher, Filter filter, Formatter<?> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
 		Map<String, Template> macros = new HashMap<String, Template>();

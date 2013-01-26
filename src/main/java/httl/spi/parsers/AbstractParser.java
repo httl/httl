@@ -77,43 +77,41 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractParser implements Parser {
 	
-	protected static final char SPECIAL = '\27';
+	private static final char SPECIAL = '\27';
 
-	protected static final char POUND = '#';
+	private static final char POUND = '#';
 	
-	protected static final char DOLLAR = '$';
+	private static final char DOLLAR = '$';
 	
-	protected static final char POUND_SPECIAL = '\24';
+	private static final char POUND_SPECIAL = '\24';
 	
-	protected static final char DOLLAR_SPECIAL = '\25';
+	private static final char DOLLAR_SPECIAL = '\25';
 	
 	protected static final String LEFT = "<" + SPECIAL;
 	
 	protected static final String RIGHT = SPECIAL + ">";
 	
-	protected static final Pattern DIRECTIVE_PATTERN = Pattern.compile(RIGHT + "([^" + SPECIAL + "]*)" + LEFT + "([0-9]*)([a-z]*)");
+	private static final Pattern DIRECTIVE_PATTERN = Pattern.compile(RIGHT + "([^" + SPECIAL + "]*)" + LEFT + "([0-9]*)([a-z]*)");
 	
-	protected static final Pattern EXPRESSION_PATTERN = Pattern.compile("([$#][!]?)\\{([^}]*)\\}");
+	private static final Pattern EXPRESSION_PATTERN = Pattern.compile("([$#][!]?)\\{([^}]*)\\}");
 
-	protected static final Pattern COMMA_PATTERN = Pattern.compile("\\s*\\,+\\s*");
+	private static final Pattern IN_PATTERN = Pattern.compile("(\\s+in\\s+)");
 
-	protected static final Pattern IN_PATTERN = Pattern.compile("(\\s+in\\s+)");
+	private static final Pattern ASSIGN_PATTERN = Pattern.compile(";\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)");
 
-	protected static final Pattern ASSIGN_PATTERN = Pattern.compile(";\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)");
-
-	protected static final Pattern ESCAPE_PATTERN = Pattern.compile("(\\\\+)([#$])");
+	private static final Pattern ESCAPE_PATTERN = Pattern.compile("(\\\\+)([#$])");
 	
-	protected static final Pattern COMMENT_PATTERN = Pattern.compile("<!--##.*?-->", Pattern.DOTALL);
+	private static final Pattern COMMENT_PATTERN = Pattern.compile("<!--##.*?-->", Pattern.DOTALL);
 
-	protected static final Pattern CDATA_PATTERN = Pattern.compile("<!\\[CDATA\\[##(.*?)\\]\\]>", Pattern.DOTALL);
+	private static final Pattern CDATA_PATTERN = Pattern.compile("<!\\[CDATA\\[##(.*?)\\]\\]>", Pattern.DOTALL);
 	
-	protected static final Pattern VAR_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
+	private static final Pattern VAR_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
 
-	protected static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
+	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
 	
-	protected static final String CDATA_LEFT = LEFT + "11" + RIGHT;
+	private static final String CDATA_LEFT = LEFT + "11" + RIGHT;
 	
-	protected static final String CDATA_RIGHT = LEFT + "3" + RIGHT;
+	private static final String CDATA_RIGHT = LEFT + "3" + RIGHT;
 
 	protected static final String VAR = "var";
 
@@ -151,75 +149,71 @@ public abstract class AbstractParser implements Parser {
 
 	protected String endDirective = END;
 
-	protected String foreachVariable = FOREACH;
+	private String foreachVariable = FOREACH;
 
-	protected String filterVariable = "filter";
+	private String filterVariable = "filter";
 
-	protected String defaultFilterVariable = "$" + filterVariable;
+	private String defaultFilterVariable = "$" + filterVariable;
 
-	protected String version;
+	private Engine engine;
 	
-	protected Engine engine;
+	private Compiler compiler;
 	
-	protected Compiler compiler;
+	private Translator translator;
 	
-	protected Translator translator;
+	private Interceptor interceptor;
 	
-	protected Interceptor interceptor;
+	private Switcher<Filter> textFilterSwitcher;
+
+	private Switcher<Filter> valueFilterSwitcher;
+
+	private Filter templateFilter;
+
+	private Filter textFilter;
+
+	private Filter valueFilter;
 	
-	protected Switcher textSwitcher;
+	private Converter<Object, Object> mapConverter;
 
-	protected Switcher valueSwitcher;
+	private Converter<Object, Object> outConverter;
 
-	protected Filter templateFilter;
+	private Formatter<?> formatter;
 
-	protected Filter textFilter;
-
-	protected Filter valueFilter;
-	
-	protected Converter<Object, Object> mapConverter;
-
-	protected Converter<Object, Object> outConverter;
-
-	protected Formatter<?> formatter;
-
-	protected String[] importMacros;
+	private String[] importMacros;
    
-	protected final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
+	private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
 
-	protected String[] importPackages;
+	private String[] importPackages;
 
-	protected Set<String> importPackageSet;
+	private Set<String> importPackageSet;
 
-	protected String[] importVariables;
+	private String[] importVariables;
 
-	protected Map<String, Class<?>> importTypes;
+	private Map<String, Class<?>> importTypes;
 
 	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
-	protected static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
+	private static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
 	
-	protected static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
+	private static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
 
-	protected final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
+	private final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
 	
-	protected boolean isOutputStream;
+	private boolean isOutputStream;
 
-	protected boolean isOutputWriter;
+	private boolean isOutputWriter;
 
-	protected boolean sourceInClass;
+	private boolean sourceInClass;
 
-	protected boolean textInClass;
+	private boolean textInClass;
 	
-	protected boolean stringToChars;
-
-	protected boolean removeDirectiveBlank;
+	private boolean removeDirectiveBlank;
 	
-	protected String outputEncoding;
+	private String outputEncoding;
 	
-	protected Logger logger;
+	private Logger logger;
 	
-	protected Class<?> defaultVariableType;
+	private Class<?> defaultVariableType;
 
 	/**
 	 * httl.properties: default.variable.type=java.lang.String
@@ -256,6 +250,10 @@ public abstract class AbstractParser implements Parser {
 		this.engine = engine;
 	}
 
+	protected Engine getEngine() {
+		return engine;
+	}
+
 	/**
 	 * httl.properties: compiler=httl.spi.compilers.JdkCompiler
 	 */
@@ -278,17 +276,17 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	/**
-	 * httl.properties: text.switchers=httl.spi.switchers.JavaScriptSwitcher
+	 * httl.properties: text.filter.switchers=httl.spi.switchers.JavaScriptFilterSwitcher
 	 */
-	public void setTextSwitcher(Switcher textSwitcher) {
-		this.textSwitcher = textSwitcher;
+	public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
+		this.textFilterSwitcher = textFilterSwitcher;
 	}
 
 	/**
-	 * httl.properties: value.switchers=httl.spi.switchers.JavaScriptSwitcher
+	 * httl.properties: value.filter.switchers=httl.spi.switchers.JavaScriptFilterSwitcher
 	 */
-	public void setValueSwitcher(Switcher valueSwitcher) {
-		this.valueSwitcher = valueSwitcher;
+	public void setValueFilterSwitcher(Switcher<Filter> valueFilterSwitcher) {
+		this.valueFilterSwitcher = valueFilterSwitcher;
 	}
 
 	/**
@@ -362,13 +360,6 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	/**
-	 * httl.properties: string.to.chars=true
-	 */
-	public void setStringToChars(boolean stringToChars) {
-		this.stringToChars = stringToChars;
-	}
-
-	/**
 	 * httl.properties: remove.directive.blank=true
 	 */
 	public void setRemoveDirectiveBlank(boolean removeDirectiveBlank) {
@@ -388,13 +379,6 @@ public abstract class AbstractParser implements Parser {
 	public void setFilterVariable(String filterVariable) {
 		this.filterVariable = filterVariable;
 		this.defaultFilterVariable = "$" + filterVariable;
-	}
-
-	/**
-	 * httl.properties: java.version=1.7
-	 */
-	public void setJavaVersion(String version) {
-		this.version = version;
 	}
 
 	/**
@@ -472,12 +456,12 @@ public abstract class AbstractParser implements Parser {
 			if (isOutputWriter || ! isOutputStream) {
 				Class<?> clazz = parseClass(resource, parameterTypes, false, 0);
 				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+						.newInstance(engine, interceptor, valueFilterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (isOutputStream) {
 				Class<?> clazz = parseClass(resource, parameterTypes, true, 0);
 				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+						.newInstance(engine, interceptor, valueFilterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (writerTemplate != null && streamTemplate != null) {
 				return new AdaptiveTemplate(writerTemplate, streamTemplate, outConverter);
@@ -651,11 +635,11 @@ public abstract class AbstractParser implements Parser {
 				}
 				funtionFileds.append("private final ");
 				funtionFileds.append(typeName);
-				funtionFileds.append(" _");
+				funtionFileds.append(" $");
 				funtionFileds.append(functionType.getName().replace('.','_'));
 				funtionFileds.append(";\n");
 				
-				functionInits.append("	this._");
+				functionInits.append("	this.$");
 				functionInits.append(functionType.getName().replace('.','_'));
 				functionInits.append(" = (");
 				functionInits.append(typeName);
@@ -748,7 +732,7 @@ public abstract class AbstractParser implements Parser {
 					+ "	return $CTS;\n"
 					+ "}\n"
 					+ "\n"
-					+ "public " + Map.class.getName() + " getMacroTypes() {\n"
+					+ "protected " + Map.class.getName() + " getMacroTypes() {\n"
 					+ "	return " + toTypeCode(macros) + ";\n"
 					+ "}\n"
 					+ "\n"
@@ -974,14 +958,39 @@ public abstract class AbstractParser implements Parser {
 			} else if (Resource.class.isAssignableFrom(returnType)) {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
 			}
-			code = "$formatter." + (stream ? "toBytes" : stringToChars ? "toChars" : "toString") + "(" + code + ")";
-			if (! nofilter) {
-				getVariables.add(filterVariable);
-				code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
+			if (! stream && Object.class.equals(returnType)) {
+				String pre = "";
+				String var = "$obj" + TMP_VAR_SEQ.getAndIncrement();
+				pre = "	Object " + var + " = " + code + ";\n";
+				String charsCode = "(char[]) " + var;
+				code = "$formatter.toString(" + var + ")";
+				if (! nofilter) {
+					getVariables.add(filterVariable);
+					charsCode = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + charsCode + ")";
+					code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
+				}
+				buf.append(pre);
+				buf.append("	if (" + var + " instanceof char[]) $output.write(");
+				buf.append(charsCode);
+				buf.append("); else $output.write(");
+				buf.append(code);
+				buf.append(");\n");
+			} else {
+				if (stream) {
+					code = "$formatter.toBytes(" + code + ")";
+				} else if (char[].class.equals(returnType)) {
+					code = "$formatter.toChars(" + code + ")";
+				} else {
+					code = "$formatter.toString(" + code + ")";
+				}
+				if (! nofilter) {
+					getVariables.add(filterVariable);
+					code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
+				}
+				buf.append("	$output.write(");
+				buf.append(code);
+				buf.append(");\n");
 			}
-			buf.append("	$output.write(");
-			buf.append(code);
-			buf.append(");\n");
 		}
 		return buf.toString();
 	}
@@ -1066,13 +1075,13 @@ public abstract class AbstractParser implements Parser {
 			return;
 		}
 		Filter filter = textFilter;
-		if (valueSwitcher != null || textSwitcher != null) {
+		if (valueFilterSwitcher != null || textFilterSwitcher != null) {
 			Set<String> locations = new HashSet<String>();
-			List<String> valueLocations = valueSwitcher == null ? null : valueSwitcher.locations();
+			List<String> valueLocations = valueFilterSwitcher == null ? null : valueFilterSwitcher.locations();
 			if (valueLocations != null) {
 				locations.addAll(valueLocations);
 			}
-			List<String> textLocations = textSwitcher == null ? null : textSwitcher.locations();
+			List<String> textLocations = textFilterSwitcher == null ? null : textFilterSwitcher.locations();
 			if (textLocations != null) {
 				locations.addAll(textLocations);
 			}
@@ -1100,7 +1109,7 @@ public abstract class AbstractParser implements Parser {
 						buf.append(");\n");
 						for (String location : entry.getValue()) {
 							if (textLocations != null && textLocations.contains(location)) {
-								filter = textSwitcher.enter(location, textFilter);
+								filter = textFilterSwitcher.enter(location, textFilter);
 							}
 							if (valueLocations != null && valueLocations.contains(location)) {
 								buf.append("	" + filterVariable + " = enter(\"" + StringUtils.escapeString(location) + "\", " + defaultFilterVariable + ");\n");

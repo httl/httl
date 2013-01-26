@@ -17,7 +17,7 @@ package httl.spi.switchers;
 
 import httl.spi.Filter;
 
-public class StyleTextSwitcher extends StyleSwitcher {
+public class StyleTextFilterSwitcher extends StyleFilterSwitcher {
 
 	/**
 	 * httl.properties: style.text.filter=httl.spi.filters.StyleTextFilter
