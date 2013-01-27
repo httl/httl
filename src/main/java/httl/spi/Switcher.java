@@ -22,6 +22,7 @@ import java.util.List;
  * 
  * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
  * @see httl.spi.parsers.AbstractParser#setValueFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setFormatterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

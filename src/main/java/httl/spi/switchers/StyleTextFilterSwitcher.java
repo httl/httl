@@ -16,7 +16,15 @@
 package httl.spi.switchers;
 
 import httl.spi.Filter;
+import httl.spi.Switcher;
 
+/**
+ * StyleTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class StyleTextFilterSwitcher extends StyleFilterSwitcher {
 
 	/**

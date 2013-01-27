@@ -17,12 +17,21 @@ package httl.spi.switchers;
 
 import httl.spi.Filter;
 import httl.spi.Switcher;
+import httl.util.Reqiured;
 
+/**
+ * MultiTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class MultiTextFilterSwitcher extends MultiSwitcher<Filter> {
 
 	/**
 	 * httl.properties: text.filter.switchers=httl.spi.switchers.JavascriptFilterSwitcher
 	 */
+	@Reqiured
 	public void setTextFilterSwitchers(Switcher<Filter>[] switchers) {
 		setSwitchers(switchers);
 	}

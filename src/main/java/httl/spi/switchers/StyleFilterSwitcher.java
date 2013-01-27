@@ -21,6 +21,14 @@ import java.util.List;
 import httl.spi.Switcher;
 import httl.spi.Filter;
 
+/**
+ * StyleFilterSwitcher. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setValueFilterSwitcher(Switcher)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class StyleFilterSwitcher implements Switcher<Filter> {
 
 	private static final String START_TAG = "<style";

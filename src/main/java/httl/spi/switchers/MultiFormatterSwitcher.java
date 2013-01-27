@@ -15,23 +15,25 @@
  */
 package httl.spi.switchers;
 
-import httl.spi.Filter;
+import httl.spi.Formatter;
 import httl.spi.Switcher;
+import httl.util.Reqiured;
 
 /**
- * ScriptTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
+ * MultiFormatterSwitcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setFormatterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ScriptTextFilterSwitcher extends ScriptFilterSwitcher {
+public class MultiFormatterSwitcher extends MultiSwitcher<Formatter<Object>> {
 
 	/**
-	 * httl.properties: script.text.filter=httl.spi.filters.ScriptTextFilter
+	 * httl.properties: formatter.switchers=httl.spi.switchers.StyleFormatterSwitcher
 	 */
-	public void setScriptTextFilter(Filter filter) {
-		setScriptFilter(filter);
+	@Reqiured
+	public void setFormatterSwitchers(Switcher<Formatter<Object>>[] switchers) {
+		setSwitchers(switchers);
 	}
 
 }

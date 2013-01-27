@@ -21,6 +21,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * MultiSwitcher. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setValueFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.AbstractParser#setFormatterSwitcher(Switcher)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class MultiSwitcher<T> implements Switcher<T> {
 
 	private Switcher<T>[] switchers;

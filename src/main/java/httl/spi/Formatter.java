@@ -27,6 +27,7 @@ public interface Formatter<T> {
 	/**
 	 * Format the value to a string.
 	 * 
+	 * @param key - expression key.
 	 * @param value - object value.
 	 * @return string value
 	 */
@@ -35,16 +36,18 @@ public interface Formatter<T> {
 	/**
 	 * Format the value to a char array.
 	 * 
+	 * @param key - expression key.
 	 * @param value - object value.
-	 * @return string value
+	 * @return char array value
 	 */
 	char[] toChars(String key, T value);
 
 	/**
 	 * Format the value to a byte array.
 	 * 
+	 * @param key - expression key.
 	 * @param value - object value.
-	 * @return string value
+	 * @return byte array value
 	 */
 	byte[] toBytes(String key, T value);
 
