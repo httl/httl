@@ -214,6 +214,8 @@ public abstract class AbstractParser implements Parser {
 	
 	private Class<?> defaultVariableType;
 
+	private String engineName;
+
 	/**
 	 * httl.properties: var.directive=var
 	 */
@@ -304,12 +306,24 @@ public abstract class AbstractParser implements Parser {
 	public void setOutputEncoding(String outputEncoding) {
 		this.outputEncoding = outputEncoding;
 	}
+	
+	private static final String PROPERTIES_SUFFIX = ".properties";
 
 	/**
 	 * httl.properties: engine=httl.spi.engines.DefaultEngine
 	 */
 	public void setEngine(Engine engine) {
 		this.engine = engine;
+	}
+
+	/**
+	 * httl.properties: engine.name=httl.properties
+	 */
+	public void setEngineName(String name) {
+		if (name.endsWith(PROPERTIES_SUFFIX)) {
+			name = name.substring(0, name.length() - PROPERTIES_SUFFIX.length());
+		}
+		this.engineName = name;
 	}
 
 	protected Engine getEngine() {
@@ -531,12 +545,13 @@ public abstract class AbstractParser implements Parser {
 	}
 	
 	protected String getDiretive(String name, String value) {
-		return name + "(" + value + ")";
+		return "#" + name + "(" + value + ")";
 	}
 
 	protected abstract String doParse(Resource resoure, boolean stream, String source, Translator translator, 
 									  List<String> parameters, List<Class<?>> parameterTypes, 
-									  Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException;
+									  Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
+									  Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros, StringBuilder textFields, AtomicInteger seq) throws IOException, ParseException;
 
 	public Template parse(Resource resource, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
 		try {
@@ -575,6 +590,10 @@ public abstract class AbstractParser implements Parser {
 		long lastModified = resource.getLastModified();
 		StringBuilder buf = new StringBuilder(name.length() + 40);
 		buf.append(name);
+		if (engineName != null) {
+			buf.append("_");
+			buf.append(engineName);
+		}
 		if (encoding != null) {
 			buf.append("_");
 			buf.append(encoding);
@@ -630,8 +649,9 @@ public abstract class AbstractParser implements Parser {
 			src = filterCData(src);
 			src = filterComment(src);
 			src = filterEscape(src);
-			src = doParse(resource, stream, src, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros);
-			String code = filterStatement(src, textFields, getVariables, types, new AtomicInteger(), stream, resource);
+			AtomicInteger seq = new AtomicInteger();
+			src = doParse(resource, stream, src, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros, textFields, seq);
+			String code = filterStatement(src, textFields, getVariables, types, seq, stream, resource);
 			int i = name.lastIndexOf('.');
 			String packageName = i < 0 ? "" : name.substring(0, i);
 			String className = i < 0 ? name : name.substring(i + 1);
@@ -1031,7 +1051,7 @@ public abstract class AbstractParser implements Parser {
 		return buf.toString().replace("	$output.write();\n", "");
 	}
 	
-	protected String getExpressionCode(String symbol, String expr, String code, Class<?> returnType, boolean stream, Set<String> getVariables) {
+	protected String getExpressionCode(String symbol, String expr, String code, Class<?> returnType, boolean stream, Set<String> getVariables, StringBuilder textFields, AtomicInteger seq) {
 		StringBuilder buf = new StringBuilder();
 		boolean nofilter = "$!".equals(symbol);
 		if (nofilter && Template.class.isAssignableFrom(returnType)) {
@@ -1057,16 +1077,19 @@ public abstract class AbstractParser implements Parser {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
 			}
 			getVariables.add(formatterVariable);
+			StringBuffer keyBuf = new StringBuffer();
+			appendText(keyBuf, expr, null, textFields, seq, stream, true);
+			String key = keyBuf.toString();
 			if (! stream && Object.class.equals(returnType)) {
 				String pre = "";
 				String var = "$obj" + TMP_VAR_SEQ.getAndIncrement();
 				pre = "	Object " + var + " = " + code + ";\n";
-				String charsCode = "formatter.toChars(" + var + ")";
-				code = "formatter.toString(" + var + ")";
+				String charsCode = "formatter.toChars(" + key + ", (char[]) " + var + ")";
+				code = "formatter.toString(" + key + ", " + var + ")";
 				if (! nofilter) {
 					getVariables.add(filterVariable);
-					charsCode = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + charsCode + ")";
-					code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
+					charsCode = "doFilter(" + filterVariable + ", " + key + ", " + charsCode + ")";
+					code = "doFilter(" + filterVariable + ", " + key + ", " + code + ")";
 				}
 				buf.append(pre);
 				buf.append("	if (" + var + " instanceof char[]) $output.write(");
@@ -1076,15 +1099,15 @@ public abstract class AbstractParser implements Parser {
 				buf.append(");\n");
 			} else {
 				if (stream) {
-					code = "formatter.toBytes(" + code + ")";
+					code = "formatter.toBytes(" + key + ", " + code + ")";
 				} else if (char[].class.equals(returnType)) {
-					code = "formatter.toChars(" + code + ")";
+					code = "formatter.toChars(" + key + ", " + code + ")";
 				} else {
-					code = "formatter.toString(" + code + ")";
+					code = "formatter.toString(" + key + ", " + code + ")";
 				}
 				if (! nofilter) {
 					getVariables.add(filterVariable);
-					code = "doFilter(" + filterVariable + ", \"" + StringUtils.escapeString(expr) + "\", " + code + ")";
+					code = "doFilter(" + filterVariable + ", " + key + ", " + code + ")";
 				}
 				buf.append("	$output.write(");
 				buf.append(code);
@@ -1120,7 +1143,7 @@ public abstract class AbstractParser implements Parser {
 				getVariables.addAll(expr.getParameterTypes().keySet());
 				String code = expr.getCode();
 				Class<?> returnType = expr.getReturnType();
-				buf.append(getExpressionCode(symbol, expression, code, returnType, stream, getVariables));
+				buf.append(getExpressionCode(symbol, expression, code, returnType, stream, getVariables, textFields, seq));
 			} else {
 				boolean nofilter = "#!".equals(symbol);
 				Expression expr = translator.translate(expression, Collections.EMPTY_MAP, off);
@@ -1135,7 +1158,7 @@ public abstract class AbstractParser implements Parser {
 					} else if (value instanceof Resource) {
 						value = IOUtils.readToString(((Resource)value).getReader());
 					}
-					String str = formatter.toString(value);
+					String str = formatter.toString(expression, value);
 					if (! nofilter && valueFilter != null) {
 						str = valueFilter.filter(str, str);
 					}
@@ -1206,7 +1229,7 @@ public abstract class AbstractParser implements Parser {
 					int begin = 0;
 					for (Map.Entry<Integer, Set<String>> entry : switchesd.entrySet()) {
 						int end = entry.getKey();
-						appendText(buf, txt.substring(begin, end), filter, textFields, seq, stream);
+						appendText(buf, txt.substring(begin, end), filter, textFields, seq, stream, false);
 						begin = end;
 						buf.append(");\n");
 						for (String location : entry.getValue()) {
@@ -1226,10 +1249,10 @@ public abstract class AbstractParser implements Parser {
 				}
 			}
 		}
-		appendText(buf, txt, filter, textFields, seq, stream);
+		appendText(buf, txt, filter, textFields, seq, stream, false);
 	}
 
-	private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder textFields, AtomicInteger seq, boolean stream) {
+	private void appendText(StringBuffer buf, String txt, Filter filter, StringBuilder textFields, AtomicInteger seq, boolean stream, boolean string) {
 		if (StringUtils.isEmpty(txt)) {
 			return;
 		}
@@ -1240,7 +1263,14 @@ public abstract class AbstractParser implements Parser {
 		}
 		if (StringUtils.isNotEmpty(txt)) {
 			String var = "$TXT" + seq.incrementAndGet();
-			if (stream) {
+			if (string) {
+				if (textInClass) {
+					textFields.append("private static final String " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
+				} else {
+					String txtId = StringCache.put(txt);
+					textFields.append("private static final String " + var + " = " + StringCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
+				}
+			} else if (stream) {
 				if (textInClass) {
 					textFields.append("private static final byte[] " + var + " = new byte[] {" + StringUtils.toByteString(StringUtils.toBytes(txt, outputEncoding)) + "};\n");
 				} else {
@@ -1249,7 +1279,7 @@ public abstract class AbstractParser implements Parser {
 				}
 			} else {
 				if (textInClass) {
-					textFields.append("private static final char[] " + var + " = \"" + StringUtils.escapeString(txt) + "\";\n");
+					textFields.append("private static final char[] " + var + " = new char[] {" + StringUtils.toCharString(txt.toCharArray()) + "};\n");
 				} else {
 					String txtId = CharCache.put(txt.toCharArray());
 					textFields.append("private static final char[] " + var + " = " + CharCache.class.getName() +  ".getAndRemove(\"" + txtId + "\");\n");
@@ -1435,7 +1465,7 @@ public abstract class AbstractParser implements Parser {
 			}
 		} else if (varDirective.equals(name)) {
 			if (StringUtils.isEmpty(value)) {
-				throw new ParseException("The in parameters == null!", begin);
+				throw new ParseException("The #" + varDirective + " parameters == null!", begin);
 			}
 			value = BLANK_PATTERN.matcher(value).replaceAll(" ");
 			List<String> vs = new ArrayList<String>();

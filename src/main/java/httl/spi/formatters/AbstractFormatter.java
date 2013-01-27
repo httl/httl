@@ -15,22 +15,22 @@ public abstract class AbstractFormatter<T> implements Formatter<T> {
 		this.outputEncoding = outputEncoding;
 	}
 
-	public char[] toChars(T value) { // slowly
+	public char[] toChars(String key, T value) { // slowly
 		if (value == null) {
 			return new char[0];
 		}
-		String str = toString(value);
+		String str = toString(key, value);
 		if (str == null) {
 			return new char[0];
 		}
 		return str.toCharArray();
 	}
 
-	public byte[] toBytes(T value) { // slowly
+	public byte[] toBytes(String key, T value) { // slowly
 		if (value == null) {
 			return new byte[0];
 		}
-		String str = toString(value);
+		String str = toString(key, value);
 		if (str == null) {
 			return new byte[0];
 		}

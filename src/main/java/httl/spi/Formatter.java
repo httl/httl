@@ -30,7 +30,7 @@ public interface Formatter<T> {
 	 * @param value - object value.
 	 * @return string value
 	 */
-	String toString(T value);
+	String toString(String key, T value);
 
 	/**
 	 * Format the value to a char array.
@@ -38,7 +38,7 @@ public interface Formatter<T> {
 	 * @param value - object value.
 	 * @return string value
 	 */
-	char[] toChars(T value);
+	char[] toChars(String key, T value);
 
 	/**
 	 * Format the value to a byte array.
@@ -46,6 +46,6 @@ public interface Formatter<T> {
 	 * @param value - object value.
 	 * @return string value
 	 */
-	byte[] toBytes(T value);
+	byte[] toBytes(String key, T value);
 
 }

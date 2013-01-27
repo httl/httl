@@ -47,7 +47,7 @@ public class DateFormatter extends AbstractFormatter<Date> {
 		this.timeZone = TimeZone.getTimeZone(timeZone);
 	}
 
-	public String toString(Date value) {
+	public String toString(String key, Date value) {
 		return DateUtils.format(value, dateFormat, timeZone);
 	}
 

@@ -22,14 +22,14 @@ import httl.spi.translators.expressions.Bracket;
 import httl.spi.translators.expressions.Constant;
 import httl.spi.translators.expressions.Node;
 import httl.spi.translators.expressions.Operator;
-import httl.spi.translators.expressions.Token;
 import httl.spi.translators.expressions.UnaryOperator;
 import httl.spi.translators.expressions.Variable;
+import httl.util.DfaScanner;
 import httl.util.LinkedStack;
 import httl.util.StringUtils;
+import httl.util.Token;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,38 +51,80 @@ public class DfaParser {
 
 	//单字母命名, 保证状态机图简洁
 	
-	// END，结束片段，包含当前字符
-	private static final int E = -1;
+	// BREAK，结束片段，包含当前字符
+	private static final int B = DfaScanner.BREAK;
 
-	// BACK，结束片段，退还当前字符
-	private static final int B = -2;
+	// BACK_ONE，结束片段，退还当前字符
+	private static final int B1 = DfaScanner.BREAK - 1;
 
 	// BACK_TWO，结束片段，退还两个字符
-	private static final int T = -3;
+	private static final int B2 = DfaScanner.BREAK - 2;
 
-	// FAIL，解析出错
-	private static final int F = -99;
+	// ERROR，解析出错
+	private static final int E = DfaScanner.ERROR;
 
 	// 表达式语法状态机图
 	// 行表示状态
 	// 行列交点表示, 在该状态时, 遇到某类型的字符时, 切换到的下一状态(数组行号)
 	// E/B/T表示接收前面经过的字符为一个片断, R表示错误状态(这些状态均为负数)
-	private static final int states[][] = {
+	static final int states[][] = {
 				  // 0.空格, 1.字母, 2.数字, 3.点号, 4.双引号, 5.单引号, 6.反单引号, 7.反斜线, 8.括号, 9.其它
 		/* 0.起始  */ { 0, 1, 2, 5, 7, 9, 11, 4, 6, 4}, // 初始状态或上一片断刚接收完成状态
-		/* 1.变量  */{ B, 1, 1, B, F, F, F, B, B, B}, // 变量名识别
-		/* 2.数字  */{ B, 2, 2, 13, F, F, F, B, B, B}, // 数字识别
-		/* 3.小数  */{ B, 3, 3, B, F, F, F, B, B, B}, // 小数点号识别
-		/* 4.操作*/{ B, B, B, 4, B, B, B, 4, B, 4}, // 操作符识别
-		/* 5.点号  */{ B, 1, 3, E, B, B, B, B, B, 4}, // 属性点号
-		/* 6.括号  */{ B, B, B, B, B, B, B, B, B, B}, // 括号
-		/* 7.字符*/{ 7, 7, 7, 7, E, 7, 7, 8, 7, 7}, // 双引号字符串识别
+		/* 1.变量  */{ B1, 1, 1, B1, E, E, E, B1, B1, B1}, // 变量名识别
+		/* 2.数字  */{ B1, 2, 2, 13, E, E, E, B1, B1, B1}, // 数字识别
+		/* 3.小数  */{ B1, 3, 3, B1, E, E, E, B1, B1, B1}, // 小数点号识别
+		/* 4.操作*/{ B1, B1, B1, 4, B1, B1, B1, 4, B1, 4}, // 操作符识别
+		/* 5.点号  */{ B1, 1, 3, B, B1, B1, B1, B1, B1, 4}, // 属性点号
+		/* 6.括号  */{ B1, B1, B1, B1, B1, B1, B1, B1, B1, B1}, // 括号
+		/* 7.字符*/{ 7, 7, 7, 7, B, 7, 7, 8, 7, 7}, // 双引号字符串识别
 		/* 8.转义  */{ 7, 7, 7, 7, 7, 7, 7, 7, 7, 7}, // 双引号字符串转义
-		/* 9.字符*/{ 9, 9, 9, 9, 9, E, 9, 10, 9, 9}, // 单引号字符串识别
+		/* 9.字符*/{ 9, 9, 9, 9, 9, B, 9, 10, 9, 9}, // 单引号字符串识别
 		/*10.转义  */{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9}, // 单引号字符串转义
-		/*11.字符  */{ 11, 11, 11, 11, 11, 11, E, 11, 11, 11}, // 反单引号字符串识别
+		/*11.字符  */{ 11, 11, 11, 11, 11, 11, B, 11, 11, 11}, // 反单引号字符串识别
 		/*12.转义  */{ 11, 11, 11, 11, 11, 11, 11, 11, 11, 11}, // 反单引号字符串转义
-		/*13.数点  */{ T, T, 3, T, T, T, T, T, T, T}, // 数字属性点号识别, 区分于小数点(如: 123.toString 或 11..15)
+		/*13.数点  */{ B2, B2, 3, B2, B2, B2, B2, B2, B2, B2}, // 数字属性点号识别, 区分于小数点(如: 123.toString 或 11..15)
+	};
+
+	static int getCharType(char ch) {
+		switch (ch) {
+			case ' ': case '\t': case '\n': case '\r': case '\f': case '\b':
+				return 0;
+			case '_' :
+			case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : 
+			case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' : 
+			case 'o' : case 'p' : case 'q' : case 'r' : case 's' : case 't' : 
+			case 'u' : case 'v' : case 'w' : case 'x' : case 'y' : case 'z' :
+			case 'A' : case 'B' : case 'C' : case 'D' : case 'E' : case 'F' : case 'G' : 
+			case 'H' : case 'I' : case 'J' : case 'K' : case 'L' : case 'M' : case 'N' : 
+			case 'O' : case 'P' : case 'Q' : case 'R' : case 'S' : case 'T' : 
+			case 'U' : case 'V' : case 'W' : case 'X' : case 'Y' : case 'Z' :
+				return 1;
+			case '0' : case '1' : case '2' : case '3' : case '4' : 
+			case '5' : case '6' : case '7' : case '8' : case '9' : 
+				return 2;
+			case '.' : 
+				return 3;
+			case '\"' : 
+				return 4;
+			case '\'' : 
+				return 5;
+			case '`' : 
+				return 6;
+			case '\\' : 
+				return 7;
+			case '(' : case ')' : case '[' : case ']' : 
+				return 8;
+			default:
+				return 9;
+		}
+	}
+
+	private static DfaScanner scanner = new DfaScanner() {
+		@Override
+		public int next(int state, char ch) {
+			return states[state][getCharType(ch)];
+		}
+		
 	};
 	
 	private static final Set<String> BINARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "*", "/", "%", "==", "!=", ">", ">=", "<", "<=", "gt", "ge", "lt", "le", "&&", "||", "&", "|", "^", ">>", "<<", ">>>", ",", "?", ":", "instanceof", "[", ".."}));
@@ -135,40 +177,6 @@ public class DfaParser {
 			offset = 0;
 		}
 		return offset;
-	}
-	
-	private int getCharType(char ch) {
-		switch (ch) {
-			case ' ': case '\t': case '\n': case '\r': case '\f': case '\b':
-				return 0;
-			case '_' :
-			case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : 
-			case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' : 
-			case 'o' : case 'p' : case 'q' : case 'r' : case 's' : case 't' : 
-			case 'u' : case 'v' : case 'w' : case 'x' : case 'y' : case 'z' :
-			case 'A' : case 'B' : case 'C' : case 'D' : case 'E' : case 'F' : case 'G' : 
-			case 'H' : case 'I' : case 'J' : case 'K' : case 'L' : case 'M' : case 'N' : 
-			case 'O' : case 'P' : case 'Q' : case 'R' : case 'S' : case 'T' : 
-			case 'U' : case 'V' : case 'W' : case 'X' : case 'Y' : case 'Z' :
-				return 1;
-			case '0' : case '1' : case '2' : case '3' : case '4' : 
-			case '5' : case '6' : case '7' : case '8' : case '9' : 
-				return 2;
-			case '.' : 
-				return 3;
-			case '\"' : 
-				return 4;
-			case '\'' : 
-				return 5;
-			case '`' : 
-				return 6;
-			case '\\' : 
-				return 7;
-			case '(' : case ')' : case '[' : case ']' : 
-				return 8;
-			default:
-				return 9;
-		}
 	}
 	
 	private int getPriority(String operator, boolean unary) {
@@ -250,61 +258,8 @@ public class DfaParser {
 		return priority;
 	}
 	
-	public List<Token> scan(String charStream) throws ParseException {
-		List<Token> tokens = new ArrayList<Token>();
-		// 解析时状态 ----
-		StringBuilder buffer = new StringBuilder(); // 缓存字符
-		StringBuilder remain = new StringBuilder(); // 残存字符
-		int state = 0; // 当前状态
-		char ch; // 当前字符
-		int offset = 0;
-
-		// 逐字解析 ----
-		int i = 0;
-		for(;;) {
-			if (remain.length() > 0) { // 先处理残存字符
-				ch = remain.charAt(0);
-				remain.deleteCharAt(0);
-			} else { // 没有残存字符则读取字符流
-				if (i >= charStream.length()) {
-					break;
-				}
-				ch = charStream.charAt(i ++);
-				offset ++;
-			}
-
-			buffer.append(ch); // 将字符加入缓存
-			int type = getCharType(ch); // 获取字符类型
-			state = states[state][type]; // 从状态机图中取下一状态
-			if (state < 0) { // 负数表示接收状态
-				if (state == E || state == B || state == T) {
-					int acceptLength = buffer.length() + state + 1;
-					if (acceptLength < 0 || acceptLength > buffer.length())
-						throw new ParseException("DFAScanner.accepter.error", offset - buffer.length());
-					if (acceptLength != 0) {
-						String message = buffer.substring(0, acceptLength);
-						Token token = new Token(message, offset - buffer.length(), state);
-						tokens.add(token);// 完成接收
-					}
-					if (acceptLength != buffer.length())
-						remain.insert(0, buffer.substring(acceptLength)); // 将未接收的缓存记入残存
-					buffer.setLength(0); // 清空缓存
-					state = 0; // 回归到初始状态
-				} else {
-					throw new ParseException("DFAScanner.state.error", offset - buffer.length());
-				}
-			}
-		}
-		// 接收最后缓存中的内容
-		if (buffer.length() > 0) {
-			String message = buffer.toString();
-			tokens.add(new Token(message, offset - message.length(), 0));
-		}
-		return tokens;
-	}
-	
 	public Node parse(String source, Set<String> variables) throws ParseException {
-		List<Token> tokens = scan(source);
+		List<Token> tokens = scanner.scan(source);
 		boolean beforeOperator = true;
 		for (int i = 0; i < tokens.size(); i ++) {
 			Token token = tokens.get(i);

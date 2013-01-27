@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.util;
 
-import httl.util.StringUtils;
 
 /**
  * Token. (Tool, Prototype, NotThreadsafe)

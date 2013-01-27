@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,21 +85,21 @@ public class AttributeParser extends AbstractParser {
 	}
 
 	protected String doParse(Resource resource, boolean stream, String reader, Translator translator, 
-							 List<String> parameters, List<Class<?>> parameterTypes, 
-							 Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
+							 List<String> parameters, List<Class<?>> parameterTypes, Set<String> setVariables, 
+							 Set<String> getVariables, Map<String, Class<?>> types, Map<String, Class<?>> returnTypes, 
+							 Map<String, Class<?>> macros, StringBuilder textFields, AtomicInteger seq) throws IOException, ParseException {
 		Source source = new Source(reader);
 		OutputDocument document = new OutputDocument(source);
-		parseAttribute(resource, stream, source, source, document, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros);
+		parseAttribute(resource, stream, source, source, document, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros, textFields, seq);
 		return document.toString();
 	}
 
 	// 替换子元素中的指令属性
 	private void parseAttribute(Resource resource, boolean stream, Source source, 
-								 Segment segment, OutputDocument document, 
-								 Translator translator, 
+								 Segment segment, OutputDocument document, Translator translator, 
 								 List<String> parameters, List<Class<?>> parameterTypes, 
 								 Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, Map<String, 
-								 Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
+								 Class<?>> returnTypes, Map<String, Class<?>> macros, StringBuilder textFields, AtomicInteger seq) throws IOException, ParseException {
 		List<Element> elements = segment.getChildElements();
 		if (elements == null) {
 			return;
@@ -187,7 +188,7 @@ public class AttributeParser extends AbstractParser {
 							buf.append(element.getEnd() - macro.getBegin());
 							if (StringUtils.isNotEmpty(out)) {
 								getVariables.add(var);
-								String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
+								String code = getExpressionCode(out, var, var, Template.class, stream, getVariables, textFields, seq);
 								buf.append(code);
 							} else if (StringUtils.isNotEmpty(set)) {
 								getVariables.add(var);
@@ -317,7 +318,7 @@ public class AttributeParser extends AbstractParser {
 				buf.append(element.length());
 				if (StringUtils.isNotEmpty(out)) {
 					getVariables.add(var);
-					String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
+					String code = getExpressionCode(out, var, var, Template.class, stream, getVariables, textFields, seq);
 					buf.append(code);
 				} else if (StringUtils.isNotEmpty(set)) {
 					getVariables.add(var);
@@ -361,7 +362,7 @@ public class AttributeParser extends AbstractParser {
 				String end = ends.pop();
 				document.insert(element.getEnd(), LEFT + end + RIGHT); // 插入结束指令
 			}
-			parseAttribute(resource, stream, source, element, document, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros); // 递归处理子标签
+			parseAttribute(resource, stream, source, element, document, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros, textFields, seq); // 递归处理子标签
 		}
 	}
 	

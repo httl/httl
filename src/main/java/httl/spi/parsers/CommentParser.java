@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +57,7 @@ public class CommentParser extends AbstractParser {
 	protected String doParse(Resource resource, boolean stream, String source, Translator translator, 
 							 List<String> parameters, List<Class<?>> parameterTypes, 
 							 Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
-							 Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros) throws IOException, ParseException {
+							 Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros, StringBuilder textFields, AtomicInteger seq) throws IOException, ParseException {
 		LinkedStack<String> nameStack = new LinkedStack<String>();
 		LinkedStack<String> valueStack = new LinkedStack<String>();
 		StringBuffer macro = null;
@@ -147,7 +148,7 @@ public class CommentParser extends AbstractParser {
 						buf.append(matcher.end() - macroStart);
 						if (StringUtils.isNotEmpty(out)) {
 							getVariables.add(var);
-							String code = getExpressionCode(out, var, var, Template.class, stream, getVariables);
+							String code = getExpressionCode(out, var, var, Template.class, stream, getVariables, textFields, seq);
 							buf.append(code);
 						} else if (StringUtils.isNotEmpty(set)) {
 							getVariables.add(var);

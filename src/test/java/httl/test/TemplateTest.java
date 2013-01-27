@@ -135,7 +135,7 @@ public class TemplateTest extends TestCase {
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
 		Object[] maps = new Object[] {context, model, null};
-		String[] configs = new String[] { "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
+		String[] configs = new String[] { "httl-text.properties", "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
 		for (String config : configs) {
 			for (Object map : maps) {
 				if (! profile) 
@@ -166,7 +166,7 @@ public class TemplateTest extends TestCase {
 				for (long m = 0; m < max; m ++) {
 					for (int i = 0, n = files.length; i < n; i ++) {
 						File file = files[i];
-						// if (! "list.httl".equals(file.getName())) continue;
+						//if (! "include.httl".equals(file.getName())) continue;
 						if (! profile)
 							System.out.println(file.getName());
 						if (excludes.contains(file.getName()) || 
@@ -221,6 +221,11 @@ public class TemplateTest extends TestCase {
 							}
 							String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
 							expected = expected.replace("\r", "");
+							if ("httl-text.properties".equals(config) 
+									&& ! "comment_cdata_escape.httl".equals(file.getName())
+									&& ! template.getSource().contains("read(")) {
+								expected = expected.replace("<!--", "").replace("-->", "");
+							}
 							super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
 							super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
 							if ("set_parameters.httl".equals(file.getName())) {
