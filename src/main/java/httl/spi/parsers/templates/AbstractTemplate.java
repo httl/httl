@@ -108,7 +108,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	protected MultiFormatter switchFormatter(String location, MultiFormatter defaultFormatter) {
 		if (formatterSwitcher != null) {
-			return toMultiFormatter(formatterSwitcher.enter(location, defaultFormatter));
+			return toMultiFormatter(formatterSwitcher.switchover(location, defaultFormatter));
 		}
 		return defaultFormatter;
 	}
@@ -123,7 +123,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	protected Filter switchFilter(String location, Filter defaultFilter) {
 		if (filterSwitcher != null) {
-			return filterSwitcher.enter(location, defaultFilter);
+			return filterSwitcher.switchover(location, defaultFilter);
 		}
 		return defaultFilter;
 	}

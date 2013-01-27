@@ -65,16 +65,16 @@ public class MultiSwitcher<T> implements Switcher<T> {
 		return locations;
 	}
 
-	public T enter(String location, T origin) {
+	public T switchover(String location, T origin) {
 		if (switchers == null || switchers.length == 0) {
 			return origin;
 		}
 		if (switchers.length == 1) {
-			return switchers[0].enter(location, origin);
+			return switchers[0].switchover(location, origin);
 		}
 		for (Switcher<T> switcher : switchers) {
 			if (switcher.locations().contains(location)) {
-				return switcher.enter(location, origin);
+				return switcher.switchover(location, origin);
 			}
 		}
 		return origin;

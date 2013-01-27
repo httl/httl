@@ -1234,7 +1234,7 @@ public abstract class AbstractParser implements Parser {
 						buf.append(");\n");
 						for (String location : entry.getValue()) {
 							if (textLocations != null && textLocations.contains(location)) {
-								filter = textFilterSwitcher.enter(location, textFilter);
+								filter = textFilterSwitcher.switchover(location, textFilter);
 							}
 							if (valueLocations != null && valueLocations.contains(location)) {
 								buf.append("	" + filterVariable + " = switchFilter(\"" + StringUtils.escapeString(location) + "\", " + defaultFilterVariable + ");\n");

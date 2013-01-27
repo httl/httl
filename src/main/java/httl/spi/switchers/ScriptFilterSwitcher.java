@@ -57,7 +57,7 @@ public class ScriptFilterSwitcher implements Switcher<Filter> {
 		return scriptLocations;
 	}
 
-	public Filter enter(String location, Filter defaultFilter) {
+	public Filter switchover(String location, Filter defaultFilter) {
 		if (START_TAG.equals(location)) {
 			return scriptFilter;
 		}

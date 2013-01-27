@@ -57,7 +57,7 @@ public class StyleFilterSwitcher implements Switcher<Filter> {
 		return styleLocations;
 	}
 
-	public Filter enter(String location, Filter defaultFilter) {
+	public Filter switchover(String location, Filter defaultFilter) {
 		if (START_TAG.equals(location)) {
 			return styleFilter;
 		}

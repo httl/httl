@@ -54,6 +54,6 @@ public interface Switcher<T> {
 	 * @param origin - the origin value
 	 * @return the location value
 	 */
-	T enter(String location, T origin);
+	T switchover(String location, T origin);
 
 }
