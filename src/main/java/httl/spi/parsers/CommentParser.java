@@ -74,7 +74,7 @@ public class CommentParser extends AbstractParser {
 			} else {
 				offset = matcher.start(2);
 			}
-			if (value.startsWith("(")
+			if (value != null && value.startsWith("(")
 					&& (varDirective.equals(name) || setDirective.equals(name)
 							|| elseDirective.equals(name) || foreachDirective.equals(name) 
 							|| macroDirective.equals(name) || endDirective.equals(name))) {
