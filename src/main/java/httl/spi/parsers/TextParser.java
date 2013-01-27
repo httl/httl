@@ -87,7 +87,6 @@ public class TextParser extends AbstractParser {
 		switch (ch) {
 			case ' ': case '\t': case '\n': case '\r': case '\f': case '\b':
 				return 0;
-			case '_' :
 			case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : 
 			case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' : 
 			case 'o' : case 'p' : case 'q' : case 'r' : case 's' : case 't' : 
