@@ -68,15 +68,15 @@ public class ServletResolver implements Resolver, Filter {
 
 	private static String RESPONSE_ENCODING;
 
-	private static void setResponseEncoding(String responseEncoding) {
+	private static void _setResponseEncoding(String responseEncoding) {
 		RESPONSE_ENCODING = responseEncoding;
 	}
 
 	/**
-	 * httl.properties: output.encoding=UTF-8
+	 * httl.properties: response.encoding=UTF-8
 	 */
-	public void setOutputEncoding(String outputEncoding) {
-		setResponseEncoding(outputEncoding);
+	public void setResponseEncoding(String responseEncoding) {
+		_setResponseEncoding(responseEncoding);
 	}
 
 	public static void set(HttpServletRequest request, HttpServletResponse response) {
@@ -255,8 +255,7 @@ public class ServletResolver implements Resolver, Filter {
 	}
 
 	private static void checkResponseEncoding(HttpServletResponse response) {
-		if (StringUtils.isNotEmpty(RESPONSE_ENCODING)
-				&& StringUtils.isEmpty(response.getCharacterEncoding())) {
+		if (StringUtils.isNotEmpty(RESPONSE_ENCODING)) {
 			response.setCharacterEncoding(RESPONSE_ENCODING);
 			String contentType = response.getContentType();
 			if (StringUtils.isEmpty(contentType)) {
