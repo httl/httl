@@ -26,12 +26,14 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * ServletResolver. (SPI, Singleton, ThreadSafe)
@@ -66,15 +68,15 @@ public class ServletResolver implements Resolver, Filter {
 
 	private static String RESPONSE_ENCODING;
 
-	private static void _setResponseEncoding(String responseEncoding) {
+	private static void setResponseEncoding(String responseEncoding) {
 		RESPONSE_ENCODING = responseEncoding;
 	}
 
 	/**
-	 * httl.properties: response.encoding=UTF-8
+	 * httl.properties: output.encoding=UTF-8
 	 */
-	public void setResponseEncoding(String responseEncoding) {
-		_setResponseEncoding(responseEncoding);
+	public void setOutputEncoding(String outputEncoding) {
+		setResponseEncoding(outputEncoding);
 	}
 
 	public static void set(HttpServletRequest request, HttpServletResponse response) {
@@ -100,7 +102,7 @@ public class ServletResolver implements Resolver, Filter {
 
 	public static void setResponse(HttpServletResponse response) {
 		if (response != null) {
-			setResponseEncoding(response);
+			checkResponseEncoding(response);
 			RESPONSE_LOCAL.set(response);
 		} else {
 			RESPONSE_LOCAL.remove();
@@ -169,45 +171,6 @@ public class ServletResolver implements Resolver, Filter {
 		if (request == null) {
 			return null;
 		}
-		Object value = ClassUtils.getProperty(request, key);
-		if (value != null) {
-			if ("contextPath".equals(key) && "/".equals(value)) {
-				return ""; // e.g. ${contextPath}/index.html
-			}
-			return value;
-		}
-		value = request.getAttribute(key);
-		if (value != null) {
-			return value;
-		}
-		value = getParameterValue(request, key);
-		if (value != null) {
-			return value;
-		}
-		value = getHeaderValue(request, key);
-		if (value != null) {
-			return value;
-		}
-		value = ClassUtils.getProperty(request.getSession(), key);
-		if (value != null) {
-			return value;
-		}
-		value = request.getSession().getAttribute(key);
-		if (value != null) {
-			return value;
-		}
-		value = getCookieValue(request, key);
-		if (value != null) {
-			return value;
-		}
-		value = ClassUtils.getProperty(request.getSession().getServletContext(), key);
-		if (value != null) {
-			return value;
-		}
-		value = request.getSession().getServletContext().getAttribute(key);
-		if (value != null) {
-			return value;
-		}
 		if (REQUEST_KEY.equals(key)) {
 			return request;
 		}
@@ -241,11 +204,59 @@ public class ServletResolver implements Resolver, Filter {
 				}
 			};
 		}
+		Object value = ClassUtils.getProperty(request, key);
+		if (value != null) {
+			if ("contextPath".equals(key) && "/".equals(value)) {
+				return ""; // e.g. ${contextPath}/index.html
+			}
+			return value;
+		}
+		value = request.getAttribute(key);
+		if (value != null) {
+			return value;
+		}
+		value = getParameterValue(request, key);
+		if (value != null) {
+			return value;
+		}
+		value = getHeaderValue(request, key);
+		if (value != null) {
+			return value;
+		}
+		HttpSession session = request.getSession();
+		if (session != null) {
+			value = ClassUtils.getProperty(session, key);
+			if (value != null) {
+				return value;
+			}
+			value = session.getAttribute(key);
+			if (value != null) {
+				return value;
+			}
+		}
+		value = getCookieValue(request, key);
+		if (value != null) {
+			return value;
+		}
+		if (session != null) {
+			ServletContext servletContext = session.getServletContext();
+			if (servletContext != null) {
+				value = ClassUtils.getProperty(servletContext, key);
+				if (value != null) {
+					return value;
+				}
+				value = servletContext.getAttribute(key);
+				if (value != null) {
+					return value;
+				}
+			}
+		}
 		return value;
 	}
 
-	private static void setResponseEncoding(HttpServletResponse response) {
-		if (StringUtils.isNotEmpty(RESPONSE_ENCODING)) {
+	private static void checkResponseEncoding(HttpServletResponse response) {
+		if (StringUtils.isNotEmpty(RESPONSE_ENCODING)
+				&& StringUtils.isEmpty(response.getCharacterEncoding())) {
 			response.setCharacterEncoding(RESPONSE_ENCODING);
 			String contentType = response.getContentType();
 			if (StringUtils.isEmpty(contentType)) {

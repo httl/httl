@@ -19,6 +19,7 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Formatter;
+import httl.util.ClassComparator;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
 import httl.util.IOUtils;
@@ -27,8 +28,10 @@ import httl.util.StringUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,6 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MultiFormatter implements Formatter<Object> {
 
 	private final Map<Class<?>, Formatter<?>> formatters = new ConcurrentHashMap<Class<?>, Formatter<?>>();
+
+	private Map<Class<?>, Formatter<?>> sortedFormatters;
 
 	private Formatter<Object> formatter;
 	
@@ -86,9 +91,7 @@ public class MultiFormatter implements Formatter<Object> {
 	}
 
 	public MultiFormatter(Formatter<?> formatter) {
-		if (formatter != null) {
-			setFormatters(new Formatter<?>[] { formatter });
-		}
+		setFormatters(new Formatter<?>[] { formatter });
 		init();
 	}
 
@@ -102,6 +105,16 @@ public class MultiFormatter implements Formatter<Object> {
 		if (falseValue == null) {
 			setFalseValue("false");
 		}
+		this.numberFormatter = get(Number.class);
+		this.booleanFormatter = get(Boolean.class);
+		this.byteFormatter = getFormatter(Byte.class, numberFormatter);
+		this.charFormatter = get(Character.class);
+		this.shortFormatter = getFormatter(Short.class, numberFormatter);
+		this.intFormatter = getFormatter(Integer.class, numberFormatter);
+		this.longFormatter = getFormatter(Long.class, numberFormatter);
+		this.floatFormatter = getFormatter(Float.class, numberFormatter);
+		this.doubleFormatter = getFormatter(Double.class, numberFormatter);
+		this.dateFormatter = get(Date.class);
 	}
 
 	/**
@@ -139,6 +152,47 @@ public class MultiFormatter implements Formatter<Object> {
 	}
 
 	/**
+	 * Add and copy the MultiFormatter.
+	 * 
+	 * @param formatters
+	 * @return
+	 */
+	public MultiFormatter add(Formatter<?>... formatters) {
+		if (formatter != null) {
+			MultiFormatter copy = new MultiFormatter();
+			copy.formatters.putAll(this.formatters);
+			copy.setFormatters(formatters);
+			return copy;
+		}
+		return this;
+	}
+
+	/**
+	 * Remove and copy the MultiFormatter.
+	 * 
+	 * @param formatters
+	 * @return
+	 */
+	public MultiFormatter remove(Formatter<?>... formatters) {
+		if (formatter != null) {
+			MultiFormatter copy = new MultiFormatter();
+			copy.formatters.putAll(this.formatters);
+			if (formatters != null && formatters.length > 0) {
+				for (Formatter<?> formatter : formatters) {
+					if (formatter != null) {
+						Class<?> type = ClassUtils.getGenericClass(formatter.getClass());
+						if (type != null) {
+							this.formatters.remove(type);
+						}
+					}
+				}
+			}
+			return copy;
+		}
+		return this;
+	}
+
+	/**
 	 * httl.properties: formatters+=httl.spi.formatters.NumberFormatter
 	 */
 	public void setFormatters(Formatter<?>[] formatters) {
@@ -151,17 +205,10 @@ public class MultiFormatter implements Formatter<Object> {
 					}
 				}
 			}
+			Map<Class<?>, Formatter<?>> sorted = new TreeMap<Class<?>, Formatter<?>>(ClassComparator.COMPARATOR);
+			sorted.putAll(this.formatters);
+			this.sortedFormatters = Collections.unmodifiableMap(sorted);
 		}
-		this.numberFormatter = get(Number.class);
-		this.booleanFormatter = get(Boolean.class);
-		this.byteFormatter = getFormatter(Byte.class, numberFormatter);
-		this.charFormatter = get(Character.class);
-		this.shortFormatter = getFormatter(Short.class, numberFormatter);
-		this.intFormatter = getFormatter(Integer.class, numberFormatter);
-		this.longFormatter = getFormatter(Long.class, numberFormatter);
-		this.floatFormatter = getFormatter(Float.class, numberFormatter);
-		this.doubleFormatter = getFormatter(Double.class, numberFormatter);
-		this.dateFormatter = get(Date.class);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -392,9 +439,18 @@ public class MultiFormatter implements Formatter<Object> {
 			return toString(key, (Resource) value);
 		if (formatter != null)
 			return formatter.toString(key, value);
-		Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
+		Class<?> cls = value.getClass();
+		Formatter<Object> formatter = (Formatter<Object>) formatters.get(cls);
 		if (formatter != null) {
 			return formatter.toString(key, value);
+		} else if (sortedFormatters != null) {
+			for (Map.Entry<Class<?>, Formatter<?>> entry : sortedFormatters.entrySet()) {
+				if (entry.getKey().isAssignableFrom(cls)) {
+					formatter = (Formatter<Object>) entry.getValue();
+					formatters.put(cls, formatter);
+					return formatter.toString(key, value);
+				}
+			}
 		}
 		return StringUtils.toString(value);
 	}
@@ -613,9 +669,18 @@ public class MultiFormatter implements Formatter<Object> {
 			return toChars(key, (Resource) value);
 		if (formatter != null)
 			return formatter.toChars(key, value);
-		Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
+		Class<?> cls = value.getClass();
+		Formatter<Object> formatter = (Formatter<Object>) formatters.get(cls);
 		if (formatter != null) {
 			return formatter.toChars(key, value);
+		} else if (sortedFormatters != null) {
+			for (Map.Entry<Class<?>, Formatter<?>> entry : sortedFormatters.entrySet()) {
+				if (entry.getKey().isAssignableFrom(cls)) {
+					formatter = (Formatter<Object>) entry.getValue();
+					formatters.put(cls, formatter);
+					return formatter.toChars(key, value);
+				}
+			}
 		}
 		return toChars(key, StringUtils.toString(value));
 	}
@@ -834,9 +899,18 @@ public class MultiFormatter implements Formatter<Object> {
 			return toBytes(key, (Resource) value);
 		if (formatter != null)
 			return formatter.toBytes(key, value);
-		Formatter<Object> formatter = (Formatter<Object>) formatters.get(value.getClass());
+		Class<?> cls = value.getClass();
+		Formatter<Object> formatter = (Formatter<Object>) formatters.get(cls);
 		if (formatter != null) {
 			return formatter.toBytes(key, value);
+		} else if (sortedFormatters != null) {
+			for (Map.Entry<Class<?>, Formatter<?>> entry : sortedFormatters.entrySet()) {
+				if (entry.getKey().isAssignableFrom(cls)) {
+					formatter = (Formatter<Object>) entry.getValue();
+					formatters.put(cls, formatter);
+					return formatter.toBytes(key, value);
+				}
+			}
 		}
 		return toBytes(key, StringUtils.toString(value));
 	}

@@ -134,14 +134,13 @@ public class TemplateTest extends TestCase {
 		model.setBooks2(books2);
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
-		Object[] maps = new Object[] {context, model, null};
 		String[] configs = new String[] { "httl-text.properties", "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
 		for (String config : configs) {
+			Engine engine = Engine.getEngine(config);
+			Object[] maps = new Object[] {context, model, null};
 			for (Object map : maps) {
-				if (! profile) 
-					System.out.println("========" + config + " (" + (map == null ? "null" : map.getClass().getSimpleName()) + " parameters)========");
-				Engine engine = Engine.getEngine(config);
 				if (! profile) {
+					System.out.println("========" + config + " (" + (map == null ? "null" : map.getClass().getSimpleName()) + " parameters)========");
 					Loader loader = engine.getProperty("loader", Loader.class);
 					assertEquals(MultiLoader.class, loader.getClass());
 					Loader[] loaders = engine.getProperty("loaders", Loader[].class);

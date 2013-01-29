@@ -15,48 +15,34 @@
  */
 package httl.spi.methods;
 
-import httl.util.ClassUtils;
-
+import java.text.ParseException;
 import java.util.Map;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * JsonMethod. (SPI, Singleton, ThreadSafe)
  * 
+ * @deprecated Replace to <code>CodecMethod</code>
+ * @see httl.spi.methods.CodecMethod
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class JsonMethod {
+@Deprecated
+public class JsonMethod extends CodecMethod {
 
-	private JsonMethod() {}
-
-	public static String toJson(Object object) {
-		if (object == null) {
-			return null;
-		}
-		return JSON.toJSONString(object);
-	}
-
-	public static Map<String, Object> parseJson(String json) {
-		if (json == null) {
-			return null;
-		}
-		return JSON.parseObject(json);
-	}
-
-	public static Object parseJson(String json, String cls) {
-		return parseJson(json, ClassUtils.forName(cls));
+	public String toJson(Object object) {
+		return super.encodeJson(object);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T parseJson(String json, Class<T> cls) {
-		if (json == null) {
-			return null;
-		}
-		if (cls == null) {
-			return (T) JSON.parseObject(json);
-		}
-		return JSON.parseObject(json, cls);
+	public Map<String, Object> parseJson(String json) throws ParseException {
+		return super.decodeJson(json, Map.class);
+	}
+
+	public Object parseJson(String json, String cls) throws ParseException {
+		return super.decodeJson(json, cls);
+	}
+
+	public <T> T parseJson(String json, Class<T> cls) throws ParseException {
+		return super.decodeJson(json, cls);
 	}
 
 }

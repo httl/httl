@@ -15,18 +15,23 @@
  */
 package httl.spi.methods;
 
+import httl.spi.Compiler;
 import httl.spi.Formatter;
+import httl.spi.converters.BeanMapConverter;
 import httl.util.ClassUtils;
 import httl.util.DateUtils;
 import httl.util.LocaleUtils;
 import httl.util.NumberUtils;
 import httl.util.StringUtils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -48,6 +53,12 @@ public class TypeMethod {
 
 	private String[] importPackages;
 
+	private final BeanMapConverter mapConverter = new BeanMapConverter();
+
+	public void setCompiler(Compiler compiler) {
+		this.mapConverter.setCompiler(compiler);
+	}
+	
 	/**
 	 * httl.properties: formatter=httl.spi.formatters.DateFormatter
 	 */
@@ -191,6 +202,17 @@ public class TypeMethod {
 
 	public static Class<?> toClass(String value) {
 		return StringUtils.isEmpty(value) ? null : ClassUtils.forName(value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> toMap(Object value) throws IOException, ParseException {
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof Map) {
+			return (Map<String, Object>) value;
+		}
+		return (Map<String, Object>) mapConverter.convert(value);
 	}
 
 	@SuppressWarnings("unchecked")

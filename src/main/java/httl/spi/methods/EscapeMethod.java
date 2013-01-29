@@ -15,8 +15,10 @@
  */
 package httl.spi.methods;
 
+import httl.util.Base64;
 import httl.util.StringUtils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -66,6 +68,18 @@ public class EscapeMethod {
 		try {
 			return value == null ? null : URLDecoder.decode(value, encoding);
 		} catch (UnsupportedEncodingException e) {
+			return value;
+		}
+	}
+
+	public static String escapeBase64(String value) {
+		return value == null ? null : Base64.encodeBytes(value.getBytes());
+	}
+
+	public static String unescapeBase64(String value) {
+		try {
+			return value == null ? null : new String(Base64.decode(value));
+		} catch (IOException e) {
 			return value;
 		}
 	}

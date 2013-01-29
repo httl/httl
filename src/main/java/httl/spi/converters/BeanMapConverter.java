@@ -17,6 +17,7 @@ package httl.spi.converters;
 
 import httl.spi.Compiler;
 import httl.spi.Converter;
+import httl.util.ClassUtils;
 import httl.util.MapSupport;
 
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		Class<?> wrapperClass = BEAN_WRAPPERS.get(beanClass);
 		if (wrapperClass == null) {
 			try {
-				wrapperClass = createWrapperClass(beanClass, compiler);
+				wrapperClass = getWrapperClass(beanClass, compiler);
 				Class<?> old = BEAN_WRAPPERS.putIfAbsent(beanClass, wrapperClass);
 				if (old != null) {
 					wrapperClass = old;
@@ -75,9 +76,10 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		}
 	}
 
-	private Class<?> createWrapperClass(Class<?> beanClass, Compiler compiler) throws ParseException {
+	public static Class<?> getWrapperClass(Class<?> beanClass, Compiler compiler) throws ParseException {
 		StringBuilder keys = new StringBuilder();
 		StringBuilder gets = new StringBuilder();
+		StringBuilder puts = new StringBuilder();
 		for (Method method : beanClass.getMethods()) {
 			String name = method.getName();
 			if ((name.length() > 3 && name.startsWith("get") 
@@ -95,6 +97,15 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 					gets.append("else ");
 				}
 				gets.append("if (\"" + key + "\".equals(key)) return bean." + name + "();\n");
+			} else if (name.length() > 3 && name.startsWith("set")
+					&& Modifier.isPublic(method.getModifiers())
+					&& method.getParameterTypes().length == 1
+					&& method.getDeclaringClass() != Object.class) {
+				String key = name.substring(3, 3 + 1).toLowerCase() + name.substring(3 + 1);
+				if (puts.length() > 0) {
+					puts.append("else ");
+				}
+				puts.append("if (\"" + key + "\".equals(key)) bean." + name + "((" + ClassUtils.getBoxedClass(method.getParameterTypes()[0]).getCanonicalName() + ") value);\n");
 			}
 		}
 		StringBuilder code = new StringBuilder();
@@ -109,6 +120,11 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		code.append("public Object get(Object key) {\n");
 		code.append(gets);
 		code.append("return null;\n");
+		code.append("}\n");
+		code.append("public Object put(Object key, Object value) {\n");
+		code.append("Object old = get(key);\n");
+		code.append(puts);
+		code.append("return old;\n");
 		code.append("}\n");
 		code.append("}\n");
 		return compiler.compile(code.toString());

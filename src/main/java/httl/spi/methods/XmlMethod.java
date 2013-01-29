@@ -15,50 +15,32 @@
  */
 package httl.spi.methods;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
-import com.thoughtworks.xstream.io.xml.Xpp3Driver;
+import java.text.ParseException;
 
 /**
  * XmlMethod. (SPI, Singleton, ThreadSafe)
  * 
+ * @deprecated Replace to <code>CodecMethod</code>
+ * @see httl.spi.methods.CodecMethod
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class XmlMethod {
+@Deprecated
+public class XmlMethod extends CodecMethod {
 
-	private XmlMethod() {}
-
-	private static XStream XSTREAM = new XStream(new Xpp3Driver());
-	
-	public static void setDriver(HierarchicalStreamDriver driver) {
-		XSTREAM = new XStream(driver);
+	public String toXml(Object object) {
+		return super.encodeXml(object);
 	}
 
-	public static String toXml(Object object) {
-		return XSTREAM.toXML(object);
+	public Object parseXml(String xml) throws ParseException {
+		return super.decodeXml(xml);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> T parseXml(String xml) {
-		if (xml == null) {
-			return null;
-		}
-		return (T) XSTREAM.fromXML(xml);
+	public <T> T parseXml(String xml, Class<T> cls) throws ParseException {
+		return super.decodeXml(xml, cls);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> T parseXml(String xml, Class<T> cls) {
-		if (xml == null) {
-			return null;
-		}
-		if (cls == null) {
-			return (T) XSTREAM.fromXML(xml);
-		}
-		try {
-			return (T) XSTREAM.fromXML(xml, cls.newInstance());
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
+	public Object parseXml(String xml, String cls) throws ParseException {
+		return super.decodeXml(xml, cls);
 	}
 
 }

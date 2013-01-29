@@ -193,20 +193,36 @@ public final class ConfigUtils {
 		for (Map.Entry<Object, Object> entry : new HashMap<Object, Object>(result).entrySet()) {
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
-			while (StringUtils.isNotEmpty(value) && value.startsWith(REF)) {
-				String ref = value.substring(1);
-				value = result.getProperty(ref);
-				if (value == null) {
-					value = System.getProperty(ref);
-				}
-				if (value == null) {
-					result.remove(key);
+			if (StringUtils.isNotEmpty(value) && value.contains(REF)) {
+				if (value.contains(COMMA)) {
+					String[] values = StringUtils.splitByComma(value);
+					StringBuilder buf = new StringBuilder(value.length());
+					for (String v : values) {
+						if (buf.length() > 0) {
+							buf.append(COMMA);
+						}
+						buf.append(getRefValue(result, v));
+					}
+					result.put(key, buf.toString());
 				} else {
-					result.put(key, value);
+					result.put(key, getRefValue(result, value));
 				}
 			}
 		}
 		return result;
+	}
+	
+	private static String getRefValue(Properties result, String v) {
+		if (v != null) {
+			while (v.startsWith(REF)) {
+				String ref = v.substring(1);
+				v = result.getProperty(ref);
+				if (v == null) {
+					v = System.getProperty(ref);
+				}
+			}
+		}
+		return v == null ? "" : v;
 	}
 
 	private ConfigUtils() {}

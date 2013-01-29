@@ -1,5 +1,5 @@
 <!--#var(User user)-->
-${user.name.toMd5}
-${user.name.toSha}
-${user.name.toBase64}
-${user.name.toBase64.parseBase64}
+${user.name.md5}
+${user.name.sha}
+${user.name.escapeBase64}
+${user.name.escapeBase64.unescapeBase64}

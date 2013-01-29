@@ -1,4 +1,4 @@
 <!--#var(User user)-->
-$!{user.toJson}
-${user.toJson.parseJson.name}
-${user.toJson.parseJson("httl.test.model.User").to("httl.test.model.User").name}
+$!{user.encodeJson}
+${user.encodeJson.decodeJson.toMap.name}
+${user.encodeJson.decodeJson("httl.test.model.User").to("httl.test.model.User").name}

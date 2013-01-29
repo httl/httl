@@ -41,17 +41,7 @@ public class ListenerTemplate extends ProxyTemplate {
 	@Override
 	public void render(Object parameters, Object out)
 			throws IOException, ParseException {
-		Context context = Context.getContext();
-		if (context.getOut() != out) {
-			context = Context.pushContext(this, null, out);
-			try {
-				listener.render(context);
-			} finally {
-				Context.popContext();
-			}
-		} else {
-			listener.render(context);
-		}
+		listener.render(Context.getContext());
 	}
 
 }

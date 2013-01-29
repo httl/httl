@@ -15,14 +15,12 @@
  */
 package httl.spi.methods;
 
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import httl.spi.Codec;
+import httl.util.ClassUtils;
 
-import httl.util.Base64;
-import httl.util.Digest;
+import java.text.ParseException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * CodecMethod. (SPI, Singleton, ThreadSafe)
@@ -31,58 +29,74 @@ import httl.util.Digest;
  */
 public class CodecMethod {
 
-	private CodecMethod() {}
+	private final Map<String, Codec> codecs = new ConcurrentHashMap<String, Codec>();
 
-	public static String toMd5(String value) {
-		return value == null ? null : Digest.getMD5(value);
-	}
+	private String[] importPackages;
 
-	public static String toSha(String value) {
-		return value == null ? null : Digest.getSHA(value);
-	}
-
-	public static String toDigest(String value, String digest) {
-		return value == null ? null : Digest.getDigest(digest, value);
-	}
-
-	public static String toBase64(String value) {
-		return value == null ? null : Base64.encodeBytes(value.getBytes());
-	}
-
-	public static String parseBase64(String value) {
-		try {
-			return value == null ? null : new String(Base64.decode(value));
-		} catch (IOException e) {
-			return value;
+	public void setCodecs(Codec[] codecs) {
+		for (Codec codec : codecs) {
+			this.codecs.put(codec.getFormat(), codec);
 		}
 	}
 
-	public static String toXbean(Object object) {
-		if (object == null) {
-			return null;
-		}
-		ByteArrayOutputStream bo = new ByteArrayOutputStream();
-		XMLEncoder xe = new XMLEncoder(bo);
-		try {
-			xe.writeObject(object);
-			xe.flush();
-		} finally {
-			xe.close();
-		}
-		return new String(bo.toByteArray());
+	public void setImportPackages(String[] importPackages) {
+		this.importPackages = importPackages;
 	}
 
-	public static Object parseXbean(String xml) {
-		if (xml == null) {
-			return null;
+	private Codec getAndCheckCodec(String format) {
+		Codec codec = codecs.get(format);
+		if (codec == null) {
+			throw new IllegalStateException("Unsupported encode format " + format + ", please add config codecs+=com.your." + format + "Codec" + " in httl.properties.");
 		}
-		ByteArrayInputStream bi = new ByteArrayInputStream(xml.getBytes());
-		XMLDecoder xd = new XMLDecoder(bi);
-		try {
-			return xd.readObject();
-		} finally {
-			xd.close();
-		}
+		return codec;
+	}
+
+	public String encode(Object value, String format) {
+		return getAndCheckCodec(format).encode(value);
+	}
+
+	public Object decode(String value, String format) throws ParseException {
+		return decode(value, (Class<?>) null, format);
+	}
+
+	public Object decode(String value, String type, String format) throws ParseException {
+		return decode(value, ClassUtils.forName(importPackages, type), format);
+	}
+
+	public <T> T decode(String value, Class<T> type, String format) throws ParseException {
+		return getAndCheckCodec(format).decode(value, type);
+	}
+
+	public String encodeJson(Object value) {
+		return encode(value, "json");
+	}
+
+	public Object decodeJson(String value) throws ParseException {
+		return decode(value, (Class<?>) null, "json");
+	}
+
+	public <T> T decodeJson(String value, Class<T> type) throws ParseException {
+		return decode(value, type, "json");
+	}
+
+	public Object decodeJson(String value, String type) throws ParseException {
+		return decode(value, type, "json");
+	}
+
+	public String encodeXml(Object value) {
+		return encode(value, "xml");
+	}
+
+	public Object decodeXml(String value) throws ParseException {
+		return decode(value, "xml");
+	}
+
+	public <T> T decodeXml(String value, Class<T> type) throws ParseException {
+		return decode(value, type, "xml");
+	}
+
+	public Object decodeXml(String value, String type) throws ParseException {
+		return decode(value, type, "xml");
 	}
 
 }

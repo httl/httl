@@ -17,6 +17,8 @@ package httl;
 
 import httl.util.DelegateMap;
 
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -76,7 +78,23 @@ public final class Context extends DelegateMap<String, Object> {
 	 * @param parameters - current parameters
 	 * @param out - current out
 	 */
-	public static Context pushContext(Template template, Map<String, Object> parameters, Object out) {
+	public static Context pushContext(Template template, Map<String, Object> parameters, Writer out) {
+		return _pushContext(template, parameters, out);
+	}
+
+	/**
+	 * Push the current context to thread local.
+	 * 
+	 * @param template - current template
+	 * @param parameters - current parameters
+	 * @param out - current out
+	 */
+	public static Context pushContext(Template template, Map<String, Object> parameters, OutputStream out) {
+		return _pushContext(template, parameters, out);
+	}
+
+	// do push
+	private static Context _pushContext(Template template, Map<String, Object> parameters, Object out) {
 		Context parent = getContext();
 		if (template != null && parent.parent == null) {
 			parent.engine = template.getEngine(); // set root context engine

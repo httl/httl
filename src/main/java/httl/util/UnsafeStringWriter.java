@@ -38,6 +38,13 @@ public class UnsafeStringWriter extends Writer {
 		lock = buffer = new StringBuilder(size);
 	}
 
+	public UnsafeStringWriter(StringBuilder sb){
+		if (sb == null) {
+			throw new IllegalArgumentException("StringBuilder == null");
+		}
+		lock = buffer = sb;
+	}
+
 	@Override
 	public void write(int c) {
 		buffer.append((char) c);
