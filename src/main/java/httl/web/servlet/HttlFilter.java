@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.web.filter;
+package httl.web.servlet;
 
 import httl.Context;
 import httl.util.StringUtils;
@@ -85,6 +85,10 @@ public class HttlFilter implements Filter {
 			path = getRootPath();
 		}
 		if (StringUtils.isNotEmpty(suffix) && ! path.endsWith(suffix)) {
+			int i = path.lastIndexOf('.');
+			if (i > 0 && i > path.lastIndexOf('/')) {
+				path = path.substring(0, i);
+			}
 			path += suffix;
 		}
 		return path;
