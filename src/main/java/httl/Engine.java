@@ -23,6 +23,7 @@ import httl.util.VolatileReference;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -49,7 +50,7 @@ public abstract class Engine {
 	// Built-in configuration name
 	private static final String HTTL_DEFAULT_PROPERTIES = "httl-default.properties";
 
-	// User default configuration name
+	// User configuration name
 	private static final String HTTL_PROPERTIES = "httl.properties";
 
 	// The engine name config
@@ -437,5 +438,14 @@ public abstract class Engine {
 	 * @throws ParseException - If the template cannot be parsed
 	 */
 	public abstract Template parseTemplate(String source, Map<String, Class<?>> parameterTypes) throws ParseException;
+
+	/**
+	 * Create context map.
+	 * 
+	 * @return context map
+	 */
+	public Map<String, Object> createContext() {
+		return new HashMap<String, Object>();
+	}
 
 }

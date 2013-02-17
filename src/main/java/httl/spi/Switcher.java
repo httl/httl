@@ -43,11 +43,11 @@ public interface Switcher<T> {
 	 * Enter the location.
 	 * 
 	 * <pre>
-	 * filter = switcher.enter("&lt;script", defaultFilter); // return EscapeStringFilter
+	 * filter = switcher.switchover("&lt;script", defaultFilter); // return EscapeStringFilter
 	 * &lt;script type="text/javascript"&gt;
 	 * ...
-	 * filter = switcher.enter("&lt;script&gt;", defaultFilter); // return defaultFilter
-	 * &lt;script&gt;
+	 * filter = switcher.switchover("&lt;/script&gt;", defaultFilter); // return defaultFilter
+	 * &lt;/script&gt;
 	 * </pre>
 	 * 
 	 * @param location - the entered location
