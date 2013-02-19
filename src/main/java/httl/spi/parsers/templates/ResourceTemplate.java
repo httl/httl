@@ -114,7 +114,7 @@ public class ResourceTemplate implements Template {
 	}
 
 	public Object evaluate() throws ParseException {
-		return evaluate(null);
+		throw new UnsupportedOperationException();
 	}
 
 	public Object evaluate(Object context) throws ParseException {
@@ -122,7 +122,7 @@ public class ResourceTemplate implements Template {
 	}
 
 	public void render(Object out) throws IOException, ParseException {
-		render(null, out);
+		throw new UnsupportedOperationException();
 	}
 
 	public void render(Object context, Object out) throws IOException, ParseException {

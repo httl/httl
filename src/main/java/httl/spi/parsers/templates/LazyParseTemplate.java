@@ -15,6 +15,7 @@
  */
 package httl.spi.parsers.templates;
 
+import httl.Engine;
 import httl.Resource;
 import httl.Template;
 import httl.internal.util.DelegateMap;
@@ -23,7 +24,10 @@ import httl.spi.Converter;
 import httl.spi.Parser;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -76,6 +80,10 @@ public class LazyParseTemplate extends ResourceTemplate {
 		}
 	}
 
+	public Object evaluate() throws ParseException {
+		return evaluate(null);
+	}
+
 	@Override
 	public Object evaluate(Object context) throws ParseException {
 		try {
@@ -86,10 +94,110 @@ public class LazyParseTemplate extends ResourceTemplate {
 		return template.evaluate(context);
 	}
 
+	public void render(Object out) throws IOException, ParseException {
+		render(null, out);
+	}
+
 	@Override
 	public void render(Object context, Object out) throws IOException, ParseException {
 		init(context);
 		template.render(context, out);
+	}
+
+	public String getName() {
+		if (template == null)
+			return super.getName();
+		return template.getName();
+	}
+
+	public String getEncoding() {
+		if (template == null)
+			return super.getEncoding();
+		return template.getEncoding();
+	}
+
+	public Locale getLocale() {
+		if (template == null)
+			return super.getLocale();
+		return template.getLocale();
+	}
+
+	public long getLastModified() {
+		if (template == null)
+			return super.getLastModified();
+		return template.getLastModified();
+	}
+
+	public long getLength() {
+		if (template == null)
+			return super.getLength();
+		return template.getLength();
+	}
+
+	public String getSource() {
+		if (template == null)
+			return super.getSource();
+		return template.getSource();
+	}
+
+	public Reader getReader() throws IOException {
+		if (template == null)
+			return super.getReader();
+		return template.getReader();
+	}
+
+	public Map<String, Class<?>> getParameterTypes() {
+		if (template == null)
+			return super.getParameterTypes();
+		return template.getParameterTypes();
+	}
+
+	public Class<?> getReturnType() {
+		if (template == null)
+			return super.getReturnType();
+		return template.getReturnType();
+	}
+
+	public InputStream getInputStream() throws IOException {
+		if (template == null)
+			return super.getInputStream();
+		return template.getInputStream();
+	}
+
+	public String getCode() {
+		if (template == null)
+			return super.getCode();
+		return template.getCode();
+	}
+
+	public Map<String, Class<?>> getContextTypes() {
+		if (template == null)
+			return super.getContextTypes();
+		return template.getContextTypes();
+	}
+
+	public int getOffset() {
+		if (template == null)
+			return super.getOffset();
+		return template.getOffset();
+	}
+
+	public Map<String, Template> getMacros() {
+		if (template == null)
+			return super.getMacros();
+		return template.getMacros();
+	}
+
+	public boolean isMacro() {
+		if (template == null)
+			return super.isMacro();
+		return template.isMacro();
+	}
+
+	public Engine getEngine() {
+		if (template == null)
+			return super.getEngine();
+		return template.getEngine();
 	}
 
 }
