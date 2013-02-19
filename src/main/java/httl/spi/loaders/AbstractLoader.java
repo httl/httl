@@ -21,9 +21,9 @@ import httl.spi.Loader;
 import httl.spi.Locator;
 import httl.spi.Logger;
 import httl.spi.loaders.resources.InputStreamResource;
-import httl.util.LocaleUtils;
-import httl.util.StringUtils;
-import httl.util.UrlUtils;
+import httl.internal.util.LocaleUtils;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UrlUtils;
 
 import java.io.File;
 import java.io.IOException;

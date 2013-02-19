@@ -16,7 +16,7 @@
 package httl.spi.formatters;
 
 import httl.spi.Formatter;
-import httl.util.NumberUtils;
+import httl.internal.util.NumberUtils;
 
 import java.text.DecimalFormat;
 

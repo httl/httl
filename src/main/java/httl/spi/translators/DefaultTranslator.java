@@ -24,7 +24,7 @@ import httl.spi.Translator;
 import httl.spi.sequences.StringSequence;
 import httl.spi.translators.expressions.ExpressionImpl;
 import httl.spi.translators.expressions.Node;
-import httl.util.ClassUtils;
+import httl.internal.util.ClassUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;

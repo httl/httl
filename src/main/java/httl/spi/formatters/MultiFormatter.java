@@ -19,11 +19,11 @@ import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Formatter;
-import httl.util.ClassComparator;
-import httl.util.ClassUtils;
-import httl.util.DateUtils;
-import httl.util.IOUtils;
-import httl.util.StringUtils;
+import httl.internal.util.ClassComparator;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.DateUtils;
+import httl.internal.util.IOUtils;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

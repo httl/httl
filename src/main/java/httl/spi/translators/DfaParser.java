@@ -24,10 +24,10 @@ import httl.spi.translators.expressions.Node;
 import httl.spi.translators.expressions.Operator;
 import httl.spi.translators.expressions.UnaryOperator;
 import httl.spi.translators.expressions.Variable;
-import httl.util.DfaScanner;
-import httl.util.LinkedStack;
-import httl.util.StringUtils;
-import httl.util.Token;
+import httl.internal.util.DfaScanner;
+import httl.internal.util.LinkedStack;
+import httl.internal.util.StringUtils;
+import httl.internal.util.Token;
 
 import java.text.ParseException;
 import java.util.Arrays;

@@ -15,7 +15,7 @@
  */
 package httl;
 
-import httl.util.DelegateMap;
+import httl.internal.util.DelegateMap;
 
 import java.io.OutputStream;
 import java.io.Writer;

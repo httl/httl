@@ -20,8 +20,8 @@ import httl.Engine;
 import httl.Expression;
 import httl.spi.Compiler;
 import httl.spi.Converter;
-import httl.util.ClassUtils;
-import httl.util.Digest;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.Digest;
 
 import java.io.IOException;
 import java.io.Serializable;

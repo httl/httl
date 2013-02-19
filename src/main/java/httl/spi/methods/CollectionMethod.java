@@ -25,7 +25,7 @@ import httl.spi.methods.cycles.IntArrayCycle;
 import httl.spi.methods.cycles.ListCycle;
 import httl.spi.methods.cycles.LongArrayCycle;
 import httl.spi.methods.cycles.ShortArrayCycle;
-import httl.util.CollectionUtils;
+import httl.internal.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

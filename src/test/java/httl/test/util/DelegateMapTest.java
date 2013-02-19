@@ -15,7 +15,7 @@
  */
 package httl.test.util;
 
-import httl.util.DelegateMap;
+import httl.internal.util.DelegateMap;
 
 import java.util.Collection;
 import java.util.HashMap;

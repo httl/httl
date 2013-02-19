@@ -18,11 +18,11 @@ package httl.spi.methods;
 import httl.spi.Compiler;
 import httl.spi.Formatter;
 import httl.spi.converters.BeanMapConverter;
-import httl.util.ClassUtils;
-import httl.util.DateUtils;
-import httl.util.LocaleUtils;
-import httl.util.NumberUtils;
-import httl.util.StringUtils;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.DateUtils;
+import httl.internal.util.LocaleUtils;
+import httl.internal.util.NumberUtils;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

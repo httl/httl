@@ -17,7 +17,7 @@ package httl.script;
 
 import httl.Engine;
 import httl.spi.Parser;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -19,7 +19,7 @@ import httl.Context;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.Logger;
-import httl.util.Optional;
+import httl.internal.util.Optional;
 
 import java.io.IOException;
 import java.text.ParseException;

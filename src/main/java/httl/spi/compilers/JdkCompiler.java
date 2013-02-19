@@ -16,10 +16,10 @@
 package httl.spi.compilers;
 
 import httl.spi.Compiler;
-import httl.util.ClassUtils;
-import httl.util.StringUtils;
-import httl.util.UnsafeByteArrayInputStream;
-import httl.util.UnsafeByteArrayOutputStream;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UnsafeByteArrayInputStream;
+import httl.internal.util.UnsafeByteArrayOutputStream;
 
 import java.io.File;
 import java.io.IOException;

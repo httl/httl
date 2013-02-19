@@ -15,7 +15,7 @@
  */
 package httl.test.util;
 
-import httl.util.UrlUtils;
+import httl.internal.util.UrlUtils;
 import junit.framework.Assert;
 
 import org.junit.Test;

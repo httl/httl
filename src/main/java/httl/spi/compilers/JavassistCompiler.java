@@ -16,7 +16,7 @@
 package httl.spi.compilers;
 
 import httl.spi.Compiler;
-import httl.util.ClassUtils;
+import httl.internal.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

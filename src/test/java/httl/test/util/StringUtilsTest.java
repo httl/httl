@@ -17,7 +17,7 @@ package httl.test.util;
 
 import java.text.DecimalFormat;
 
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 import junit.framework.Assert;
 
 import org.junit.Test;

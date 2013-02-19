@@ -15,7 +15,7 @@
  */
 package httl.test.util;
 
-import httl.util.ConcurrentLinkedHashMap;
+import httl.internal.util.ConcurrentLinkedHashMap;
 
 import java.util.Map;
 

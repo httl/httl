@@ -24,8 +24,8 @@ import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.Switcher;
-import httl.util.UnsafeByteArrayOutputStream;
-import httl.util.WriterOutputStream;
+import httl.internal.util.UnsafeByteArrayOutputStream;
+import httl.internal.util.WriterOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;

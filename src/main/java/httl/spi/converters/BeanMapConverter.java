@@ -17,8 +17,8 @@ package httl.spi.converters;
 
 import httl.spi.Compiler;
 import httl.spi.Converter;
-import httl.util.ClassUtils;
-import httl.util.MapSupport;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.MapSupport;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

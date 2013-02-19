@@ -21,7 +21,7 @@ import httl.spi.converters.ResponseOutConverter;
 import httl.spi.interceptors.ServletInterceptor;
 import httl.spi.loaders.ServletLoader;
 import httl.spi.resolvers.ServletResolver;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -20,9 +20,9 @@ import httl.Engine;
 import httl.Expression;
 import httl.Resource;
 import httl.Template;
-import httl.util.IOUtils;
-import httl.util.StringUtils;
-import httl.util.UrlUtils;
+import httl.internal.util.IOUtils;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UrlUtils;
 
 import java.io.IOException;
 import java.text.ParseException;

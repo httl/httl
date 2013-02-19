@@ -21,9 +21,9 @@ import httl.Resource;
 import httl.Template;
 import httl.spi.Logger;
 import httl.spi.Resolver;
-import httl.util.EncodingProperties;
-import httl.util.LocaleUtils;
-import httl.util.StringUtils;
+import httl.internal.util.EncodingProperties;
+import httl.internal.util.LocaleUtils;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;

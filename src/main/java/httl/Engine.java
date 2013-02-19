@@ -15,11 +15,11 @@
  */
 package httl;
 
-import httl.util.BeanFactory;
-import httl.util.ConfigUtils;
-import httl.util.StringUtils;
-import httl.util.Version;
-import httl.util.VolatileReference;
+import httl.internal.util.BeanFactory;
+import httl.internal.util.ConfigUtils;
+import httl.internal.util.StringUtils;
+import httl.internal.util.Version;
+import httl.internal.util.VolatileReference;
 
 import java.io.IOException;
 import java.text.ParseException;

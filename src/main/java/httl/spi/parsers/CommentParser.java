@@ -20,8 +20,8 @@ import httl.Template;
 import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.spi.loaders.resources.StringResource;
-import httl.util.LinkedStack;
-import httl.util.StringUtils;
+import httl.internal.util.LinkedStack;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.text.ParseException;

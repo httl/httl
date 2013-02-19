@@ -23,7 +23,7 @@ import httl.spi.Codec;
 import httl.spi.Compiler;
 import httl.spi.codecs.json.JSON;
 import httl.spi.converters.BeanMapConverter;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 
 /**
  * Json Codec. (SPI, Singleton, ThreadSafe)

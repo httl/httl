@@ -15,8 +15,8 @@
  */
 package httl.spi.methods;
 
-import httl.util.Digest;
-import httl.util.StringUtils;
+import httl.internal.util.Digest;
+import httl.internal.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

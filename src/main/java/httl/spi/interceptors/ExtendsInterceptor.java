@@ -22,9 +22,9 @@ import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.methods.FileMethod;
 import httl.spi.parsers.templates.ListenerTemplate;
-import httl.util.Optional;
-import httl.util.StringUtils;
-import httl.util.UrlUtils;
+import httl.internal.util.Optional;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UrlUtils;
 
 import java.io.IOException;
 import java.text.ParseException;

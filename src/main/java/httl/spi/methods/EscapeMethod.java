@@ -15,8 +15,8 @@
  */
 package httl.spi.methods;
 
-import httl.util.Base64;
-import httl.util.StringUtils;
+import httl.internal.util.Base64;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

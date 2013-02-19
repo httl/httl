@@ -16,8 +16,8 @@
 package httl.spi.codecs.json;
 
 import httl.spi.Converter;
-import httl.util.Stack;
-import httl.util.StringUtils;
+import httl.internal.util.Stack;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Array;

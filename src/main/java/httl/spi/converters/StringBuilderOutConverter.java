@@ -16,7 +16,7 @@
 package httl.spi.converters;
 
 import httl.spi.Converter;
-import httl.util.UnsafeStringWriter;
+import httl.internal.util.UnsafeStringWriter;
 
 import java.io.IOException;
 import java.io.Writer;

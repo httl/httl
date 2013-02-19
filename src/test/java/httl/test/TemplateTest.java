@@ -25,10 +25,10 @@ import httl.spi.parsers.templates.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.Model;
 import httl.test.model.User;
-import httl.util.ClassUtils;
-import httl.util.IOUtils;
-import httl.util.StringUtils;
-import httl.util.UnsafeByteArrayOutputStream;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.IOUtils;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UnsafeByteArrayOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;

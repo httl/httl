@@ -20,11 +20,11 @@ import httl.Template;
 import httl.spi.Parser;
 import httl.spi.Translator;
 import httl.spi.loaders.resources.StringResource;
-import httl.util.DfaScanner;
-import httl.util.IOUtils;
-import httl.util.LinkedStack;
-import httl.util.StringUtils;
-import httl.util.Token;
+import httl.internal.util.DfaScanner;
+import httl.internal.util.IOUtils;
+import httl.internal.util.LinkedStack;
+import httl.internal.util.StringUtils;
+import httl.internal.util.Token;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

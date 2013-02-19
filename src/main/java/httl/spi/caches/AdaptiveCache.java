@@ -15,7 +15,7 @@
  */
 package httl.spi.caches;
 
-import httl.util.ConcurrentLinkedHashMap;
+import httl.internal.util.ConcurrentLinkedHashMap;
 
 import java.util.Collection;
 import java.util.Map;

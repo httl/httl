@@ -16,7 +16,7 @@
 package httl.spi.translators.expressions;
 
 import httl.spi.Translator;
-import httl.util.ClassUtils;
+import httl.internal.util.ClassUtils;
 
 import java.text.ParseException;
 import java.util.Map;

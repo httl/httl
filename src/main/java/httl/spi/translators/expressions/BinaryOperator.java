@@ -20,10 +20,10 @@ import httl.spi.Translator;
 import httl.spi.sequences.CharacterSequence;
 import httl.spi.sequences.IntegerSequence;
 import httl.spi.sequences.StringSequence;
-import httl.util.ClassUtils;
-import httl.util.CollectionUtils;
-import httl.util.MapEntry;
-import httl.util.StringUtils;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.CollectionUtils;
+import httl.internal.util.MapEntry;
+import httl.internal.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

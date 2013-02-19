@@ -16,7 +16,7 @@
 package httl.spi.codecs;
 
 import httl.spi.Codec;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

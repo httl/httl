@@ -17,7 +17,7 @@ package httl.spi.converters;
 
 import httl.spi.Codec;
 import httl.spi.Converter;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 import java.text.ParseException;

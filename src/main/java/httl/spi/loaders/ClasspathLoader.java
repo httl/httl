@@ -18,7 +18,7 @@ package httl.spi.loaders;
 import httl.Resource;
 import httl.spi.Loader;
 import httl.spi.loaders.resources.ClasspathResource;
-import httl.util.UrlUtils;
+import httl.internal.util.UrlUtils;
 
 import java.io.IOException;
 import java.util.List;

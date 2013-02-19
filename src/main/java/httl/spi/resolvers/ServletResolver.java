@@ -17,9 +17,9 @@ package httl.spi.resolvers;
 
 import httl.spi.Resolver;
 import httl.spi.loaders.ServletLoader;
-import httl.util.ClassUtils;
-import httl.util.MapSupport;
-import httl.util.StringUtils;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.MapSupport;
+import httl.internal.util.StringUtils;
 
 import java.io.IOException;
 

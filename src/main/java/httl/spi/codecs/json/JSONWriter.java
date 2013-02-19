@@ -15,7 +15,7 @@
  */
 package httl.spi.codecs.json;
 
-import httl.util.Stack;
+import httl.internal.util.Stack;
 
 import java.io.IOException;
 import java.io.OutputStream;

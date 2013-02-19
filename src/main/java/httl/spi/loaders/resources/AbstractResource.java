@@ -17,7 +17,7 @@ package httl.spi.loaders.resources;
 
 import httl.Engine;
 import httl.Resource;
-import httl.util.IOUtils;
+import httl.internal.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Serializable;

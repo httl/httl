@@ -17,7 +17,7 @@ package httl.spi.compilers;
 
 import httl.spi.Compiler;
 import httl.spi.Logger;
-import httl.util.ClassUtils;
+import httl.internal.util.ClassUtils;
 
 import java.text.ParseException;
 

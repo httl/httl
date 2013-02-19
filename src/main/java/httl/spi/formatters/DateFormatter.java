@@ -16,7 +16,7 @@
 package httl.spi.formatters;
 
 import httl.spi.Formatter;
-import httl.util.DateUtils;
+import httl.internal.util.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

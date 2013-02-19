@@ -16,8 +16,8 @@
 package httl.spi.locators;
 
 import httl.spi.Locator;
-import httl.util.LocaleUtils;
-import httl.util.StringUtils;
+import httl.internal.util.LocaleUtils;
+import httl.internal.util.StringUtils;
 
 import java.util.Locale;
 

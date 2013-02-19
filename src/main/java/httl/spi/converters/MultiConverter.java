@@ -16,8 +16,8 @@
 package httl.spi.converters;
 
 import httl.spi.Converter;
-import httl.util.ClassComparator;
-import httl.util.ClassUtils;
+import httl.internal.util.ClassComparator;
+import httl.internal.util.ClassUtils;
 
 import java.io.IOException;
 import java.text.ParseException;

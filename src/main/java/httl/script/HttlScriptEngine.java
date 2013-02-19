@@ -16,7 +16,7 @@
 package httl.script;
 
 import httl.Engine;
-import httl.util.IOUtils;
+import httl.internal.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Reader;

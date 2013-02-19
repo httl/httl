@@ -16,7 +16,7 @@
 package httl.spi.loaders.resources;
 
 import httl.Engine;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

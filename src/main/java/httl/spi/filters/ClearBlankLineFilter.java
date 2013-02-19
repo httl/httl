@@ -16,7 +16,7 @@
 package httl.spi.filters;
 
 import httl.spi.Filter;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 
 /**
  * CompressBlankFilter. (SPI, Singleton, ThreadSafe)

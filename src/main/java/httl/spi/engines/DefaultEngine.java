@@ -25,12 +25,12 @@ import httl.spi.Parser;
 import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
-import httl.util.ClassUtils;
-import httl.util.ConfigUtils;
-import httl.util.Digest;
-import httl.util.StringUtils;
-import httl.util.UrlUtils;
-import httl.util.VolatileReference;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.ConfigUtils;
+import httl.internal.util.Digest;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UrlUtils;
+import httl.internal.util.VolatileReference;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

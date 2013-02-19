@@ -17,9 +17,9 @@ package httl.spi.compilers;
 
 import httl.spi.Compiler;
 import httl.spi.Logger;
-import httl.util.ClassUtils;
-import httl.util.StringUtils;
-import httl.util.VolatileReference;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.StringUtils;
+import httl.internal.util.VolatileReference;
 
 import java.io.File;
 import java.io.FileOutputStream;

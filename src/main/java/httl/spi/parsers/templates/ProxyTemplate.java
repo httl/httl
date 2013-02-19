@@ -17,8 +17,8 @@ package httl.spi.parsers.templates;
 
 import httl.Engine;
 import httl.Template;
-import httl.util.UnsafeByteArrayOutputStream;
-import httl.util.UnsafeStringWriter;
+import httl.internal.util.UnsafeByteArrayOutputStream;
+import httl.internal.util.UnsafeStringWriter;
 
 import java.io.IOException;
 import java.io.InputStream;

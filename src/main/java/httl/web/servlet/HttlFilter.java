@@ -16,7 +16,7 @@
 package httl.web.servlet;
 
 import httl.Context;
-import httl.util.StringUtils;
+import httl.internal.util.StringUtils;
 import httl.web.WebEngine;
 
 import java.io.IOException;

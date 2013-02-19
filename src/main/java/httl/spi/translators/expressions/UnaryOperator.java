@@ -17,9 +17,9 @@ package httl.spi.translators.expressions;
 
 import httl.Expression;
 import httl.spi.Translator;
-import httl.util.ClassUtils;
-import httl.util.CollectionUtils;
-import httl.util.StringUtils;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.CollectionUtils;
+import httl.internal.util.StringUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
