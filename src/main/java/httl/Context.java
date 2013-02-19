@@ -75,22 +75,22 @@ public final class Context extends DelegateMap<String, Object> {
 
 	/**
 	 * Push the current context to thread local.
-	 * @param current - current current
+	 * @param map - current current
 	 * @param out - current out
 	 * @param template - current template
 	 */
-	public static Context pushContext(Map<String, Object> current, Writer out, Template template) {
-		return doPushContext(current, out, template);
+	public static Context pushContext(Map<String, Object> map, Writer out, Template template) {
+		return doPushContext(map, out, template);
 	}
 
 	/**
 	 * Push the current context to thread local.
-	 * @param current - current current
+	 * @param map - current current
 	 * @param out - current out
 	 * @param template - current template
 	 */
-	public static Context pushContext(Map<String, Object> current, OutputStream out, Template template) {
-		return doPushContext(current, out, template);
+	public static Context pushContext(Map<String, Object> map, OutputStream out, Template template) {
+		return doPushContext(map, out, template);
 	}
 
 	// do push
