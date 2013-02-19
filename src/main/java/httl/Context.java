@@ -211,6 +211,19 @@ public final class Context extends DelegateMap<String, Object> {
 		return level;
 	}
 
+	/**
+	 * Get the variable value.
+	 * 
+	 * @see #getContext()
+	 * @param key - variable key
+	 * @param defaultValue - default value
+	 * @return variable value
+	 */
+	public Object get(String key, Object defaultValue) {
+		Object value = get(key);
+		return value == null ? defaultValue : value;
+	}
+
 	// Get the special variables after the user variables.
 	// Allows the user to override these special variables.
 	@Override
@@ -236,6 +249,7 @@ public final class Context extends DelegateMap<String, Object> {
 		}
 	}
 
+	// Create the context writable storage map.
 	@Override
 	protected Map<String, Object> newMap() {
 		Engine engine = getEngine();
