@@ -453,7 +453,7 @@ public abstract class Engine {
 	 * 
 	 * @return context map
 	 */
-	public Map<String, Object> createContext(final Context parent, Map<String, Object> current) {
+	public Map<String, Object> createContext(final Map<String, Object> parent, Map<String, Object> current) {
 		return new DelegateMap<String, Object>(parent, current) {
 			private static final long serialVersionUID = 1L;
 			@Override
