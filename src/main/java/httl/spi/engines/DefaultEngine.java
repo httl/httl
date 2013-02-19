@@ -404,7 +404,7 @@ public class DefaultEngine extends Engine {
 	 * On all inited.
 	 */
 	public void inited() {
-		if (precompiled && ! runtimeVariableType) {
+		if (precompiled) {
 			try {
 				int count = 0;
 				if (templateSuffix == null) {
