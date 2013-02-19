@@ -148,7 +148,7 @@ public class LazyParseTemplate extends ResourceTemplate {
 
 	public Map<String, Class<?>> getParameterTypes() {
 		if (template == null)
-			return super.getParameterTypes();
+			return parameterTypes == null ? super.getParameterTypes() : parameterTypes;
 		return template.getParameterTypes();
 	}
 
