@@ -16,6 +16,7 @@
 package httl.spi.resolvers;
 
 import httl.Engine;
+import httl.internal.util.StringUtils;
 import httl.spi.Resolver;
 
 /**
@@ -32,7 +33,7 @@ public class EngineResolver implements Resolver {
 	}
 
 	public Object get(String key) {
-		return engine == null ? null : engine.getProperty(key);
+		return engine == null ? null : engine.getProperty(StringUtils.splitCamelName(key, "."));
 	}
 
 }

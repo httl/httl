@@ -15,6 +15,7 @@
  */
 package httl.spi.resolvers;
 
+import httl.internal.util.StringUtils;
 import httl.spi.Resolver;
 
 /**
@@ -25,6 +26,7 @@ import httl.spi.Resolver;
 public class SystemResolver implements Resolver {
 
 	public Object get(String key) {
+		key = StringUtils.splitCamelName(key, ".");
 		String value = System.getProperty(key);
 		if (value != null) {
 			return value;
