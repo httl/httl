@@ -13,8 +13,17 @@ public class TypeMap extends MapSupport<String, Class<?>> {
 	}
 
 	public Class<?> get(Object key) {
-		Object value = valueMap == null ? null : valueMap.get(key);
-		return value == null ? null : value.getClass();
+		if (valueMap != null) {
+			Object value = valueMap.get(key);
+			if (value != null) {
+				return value.getClass();
+			}
+			value = valueMap.get(key + ".class");
+			if (value instanceof Class) {
+				return (Class<?>) value;
+			}
+		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
