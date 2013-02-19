@@ -16,8 +16,10 @@
 package httl;
 
 import httl.internal.util.DelegateMap;
+import httl.internal.util.WriterOutputStream;
 
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
@@ -73,33 +75,31 @@ public final class Context extends DelegateMap<String, Object> {
 
 	/**
 	 * Push the current context to thread local.
-	 * 
-	 * @param template - current template
 	 * @param parameters - current parameters
 	 * @param out - current out
+	 * @param template - current template
 	 */
-	public static Context pushContext(Template template, Map<String, Object> parameters, Writer out) {
-		return doPushContext(template, parameters, out);
+	public static Context pushContext(Map<String, Object> parameters, Writer out, Template template) {
+		return doPushContext(parameters, out, template);
 	}
 
 	/**
 	 * Push the current context to thread local.
-	 * 
-	 * @param template - current template
 	 * @param parameters - current parameters
 	 * @param out - current out
+	 * @param template - current template
 	 */
-	public static Context pushContext(Template template, Map<String, Object> parameters, OutputStream out) {
-		return doPushContext(template, parameters, out);
+	public static Context pushContext(Map<String, Object> parameters, OutputStream out, Template template) {
+		return doPushContext(parameters, out, template);
 	}
 
 	// do push
-	private static Context doPushContext(Template template, Map<String, Object> parameters, Object out) {
+	private static Context doPushContext(Map<String, Object> parameters, Object out, Template template) {
 		Context parent = getContext();
 		if (template != null && parent.parent == null) {
 			parent.engine = template.getEngine(); // set root context engine
 		}
-		Context context = new Context(parent, template, parameters, out);
+		Context context = new Context(parent, parameters, out, template);
 		LOCAL.set(context);
 		return context;
 	}
@@ -126,27 +126,28 @@ public final class Context extends DelegateMap<String, Object> {
 		LOCAL.remove();
 	}
 
-	// The context level.
-	private final int level;
-
 	// The parent context.
 	private final Context parent;
 
-	// The current template.
-	private Template template;
+	// The context level.
+	private final int level;
 
 	// The current out.
 	private Object out;
 
+	// The current template.
+	private Template template;
+
 	// The current engine.
 	private Engine engine;
 
-	private Context(Context parent, Template template, Map<String, Object> parameters, Object out) {
+	private Context(Context parent, Map<String, Object> parameters, Object out, Template template) {
 		super(parent, parameters);
 		this.parent = parent;
-		this.template = template;
-		this.out = out;
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
+		this.out = out;
+		this.template = template;
+		this.engine = template == null ? null : template.getEngine();
 	}
 
 	/**
@@ -209,9 +210,6 @@ public final class Context extends DelegateMap<String, Object> {
 	 * @return current engine
 	 */
 	public Engine getEngine() {
-		if (engine == null && template != null) {
-			engine = template.getEngine();
-		}
 		return engine;
 	}
 
@@ -239,11 +237,42 @@ public final class Context extends DelegateMap<String, Object> {
 	}
 
 	/**
-	 * Set the current out.
+	 * Get the current output stream.
 	 * 
-	 * @param out - current out
+	 * @see #getContext()
+	 * @return current output stream
 	 */
-	public Context setOut(Object out) {
+	@SuppressWarnings("resource")
+	public OutputStream getOutputStream() {
+		return out instanceof OutputStream ? (OutputStream) out : new WriterOutputStream((Writer) out);
+	}
+
+	/**
+	 * Set the current output stream.
+	 * 
+	 * @param out - current output stream
+	 */
+	public Context setOutputStream(OutputStream out) {
+		this.out = out;
+		return this;
+	}
+
+	/**
+	 * Get the current writer.
+	 * 
+	 * @see #getContext()
+	 * @return current writer
+	 */
+	public Writer getWriter() {
+		return out instanceof Writer ? (Writer) out : new OutputStreamWriter((OutputStream) out);
+	}
+
+	/**
+	 * Set the current writer.
+	 * 
+	 * @param out - current writer
+	 */
+	public Context setWriter(Writer out) {
 		this.out = out;
 		return this;
 	}

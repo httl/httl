@@ -1150,7 +1150,7 @@ public abstract class AbstractParser implements Parser {
 				getVariables.addAll(expr.getParameterTypes().keySet());
 				ResourceTemplate template = new ResourceTemplate(resource);
 				UnsafeStringWriter writer = new UnsafeStringWriter();
-				Context.pushContext(template, Collections.EMPTY_MAP, writer);
+				Context.pushContext(Collections.EMPTY_MAP, writer, template);
 				try {
 					Object value = expr.evaluate(Collections.EMPTY_MAP);
 					if (value instanceof Expression) {

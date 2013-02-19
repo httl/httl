@@ -77,7 +77,7 @@ public abstract class OutputStreamTemplate extends AbstractTemplate {
 			throw new IllegalArgumentException("output == null");
 		if (Context.getContext().getTemplate() == this)
 			throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
-		Context context = Context.pushContext(this, parameters, stream);
+		Context context = Context.pushContext(parameters, stream, this);
 		try {
 			Interceptor interceptor = getInterceptor();
 			if (interceptor != null) {

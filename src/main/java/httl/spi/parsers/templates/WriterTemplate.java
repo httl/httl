@@ -77,7 +77,7 @@ public abstract class WriterTemplate extends AbstractTemplate {
 		 	throw new IllegalArgumentException("writer == null");
 		if (Context.getContext().getTemplate() == this)
 			throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
-		Context context = Context.pushContext(this, parameters, writer);
+		Context context = Context.pushContext(parameters, writer, this);
 		try {
 			Interceptor interceptor = getInterceptor();
 			if (interceptor != null) {
