@@ -79,7 +79,7 @@ public final class Context extends DelegateMap<String, Object> {
 	 * @param out - current out
 	 */
 	public static Context pushContext(Template template, Map<String, Object> parameters, Writer out) {
-		return _pushContext(template, parameters, out);
+		return doPushContext(template, parameters, out);
 	}
 
 	/**
@@ -90,11 +90,11 @@ public final class Context extends DelegateMap<String, Object> {
 	 * @param out - current out
 	 */
 	public static Context pushContext(Template template, Map<String, Object> parameters, OutputStream out) {
-		return _pushContext(template, parameters, out);
+		return doPushContext(template, parameters, out);
 	}
 
 	// do push
-	private static Context _pushContext(Template template, Map<String, Object> parameters, Object out) {
+	private static Context doPushContext(Template template, Map<String, Object> parameters, Object out) {
 		Context parent = getContext();
 		if (template != null && parent.parent == null) {
 			parent.engine = template.getEngine(); // set root context engine
@@ -160,10 +160,10 @@ public final class Context extends DelegateMap<String, Object> {
 	}
 
 	/**
-	 * Get the super template.
+	 * Get the parent template.
 	 * 
 	 * @see #getContext()
-	 * @return super template
+	 * @return parent template
 	 */
 	public Template getSuper() {
 		return parent == null ? null : parent.getTemplate();
@@ -211,50 +211,23 @@ public final class Context extends DelegateMap<String, Object> {
 		return level;
 	}
 
-	// The context key
-	private static final String CONTEXT_KEY = "context";
-
-	// The current context key
-	private static final String CURRENT_KEY = "current";
-
-	// The parent context key
-	private static final String PARENT_KEY = "parent";
-
-	// The template key
-	private static final String TEMPLATE_KEY = "template";
-
-	// The this template key
-	private static final String THIS_KEY = "this";
-
-	// The super template key
-	private static final String SUPER_KEY = "super";
-
-	// The engine key
-	private static final String ENGINE_KEY = "engine";
-
-	// The render out key
-	private static final String OUT_KEY = "out";
-
-	// The context level key
-	private static final String LEVEL_KEY = "level";
-
 	// Get the special variables after the user variables.
 	// Allows the user to override these special variables.
 	@Override
 	protected Object doGet(Object key) {
-		if (SUPER_KEY.equals(key)) {
+		if ("super".equals(key)) {
 			return getSuper();
-		} else if (TEMPLATE_KEY.equals(key) || THIS_KEY.equals(key)) {
+		} else if ("template".equals(key) || "this".equals(key)) {
 			return getTemplate();
-		} else if (ENGINE_KEY.equals(key)) {
+		} else if ("engine".equals(key)) {
 			return getEngine();
-		} else if (OUT_KEY.equals(key)) {
+		} else if ("out".equals(key)) {
 			return getOut();
-		} else if (LEVEL_KEY.equals(key)) {
+		} else if ("level".equals(key)) {
 			return getLevel();
-		} else if (PARENT_KEY.equals(key)) {
+		} else if ("parent".equals(key)) {
 			return getParent();
-		} else if (CONTEXT_KEY.equals(key) || CURRENT_KEY.equals(key)) {
+		} else if ("context".equals(key) || "current".equals(key)) {
 			return this;
 		} else if (getParent() == null && getEngine() != null) {
 			return getEngine().getProperty((String) key);
