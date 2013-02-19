@@ -119,7 +119,7 @@ public abstract class MapSupport<K, V> implements Map<K, V> {
 
 		private class BeanIterator implements Iterator<T> {
 			
-			private final Iterator<K> iterator = keySet().iterator();
+			private final Iterator<K> iterator = MapSupport.this.keySet().iterator();
 			
 			private K key;
 			

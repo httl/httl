@@ -19,22 +19,22 @@ import httl.Engine;
 import httl.Expression;
 import httl.Resource;
 import httl.Template;
+import httl.internal.util.ConfigUtils;
+import httl.internal.util.Digest;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UrlUtils;
+import httl.internal.util.VolatileReference;
+import httl.spi.Converter;
 import httl.spi.Loader;
 import httl.spi.Logger;
 import httl.spi.Parser;
 import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
-import httl.internal.util.ClassUtils;
-import httl.internal.util.ConfigUtils;
-import httl.internal.util.Digest;
-import httl.internal.util.StringUtils;
-import httl.internal.util.UrlUtils;
-import httl.internal.util.VolatileReference;
+import httl.spi.parsers.templates.LazyParseTemplate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -79,6 +79,16 @@ public class DefaultEngine extends Engine {
 	// httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
 	private Map<Object, Object> expressionCache;
 
+	// httl.properties: map.converters=httl.spi.converters.BeanMapConverter
+	private Converter<Object, Object> mapConverter;
+
+	/**
+	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
+	 */
+	public void setMapConverter(Converter<Object, Object> mapConverter) {
+		this.mapConverter = mapConverter;
+	}
+
 	// httl.properties: template.directory=/META-INF/templates
 	private String templateDirectory;
 
@@ -99,6 +109,9 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: instantiated content
 	private Map<String, Object> properties;
+
+	// httl.properties: runtime.variable.type=false
+	private boolean runtimeVariableType;
 
 	public DefaultEngine() {
 		this.stringLoader = new StringLoader(this);
@@ -279,33 +292,13 @@ public class DefaultEngine extends Engine {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
-		try {
+		if (runtimeVariableType) {
+			return new LazyParseTemplate(parser, resource, parameterTypes, mapConverter);
+		} else {
 			return parser.parse(resource, parameterTypes);
-		} catch (ParseException e) {
-			if (e.getMessage() != null 
-					&& e.getMessage().contains("Occur to offset:")) {
-				throw e;
-			}
-			int offset = e.getErrorOffset();
-			if (offset <= 0) {
-				throw e;
-			}
-			String location = null;
-			try {
-				Reader reader = resource.getReader();
-				try {
-					location = StringUtils.getLocationMessage(name, reader, offset);
-				} finally {
-					reader.close();
-				}
-			} catch (Throwable t) {
-			}
-			throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
-									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
-									 + ", stack: " + ClassUtils.toString(e), offset);
 		}
 	}
-
+	
 	/**
 	 * Parse string template.
 	 * 
@@ -411,7 +404,7 @@ public class DefaultEngine extends Engine {
 	 * On all inited.
 	 */
 	public void inited() {
-		if (precompiled) {
+		if (precompiled && ! runtimeVariableType) {
 			try {
 				int count = 0;
 				if (templateSuffix == null) {
@@ -494,6 +487,13 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setLocalized(boolean localized) {
 		this.localized = localized;
+	}
+
+	/**
+	 * httl.properties: runtime.variable.type=false
+	 */
+	public void setRuntimeVariableType(boolean runtimeVariableType) {
+		this.runtimeVariableType = runtimeVariableType;
 	}
 
 	/**

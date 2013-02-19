@@ -50,6 +50,7 @@ import httl.internal.util.UnsafeStringWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -585,10 +586,33 @@ public abstract class AbstractParser implements Parser {
 			}
 		} catch (IOException e) {
 			throw e;
-		} catch (ParseException e) {
-			throw e;
 		} catch (Exception e) {
-			throw new ParseException("Failed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
+			ParseException pe;
+			if (e instanceof ParseException)
+				pe = (ParseException) e;
+			else
+				pe = new ParseException("Failed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
+			if (e.getMessage() != null 
+					&& e.getMessage().contains("Occur to offset:")) {
+				throw pe;
+			}
+			int offset = pe.getErrorOffset();
+			if (offset <= 0) {
+				throw pe;
+			}
+			String location = null;
+			try {
+				Reader reader = resource.getReader();
+				try {
+					location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
+				} finally {
+					reader.close();
+				}
+			} catch (Throwable t) {
+			}
+			throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
+									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
+									 + ", stack: " + ClassUtils.toString(e), offset);
 		}
 	}
 	

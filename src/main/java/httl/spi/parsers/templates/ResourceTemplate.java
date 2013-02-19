@@ -42,6 +42,10 @@ public class ResourceTemplate implements Template {
 		this.resource = resource;
 	}
 
+	public Resource getResource() {
+		return resource;
+	}
+
 	public String getName() {
 		return resource.getName();
 	}
@@ -109,19 +113,19 @@ public class ResourceTemplate implements Template {
 		return false;
 	}
 
-	public Object evaluate() {
-		throw new UnsupportedOperationException();
+	public Object evaluate() throws ParseException {
+		return evaluate(null);
 	}
 
 	public Object evaluate(Object context) throws ParseException {
 		throw new UnsupportedOperationException();
 	}
 
-	public void render(Object out) throws IOException {
-		throw new UnsupportedOperationException();
+	public void render(Object out) throws IOException, ParseException {
+		render(null, out);
 	}
 
-	public void render(Object context, Object out) throws IOException {
+	public void render(Object context, Object out) throws IOException, ParseException {
 		throw new UnsupportedOperationException();
 	}
 
