@@ -145,14 +145,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 
 	public V put(K key, V value) {
 		if (writable == null) {
-			writable = new HashMap<K, V>();
+			writable = newMap();
 		}
 		return writable.put(key, value);
 	}
 
 	public void putAll(Map<? extends K, ? extends V> map) {
 		if (writable == null) {
-			writable = new HashMap<K, V>();
+			writable = newMap();
 		}
 		writable.putAll(map);
 	}
