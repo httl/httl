@@ -63,6 +63,15 @@ public class DefaultTranslator implements Translator {
 
 	private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
+	private String[] importSizers;
+	
+	/**
+	 * httl.properties: import.sizers=size,length,getSize,getLength
+	 */
+	public void setImportSizers(String[] importSizers) {
+		this.importSizers = importSizers;
+	}
+
 	/**
 	 * httl.properties: engine=httl.spi.engines.DefaultEngine
 	 */
@@ -147,7 +156,7 @@ public class DefaultTranslator implements Translator {
 			source = expressionFilter.filter(source, source);
 		}
 		Set<String> variables = new HashSet<String>();
-		Node node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importPackages, offset).parse(source, variables);
+		Node node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importSizers, importPackages, offset).parse(source, variables);
 		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, mapConverter, importPackages, functions);
 	}
 

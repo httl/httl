@@ -971,7 +971,7 @@ public class StringUtils {
 		return value;
 	}
 
-	public static String getConditionCode(Class<?> type, String code) throws ParseException {
+	public static String getConditionCode(Class<?> type, String code, String[] sizers) throws ParseException {
 		if (type != boolean.class) {
 			if (type == byte.class 
 					|| type == short.class
@@ -993,7 +993,7 @@ public class StringUtils {
 			} else if (Map.class.isAssignableFrom(type)) {
 				code = "(" + code + ") != null && (" + code + ").size() > 0";
 			} else {
-				String method = ClassUtils.getSizeMethod(type);
+				String method = ClassUtils.getSizeMethod(type, sizers);
 				if (StringUtils.isNotEmpty(method)) {
 					code = "(" + code + ") != null && (" + code + ")." + method + " > 0";
 				} else {

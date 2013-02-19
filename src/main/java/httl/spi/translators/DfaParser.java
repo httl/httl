@@ -146,6 +146,8 @@ public class DfaParser {
 	private final String[] getters;
 
 	private final String[] packages;
+	
+	private final String[] sizers;
 
 	private final int offset;
 	
@@ -155,7 +157,7 @@ public class DfaParser {
 	
 	private final Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
 
-	public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] packages, int offset) {
+	public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] sizers, String[] packages, int offset) {
 		this.translator = translator;
 		this.parameterTypes = parameterTypes;
 		this.defaultType = defaultType;
@@ -163,6 +165,7 @@ public class DfaParser {
 		this.sequences = sequences;
 		this.getters = getters;
 		this.packages = packages;
+		this.sizers = sizers;
 		this.offset = offset;
 	}
 	
@@ -290,7 +293,7 @@ public class DfaParser {
 						if (left != Bracket.ROUND) {
 							throw new ParseException("Miss left parenthesis", token.getOffset());
 						}
-						UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, packages, msg, getPriority(msg, true));
+						UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sizers, packages, msg, getPriority(msg, true));
 						operatorTokens.put(operator, token);
 						operatorStack.push(operator);
 						beforeOperator = true;
@@ -380,14 +383,14 @@ public class DfaParser {
 					if (! msg.startsWith("new ") && ! StringUtils.isFunction(msg) && ! UNARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
 					}
-					UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, packages, msg, getPriority(msg, true));
+					UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sizers, packages, msg, getPriority(msg, true));
 					operatorTokens.put(operator, token);
 					operatorStack.push(operator);
 				} else {
 					if (! StringUtils.isFunction(msg) && ! BINARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
 					}
-					BinaryOperator operator = new BinaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sequences, getters, packages, msg, getPriority(msg, false));
+					BinaryOperator operator = new BinaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sequences, getters, sizers, packages, msg, getPriority(msg, false));
 					operatorTokens.put(operator, token);
 					while (! operatorStack.isEmpty() && ! (operatorStack.peek() instanceof Bracket)
 							&& operatorStack.peek().getPriority() >= operator.getPriority()) {

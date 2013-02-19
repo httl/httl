@@ -40,9 +40,12 @@ public final class UnaryOperator extends Operator {
 
 	private Node parameter;
 
+	private String[] sizers;
+	
 	public UnaryOperator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, 
-						 Collection<Class<?>> functions, String[] packages, String name, int priority) {
+						 Collection<Class<?>> functions, String[] sizers, String[] packages, String name, int priority) {
 		super(translator, source, offset, parameterTypes, functions, packages, name, priority);
+		this.sizers = sizers;
 	}
 
 	public Node getParameter() {
@@ -141,7 +144,7 @@ public final class UnaryOperator extends Operator {
 				return "new " + types[0].getCanonicalName() + "[] {" + parameter.getCode() + "}";
 			}
 		} else if (getName().equals("!") && ! boolean.class.equals(types[0])) {
-			return "! (" + StringUtils.getConditionCode(types[0], parameter.getCode()) + ")";
+			return "! (" + StringUtils.getConditionCode(types[0], parameter.getCode(), sizers) + ")";
 		} else {
 			if (parameter instanceof Operator
 					&& ((Operator) parameter).getPriority() < getPriority()) {

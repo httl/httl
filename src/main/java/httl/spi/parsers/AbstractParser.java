@@ -216,6 +216,15 @@ public abstract class AbstractParser implements Parser {
 
 	private String engineName;
 
+	private String[] importSizers;
+	
+	/**
+	 * httl.properties: import.sizers=size,length,getSize,getLength
+	 */
+	public void setImportSizers(String[] importSizers) {
+		this.importSizers = importSizers;
+	}
+
 	/**
 	 * httl.properties: var.directive=var
 	 */
@@ -1561,7 +1570,7 @@ public abstract class AbstractParser implements Parser {
 	}
 	
 	protected String getConditionCode(Expression expression) throws IOException, ParseException {
-		return StringUtils.getConditionCode(expression.getReturnType(), expression.getCode());
+		return StringUtils.getConditionCode(expression.getReturnType(), expression.getCode(), importSizers);
 	}
 
 	protected String getForeachCode(String type, Class<?> clazz, String var, String code) {

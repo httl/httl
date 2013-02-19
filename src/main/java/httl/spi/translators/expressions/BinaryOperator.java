@@ -50,13 +50,16 @@ public final class BinaryOperator extends Operator {
 	private List<StringSequence> sequences;
 
 	private String[] getters;
+
+	private String[] sizers;
 	
 	public BinaryOperator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, 
-						  Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters,
+						  Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] sizers,
 						  String[] packages, String name, int priority){
 		super(translator, source, offset, parameterTypes, functions, packages, name, priority);
 		this.sequences = sequences;
 		this.getters = getters;
+		this.sizers = sizers;
 	}
 
 	public Node getLeftParameter() {
@@ -262,21 +265,21 @@ public final class BinaryOperator extends Operator {
 				&& ! leftType.isPrimitive() && ! rightParameter.getReturnType().isPrimitive()) {
 			return getNotNullCode(leftCode, "(! " + leftCode + ".equals(" + rightCode + "))");
 		} else if("||".equals(name) && ! boolean.class.equals(leftType)) {
-			return "(" + ClassUtils.class.getName() + ".isTrue(" + leftCode + ") ? (" + leftCode + ") : (" + rightCode + "))";
+			return "(" + StringUtils.getConditionCode(leftType, leftCode, sizers) + ") ? (" + leftCode + ") : (" + rightCode + "))";
 		} else if("&&".equals(name) && ! boolean.class.equals(leftType)) {
 			if (rightParameter instanceof Operator
 					&& ((Operator) rightParameter).getPriority() < getPriority()) {
 				rightCode = "(" + rightCode + ")";
 			}
-			leftCode = StringUtils.getConditionCode(leftType, leftCode);
-			rightCode = StringUtils.getConditionCode(rightParameter.getReturnType(), rightCode);
+			leftCode = StringUtils.getConditionCode(leftType, leftCode, sizers);
+			rightCode = StringUtils.getConditionCode(rightParameter.getReturnType(), rightCode, sizers);
 			return leftCode + " " + name + " " + rightCode;
 		} else if (name.equals("?")) {
 			if (rightParameter instanceof Operator
 					&& ((Operator) rightParameter).getPriority() < getPriority()) {
 				rightCode = "(" + rightCode + ")";
 			}
-			leftCode = StringUtils.getConditionCode(leftType, leftCode);
+			leftCode = StringUtils.getConditionCode(leftType, leftCode, sizers);
 			return leftCode + " " + name + " " + rightCode;
 		} else if (":".equals(name) 
 				&& ! (leftParameter instanceof BinaryOperator 

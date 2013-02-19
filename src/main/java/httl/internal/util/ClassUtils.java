@@ -495,24 +495,14 @@ public class ClassUtils {
 		}
 	}
 	
-	public static String getSizeMethod(Class<?> cls) {
-		try {
-			return cls.getMethod("size", new Class<?>[0]).getName() + "()";
-		} catch (NoSuchMethodException e) {
+	public static String getSizeMethod(Class<?> cls, String[] sizers) {
+		for (String sizer : sizers) {
 			try {
-				return cls.getMethod("length", new Class<?>[0]).getName() + "()";
-			} catch (NoSuchMethodException e2) {
-				try {
-					return cls.getMethod("getSize", new Class<?>[0]).getName() + "()";
-				} catch (NoSuchMethodException e3) {
-					try {
-						return cls.getMethod("getLength", new Class<?>[0]).getName() + "()";
-					} catch (NoSuchMethodException e4) {
-						return null;
-					}
-				}
+				return cls.getMethod(sizer, new Class<?>[0]).getName() + "()";
+			} catch (NoSuchMethodException e) {
 			}
 		}
+		return null;
 	}
 	
 	public static String getMethodName(Method method, Class<?>[] parameterClasses, String rightCode) {
