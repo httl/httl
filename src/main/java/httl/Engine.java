@@ -214,6 +214,15 @@ public abstract class Engine {
 	public abstract <T> T getProperty(String key, Class<T> cls);
 
 	/**
+	 * Get variable value.
+	 * 
+	 * @see #getEngine()
+	 * @param key - variable key
+	 * @return variable value
+	 */
+	public abstract Object getVariable(String key);
+
+	/**
 	 * Get expression.
 	 * 
 	 * @see #getEngine()

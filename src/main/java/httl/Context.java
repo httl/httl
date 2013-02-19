@@ -280,7 +280,7 @@ public final class Context extends DelegateMap<String, Object> {
 		} else if ("context".equals(key) || "current".equals(key)) {
 			return this;
 		} else if (getParent() == null && getEngine() != null) {
-			return getEngine().getProperty((String) key);
+			return getEngine().getVariable((String) key);
 		} else {
 			return null;
 		}

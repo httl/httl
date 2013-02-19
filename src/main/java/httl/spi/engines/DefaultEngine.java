@@ -110,7 +110,7 @@ public class DefaultEngine extends Engine {
 	public String getName() {
 		return name;
 	}
-
+	
 	/**
 	 * Get config instantiated value.
 	 * 
@@ -121,12 +121,6 @@ public class DefaultEngine extends Engine {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getProperty(String key, Class<T> cls) {
-		if (resolver != null) {
-			Object value = resolver.get(key);
-			if (value != null) {
-				return (T) value;
-			}
-		}
 		if (properties != null) {
 			if (cls != null && cls != Object.class && cls != String.class 
 					&& ! cls.isInterface() && ! cls.isArray()) {
@@ -142,6 +136,17 @@ public class DefaultEngine extends Engine {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Get variable value.
+	 * 
+	 * @see #getEngine()
+	 * @param key - variable key
+	 * @return variable value
+	 */
+	public Object getVariable(String key) {
+		return resolver == null ? null : resolver.get(key);
 	}
 
 	/**
