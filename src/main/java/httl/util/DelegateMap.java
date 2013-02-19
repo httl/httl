@@ -67,6 +67,10 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 	protected V doGet(Object key) {
 		return null;
 	}
+	
+	protected Map<K, V> newMap() {
+		return new HashMap<K, V>();
+	}
 
 	public Set<Map.Entry<K, V>> entrySet() {
 		return new DelegateSet<Map.Entry<K, V>>() {

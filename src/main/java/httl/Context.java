@@ -236,4 +236,10 @@ public final class Context extends DelegateMap<String, Object> {
 		}
 	}
 
+	@Override
+	protected Map<String, Object> newMap() {
+		Engine engine = getEngine();
+		return engine == null ? super.newMap() : engine.createContext();
+	}
+
 }
