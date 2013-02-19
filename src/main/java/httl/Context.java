@@ -122,7 +122,8 @@ public final class Context implements Map<String, Object> {
 	public static void removeContext() {
 		LOCAL.remove();
 	}
-	
+
+	// The current thread id
 	private final long thread;
 
 	// The context level.
@@ -150,12 +151,12 @@ public final class Context implements Map<String, Object> {
 		this.current = current;
 		this.out = out;
 		this.template = template;
-		initEngine(engine);
+		initEngine(template == null ? null : template.getEngine());
 	}
 
 	// Check the cross-thread use.
 	private void checkThread() {
-		if (thread != Thread.currentThread().getId()) {
+		if (Thread.currentThread().getId() != thread) {
 			throw new IllegalStateException("Don't cross-thread using " + Context.class.getName() + " object.");
 		}
 	}
