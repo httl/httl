@@ -171,10 +171,16 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	}
 
 	public Object evaluate(Object context) throws ParseException {
+		if (context instanceof Context) {
+			throw new IllegalArgumentException("Don't use the " + Context.class.getName() + " type as evaluate() parameters, it implicitly delivery.");
+		}
 		return evaluate(convertMap(context));
 	}
 
 	public void render(Object context, Object out) throws IOException, ParseException {
+		if (context instanceof Context) {
+			throw new IllegalArgumentException("Don't use the " + Context.class.getName() + " type as render() parameters, it implicitly delivery.");
+		}
 		out = convertOut(out);
 		if (out == null) {
 			throw new IllegalArgumentException("out == null");

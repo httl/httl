@@ -122,6 +122,8 @@ public final class Context implements Map<String, Object> {
 	public static void removeContext() {
 		LOCAL.remove();
 	}
+	
+	private final long thread;
 
 	// The context level.
 	private final int level;
@@ -142,11 +144,20 @@ public final class Context implements Map<String, Object> {
 	private Engine engine;
 
 	private Context(Context parent, Map<String, Object> current, Object out, Template template) {
+		this.thread = Thread.currentThread().getId();
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
 		this.parent = parent;
 		this.current = current;
 		this.out = out;
-		setTemplate(template);
+		this.template = template;
+		initEngine(engine);
+	}
+
+	// Check the cross-thread use.
+	private void checkThread() {
+		if (thread != Thread.currentThread().getId()) {
+			throw new IllegalStateException("Don't cross-thread using " + Context.class.getName() + " object.");
+		}
 	}
 
 	/**
@@ -156,6 +167,7 @@ public final class Context implements Map<String, Object> {
 	 * @return context level
 	 */
 	public int getLevel() {
+		checkThread();
 		return level;
 	}
 
@@ -166,6 +178,7 @@ public final class Context implements Map<String, Object> {
 	 * @return parent context
 	 */
 	public Context getParent() {
+		checkThread();
 		return parent;
 	}
 
@@ -176,6 +189,7 @@ public final class Context implements Map<String, Object> {
 	 * @return parent template
 	 */
 	public Template getSuper() {
+		checkThread();
 		return parent == null ? null : parent.getTemplate();
 	}
 
@@ -186,6 +200,7 @@ public final class Context implements Map<String, Object> {
 	 * @return current template
 	 */
 	public Template getTemplate() {
+		checkThread();
 		return template;
 	}
 
@@ -195,6 +210,7 @@ public final class Context implements Map<String, Object> {
 	 * @param template - current template
 	 */
 	public Context setTemplate(Template template) {
+		checkThread();
 		this.template = template;
 		if (template != null) {
 			setEngine(template.getEngine());
@@ -209,6 +225,7 @@ public final class Context implements Map<String, Object> {
 	 * @return current engine
 	 */
 	public Engine getEngine() {
+		checkThread();
 		return engine;
 	}
 
@@ -218,9 +235,15 @@ public final class Context implements Map<String, Object> {
 	 * @param engine - current engine
 	 */
 	public Context setEngine(Engine engine) {
+		checkThread();
 		if (template != null && template.getEngine() != engine) {
 			throw new IllegalStateException("template.engine != context.engine");
 		}
+		initEngine(engine);
+		return this;
+	}
+	
+	private void initEngine(Engine engine) {
 		if (engine != null) {
 			if (parent != null && parent.getEngine() == null) {
 				parent.setEngine(engine);
@@ -230,7 +253,6 @@ public final class Context implements Map<String, Object> {
 			}
 		}
 		this.engine = engine;
-		return this;
 	}
 
 	/**
@@ -240,6 +262,7 @@ public final class Context implements Map<String, Object> {
 	 * @return current out
 	 */
 	public Object getOut() {
+		checkThread();
 		return out;
 	}
 
@@ -251,6 +274,7 @@ public final class Context implements Map<String, Object> {
 	 */
 	@SuppressWarnings("resource")
 	public OutputStream getOutputStream() {
+		checkThread();
 		return out == null ? null : (out instanceof OutputStream ? (OutputStream) out 
 				: new WriterOutputStream((Writer) out));
 	}
@@ -261,6 +285,7 @@ public final class Context implements Map<String, Object> {
 	 * @param out - current output stream
 	 */
 	public Context setOutputStream(OutputStream out) {
+		checkThread();
 		this.out = out;
 		return this;
 	}
@@ -272,6 +297,7 @@ public final class Context implements Map<String, Object> {
 	 * @return current writer
 	 */
 	public Writer getWriter() {
+		checkThread();
 		return out == null ? null : (out instanceof Writer ? (Writer) out 
 				: new OutputStreamWriter((OutputStream) out));
 	}
@@ -282,6 +308,7 @@ public final class Context implements Map<String, Object> {
 	 * @param out - current writer
 	 */
 	public Context setWriter(Writer out) {
+		checkThread();
 		this.out = out;
 		return this;
 	}
@@ -302,41 +329,50 @@ public final class Context implements Map<String, Object> {
 	// ==== Delegate the current context ==== //
 
 	public Object get(Object key) {
+		checkThread();
 		return current == null ? null : current.get(key);
 	}
 
 	public int size() {
+		checkThread();
 		return current == null ? 0 : current.size();
 	}
 
 	public boolean isEmpty() {
+		checkThread();
 		return current == null ? true : current.isEmpty();
 	}
 
 	public boolean containsKey(Object key) {
+		checkThread();
 		return current == null ? false : current.containsKey(key);
 	}
 
 	public boolean containsValue(Object value) {
+		checkThread();
 		return current == null ? false : current.containsValue(value);
 	}
 
 	@SuppressWarnings("unchecked")
 	public Set<String> keySet() {
+		checkThread();
 		return current == null ? Collections.EMPTY_SET : current.keySet();
 	}
 
 	@SuppressWarnings("unchecked")
 	public Collection<Object> values() {
+		checkThread();
 		return current == null ? Collections.EMPTY_SET : current.values();
 	}
 
 	@SuppressWarnings("unchecked")
 	public Set<Map.Entry<String, Object>> entrySet() {
+		checkThread();
 		return current == null ? Collections.EMPTY_SET : current.entrySet();
 	}
 
 	public Object put(String key, Object value) {
+		checkThread();
 		if (current == null) {
 			current = new HashMap<String, Object>();
 		}
@@ -344,6 +380,7 @@ public final class Context implements Map<String, Object> {
 	}
 
 	public void putAll(Map<? extends String, ? extends Object> m) {
+		checkThread();
 		if (current == null) {
 			current = new HashMap<String, Object>();
 		}
@@ -351,10 +388,12 @@ public final class Context implements Map<String, Object> {
 	}
 
 	public Object remove(Object key) {
+		checkThread();
 		return current == null ? null : current.remove(key);
 	}
 
 	public void clear() {
+		checkThread();
 		if (current != null) {
 			current.clear();
 		}
