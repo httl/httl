@@ -126,17 +126,17 @@ public final class Context extends DelegateMap<String, Object> {
 		LOCAL.remove();
 	}
 
-	// The parent context.
-	private final Context parent;
-	
-	// The current template.
-	private final Template template;
-
-	// The current out.
-	private final Object out;
-
 	// The context level.
 	private final int level;
+
+	// The parent context.
+	private final Context parent;
+
+	// The current template.
+	private Template template;
+
+	// The current out.
+	private Object out;
 
 	// The current engine.
 	private Engine engine;
@@ -147,6 +147,16 @@ public final class Context extends DelegateMap<String, Object> {
 		this.template = template;
 		this.out = out;
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
+	}
+
+	/**
+	 * Get the context level.
+	 * 
+	 * @see #getContext()
+	 * @return context level
+	 */
+	public int getLevel() {
+		return level;
 	}
 
 	/**
@@ -180,15 +190,40 @@ public final class Context extends DelegateMap<String, Object> {
 	}
 
 	/**
+	 * Set the current template.
+	 * 
+	 * @param template - current template
+	 */
+	public void setTemplate(Template template) {
+		this.template = template;
+		if (template != null) {
+			this.engine = template.getEngine();
+		}
+	}
+
+	/**
 	 * Get the current engine.
 	 * 
 	 * @see #getContext()
 	 * @return current engine
 	 */
 	public Engine getEngine() {
-		if (engine == null && template != null)
+		if (engine == null && template != null) {
 			engine = template.getEngine();
+		}
 		return engine;
+	}
+
+	/**
+	 * Set the current engine.
+	 * 
+	 * @param engine - current engine
+	 */
+	public void setEngine(Engine engine) {
+		if (template != null && template.getEngine() != engine) {
+			throw new IllegalStateException("template.engine != context.engine");
+		}
+		this.engine = engine;
 	}
 
 	/**
@@ -202,13 +237,12 @@ public final class Context extends DelegateMap<String, Object> {
 	}
 
 	/**
-	 * Get the context level.
+	 * Set the current out.
 	 * 
-	 * @see #getContext()
-	 * @return context level
+	 * @param out - current out
 	 */
-	public int getLevel() {
-		return level;
+	public void setOut(Object out) {
+		this.out = out;
 	}
 
 	/**
