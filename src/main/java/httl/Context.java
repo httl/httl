@@ -35,7 +35,7 @@ import java.util.Map;
  * 
  * <pre>
  * if (value == null) value = puts.get(key); // context.put(key, value);
- * if (value == null) value = parameters.get(key); // render(parameters);
+ * if (value == null) value = current.get(key); // render(current);
  * if (value == null) value = parent.get(key); // recursive above
  * 
  * if (value == null) value = servletResovler.get(key); // httl.properties: resovlers+=ServletResovler
@@ -75,31 +75,31 @@ public final class Context extends DelegateMap<String, Object> {
 
 	/**
 	 * Push the current context to thread local.
-	 * @param parameters - current parameters
+	 * @param current - current current
 	 * @param out - current out
 	 * @param template - current template
 	 */
-	public static Context pushContext(Map<String, Object> parameters, Writer out, Template template) {
-		return doPushContext(parameters, out, template);
+	public static Context pushContext(Map<String, Object> current, Writer out, Template template) {
+		return doPushContext(current, out, template);
 	}
 
 	/**
 	 * Push the current context to thread local.
-	 * @param parameters - current parameters
+	 * @param current - current current
 	 * @param out - current out
 	 * @param template - current template
 	 */
-	public static Context pushContext(Map<String, Object> parameters, OutputStream out, Template template) {
-		return doPushContext(parameters, out, template);
+	public static Context pushContext(Map<String, Object> current, OutputStream out, Template template) {
+		return doPushContext(current, out, template);
 	}
 
 	// do push
-	private static Context doPushContext(Map<String, Object> parameters, Object out, Template template) {
+	private static Context doPushContext(Map<String, Object> current, Object out, Template template) {
 		Context parent = getContext();
 		if (template != null && parent.parent == null) {
 			parent.engine = template.getEngine(); // set root context engine
 		}
-		Context context = new Context(parent, parameters, out, template);
+		Context context = new Context(parent, current, out, template);
 		LOCAL.set(context);
 		return context;
 	}
@@ -141,8 +141,8 @@ public final class Context extends DelegateMap<String, Object> {
 	// The current engine.
 	private Engine engine;
 
-	private Context(Context parent, Map<String, Object> parameters, Object out, Template template) {
-		super(parent, parameters);
+	private Context(Context parent, Map<String, Object> current, Object out, Template template) {
+		super(parent, current);
 		this.parent = parent;
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
 		this.out = out;
