@@ -194,11 +194,12 @@ public final class Context extends DelegateMap<String, Object> {
 	 * 
 	 * @param template - current template
 	 */
-	public void setTemplate(Template template) {
+	public Context setTemplate(Template template) {
 		this.template = template;
 		if (template != null) {
 			this.engine = template.getEngine();
 		}
+		return this;
 	}
 
 	/**
@@ -219,11 +220,12 @@ public final class Context extends DelegateMap<String, Object> {
 	 * 
 	 * @param engine - current engine
 	 */
-	public void setEngine(Engine engine) {
+	public Context setEngine(Engine engine) {
 		if (template != null && template.getEngine() != engine) {
 			throw new IllegalStateException("template.engine != context.engine");
 		}
 		this.engine = engine;
+		return this;
 	}
 
 	/**
@@ -241,8 +243,9 @@ public final class Context extends DelegateMap<String, Object> {
 	 * 
 	 * @param out - current out
 	 */
-	public void setOut(Object out) {
+	public Context setOut(Object out) {
 		this.out = out;
+		return this;
 	}
 
 	/**
