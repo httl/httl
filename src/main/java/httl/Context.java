@@ -15,13 +15,16 @@
  */
 package httl;
 
-import httl.internal.util.DelegateMap;
 import httl.internal.util.WriterOutputStream;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Context. (API, Prototype, ThreadLocal, ThreadSafe)
@@ -52,9 +55,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Context extends DelegateMap<String, Object> {
-
-	private static final long serialVersionUID = 1L;
+public final class Context implements Map<String, Object> {
 
 	// The context thread local holder.
 	private static final ThreadLocal<Context> LOCAL = new ThreadLocal<Context>();
@@ -94,12 +95,8 @@ public final class Context extends DelegateMap<String, Object> {
 	}
 
 	// do push
-	private static Context doPushContext(Map<String, Object> current, Object out, Template template) {
-		Context parent = getContext();
-		if (template != null && parent.parent == null) {
-			parent.engine = template.getEngine(); // set root context engine
-		}
-		Context context = new Context(parent, current, out, template);
+	private static Context doPushContext(Map<String, Object> map, Object out, Template template) {
+		Context context = new Context(getContext(), map, out, template);
 		LOCAL.set(context);
 		return context;
 	}
@@ -126,11 +123,14 @@ public final class Context extends DelegateMap<String, Object> {
 		LOCAL.remove();
 	}
 
+	// The context level.
+	private final int level;
+
 	// The parent context.
 	private final Context parent;
 
-	// The context level.
-	private final int level;
+	// The current context.
+	private Map<String, Object> current;
 
 	// The current out.
 	private Object out;
@@ -142,12 +142,11 @@ public final class Context extends DelegateMap<String, Object> {
 	private Engine engine;
 
 	private Context(Context parent, Map<String, Object> current, Object out, Template template) {
-		super(parent, current);
-		this.parent = parent;
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
+		this.parent = parent;
+		this.current = current;
 		this.out = out;
-		this.template = template;
-		this.engine = template == null ? null : template.getEngine();
+		setTemplate(template);
 	}
 
 	/**
@@ -198,7 +197,7 @@ public final class Context extends DelegateMap<String, Object> {
 	public Context setTemplate(Template template) {
 		this.template = template;
 		if (template != null) {
-			this.engine = template.getEngine();
+			setEngine(template.getEngine());
 		}
 		return this;
 	}
@@ -222,6 +221,14 @@ public final class Context extends DelegateMap<String, Object> {
 		if (template != null && template.getEngine() != engine) {
 			throw new IllegalStateException("template.engine != context.engine");
 		}
+		if (engine != null) {
+			if (parent != null && parent.getEngine() == null) {
+				parent.setEngine(engine);
+			}
+			if (this.engine == null) {
+				current = engine.createContext(parent, current);
+			}
+		}
 		this.engine = engine;
 		return this;
 	}
@@ -244,7 +251,8 @@ public final class Context extends DelegateMap<String, Object> {
 	 */
 	@SuppressWarnings("resource")
 	public OutputStream getOutputStream() {
-		return out instanceof OutputStream ? (OutputStream) out : new WriterOutputStream((Writer) out);
+		return out == null ? null : (out instanceof OutputStream ? (OutputStream) out 
+				: new WriterOutputStream((Writer) out));
 	}
 
 	/**
@@ -264,7 +272,8 @@ public final class Context extends DelegateMap<String, Object> {
 	 * @return current writer
 	 */
 	public Writer getWriter() {
-		return out instanceof Writer ? (Writer) out : new OutputStreamWriter((OutputStream) out);
+		return out == null ? null : (out instanceof Writer ? (Writer) out 
+				: new OutputStreamWriter((OutputStream) out));
 	}
 
 	/**
@@ -289,37 +298,66 @@ public final class Context extends DelegateMap<String, Object> {
 		Object value = get(key);
 		return value == null ? defaultValue : value;
 	}
+	
+	// ==== Delegate the current context ==== //
 
-	// Get the special variables after the user variables.
-	// Allows the user to override these special variables.
-	@Override
-	protected Object doGet(Object key) {
-		if ("super".equals(key)) {
-			return getSuper();
-		} else if ("template".equals(key) || "this".equals(key)) {
-			return getTemplate();
-		} else if ("engine".equals(key)) {
-			return getEngine();
-		} else if ("out".equals(key)) {
-			return getOut();
-		} else if ("level".equals(key)) {
-			return getLevel();
-		} else if ("parent".equals(key)) {
-			return getParent();
-		} else if ("context".equals(key) || "current".equals(key)) {
-			return this;
-		} else if (getParent() == null && getEngine() != null) {
-			return getEngine().getVariable((String) key);
-		} else {
-			return null;
-		}
+	public Object get(Object key) {
+		return current == null ? null : current.get(key);
 	}
 
-	// Create the context writable storage map.
-	@Override
-	protected Map<String, Object> newMap() {
-		Engine engine = getEngine();
-		return engine == null ? super.newMap() : engine.createContext();
+	public int size() {
+		return current == null ? 0 : current.size();
+	}
+
+	public boolean isEmpty() {
+		return current == null ? true : current.isEmpty();
+	}
+
+	public boolean containsKey(Object key) {
+		return current == null ? false : current.containsKey(key);
+	}
+
+	public boolean containsValue(Object value) {
+		return current == null ? false : current.containsValue(value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<String> keySet() {
+		return current == null ? Collections.EMPTY_SET : current.keySet();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<Object> values() {
+		return current == null ? Collections.EMPTY_SET : current.values();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<Map.Entry<String, Object>> entrySet() {
+		return current == null ? Collections.EMPTY_SET : current.entrySet();
+	}
+
+	public Object put(String key, Object value) {
+		if (current == null) {
+			current = new HashMap<String, Object>();
+		}
+		return current.put(key, value);
+	}
+
+	public void putAll(Map<? extends String, ? extends Object> m) {
+		if (current == null) {
+			current = new HashMap<String, Object>();
+		}
+		current.putAll(m);
+	}
+
+	public Object remove(Object key) {
+		return current == null ? null : current.remove(key);
+	}
+
+	public void clear() {
+		if (current != null) {
+			current.clear();
+		}
 	}
 
 }

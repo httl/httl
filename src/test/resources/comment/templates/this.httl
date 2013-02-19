@@ -1,2 +1,4 @@
 ${this.name}
 ${this.encoding}
+${template.name}
+${template.encoding}

@@ -17,13 +17,13 @@ package httl;
 
 import httl.internal.util.BeanFactory;
 import httl.internal.util.ConfigUtils;
+import httl.internal.util.DelegateMap;
 import httl.internal.util.StringUtils;
 import httl.internal.util.Version;
 import httl.internal.util.VolatileReference;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -453,8 +453,14 @@ public abstract class Engine {
 	 * 
 	 * @return context map
 	 */
-	public Map<String, Object> createContext() {
-		return new HashMap<String, Object>();
+	public Map<String, Object> createContext(final Context parent, Map<String, Object> current) {
+		return new DelegateMap<String, Object>(parent, current) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			protected Object doGet(Object key) {
+				return parent == null ? Engine.this.getVariable((String) key) : null;
+			}
+		};
 	}
 
 }
