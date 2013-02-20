@@ -147,7 +147,7 @@ public final class ConfigUtils {
 		Document document = builder.parse(dataInputStream);
 		return document;
 	}
-	
+
 	private static final String CONFIG_KEY_PREFIX = "httl.";
 
 	@SuppressWarnings("unchecked")
@@ -173,6 +173,7 @@ public final class ConfigUtils {
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
+				key = key.replace('_', '.').replace('-', '.');
 				if (key.startsWith(CONFIG_KEY_PREFIX)) {
 					key = key.substring(CONFIG_KEY_PREFIX.length());
 				}
