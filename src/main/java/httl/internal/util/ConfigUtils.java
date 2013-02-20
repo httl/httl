@@ -148,7 +148,20 @@ public final class ConfigUtils {
 		return document;
 	}
 
-	private static final String CONFIG_KEY_PREFIX = "httl.";
+	private static String normalizeKey(String key) {
+		return key.replace('_', '.').replace('-', '.');
+	}
+
+	public static Map<String, String> filterWithPrefix(String prefix, Map<String, String> input) {
+		Map<String, String> ret = new HashMap<String, String>();
+		for (Map.Entry<String, String> entry : input.entrySet()) {
+			String key = normalizeKey(entry.getKey());
+			if(key.startsWith(prefix)) {
+				ret.put(key.substring(prefix.length()), entry.getValue());
+			}
+		}
+		return ret;
+	}
 
 	@SuppressWarnings("unchecked")
 	public static Properties mergeProperties(Object... configs) {
@@ -160,7 +173,7 @@ public final class ConfigUtils {
 				Map<Object, Object> properties;
 				if (config instanceof String) {
 					boolean required = (i == last || configs[i + 1] == null);
-					properties = (Map<Object, Object>) loadProperties((String) config, required);
+					properties = loadProperties((String) config, required);
 				} else {
 					properties = (Map<Object, Object>) config;
 				}
@@ -173,10 +186,6 @@ public final class ConfigUtils {
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
-				key = key.replace('_', '.').replace('-', '.');
-				if (key.startsWith(CONFIG_KEY_PREFIX)) {
-					key = key.substring(CONFIG_KEY_PREFIX.length());
-				}
 				if (key.endsWith(PLUS)) {
 					if (StringUtils.isNotEmpty(value)) {
 						plusConfigs.put(key, value);

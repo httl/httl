@@ -56,6 +56,8 @@ public abstract class Engine {
 	// User configuration prefix
 	private static final String HTTL_PREFIX = "httl-";
 
+	private static final String HTTL_CONFIG_KEY_PREFIX = "httl.";
+
 	// The mode config key
 	private static final String MODE_KEY = "modes";
 
@@ -122,8 +124,11 @@ public abstract class Engine {
 			synchronized (reference) { // reference lock
 				engine = reference.get();
 				if (engine == null) { // double check
+					final Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_CONFIG_KEY_PREFIX, (Map)System.getProperties());
+					final Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_CONFIG_KEY_PREFIX, System.getenv());
+
 					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
-							configProperties, System.getProperties(), System.getenv());
+							configProperties, systemProperties, systemEnv);
 
 					final String modes = properties.getProperty(MODE_KEY);
 					String[] modeArray = StringUtils.splitByComma(modes);
@@ -135,9 +140,8 @@ public abstract class Engine {
 						}
 						configs[1 + modeArray.length] = configPath;
 						configs[1 + modeArray.length + 1] = configProperties;
-						configs[1 + modeArray.length + 2] = System.getProperties();
-						configs[1 + modeArray.length + 3] = System.getenv();
-
+						configs[1 + modeArray.length + 2] = systemProperties;
+						configs[1 + modeArray.length + 3] = systemEnv;
 						properties = ConfigUtils.mergeProperties(configs);
 					}
 					properties.setProperty(ENGINE_NAME, configPath);
