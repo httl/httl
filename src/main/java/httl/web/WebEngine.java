@@ -16,12 +16,9 @@
 package httl.web;
 
 import httl.Engine;
-import httl.spi.Logger;
-import httl.spi.converters.ResponseOutConverter;
-import httl.spi.interceptors.ServletInterceptor;
-import httl.spi.loaders.ServletLoader;
-import httl.spi.resolvers.ServletResolver;
 import httl.internal.util.StringUtils;
+import httl.spi.Logger;
+import httl.spi.loaders.ServletLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +27,6 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * WebEngine (Integration, Singleton, ThreadSafe)
@@ -52,17 +46,7 @@ public class WebEngine {
 	private static final Map<String, String> setProperties = new ConcurrentHashMap<String, String>();
 
 	static {
-		addProperty("loaders", ServletLoader.class.getName());
-		addProperty("resolvers", ServletResolver.class.getName());
-		addProperty("interceptors", ServletInterceptor.class.getName());
-		addProperty("out.converters", ResponseOutConverter.class.getName());
-		addProperty("import.variables", HttpServletRequest.class.getName() + " request,"
-				+ HttpServletResponse.class.getName() + " response,"
-				+ HttpSession.class.getName() + " session,"
-				+ ServletContext.class.getName() + " application,"
-				+ Map.class.getName() + " cookie,"
-				+ Map.class.getName() + " parameter,"
-				+ Map.class.getName() + " header");
+		addProperty("modes", "web");
 	}
 
 	private WebEngine() {}
