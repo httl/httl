@@ -6,7 +6,7 @@ import java.io.UnsupportedEncodingException;
 
 public abstract class AbstractFormatter<T> implements Formatter<T> {
 
-	private String outputEncoding;
+	protected String outputEncoding;
 
 	/**
 	 * httl.properties: output.encoding=UTF-8
@@ -19,18 +19,24 @@ public abstract class AbstractFormatter<T> implements Formatter<T> {
 		if (value == null) {
 			return new char[0];
 		}
-		String str = toString(key, value);
-		if (str == null) {
-			return new char[0];
-		}
-		return str.toCharArray();
+		return toChars(toString(key, value));
 	}
 
 	public byte[] toBytes(String key, T value) { // slowly
 		if (value == null) {
 			return new byte[0];
 		}
-		String str = toString(key, value);
+		return toBytes(toString(key, value));
+	}
+	
+	protected char[] toChars(String str) {
+		if (str == null) {
+			return new char[0];
+		}
+		return str.toCharArray();
+	}
+
+	protected byte[] toBytes(String str) {
 		if (str == null) {
 			return new byte[0];
 		}

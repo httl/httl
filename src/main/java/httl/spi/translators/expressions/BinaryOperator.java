@@ -265,7 +265,7 @@ public final class BinaryOperator extends Operator {
 				&& ! leftType.isPrimitive() && ! rightParameter.getReturnType().isPrimitive()) {
 			return getNotNullCode(leftCode, "(! " + leftCode + ".equals(" + rightCode + "))");
 		} else if("||".equals(name) && ! boolean.class.equals(leftType)) {
-			return "(" + StringUtils.getConditionCode(leftType, leftCode, sizers) + ") ? (" + leftCode + ") : (" + rightCode + "))";
+			return "(" + StringUtils.getConditionCode(leftType, leftCode, sizers) + " ? (" + leftCode + ") : (" + rightCode + "))";
 		} else if("&&".equals(name) && ! boolean.class.equals(leftType)) {
 			if (rightParameter instanceof Operator
 					&& ((Operator) rightParameter).getPriority() < getPriority()) {

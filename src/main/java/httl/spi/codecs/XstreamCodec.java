@@ -15,6 +15,9 @@
  */
 package httl.spi.codecs;
 
+import httl.internal.util.UnsafeByteArrayInputStream;
+import httl.internal.util.UnsafeByteArrayOutputStream;
+
 import java.text.ParseException;
 
 import com.thoughtworks.xstream.XStream;
@@ -34,12 +37,18 @@ public class XstreamCodec extends XmlCodec {
 		XSTREAM = new XStream(driver);
 	}
 
-	public String encode(Object value) {
+	public String toString(String key, Object value) {
 		return XSTREAM.toXML(value);
 	}
 
+	public byte[] toBytes(String key, Object value) {
+		UnsafeByteArrayOutputStream out = new UnsafeByteArrayOutputStream();
+		XSTREAM.toXML(value, out);
+		return out.toByteArray();
+	}
+
 	@SuppressWarnings("unchecked")
-	public <T> T decode(String str, Class<T> type) throws ParseException {
+	public <T> T valueOf(String str, Class<T> type) throws ParseException {
 		if (str == null) {
 			return null;
 		}
@@ -48,6 +57,21 @@ public class XstreamCodec extends XmlCodec {
 		}
 		try {
 			return (T) XSTREAM.fromXML(str, type.newInstance());
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
+		if (str == null) {
+			return null;
+		}
+		if (type == null) {
+			return (T) XSTREAM.fromXML(new UnsafeByteArrayInputStream(str));
+		}
+		try {
+			return (T) XSTREAM.fromXML(new UnsafeByteArrayInputStream(str), type.newInstance());
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}

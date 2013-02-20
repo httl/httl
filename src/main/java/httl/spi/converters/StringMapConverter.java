@@ -57,8 +57,8 @@ public class StringMapConverter implements Converter<String, Map<String, Object>
 		if (codecs != null) {
 			value = value.trim();
 			for (Codec codec : codecs) {
-				if (codec.isDecodable(value)) {
-					return (Map<String, Object>) codec.decode(value, Map.class);
+				if (codec.isValueOf(value)) {
+					return (Map<String, Object>) codec.valueOf(value, Map.class);
 				}
 			}
 		}

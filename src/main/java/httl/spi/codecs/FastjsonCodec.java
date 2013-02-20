@@ -27,7 +27,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  */
 public class FastjsonCodec extends JsonCodec {
 
-	public String encode(Object value) {
+	public String toString(String key, Object value) {
 		if (value == null) {
 			return null;
 		}
@@ -37,13 +37,34 @@ public class FastjsonCodec extends JsonCodec {
 		return JSON.toJSONString(value, SerializerFeature.SortField);
 	}
 
+	public byte[] toBytes(String key, Object value) {
+		if (value == null) {
+			return null;
+		}
+		if (isJsonWithClass()) {
+			return JSON.toJSONBytes(value, SerializerFeature.SortField, SerializerFeature.WriteClassName);
+		}
+		return JSON.toJSONBytes(value, SerializerFeature.SortField);
+	}
+
 	@SuppressWarnings("unchecked")
-	public <T> T decode(String str, Class<T> type) throws ParseException {
+	public <T> T valueOf(String str, Class<T> type) throws ParseException {
 		if (str == null) {
 			return null;
 		}
 		if (type == null) {
 			return (T) JSON.parseObject(str);
+		}
+		return JSON.parseObject(str, type);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
+		if (str == null) {
+			return null;
+		}
+		if (type == null) {
+			return (T) JSON.parse(str);
 		}
 		return JSON.parseObject(str, type);
 	}

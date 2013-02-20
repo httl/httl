@@ -801,17 +801,17 @@ public abstract class AbstractParser implements Parser {
 			String methodCode = statusInit.toString() + declare + code;
 			
 			if (sourceInClass) {
-				textFields.append("private static final String $SRC = \"" + StringUtils.escapeString(source) + "\";\n");
-				textFields.append("private static final String $CODE = \"" + StringUtils.escapeString(methodCode) + "\";\n");
+				textFields.append("private static final " + String.class.getSimpleName() + " $SRC = \"" + StringUtils.escapeString(source) + "\";\n");
+				textFields.append("private static final " + String.class.getSimpleName() + " $CODE = \"" + StringUtils.escapeString(methodCode) + "\";\n");
 			} else {
 				String sourceCodeId = StringCache.put(source);
-				textFields.append("private static final String $SRC = " + StringCache.class.getName() +  ".getAndRemove(\"" + sourceCodeId + "\");\n");
+				textFields.append("private static final " + String.class.getSimpleName() + " $SRC = " + StringCache.class.getName() +  ".getAndRemove(\"" + sourceCodeId + "\");\n");
 				String methodCodeId = StringCache.put(methodCode);
-				textFields.append("private static final String $CODE = " + StringCache.class.getName() +  ".getAndRemove(\"" + methodCodeId + "\");\n");
+				textFields.append("private static final " + String.class.getSimpleName() + " $CODE = " + StringCache.class.getName() +  ".getAndRemove(\"" + methodCodeId + "\");\n");
 			}
 			
-			textFields.append("private static final Map $PTS = " + toTypeCode(parameters, parameterTypes) + ";\n");
-			textFields.append("private static final Map $CTS = " + toTypeCode(returnTypes) + ";\n");
+			textFields.append("private static final " + Map.class.getName() + " $PTS = " + toTypeCode(parameters, parameterTypes) + ";\n");
+			textFields.append("private static final " + Map.class.getName() + " $CTS = " + toTypeCode(returnTypes) + ";\n");
 			
 			String sorceCode = "package " + packageName + ";\n" 
 					+ "\n"

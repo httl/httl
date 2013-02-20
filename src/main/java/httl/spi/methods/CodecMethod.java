@@ -52,7 +52,7 @@ public class CodecMethod {
 	}
 
 	public String encode(Object value, String format) {
-		return getAndCheckCodec(format).encode(value);
+		return getAndCheckCodec(format).toString(null, value);
 	}
 
 	public Object decode(String value, String format) throws ParseException {
@@ -64,7 +64,7 @@ public class CodecMethod {
 	}
 
 	public <T> T decode(String value, Class<T> type, String format) throws ParseException {
-		return getAndCheckCodec(format).decode(value, type);
+		return getAndCheckCodec(format).valueOf(value, type);
 	}
 
 	public String encodeJson(Object value) {

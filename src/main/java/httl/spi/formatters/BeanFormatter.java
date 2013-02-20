@@ -25,7 +25,7 @@ import httl.spi.Formatter;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class BeanFormatter extends AbstractFormatter<Object> {
+public class BeanFormatter implements Formatter<Object> {
 
 	private Codec defaultCodec;
 
@@ -34,7 +34,15 @@ public class BeanFormatter extends AbstractFormatter<Object> {
 	}
 
 	public String toString(String key, Object value) {
-		return defaultCodec.encode(value);
+		return defaultCodec.toString(key, value);
+	}
+
+	public char[] toChars(String key, Object value) {
+		return defaultCodec.toChars(key, value);
+	}
+
+	public byte[] toBytes(String key, Object value) {
+		return defaultCodec.toBytes(key, value);
 	}
 
 }

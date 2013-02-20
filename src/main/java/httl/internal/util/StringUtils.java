@@ -33,9 +33,33 @@ public class StringUtils {
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("^[0-9]+(\\.[.0-9]+)?[BSILFDbsilfd]?$");
 	
 	public static boolean isNumber(String value) {
-		return NUMBER_PATTERN.matcher(value).matches();
+		return isEmpty(value) ? false : NUMBER_PATTERN.matcher(value).matches();
 	}
-	
+
+	public static boolean isNumber(char[] value) {
+		if (value == null || value.length == 0) {
+			return false;
+		}
+		for (char ch : value) {
+			if (ch != '.' && (ch <= '0' || ch >= '9')) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean isNumber(byte[] value) {
+		if (value == null || value.length == 0) {
+			return false;
+		}
+		for (byte ch : value) {
+			if (ch != '.' && (ch <= '0' || ch >= '9')) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private static final Pattern NAMED_PATTERN = Pattern.compile("^[_A-Za-z][_0-9A-Za-z]*$");
 	
 	public static boolean isNamed(String value) {
@@ -52,6 +76,22 @@ public class StringUtils {
 	
 	public static boolean isFunction(String value) {
 		return FUNCTION_PATTERN.matcher(value).matches();
+	}
+
+	public static boolean isEmpty(byte[] value) {
+		return value == null || value.length == 0;
+	}
+
+	public static boolean isNotEmpty(byte[] value) {
+		return ! isEmpty(value);
+	}
+
+	public static boolean isEmpty(char[] value) {
+		return value == null || value.length == 0;
+	}
+
+	public static boolean isNotEmpty(char[] value) {
+		return ! isEmpty(value);
 	}
 
 	public static boolean isEmpty(String value) {

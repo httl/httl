@@ -15,7 +15,6 @@
  */
 package httl.spi.codecs;
 
-import httl.spi.Codec;
 import httl.internal.util.StringUtils;
 
 import java.beans.XMLDecoder;
@@ -29,17 +28,29 @@ import java.text.ParseException;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class XmlCodec implements Codec {
+public class XmlCodec extends AbstractCodec {
 
 	public String getFormat() {
 		return "xml";
 	}
 
-	public boolean isDecodable(String str) {
+	public boolean isValueOf(String str) {
 		return StringUtils.isNotEmpty(str) && str.startsWith("<");
 	}
 
-	public String encode(Object value) {
+	public boolean isValueOf(char[] str) {
+		return StringUtils.isNotEmpty(str) && str[0] == '<';
+	}
+
+	public boolean isValueOf(byte[] str) {
+		return StringUtils.isNotEmpty(str) && str[0] == '<';
+	}
+
+	public String toString(String key, Object value) {
+		return toString(toBytes(key, value));
+	}
+
+	public byte[] toBytes(String key, Object value) {
 		ByteArrayOutputStream bo = new ByteArrayOutputStream();
 		XMLEncoder xe = new XMLEncoder(bo);
 		try {
@@ -48,15 +59,19 @@ public class XmlCodec implements Codec {
 		} finally {
 			xe.close();
 		}
-		return new String(bo.toByteArray());
+		return bo.toByteArray();
+	}
+
+	public <T> T valueOf(String str, Class<T> type) throws ParseException {
+		return valueOf(toBytes(str), type);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T decode(String str, Class<T> type) throws ParseException {
+	public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
 		if (str == null) {
 			return null;
 		}
-		ByteArrayInputStream bi = new ByteArrayInputStream(str.getBytes());
+		ByteArrayInputStream bi = new ByteArrayInputStream(str);
 		XMLDecoder xd = new XMLDecoder(bi);
 		try {
 			return (T) xd.readObject();

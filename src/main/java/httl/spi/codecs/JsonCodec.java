@@ -15,22 +15,34 @@
  */
 package httl.spi.codecs;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Map;
-
-import httl.spi.Codec;
+import httl.internal.util.StringUtils;
 import httl.spi.Compiler;
 import httl.spi.codecs.json.JSON;
 import httl.spi.converters.BeanMapConverter;
-import httl.internal.util.StringUtils;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Json Codec. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class JsonCodec implements Codec {
+public class JsonCodec extends AbstractCodec {
+
+	private static final char[] NULL_CHARS = "null".toCharArray();
+
+	private static final char[] TRUE_CHARS = "true".toCharArray();
+
+	private static final char[] FALSE_CHARS = "false".toCharArray();
+
+	private static final byte[] NULL_BYTES = "null".getBytes();
+
+	private static final byte[] TRUE_BYTES = "true".getBytes();
+
+	private static final byte[] FALSE_BYTES = "false".getBytes();
 
 	private final BeanMapConverter converter = new BeanMapConverter();
 
@@ -55,7 +67,7 @@ public class JsonCodec implements Codec {
 		return "json";
 	}
 
-	public boolean isDecodable(String str) {
+	public boolean isValueOf(String str) {
 		return StringUtils.isNotEmpty(str) 
 				&& (str.startsWith("{") || str.startsWith("[")
 				|| (str.startsWith("\"") && str.endsWith("\""))
@@ -64,7 +76,25 @@ public class JsonCodec implements Codec {
 				|| "true".equals(str) || "false".equals(str));
 	}
 
-	public String encode(Object value) {
+	public boolean isValueOf(char[] str) {
+		return StringUtils.isNotEmpty(str) 
+				&& (str[0] == '{' || str[0] == '['
+				|| (str.length > 1 && str[0] == '\"' && str[str.length - 1] == '\"')
+				|| (str.length > 1 && str[0] == '\'' && str[str.length - 1] == '\'')
+				|| StringUtils.isNumber(str) || Arrays.equals(NULL_CHARS, str) 
+				|| Arrays.equals(TRUE_CHARS, str) || Arrays.equals(FALSE_CHARS, str));
+	}
+
+	public boolean isValueOf(byte[] str) {
+		return StringUtils.isNotEmpty(str) 
+				&& (str[0] == '{' || str[0] == '['
+				|| (str.length > 1 && str[0] == '\"' && str[str.length - 1] == '\"')
+				|| (str.length > 1 && str[0] == '\'' && str[str.length - 1] == '\'')
+				|| StringUtils.isNumber(str) || Arrays.equals(NULL_BYTES, str) 
+				|| Arrays.equals(TRUE_BYTES, str) || Arrays.equals(FALSE_BYTES, str));
+	}
+
+	public String toString(String key, Object value) {
 		if (value == null) {
 			return null;
 		}
@@ -76,7 +106,7 @@ public class JsonCodec implements Codec {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T decode(String str, Class<T> type) throws ParseException {
+	public <T> T valueOf(String str, Class<T> type) throws ParseException {
 		if (str == null) {
 			return null;
 		}
