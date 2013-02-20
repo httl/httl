@@ -38,7 +38,7 @@ import javax.script.SimpleBindings;
  */
 public class HttlScriptContext implements ScriptContext {
 	
-	private static final List<Integer> SCOPES = Arrays.asList(new Integer[] {GLOBAL_SCOPE, ENGINE_SCOPE});
+	private static final List<Integer> SCOPES = Arrays.asList(GLOBAL_SCOPE, ENGINE_SCOPE);
 
 	private Reader reader;
 	
