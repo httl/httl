@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 HTTL Team.
+ * Copyright 2011-2013 HTTL Team.
  *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import javax.script.SimpleBindings;
  */
 public class HttlScriptContext implements ScriptContext {
 	
-	private static final List<Integer> SCOPES = Arrays.asList(new Integer[] {GLOBAL_SCOPE, ENGINE_SCOPE});
+	private static final List<Integer> SCOPES = Arrays.asList(GLOBAL_SCOPE, ENGINE_SCOPE);
 
 	private Reader reader;
 	
