@@ -122,11 +122,13 @@ public abstract class Engine {
 			synchronized (reference) { // reference lock
 				engine = reference.get();
 				if (engine == null) { // double check
-					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
+					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
+							configProperties, System.getProperties(), System.getenv());
 					String mode = properties.getProperty(MODE_KEY);
 					if (StringUtils.isNotEmpty(mode)) {
 						properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, 
-								HTTL_PREFIX + mode + PROPERTIES_SUFFIX, configPath, configProperties);
+								HTTL_PREFIX + mode + PROPERTIES_SUFFIX, configPath,
+								configProperties, System.getProperties(), System.getenv());
 					}
 					properties.setProperty(ENGINE_NAME, configPath);
 					engine = BeanFactory.createBean(Engine.class, properties); // slowly

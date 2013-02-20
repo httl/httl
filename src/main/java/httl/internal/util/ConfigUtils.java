@@ -56,7 +56,7 @@ public final class ConfigUtils {
 		return StringUtils.isNotEmpty(value) 
 				&& INTEGER_PATTERN.matcher(value).matches();
 	}
-	
+
 	public static Properties loadProperties(String path) {
 		return loadProperties(path, false);
 	}
@@ -147,6 +147,8 @@ public final class ConfigUtils {
 		Document document = builder.parse(dataInputStream);
 		return document;
 	}
+	
+	private static final String CONFIG_KEY_PREFIX = "httl.";
 
 	@SuppressWarnings("unchecked")
 	public static Properties mergeProperties(Object... configs) {
@@ -171,6 +173,9 @@ public final class ConfigUtils {
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
+				if (key.startsWith(CONFIG_KEY_PREFIX)) {
+					key = key.substring(CONFIG_KEY_PREFIX.length());
+				}
 				if (key.endsWith(PLUS)) {
 					if (StringUtils.isNotEmpty(value)) {
 						plusConfigs.put(key, value);
