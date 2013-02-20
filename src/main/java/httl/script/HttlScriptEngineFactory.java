@@ -114,7 +114,7 @@ public class HttlScriptEngineFactory implements ScriptEngineFactory {
 		return "1.0.0";
 	}
 
-	public String getMethodCallSyntax(String obj, String m, String... args) {
+	public String getMethodCallSyntax(String obj, String m, String[] args) {
 		StringBuilder buf = new StringBuilder();
 		if (args != null && args.length > 0) {
 			boolean first = true;
@@ -133,7 +133,7 @@ public class HttlScriptEngineFactory implements ScriptEngineFactory {
 		return "${" + toDisplay + "}";
 	}
 
-	public String getProgram(String... statements) {
+	public String getProgram(String[] statements) {
 		StringBuilder buf = new StringBuilder();
 		for (String stat : statements) {
 			buf.append(stat);
