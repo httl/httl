@@ -106,7 +106,7 @@ public class JSONValue {
 
 			Map<String, Object> w;
 			try {
-				w = converter.convert(obj);
+				w = converter.convert(obj, null);
 			} catch (ParseException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}

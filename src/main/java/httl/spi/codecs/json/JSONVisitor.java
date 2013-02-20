@@ -118,7 +118,7 @@ class JSONVisitor {
 		} else {
 			try {
 				currentValue = currentType.newInstance();
-				currentWrapper = converter.convert(currentValue);
+				currentWrapper = converter.convert(currentValue, null);
 			} catch (IllegalAccessException e) {
 				throw new ParseException(StringUtils.toString(e), 0);
 			} catch (InstantiationException e) {

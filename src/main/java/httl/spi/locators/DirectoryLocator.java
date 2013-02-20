@@ -36,6 +36,8 @@ public class DirectoryLocator implements Locator {
 
 	private String messageDirectory;
 
+	private String messageBasename;
+
 	private String[] messageSuffix;
 
 	/**
@@ -60,6 +62,13 @@ public class DirectoryLocator implements Locator {
 	}
 
 	/**
+	 * httl.properties: message.basename=messages
+	 */
+	public void setMessageBasename(String messageBasename) {
+		this.messageBasename = messageBasename;
+	}
+
+	/**
 	 * httl.properties: message.suffix=.properties
 	 */
 	public void setMessageSuffix(String[] suffix) {
@@ -70,7 +79,7 @@ public class DirectoryLocator implements Locator {
 		if (templateDirectory != null && StringUtils.endsWith(suffix, templateSuffix)) {
 			return templateDirectory;
 		} else if (messageDirectory != null && StringUtils.endsWith(suffix, messageSuffix)) {
-			return templateDirectory;
+			return messageDirectory;
 		}
 		return null;
 	}
@@ -81,7 +90,8 @@ public class DirectoryLocator implements Locator {
 		}
 		if (templateDirectory != null && StringUtils.endsWith(name, templateSuffix)) {
 			return templateDirectory + name;
-		} else if (messageDirectory != null && StringUtils.endsWith(name, messageSuffix)) {
+		} else if (messageBasename != null && name.startsWith(messageBasename)
+				&& messageDirectory != null && StringUtils.endsWith(name, messageSuffix)) {
 			return messageDirectory + name;
 		} else {
 			return name;

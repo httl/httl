@@ -50,7 +50,7 @@ public class StringMapConverter implements Converter<String, Map<String, Object>
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> convert(String value) throws IOException,
+	public Map<String, Object> convert(String value, Class<Map<String, Object>> type) throws IOException,
 			ParseException {
 		if (StringUtils.isEmpty(value))
 			return null;

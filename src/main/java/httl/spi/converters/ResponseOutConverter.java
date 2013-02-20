@@ -40,7 +40,7 @@ public class ResponseOutConverter implements Converter<HttpServletResponse, Obje
 		this.outputStream = outputStream;
 	}
 
-	public Object convert(HttpServletResponse value) throws IOException, ParseException {
+	public Object convert(HttpServletResponse value, Class<Object> type) throws IOException, ParseException {
 		if (outputStream) {
 			return value.getOutputStream();
 		} else {

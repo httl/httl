@@ -166,7 +166,7 @@ public class JSON {
 		} else {
 			Map<String, Object> wrapper;
 			try {
-				wrapper = mc.convert(obj);
+				wrapper = mc.convert(obj, null);
 			} catch (ParseException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}

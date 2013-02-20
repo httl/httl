@@ -57,18 +57,18 @@ public class MultiConverter implements Converter<Object, Object> {
 		}
 	}
 
-	public Object convert(Object value) throws IOException, ParseException {
+	public Object convert(Object value, Class<Object> type) throws IOException, ParseException {
 		if (value != null && converters != null) {
 			Class<?> cls = value.getClass();
 			Converter<Object, Object> converter = (Converter<Object, Object>) converters.get(cls);
 			if (converter != null) {
-				return converter.convert(value);
+				return converter.convert(value, type);
 			} else if (sortedConverters != null) {
 				for (Map.Entry<Class<?>, Converter<Object, Object>> entry : sortedConverters.entrySet()) {
 					if (entry.getKey().isAssignableFrom(cls)) {
 						converter = entry.getValue();
 						converters.put(cls, converter);
-						return converter.convert(value);
+						return converter.convert(value, type);
 					}
 				}
 			}

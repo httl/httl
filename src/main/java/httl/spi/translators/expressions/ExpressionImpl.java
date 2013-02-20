@@ -129,7 +129,7 @@ public class ExpressionImpl implements Expression, Serializable {
 	private Map<String, Object> convertMap(Object context) throws ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
 			try {
-				context = mapConverter.convert(context);
+				context = mapConverter.convert(context, null);
 			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}

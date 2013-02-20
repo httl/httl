@@ -33,10 +33,11 @@ public interface Converter<F, T> {
 	 * Convert the value.
 	 * 
 	 * @param value - origin value
+	 * @param type - convert type
 	 * @return converted value
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	T convert(F value) throws IOException, ParseException;
+	T convert(F value, Class<T> type) throws IOException, ParseException;
 
 }

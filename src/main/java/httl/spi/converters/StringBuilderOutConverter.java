@@ -31,7 +31,7 @@ import java.text.ParseException;
  */
 public class StringBuilderOutConverter implements Converter<StringBuilder, Writer> {
 
-	public Writer convert(StringBuilder value) throws IOException, ParseException {
+	public Writer convert(StringBuilder value, Class<Writer> type) throws IOException, ParseException {
 		return new UnsafeStringWriter(value);
 	}
 

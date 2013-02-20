@@ -212,7 +212,7 @@ public class TypeMethod {
 		if (value instanceof Map) {
 			return (Map<String, Object>) value;
 		}
-		return (Map<String, Object>) mapConverter.convert(value);
+		return (Map<String, Object>) mapConverter.convert(value, (Class<Map<String, Object>>) null);
 	}
 
 	@SuppressWarnings("unchecked")
