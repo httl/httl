@@ -53,6 +53,15 @@ public abstract class Engine {
 	// User configuration name
 	private static final String HTTL_PROPERTIES = "httl.properties";
 
+	// User configuration prefix
+	private static final String HTTL_PREFIX = "httl-";
+
+	// The mode config key
+	private static final String MODE_KEY = "mode";
+
+	// User configuration suffix
+	private static final String PROPERTIES_SUFFIX = ".properties";
+
 	// The engine name config
 	private static final String ENGINE_NAME = "engine.name";
 
@@ -114,13 +123,11 @@ public abstract class Engine {
 				engine = reference.get();
 				if (engine == null) { // double check
 					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
-					/*String mode = properties.getProperty("mode");
+					String mode = properties.getProperty(MODE_KEY);
 					if (StringUtils.isNotEmpty(mode)) {
-						String modeConfig = "httl-" + mode + ".properties";
-						properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, modeConfig, configPath, configProperties);
-					} else {
-						properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
-					}*/
+						properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, 
+								HTTL_PREFIX + mode + PROPERTIES_SUFFIX, configPath, configProperties);
+					}
 					properties.setProperty(ENGINE_NAME, configPath);
 					engine = BeanFactory.createBean(Engine.class, properties); // slowly
 					reference.set(engine);
