@@ -37,6 +37,13 @@ public class Log4jLogger implements Logger {
 		this.FQCN = name;
 	}
 
+	/**
+	 * httl.properties: logger.level=DEBUG
+	 */
+	public void setLoggerLevel(String level) {
+		logger.setLevel(Level.toLevel(level.toUpperCase()));
+	}
+
 	public void trace(String msg) {
 		logger.log(FQCN, Level.TRACE, msg, null);
 	}

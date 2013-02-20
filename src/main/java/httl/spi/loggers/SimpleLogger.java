@@ -26,84 +26,143 @@ import httl.spi.Logger;
  */
 public class SimpleLogger implements Logger {
 
-	private static final String prefix = "[" + NAME + "] ";
+	private static final String PREFIX = "[" + NAME + "] ";
+
+	private static final int TRACE = -2;
+
+	private static final int DEBUG = -1;
+
+	private static final int INFO = 0;
+
+	private static final int WARN = 1;
+
+	private static final int ERROR = 2;
+
+	private int level = INFO;
+
+	/**
+	 * httl.properties: logger.level=DEBUG
+	 */
+	public void setLoggerLevel(String level) {
+		if ("TRACE".equalsIgnoreCase(level)) {
+			this.level = TRACE;
+		} else if ("DEBUG".equalsIgnoreCase(level)) {
+			this.level = DEBUG;
+		} else if ("INFO".equalsIgnoreCase(level)) {
+			this.level = INFO;
+		} else if ("WARN".equalsIgnoreCase(level)) {
+			this.level = WARN;
+		} else if ("ERROR".equalsIgnoreCase(level)) {
+			this.level = ERROR;
+		}
+	}
 
 	private String getMessage(String msg) {
-		if (prefix == null)
+		if (PREFIX == null)
 			return msg;
-		return prefix + msg;
+		return PREFIX + msg;
 	}
 
 	public void trace(String msg) {
+		if (level > TRACE)
+			return;
 		System.out.println(getMessage(msg));
 	}
 
 	public void trace(Throwable e) {
+		if (level > TRACE)
+			return;
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void trace(String msg, Throwable e) {
+		if (level > TRACE)
+			return;
 		System.out.println(getMessage(msg));
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void debug(String msg) {
+		if (level > DEBUG)
+			return;
 		System.out.println(getMessage(msg));
 	}
 
 	public void debug(Throwable e) {
+		if (level > DEBUG)
+			return;
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void debug(String msg, Throwable e) {
+		if (level > DEBUG)
+			return;
 		System.out.println(getMessage(msg));
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void info(String msg) {
+		if (level > INFO)
+			return;
 		System.out.println(getMessage(msg));
 	}
 
 	public void info(Throwable e) {
+		if (level > INFO)
+			return;
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void info(String msg, Throwable e) {
+		if (level > INFO)
+			return;
 		System.out.println(getMessage(msg));
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void warn(String msg) {
+		if (level > WARN)
+			return;
 		System.err.println(getMessage(msg));
 	}
 
 	public void warn(Throwable e) {
+		if (level > WARN)
+			return;
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void warn(String msg, Throwable e) {
+		if (level > WARN)
+			return;
 		System.err.println(getMessage(msg));
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void error(String msg) {
+		if (level > ERROR)
+			return;
 		System.err.println(getMessage(msg));
 	}
 
 	public void error(Throwable e) {
+		if (level > ERROR)
+			return;
 		if (e != null)
 			e.printStackTrace();
 	}
 
 	public void error(String msg, Throwable e) {
+		if (level > ERROR)
+			return;
 		System.err.println(getMessage(msg));
 		if (e != null)
 			e.printStackTrace();

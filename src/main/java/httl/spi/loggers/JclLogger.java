@@ -15,10 +15,10 @@
  */
 package httl.spi.loggers;
 
+import httl.spi.Logger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import httl.spi.Logger;
 
 /**
  * JclLogger. (SPI, Singleton, ThreadSafe)

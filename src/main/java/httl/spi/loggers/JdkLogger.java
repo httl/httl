@@ -30,6 +30,13 @@ public class JdkLogger implements Logger {
 
 	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NAME);
 
+	/**
+	 * httl.properties: logger.level=DEBUG
+	 */
+	public void setLoggerLevel(String level) {
+		logger.setLevel(Level.parse(level.toUpperCase()));
+	}
+
 	public void trace(String msg) {
 		logger.log(Level.FINER, msg);
 	}
