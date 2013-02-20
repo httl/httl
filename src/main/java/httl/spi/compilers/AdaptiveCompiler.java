@@ -54,16 +54,16 @@ public class AdaptiveCompiler implements Compiler {
 	}
 
 	/**
-	 * httl.properties: java.version=1.7
+	 * httl.properties: compile.version=1.7
 	 */
-	public void setJavaVersion(String version) {
+	public void setCompileVersion(String version) {
 		if (version == null || ClassUtils.isBeforeJava6(version)) {
 			JavassistCompiler javassistCompiler = new JavassistCompiler();
 			javassistCompiler.setLogger(logger);
 			compiler = javassistCompiler;
 		} else {
 			JdkCompiler jdkCompiler = new JdkCompiler();
-			jdkCompiler.setJavaVersion(version);
+			jdkCompiler.setCompileVersion(version);
 			jdkCompiler.setLogger(logger);
 			compiler = jdkCompiler;
 		}
@@ -71,7 +71,7 @@ public class AdaptiveCompiler implements Compiler {
 
 	public void init() {
 		if (compiler == null) {
-			setJavaVersion(ClassUtils.getJavaVersion());
+			setCompileVersion(ClassUtils.getJavaVersion());
 		}
 	}
 

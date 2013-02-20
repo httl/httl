@@ -110,9 +110,9 @@ public class JdkCompiler extends AbstractCompiler {
 	}
 
 	/**
-	 * httl.properties: java.version=1.7
+	 * httl.properties: java.specification.version=1.7
 	 */
-	public void setJavaVersion(String version) {
+	public void setCompileVersion(String version) {
 		if (StringUtils.isNotEmpty(version)
 				&& ! version.equals(ClassUtils.getJavaVersion())) {
 			options.add("-target");

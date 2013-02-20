@@ -148,25 +148,26 @@ public final class ConfigUtils {
 		return document;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Properties mergeProperties(Object... configs) {
-		List<Properties> list = new ArrayList<Properties>();
+		List<Map<Object, Object>> list = new ArrayList<Map<Object, Object>>();
 		int last = configs.length - 1;
 		for (int i = 0; i <= last; i ++) {
 			Object config = configs[i];
 			if (config != null) {
-				Properties properties;
+				Map<Object, Object> properties;
 				if (config instanceof String) {
 					boolean required = (i == last || configs[i + 1] == null);
-					properties = loadProperties((String) config, required);
+					properties = (Map<Object, Object>) loadProperties((String) config, required);
 				} else {
-					properties = (Properties) config;
+					properties = (Map<Object, Object>) config;
 				}
 				list.add(properties);
 			}
 		}
 		Properties result = new Properties();
-		for (Properties properties : list) {
-			Map<String, String> plusConfigs = new HashMap<String, String>();
+		for (Map<Object, Object> properties : list) {
+			Map<Object, Object> plusConfigs = new HashMap<Object, Object>();
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
@@ -178,7 +179,7 @@ public final class ConfigUtils {
 					result.setProperty(key, value);
 				}
 			}
-			for (Map.Entry<String, String> entry : plusConfigs.entrySet()) {
+			for (Map.Entry<Object, Object> entry : plusConfigs.entrySet()) {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
 				String k = key.substring(0, key.length() - PLUS.length());
