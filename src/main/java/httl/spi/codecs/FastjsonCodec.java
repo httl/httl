@@ -66,7 +66,7 @@ public class FastjsonCodec extends JsonCodec {
 		if (type == null) {
 			return (T) JSON.parse(str);
 		}
-		return JSON.parseObject(str, type);
+		return (T) JSON.parseObject(str, type);
 	}
 
 }
