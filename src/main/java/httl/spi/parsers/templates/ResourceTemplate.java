@@ -82,6 +82,10 @@ public class ResourceTemplate implements Template {
 		return resource.getEngine();
 	}
 
+	public Class<?> getParameterType() {
+		return null;
+	}
+
 	@SuppressWarnings("unchecked")
 	public Map<String, Class<?>> getParameterTypes() {
 		return Collections.EMPTY_MAP;

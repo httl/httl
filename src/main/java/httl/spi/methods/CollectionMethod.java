@@ -15,6 +15,7 @@
  */
 package httl.spi.methods;
 
+import httl.internal.util.CollectionUtils;
 import httl.spi.methods.cycles.ArrayCycle;
 import httl.spi.methods.cycles.BooleanArrayCycle;
 import httl.spi.methods.cycles.ByteArrayCycle;
@@ -25,7 +26,6 @@ import httl.spi.methods.cycles.IntArrayCycle;
 import httl.spi.methods.cycles.ListCycle;
 import httl.spi.methods.cycles.LongArrayCycle;
 import httl.spi.methods.cycles.ShortArrayCycle;
-import httl.internal.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

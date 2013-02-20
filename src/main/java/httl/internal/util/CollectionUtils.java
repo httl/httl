@@ -101,7 +101,15 @@ public class CollectionUtils {
 		if (c2 == null || c2.length == 0) {
 			return c1;
 		}
-		T[] all = (T[]) Array.newInstance(c1.getClass().getComponentType(), c1.length + c2.length);
+		Class<?> t;
+		if (c1.getClass().isAssignableFrom(c2.getClass())) {
+			t = c1.getClass().getComponentType();
+		} else if (c2.getClass().isAssignableFrom(c1.getClass())) {
+			t = c2.getClass().getComponentType();
+		} else {
+			throw new IllegalStateException("Can not merge " + c1.getClass().getCanonicalName() + " and " + c2.getClass().getCanonicalName());
+		}
+		T[] all = (T[]) Array.newInstance(t, c1.length + c2.length);
 		System.arraycopy(c1, 0, all, 0, c1.length);
 		System.arraycopy(c2, 0, all, c1.length, c2.length);
 		return all;

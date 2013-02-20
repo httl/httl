@@ -38,6 +38,6 @@ public interface Converter<F, T> {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	T convert(F value, Class<T> type) throws IOException, ParseException;
+	T convert(F value, Class<?> type) throws IOException, ParseException;
 
 }

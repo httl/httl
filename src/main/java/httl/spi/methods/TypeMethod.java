@@ -19,6 +19,7 @@ import httl.spi.Compiler;
 import httl.spi.Formatter;
 import httl.spi.converters.BeanMapConverter;
 import httl.internal.util.ClassUtils;
+import httl.internal.util.CollectionUtils;
 import httl.internal.util.DateUtils;
 import httl.internal.util.LocaleUtils;
 import httl.internal.util.NumberUtils;
@@ -28,8 +29,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -215,13 +219,142 @@ public class TypeMethod {
 		return (Map<String, Object>) mapConverter.convert(value, (Class<Map<String, Object>>) null);
 	}
 
+	public <T> T[] toArray(Collection<T> values, String type) {
+		return toArray(values, StringUtils.isEmpty(type) ? null : ClassUtils.forName(importPackages, type));
+	}
+
+	public static <T> T[] toArray(Collection<T> values) {
+		return toArray(values, (Class<?>) null);
+	}
+
 	@SuppressWarnings("unchecked")
-	public <T> T[] toArray(Collection<T> value, String type) {
-		Class<T> cls = (Class<T>) ClassUtils.forName(importPackages, type);
-		if (value == null) {
-			return (T[]) Array.newInstance(cls, 0);
+	public static <T> T[] toArray(Collection<T> values, Class<?> type) {
+		if (type == null) {
+			if (CollectionUtils.isEmpty(values)) {
+				type = Object.class;
+			} else {
+				type = values.iterator().next().getClass();
+			}
 		}
-		return (T[]) value.toArray((Object[])Array.newInstance(cls, value.size()));
+		if (values == null) {
+			return (T[]) Array.newInstance(type, 0);
+		}
+		return (T[]) values.toArray((Object[])Array.newInstance(type, values.size()));
+	}
+
+	public static <T> List<T> toList(Collection<T> values) {
+		if (values instanceof List) {
+			return (List<T>) values;
+		}
+		return new ArrayList<T>(values);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Object> toList(Object[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Object> list = new ArrayList<Object>(values.length);
+		for (Object value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Boolean> toList(boolean[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Boolean> list = new ArrayList<Boolean>(values.length);
+		for (boolean value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Character> toList(char[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Character> list = new ArrayList<Character>(values.length);
+		for (char value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Byte> toList(byte[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Byte> list = new ArrayList<Byte>(values.length);
+		for (byte value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Short> toList(short[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Short> list = new ArrayList<Short>(values.length);
+		for (short value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Integer> toList(int[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Integer> list = new ArrayList<Integer>(values.length);
+		for (int value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Long> toList(long[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Long> list = new ArrayList<Long>(values.length);
+		for (long value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Float> toList(float[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Float> list = new ArrayList<Float>(values.length);
+		for (float value : values) {
+			list.add(value);
+		}
+		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Double> toList(double[] values) {
+		if (values == null) {
+			return Collections.EMPTY_LIST;
+		}
+		List<Double> list = new ArrayList<Double>(values.length);
+		for (double value : values) {
+			list.add(value);
+		}
+		return list;
 	}
 
 	public Date toDate(String value) {

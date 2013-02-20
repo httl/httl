@@ -15,9 +15,10 @@
  */
 package httl.spi.converters;
 
-import httl.spi.Codec;
-import httl.spi.Converter;
 import httl.internal.util.StringUtils;
+import httl.spi.Codec;
+import httl.spi.Compiler;
+import httl.spi.Converter;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -32,10 +33,19 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class StringMapConverter implements Converter<String, Map<String, Object>> {
-	
+
+	private final BeanMapConverter beanMapConverter = new BeanMapConverter();
+
 	private String formats = "";
 
 	private Codec[] codecs;
+
+	/**
+	 * httl.properties: compiler=httl.spi.compilers.JdkCompiler
+	 */
+	public void setCompiler(Compiler compiler) {
+		this.beanMapConverter.setCompiler(compiler);
+	}
 
 	public void setCodecs(Codec[] codecs) {
 		this.codecs = codecs;
@@ -50,7 +60,7 @@ public class StringMapConverter implements Converter<String, Map<String, Object>
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> convert(String value, Class<Map<String, Object>> type) throws IOException,
+	public Map<String, Object> convert(String value, Class<?> type) throws IOException,
 			ParseException {
 		if (StringUtils.isEmpty(value))
 			return null;
@@ -58,7 +68,11 @@ public class StringMapConverter implements Converter<String, Map<String, Object>
 			value = value.trim();
 			for (Codec codec : codecs) {
 				if (codec.isValueOf(value)) {
-					return (Map<String, Object>) codec.valueOf(value, Map.class);
+					Object bean = codec.valueOf(value, type);
+					if (bean instanceof Map) {
+						return (Map<String, Object>) bean;
+					}
+					return beanMapConverter.convert(bean, type);
 				}
 			}
 		}

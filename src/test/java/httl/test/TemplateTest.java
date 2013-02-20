@@ -18,6 +18,11 @@ package httl.test;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.IOUtils;
+import httl.internal.util.StringUtils;
+import httl.internal.util.UnsafeByteArrayOutputStream;
+import httl.spi.Codec;
 import httl.spi.Loader;
 import httl.spi.loaders.ClasspathLoader;
 import httl.spi.loaders.MultiLoader;
@@ -25,10 +30,6 @@ import httl.spi.parsers.templates.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.Model;
 import httl.test.model.User;
-import httl.internal.util.ClassUtils;
-import httl.internal.util.IOUtils;
-import httl.internal.util.StringUtils;
-import httl.internal.util.UnsafeByteArrayOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -96,7 +97,7 @@ public class TemplateTest extends TestCase {
 		List<Map<String, Object>> mapbooklist = new ArrayList<Map<String, Object>>();
 		for (Book book : books) {
 			bookmap.put(book.getTitle().replaceAll("\\s+", ""), book);
-			Map<String, Object> genericBook = ClassUtils.getBeanProperties(book);
+			Map<String, Object> genericBook = ClassUtils.getProperties(book);
 			mapbookmap.put(book.getTitle().replaceAll("\\s+", ""), genericBook);
 			mapbooklist.add(genericBook);
 		}
@@ -137,19 +138,23 @@ public class TemplateTest extends TestCase {
 		String[] configs = new String[] { "httl-text.properties", "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
 		for (String config : configs) {
 			Engine engine = Engine.getEngine(config);
-			Object[] maps = new Object[] {context, model, null};
+			Codec[] codecs = engine.getProperty("codecs", Codec[].class);
+			String json = codecs[0].toString("context", context);
+			if (! profile) {
+				Loader loader = engine.getProperty("loader", Loader.class);
+				assertEquals(MultiLoader.class, loader.getClass());
+				Loader[] loaders = engine.getProperty("loaders", Loader[].class);
+				assertEquals(ClasspathLoader.class, loaders[0].getClass());
+				loader = engine.getProperty("loaders", ClasspathLoader.class);
+				assertEquals(ClasspathLoader.class, loader.getClass());
+				String[] suffixes = engine.getProperty("template.suffix", new String[] { ".httl" });
+				List<String> list = loader.list(suffixes[0]);
+				assertTrue(list.size() > 0);
+			}
+			Object[] maps = new Object[] {context, model, /*json,*/ null}; // TODO JSON格式的Map没有顺序，断言失败
 			for (Object map : maps) {
 				if (! profile) {
 					System.out.println("========" + config + " (" + (map == null ? "null" : map.getClass().getSimpleName()) + " parameters)========");
-					Loader loader = engine.getProperty("loader", Loader.class);
-					assertEquals(MultiLoader.class, loader.getClass());
-					Loader[] loaders = engine.getProperty("loaders", Loader[].class);
-					assertEquals(ClasspathLoader.class, loaders[0].getClass());
-					loader = engine.getProperty("loaders", ClasspathLoader.class);
-					assertEquals(ClasspathLoader.class, loader.getClass());
-					String[] suffixes = engine.getProperty("template.suffix", new String[] { ".httl" });
-					List<String> list = loader.list(suffixes[0]);
-					assertTrue(list.size() > 0);
 				}
 				String dir = engine.getProperty("template.directory", "");
 				if (dir.length() > 0 && dir.startsWith("/")) {
@@ -165,7 +170,7 @@ public class TemplateTest extends TestCase {
 				for (long m = 0; m < max; m ++) {
 					for (int i = 0, n = files.length; i < n; i ++) {
 						File file = files[i];
-						// if (! "this.httl".equals(file.getName())) continue;
+						//if (! "this.httl".equals(file.getName())) continue;
 						if ("httl-javassist.properties".equals(config)  // FIXME
 								&& "list.httl".equals(file.getName())) continue;
 						if (! profile)

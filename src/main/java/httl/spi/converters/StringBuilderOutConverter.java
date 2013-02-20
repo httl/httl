@@ -15,8 +15,8 @@
  */
 package httl.spi.converters;
 
-import httl.spi.Converter;
 import httl.internal.util.UnsafeStringWriter;
+import httl.spi.Converter;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -31,7 +31,7 @@ import java.text.ParseException;
  */
 public class StringBuilderOutConverter implements Converter<StringBuilder, Writer> {
 
-	public Writer convert(StringBuilder value, Class<Writer> type) throws IOException, ParseException {
+	public Writer convert(StringBuilder value, Class<?> type) throws IOException, ParseException {
 		return new UnsafeStringWriter(value);
 	}
 

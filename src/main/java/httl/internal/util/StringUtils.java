@@ -31,7 +31,13 @@ import java.util.regex.Pattern;
 public class StringUtils {
 
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("^[0-9]+(\\.[.0-9]+)?[BSILFDbsilfd]?$");
-	
+
+	private static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
+
+	public static String getVaildName(String name) {
+		return SYMBOL_PATTERN.matcher(name).replaceAll("_");
+	}
+
 	public static boolean isNumber(String value) {
 		return isEmpty(value) ? false : NUMBER_PATTERN.matcher(value).matches();
 	}

@@ -64,6 +64,13 @@ public interface Expression {
 	Object evaluate(Object context) throws ParseException;
 
 	/**
+	 * Get the expression parameter type.
+	 * 
+	 * @return parameter type
+	 */
+	Class<?> getParameterType();
+
+	/**
 	 * Get the expression parameter types. (Ordered)
 	 * 
 	 * @return parameter types

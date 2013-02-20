@@ -110,6 +110,10 @@ public class ProxyTemplate implements Template {
 		return template.getReader();
 	}
 
+	public Class<?> getParameterType() {
+		return template.getParameterType();
+	}
+
 	public Map<String, Class<?>> getParameterTypes() {
 		return template.getParameterTypes();
 	}

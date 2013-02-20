@@ -18,11 +18,13 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Switcher;
+import httl.spi.converters.BeanMapConverter;
 import httl.spi.formatters.MultiFormatter;
 import httl.internal.util.UnsafeByteArrayInputStream;
 
@@ -51,6 +53,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private transient final Engine engine;
 
+	private transient final Compiler compiler;
+
 	private transient final Interceptor interceptor;
 
 	private transient final Switcher<Filter> filterSwitcher;
@@ -69,12 +73,13 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private final Map<String, Template> macros;
 
-	public AbstractTemplate(Engine engine, Interceptor interceptor, 
+	public AbstractTemplate(Engine engine, Interceptor interceptor, Compiler compiler,
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
 			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
 		this.engine = engine;
+		this.compiler = compiler;
 		this.interceptor = interceptor;
 		this.filterSwitcher = filterSwitcher;
 		this.formatterSwitcher = formatterSwitcher;
@@ -154,6 +159,24 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return defaultValue;
 	}
 
+	private volatile Class<?> parameterType;
+
+	public Class<?> getParameterType() {
+		if (parameterType == null) {
+			synchronized (this) {
+				if (parameterType == null) {
+					try {
+						parameterType = BeanMapConverter.getBeanClass(getName(), getParameterTypes(), compiler);
+					} catch (ParseException e) {
+						parameterType = void.class;
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		return parameterType;
+	}
+
 	public Reader getReader() throws IOException {
 		return new StringReader(getSource());
 	}
@@ -206,7 +229,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	private Map<String, Object> convertMap(Object context) throws ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
 			try {
-				context = mapConverter.convert(context, null);
+				context = mapConverter.convert(context, getParameterType());
 			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
@@ -241,8 +264,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
 			try {
 				Template macro = (Template) entry.getValue()
-						.getConstructor(Engine.class, Interceptor.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
+						.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
 				macros.put(entry.getKey(), macro);
 			} catch (Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);

@@ -153,6 +153,10 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
 	}
 
+	public Class<?> getParameterType() {
+		return writerTemplate.getParameterType();
+	}
+
 	public Map<String, Class<?>> getParameterTypes() {
 		return writerTemplate.getParameterTypes();
 	}

@@ -20,6 +20,7 @@ import httl.Engine;
 import httl.Expression;
 import httl.spi.Compiler;
 import httl.spi.Converter;
+import httl.spi.converters.BeanMapConverter;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.Digest;
 
@@ -129,7 +130,7 @@ public class ExpressionImpl implements Expression, Serializable {
 	private Map<String, Object> convertMap(Object context) throws ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
 			try {
-				context = mapConverter.convert(context, null);
+				context = mapConverter.convert(context, getParameterType());
 			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
@@ -250,6 +251,24 @@ public class ExpressionImpl implements Expression, Serializable {
 		return code;
 	}
 
+	private volatile Class<?> parameterType;
+
+	public Class<?> getParameterType() {
+		if (parameterType == null) {
+			synchronized (this) {
+				if (parameterType == null) {
+					try {
+						parameterType = BeanMapConverter.getBeanClass(md5, getParameterTypes(), compiler);
+					} catch (ParseException e) {
+						parameterType = void.class;
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		return parameterType;
+	}
+
 	public Map<String, Class<?>> getParameterTypes() {
 		return parameterTypes;
 	}
@@ -265,5 +284,5 @@ public class ExpressionImpl implements Expression, Serializable {
 	public Engine getEngine() {
 		return engine;
 	}
-	
+
 }

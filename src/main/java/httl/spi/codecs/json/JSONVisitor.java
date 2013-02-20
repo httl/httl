@@ -15,9 +15,10 @@
  */
 package httl.spi.codecs.json;
 
-import httl.spi.Converter;
+import httl.internal.util.ClassUtils;
 import httl.internal.util.Stack;
 import httl.internal.util.StringUtils;
+import httl.spi.Converter;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -135,13 +136,34 @@ class JSONVisitor {
 		currentWrapper = (Map<String, Object>) stack.pop();
 		currentType = (Class<?>) stack.pop();
 		currentValue = stack.pop();
+		if (ret instanceof Map) {
+			Map<String, Object> map = (Map<String, Object>) ret;
+			Object obj = map.get(CLASS_PROPERTY);
+			if (obj instanceof String) {
+				String className = (String) obj;
+				Class<?> cls = ClassUtils.forName(className);
+				if (! cls.isInterface() && ! cls.isPrimitive()
+						&& ! cls.isAssignableFrom(ret.getClass())) {
+					try {
+						Object value = cls.newInstance();
+						if (value instanceof Map) {
+							((Map<String, Object>) value).putAll((Map<String, Object>) ret);
+						} else {
+							ClassUtils.setProperties(value, (Map<String, Object>) ret);
+						}
+						ret = value;
+					} catch (Exception e) {
+					}
+				}
+			}
+		}
 		return ret;
 	}
 
 	public void objectItem(String name) {
 		stack.push(name); // push name.
-		Object v = currentWrapper == null ? null : currentWrapper.get(name);
-		currentType = (v == null ? Object.class : v.getClass());
+		Class<?> v = currentWrapper == null ? null : (Class<?>) currentWrapper.get(name + "." + CLASS_PROPERTY);
+		currentType = (v == null ? Object.class : v);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -172,7 +194,7 @@ class JSONVisitor {
 					} catch (IllegalAccessException e) {
 						throw new ParseException(StringUtils.toString(e), 0);
 					}
-				} else if (!CLASS_PROPERTY.equals(name)) {
+				} else if (! CLASS_PROPERTY.equals(name) || currentValue instanceof Map) {
 					currentWrapper.put(name, obj);
 				}
 			}

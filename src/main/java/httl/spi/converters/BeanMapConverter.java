@@ -15,10 +15,11 @@
  */
 package httl.spi.converters;
 
-import httl.spi.Compiler;
-import httl.spi.Converter;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.MapSupport;
+import httl.internal.util.StringUtils;
+import httl.spi.Compiler;
+import httl.spi.Converter;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -50,7 +51,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> convert(Object bean, Class<Map<String, Object>> type) throws IOException, ParseException {
+	public Map<String, Object> convert(Object bean, Class<?> type) throws IOException, ParseException {
 		if (bean == null) {
 			return null;
 		}
@@ -58,7 +59,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		Class<?> wrapperClass = BEAN_WRAPPERS.get(beanClass);
 		if (wrapperClass == null) {
 			try {
-				wrapperClass = getWrapperClass(beanClass, compiler);
+				wrapperClass = getMapClass(beanClass, compiler);
 				Class<?> old = BEAN_WRAPPERS.putIfAbsent(beanClass, wrapperClass);
 				if (old != null) {
 					wrapperClass = old;
@@ -75,16 +76,45 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
+	
+	public static Class<?> getBeanClass(String className, Map<String, Class<?>> properties, Compiler compiler) throws ParseException {
+		StringBuilder fields = new StringBuilder();
+		StringBuilder gets = new StringBuilder();
+		StringBuilder sets = new StringBuilder();
+		for (Map.Entry<String, Class<?>> entry : properties.entrySet()) {
+			String name = entry.getKey();
+			String type = entry.getValue().getCanonicalName();
+			String method = name.substring(0, 1).toUpperCase() + name.substring(1);
+			fields.append("private " + type + " " + name + ";\n");
+			gets.append("public " + type + " get" + method + "() {\n");
+			gets.append("	return " + name + ";\n");
+			gets.append("}\n");
+			sets.append("public void set" + method + "(" + type + " " + name + ") {\n");
+			sets.append("	this." + name + " = " + name + ";\n");
+			sets.append("}\n");
+		}
+		StringBuilder code = new StringBuilder();
+		className = "MapBean_" + StringUtils.getVaildName(className);
+		code.append("package " + BeanMapConverter.class.getPackage().getName() + ";\n");
+		code.append("public class " + className + " {\n");
+		code.append(fields);
+		code.append(gets);
+		code.append(sets);
+		code.append("}\n");
+		return compiler.compile(code.toString());
+	}
 
-	public static Class<?> getWrapperClass(Class<?> beanClass, Compiler compiler) throws ParseException {
+	public static Class<?> getMapClass(Class<?> beanClass, Compiler compiler) throws ParseException {
 		StringBuilder keys = new StringBuilder();
 		StringBuilder gets = new StringBuilder();
+		StringBuilder clss = new StringBuilder();
 		StringBuilder puts = new StringBuilder();
 		for (Method method : beanClass.getMethods()) {
 			String name = method.getName();
 			if ((name.length() > 3 && name.startsWith("get") 
 					|| name.length() > 2 && name.startsWith("is"))
 					&& Modifier.isPublic(method.getModifiers())
+					&& method.getReturnType() != void.class
 					&& method.getParameterTypes().length == 0
 					&& method.getDeclaringClass() != Object.class) {
 				int i = name.startsWith("get") ? 3 : 2;
@@ -97,6 +127,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 					gets.append("else ");
 				}
 				gets.append("if (\"" + key + "\".equals(key)) return bean." + name + "();\n");
+				clss.append("else if (\"" + key + ".class\".equals(key)) return " + method.getReturnType().getCanonicalName() + ".class;\n");
 			} else if (name.length() > 3 && name.startsWith("set")
 					&& Modifier.isPublic(method.getModifiers())
 					&& method.getParameterTypes().length == 1
@@ -119,6 +150,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		code.append("}\n");
 		code.append("public Object get(Object key) {\n");
 		code.append(gets);
+		code.append(clss);
 		code.append("return null;\n");
 		code.append("}\n");
 		code.append("public Object put(Object key, Object value) {\n");

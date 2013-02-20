@@ -195,8 +195,6 @@ public abstract class AbstractParser implements Parser {
 
 	private static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
 	
-	private static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
-
 	private final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
 	
 	private boolean isOutputStream;
@@ -569,13 +567,13 @@ public abstract class AbstractParser implements Parser {
 			Template streamTemplate = null;
 			if (isOutputWriter || ! isOutputStream) {
 				Class<?> clazz = parseClass(resource, parameterTypes, false, 0);
-				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (isOutputStream) {
 				Class<?> clazz = parseClass(resource, parameterTypes, true, 0);
-				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
+						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (writerTemplate != null && streamTemplate != null) {
 				return new AdaptiveTemplate(writerTemplate, streamTemplate, outConverter);
@@ -640,7 +638,7 @@ public abstract class AbstractParser implements Parser {
 			buf.append(lastModified);
 		}
 		buf.append(stream ? "_stream" : "_writer");
-		return TEMPLATE_CLASS_PREFIX + SYMBOL_PATTERN.matcher(buf.toString()).replaceAll("_");
+		return TEMPLATE_CLASS_PREFIX + StringUtils.getVaildName(buf.toString());
 	}
 	
 	protected Class<?> parseClass(Resource resource, Map<String, Class<?>> types, boolean stream, int offset) throws IOException, ParseException {
@@ -828,6 +826,7 @@ public abstract class AbstractParser implements Parser {
 					+ "public " + className + "("
 					+ Engine.class.getName() + " engine, " 
 					+ Interceptor.class.getName() + " interceptor, " 
+					+ Compiler.class.getName() + " compiler, " 
 					+ Switcher.class.getName() + " filterSwitcher, " 
 					+ Switcher.class.getName() + " formatterSwitcher, " 
 					+ Filter.class.getName() + " filter, "
@@ -836,7 +835,7 @@ public abstract class AbstractParser implements Parser {
 					+ Converter.class.getName() + " outConverter, "
 					+ Map.class.getName() + " functions, " 
 					+ Map.class.getName() + " importMacros) {\n" 
-					+ "	super(engine, interceptor, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);\n"
+					+ "	super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);\n"
 					+ functionInits
 					+ macroInits
 					+ "}\n"

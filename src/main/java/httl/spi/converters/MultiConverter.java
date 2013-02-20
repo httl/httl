@@ -57,7 +57,7 @@ public class MultiConverter implements Converter<Object, Object> {
 		}
 	}
 
-	public Object convert(Object value, Class<Object> type) throws IOException, ParseException {
+	public Object convert(Object value, Class<?> type) throws IOException, ParseException {
 		if (value != null && converters != null) {
 			Class<?> cls = value.getClass();
 			Converter<Object, Object> converter = (Converter<Object, Object>) converters.get(cls);
