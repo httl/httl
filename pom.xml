@@ -23,7 +23,7 @@
 	<packaging>jar</packaging>
 	<name>HTTL</name>
 	<description>Hyper Text Template Language and Engine.</description>
-	<url>http://httl.oskpi.com</url>
+	<url>http://httl.github.com</url>
 	<inceptionYear>2012</inceptionYear>
 	<licenses>
 		<license>
@@ -138,11 +138,11 @@
 		<repository>
 			<id>httl-repository</id>
 			<name>Httl Repository</name>
-			<url>http://httl.oskpi.com/maven</url>
+			<url>http://httl.github.com/maven</url>
 		</repository>
 	</repositories>
 	<scm>
-		<url>http://httl.oskpi.com</url>
+		<url>http://httl.github.com</url>
 		<connection>scm:git:https://github.com/httl/httl.git</connection>
 		<developerConnection>scm:git:git@github.com:httl/httl.git</developerConnection>
 	</scm>
@@ -154,6 +154,14 @@
 		<developer>
 			<name>Liang Fei</name>
 			<email>liangfei0201 A gmail D com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+		<developer>
+			<name>Li Ding</name>
+			<email>oldratlee A gmail D com</email>
 			<roles>
 				<role>Developer</role>
 			</roles>
