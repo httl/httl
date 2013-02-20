@@ -57,7 +57,7 @@ public abstract class Engine {
 	private static final String HTTL_PREFIX = "httl-";
 
 	// The mode config key
-	private static final String MODE_KEY = "mode";
+	private static final String MODE_KEY = "modes";
 
 	// User configuration suffix
 	private static final String PROPERTIES_SUFFIX = ".properties";
@@ -124,11 +124,21 @@ public abstract class Engine {
 				if (engine == null) { // double check
 					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
 							configProperties, System.getProperties(), System.getenv());
-					String mode = properties.getProperty(MODE_KEY);
-					if (StringUtils.isNotEmpty(mode)) {
-						properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, 
-								HTTL_PREFIX + mode + PROPERTIES_SUFFIX, configPath,
-								configProperties, System.getProperties(), System.getenv());
+
+					final String modes = properties.getProperty(MODE_KEY);
+					String[] modeArray = StringUtils.splitByComma(modes);
+					if(modeArray.length > 0) {
+						Object[] configs = new Object[modeArray.length + 5];
+						configs[0] = HTTL_DEFAULT_PROPERTIES;
+						for (int i = 0; i < modeArray.length; ++i) {
+							configs[1 + i] = HTTL_PREFIX + modeArray[i] + PROPERTIES_SUFFIX;
+						}
+						configs[1 + modeArray.length] = configPath;
+						configs[1 + modeArray.length + 1] = configProperties;
+						configs[1 + modeArray.length + 2] = System.getProperties();
+						configs[1 + modeArray.length + 3] = System.getenv();
+
+						properties = ConfigUtils.mergeProperties(configs);
 					}
 					properties.setProperty(ENGINE_NAME, configPath);
 					engine = BeanFactory.createBean(Engine.class, properties); // slowly
