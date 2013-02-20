@@ -113,7 +113,13 @@ public abstract class Engine {
 			synchronized (reference) { // reference lock
 				engine = reference.get();
 				if (engine == null) { // double check
-					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties);
+					Properties properties = ConfigUtils.mergeProperties(configPath, configProperties);
+					String mode = properties.getProperty("mode");
+					if (StringUtils.isNotEmpty(mode)) {
+						String modeConfig = "httl-" + mode + ".properties";
+						properties = ConfigUtils.mergeProperties(modeConfig, properties);
+					}
+					properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, properties);
 					properties.setProperty(ENGINE_NAME, configPath);
 					engine = BeanFactory.createBean(Engine.class, properties); // slowly
 					reference.set(engine);
