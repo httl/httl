@@ -151,8 +151,9 @@ public class TemplateTest extends TestCase {
 				List<String> list = loader.list(suffixes[0]);
 				assertTrue(list.size() > 0);
 			}
-			Object[] maps = new Object[] {context, model, /*json,*/ null}; // TODO JSON格式的Map没有顺序，断言失败
+			Object[] maps = new Object[] {context, model, json, null};
 			for (Object map : maps) {
+				if (map instanceof String) continue; // FIXME JSON格式的Map没有顺序，断言失败
 				if (! profile) {
 					System.out.println("========" + config + " (" + (map == null ? "null" : map.getClass().getSimpleName()) + " parameters)========");
 				}
@@ -171,7 +172,7 @@ public class TemplateTest extends TestCase {
 					for (int i = 0, n = files.length; i < n; i ++) {
 						File file = files[i];
 						//if (! "this.httl".equals(file.getName())) continue;
-						if ("httl-javassist.properties".equals(config)  // FIXME
+						if ("httl-javassist.properties".equals(config)  // FIXME javassist的foreach 1..3编译不过
 								&& "list.httl".equals(file.getName())) continue;
 						if (! profile)
 							System.out.println(file.getName());

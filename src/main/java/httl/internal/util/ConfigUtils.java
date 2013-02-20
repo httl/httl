@@ -149,7 +149,7 @@ public final class ConfigUtils {
 	}
 
 	private static String normalizeKey(String key) {
-		return key.replace('_', '.').replace('-', '.');
+		return key.replace('_', '.');
 	}
 
 	public static Map<String, String> filterWithPrefix(String prefix, Map<String, String> input) {

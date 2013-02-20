@@ -53,18 +53,19 @@ public abstract class Engine {
 	// User configuration name
 	private static final String HTTL_PROPERTIES = "httl.properties";
 
-	// User configuration prefix
+	// HTTL configuration prefix
 	private static final String HTTL_PREFIX = "httl-";
 
-	private static final String HTTL_CONFIG_KEY_PREFIX = "httl.";
+	// HTTL configuration key prefix
+	private static final String HTTL_KEY_PREFIX = "httl.";
 
-	// The mode config key
-	private static final String MODE_KEY = "modes";
-
-	// User configuration suffix
+	// HTTL configuration suffix
 	private static final String PROPERTIES_SUFFIX = ".properties";
 
-	// The engine name config
+	// The modes configuration key
+	private static final String MODES_KEY = "modes";
+
+	// The engine name configuration key
 	private static final String ENGINE_NAME = "engine.name";
 
 	// The engine singletons cache
@@ -124,34 +125,37 @@ public abstract class Engine {
 			synchronized (reference) { // reference lock
 				engine = reference.get();
 				if (engine == null) { // double check
-					final Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_CONFIG_KEY_PREFIX, (Map)System.getProperties());
-					final Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_CONFIG_KEY_PREFIX, System.getenv());
-
-					Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
-							configProperties, systemProperties, systemEnv);
-
-					final String modes = properties.getProperty(MODE_KEY);
-					String[] modeArray = StringUtils.splitByComma(modes);
-					if(modeArray.length > 0) {
-						Object[] configs = new Object[modeArray.length + 5];
-						configs[0] = HTTL_DEFAULT_PROPERTIES;
-						for (int i = 0; i < modeArray.length; ++i) {
-							configs[1 + i] = HTTL_PREFIX + modeArray[i] + PROPERTIES_SUFFIX;
-						}
-						configs[1 + modeArray.length] = configPath;
-						configs[1 + modeArray.length + 1] = configProperties;
-						configs[1 + modeArray.length + 2] = systemProperties;
-						configs[1 + modeArray.length + 3] = systemEnv;
-						properties = ConfigUtils.mergeProperties(configs);
-					}
-					properties.setProperty(ENGINE_NAME, configPath);
-					engine = BeanFactory.createBean(Engine.class, properties); // slowly
+					engine = BeanFactory.createBean(Engine.class, initProperties(configPath, configProperties)); // slowly
 					reference.set(engine);
 				}
 			}
 		}
 		assert(engine != null);
 		return engine;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static Properties initProperties(String configPath, Properties configProperties) {
+		final Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, (Map) System.getProperties());
+		final Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, System.getenv());
+		Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
+				configProperties, systemProperties, systemEnv);
+		final String modes = properties.getProperty(MODES_KEY);
+		String[] modeArray = StringUtils.splitByComma(modes);
+		if(modeArray.length > 0) {
+			Object[] configs = new Object[modeArray.length + 5];
+			configs[0] = HTTL_DEFAULT_PROPERTIES;
+			for (int i = 0; i < modeArray.length; ++i) {
+				configs[1 + i] = HTTL_PREFIX + modeArray[i] + PROPERTIES_SUFFIX;
+			}
+			configs[1 + modeArray.length] = configPath;
+			configs[1 + modeArray.length + 1] = configProperties;
+			configs[1 + modeArray.length + 2] = systemProperties;
+			configs[1 + modeArray.length + 3] = systemEnv;
+			properties = ConfigUtils.mergeProperties(configs);
+		}
+		properties.setProperty(ENGINE_NAME, configPath);
+		return properties;
 	}
 
 	/**
