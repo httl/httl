@@ -155,7 +155,6 @@ public class MultiFormatter implements Formatter<Object> {
 	 * Add and copy the MultiFormatter.
 	 * 
 	 * @param formatters
-	 * @return
 	 */
 	public MultiFormatter add(Formatter<?>... formatters) {
 		if (formatter != null) {
@@ -171,7 +170,6 @@ public class MultiFormatter implements Formatter<Object> {
 	 * Remove and copy the MultiFormatter.
 	 * 
 	 * @param formatters
-	 * @return
 	 */
 	public MultiFormatter remove(Formatter<?>... formatters) {
 		if (formatter != null) {

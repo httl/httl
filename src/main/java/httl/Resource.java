@@ -31,7 +31,7 @@ import java.util.Locale;
  * @see httl.Engine#getResource(String)
  * @see httl.Engine#getResource(String, String)
  * @see httl.spi.Loader#load(String, Locale, String)
- * @see httl.spi.Parser#parse(Resource)
+ * @see httl.spi.Parser#parse(Resource, java.util.Map)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

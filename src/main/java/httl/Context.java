@@ -47,9 +47,8 @@ import java.util.Set;
  * if (value == null) value = engineConfig.get(key); // httl.properties
  * </pre>
  * 
- * @see httl.Template#evaluate(Map)
- * @see httl.Template#render(Map, java.io.Writer)
- * @see httl.Template#render(Map, java.io.OutputStream)
+ * @see httl.Template#evaluate(Object)
+ * @see httl.Template#render(Object, Object)
  * @see httl.spi.parsers.templates.WriterTemplate#render(Map, java.io.Writer)
  * @see httl.spi.parsers.templates.OutputStreamTemplate#render(Map, java.io.OutputStream)
  * 

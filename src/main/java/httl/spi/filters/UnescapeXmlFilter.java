@@ -15,13 +15,12 @@
  */
 package httl.spi.filters;
 
-import httl.spi.Filter;
 import httl.internal.util.StringUtils;
 
 /**
  * UnescapeXmlFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setExpressionFilter(Filter)
+ * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(httl.spi.Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

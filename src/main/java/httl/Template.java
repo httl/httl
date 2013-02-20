@@ -30,7 +30,7 @@ import java.util.Map;
  * @see httl.Engine#getTemplate(String)
  * @see httl.Engine#getTemplate(String, String)
  * @see httl.Context#getTemplate()
- * @see httl.spi.Parser#parse(Resource)
+ * @see httl.spi.Parser#parse(Resource, Map)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
