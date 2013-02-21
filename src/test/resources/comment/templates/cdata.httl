@@ -1,4 +1,4 @@
-<![CDATA[##<!--#var(Book[] books)-->
+#[<!--#var(Book[] books)-->
 <table>
   <!--#foreach(book in books)-->
   <tr>
@@ -12,4 +12,4 @@
     <td>${book.price * book.discount / 100}</td>
   </tr>
   <!--#end-->
-</table>]]>
+</table>]#

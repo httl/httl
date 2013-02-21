@@ -2,8 +2,8 @@ X
 <!--##var(Book[] books)-->
 <!--## AA ${foreach.count} BB -->
 <!--## CCC -->
-<!--## 
+<!--#* 
 #var(Book[] books)
 AA ${foreach.count} BB
- -->
+ *#-->
 Y

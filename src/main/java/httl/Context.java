@@ -326,7 +326,7 @@ public final class Context implements Map<String, Object> {
 		return value == null ? defaultValue : value;
 	}
 	
-	// ==== Delegate the current context ==== //
+	// ==== Delegate the current context map ==== //
 
 	public Object get(Object key) {
 		checkThread();

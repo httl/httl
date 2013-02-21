@@ -1,6 +1,9 @@
 #var(List<Book> books)
 <html>
   <body>
+    ## line comment
+    #* block comment *#
+    #[ no parse ]#
     #if(books)
     <table>
       #foreach(book in books)

@@ -1,5 +1,4 @@
 11111111111
-${xxx("before")}
 <!--#macro(xxx(String aaa))-->
 BEGIN
 ${aaa}
