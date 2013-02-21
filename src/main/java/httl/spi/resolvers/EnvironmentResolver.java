@@ -15,18 +15,17 @@
  */
 package httl.spi.resolvers;
 
-import httl.internal.util.StringUtils;
 import httl.spi.Resolver;
 
 /**
- * SystemResolver. (SPI, Singleton, ThreadSafe)
+ * EnvironmentResolver. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class SystemResolver implements Resolver {
+public class EnvironmentResolver implements Resolver {
 
 	public Object get(String key) {
-		return System.getProperty(StringUtils.splitCamelName(key, "."));
+		return System.getenv(key);
 	}
 
 }

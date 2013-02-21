@@ -15,10 +15,7 @@
  */
 package httl;
 
-import httl.internal.util.WriterOutputStream;
-
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,10 +38,13 @@ import java.util.Set;
  * if (value == null) value = current.get(key); // render(current);
  * if (value == null) value = parent.get(key); // recursive above
  * 
- * if (value == null) value = servletResovler.get(key); // httl.properties: resovlers+=ServletResovler
+ * if (value == null) value = servletResovler.get(key); // request, response, parameter, header, session, cookie, application
+ * if (value == null) value = contextResovler.get(key); // parent, super, this, engine, out, level
  * if (value == null) value = globalResovler.get(key); // GlobalResovler.put(key, value)
  * 
- * if (value == null) value = engineConfig.get(key); // httl.properties
+ * if (value == null) value = engineResovler.get(key); // httl.properties: key=value
+ * if (value == null) value = systemResovler.get(key); // java -Dkey=value
+ * if (value == null) value = environmentResolver.get(key); // export key=value
  * </pre>
  * 
  * @see httl.Template#evaluate(Object)
@@ -150,7 +150,9 @@ public final class Context implements Map<String, Object> {
 		this.current = current;
 		this.out = out;
 		this.template = template;
-		initEngine(template == null ? null : template.getEngine());
+		if (template != null) {
+			doSetEngine(template.getEngine());
+		}
 	}
 
 	// Check the cross-thread use.
@@ -239,11 +241,11 @@ public final class Context implements Map<String, Object> {
 		if (template != null && template.getEngine() != engine) {
 			throw new IllegalStateException("template.engine != context.engine");
 		}
-		initEngine(engine);
+		doSetEngine(engine);
 		return this;
 	}
 	
-	private void initEngine(Engine engine) {
+	private void doSetEngine(Engine engine) {
 		if (engine != null) {
 			if (parent != null && parent.getEngine() == null) {
 				parent.setEngine(engine);
@@ -272,11 +274,9 @@ public final class Context implements Map<String, Object> {
 	 * @see #getContext()
 	 * @return current output stream
 	 */
-	@SuppressWarnings("resource")
 	public OutputStream getOutputStream() {
 		checkThread();
-		return out == null ? null : (out instanceof OutputStream ? (OutputStream) out 
-				: new WriterOutputStream((Writer) out));
+		return (OutputStream) out;
 	}
 
 	/**
@@ -298,8 +298,7 @@ public final class Context implements Map<String, Object> {
 	 */
 	public Writer getWriter() {
 		checkThread();
-		return out == null ? null : (out instanceof Writer ? (Writer) out 
-				: new OutputStreamWriter((OutputStream) out));
+		return (Writer) out;
 	}
 
 	/**

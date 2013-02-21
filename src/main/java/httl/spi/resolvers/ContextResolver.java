@@ -26,9 +26,11 @@ import httl.spi.Resolver;
 public class ContextResolver implements Resolver {
 
 	public Object get(String key) {
-		if ("super".equals(key)) {
+		if ("parent".equals(key)) {
+			return Context.getContext().getParent();
+		} else if ("super".equals(key)) {
 			return Context.getContext().getSuper();
-		} else if ("template".equals(key) || "this".equals(key)) {
+		} else if ("this".equals(key)) {
 			return Context.getContext().getTemplate();
 		} else if ("engine".equals(key)) {
 			return Context.getContext().getEngine();
@@ -36,10 +38,6 @@ public class ContextResolver implements Resolver {
 			return Context.getContext().getOut();
 		} else if ("level".equals(key)) {
 			return Context.getContext().getLevel();
-		} else if ("parent".equals(key)) {
-			return Context.getContext().getParent();
-		} else if ("context".equals(key) || "current".equals(key)) {
-			return Context.getContext();
 		} else {
 			return null;
 		}
