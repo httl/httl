@@ -268,6 +268,12 @@ public final class Context implements Map<String, Object> {
 		return out;
 	}
 
+	private Context setOut(Object out) {
+		checkThread();
+		this.out = out;
+		return this;
+	}
+
 	/**
 	 * Get the current output stream.
 	 * 
@@ -275,8 +281,7 @@ public final class Context implements Map<String, Object> {
 	 * @return current output stream
 	 */
 	public OutputStream getOutputStream() {
-		checkThread();
-		return (OutputStream) out;
+		return (OutputStream) getOut();
 	}
 
 	/**
@@ -285,9 +290,7 @@ public final class Context implements Map<String, Object> {
 	 * @param out - current output stream
 	 */
 	public Context setOutputStream(OutputStream out) {
-		checkThread();
-		this.out = out;
-		return this;
+		return setOut(out);
 	}
 
 	/**
@@ -307,9 +310,7 @@ public final class Context implements Map<String, Object> {
 	 * @param out - current writer
 	 */
 	public Context setWriter(Writer out) {
-		checkThread();
-		this.out = out;
-		return this;
+		return setOut(out);
 	}
 
 	/**
