@@ -6,17 +6,25 @@ import java.util.List;
 
 public abstract class DfaScanner {
 
-	// BREAK，结束片段，包含当前字符
+	// BREAK，结束片段，最多回退100个字符
+	// state = BREAK - 退回字符数
+	// state = BREAK - 1 // 结束并退回1个字符，即不包含当前字符
 	public static final int BREAK = -1;
 
-	// PUSH，压栈
-	public static final int PUSH = -1000000;
+	// PUSH，压栈，最多100个栈
+	// state = PUSH * 第几个栈 - 压栈后回到状态数
+	// state = PUSH * 2 - 4 // 压入第2个栈，压栈后回到状态4
+	public static final int PUSH = -100;
 
-	// POP，弹栈
-	public static final int POP = -2000000;
+	// POP，弹栈，如果栈为空，则结束片段
+	// state = POP * 第几个栈 - 弹栈后回到状态数
+	// state = POP * 2 - 4 // 弹出第2个栈，弹栈后回到状态4
+	public static final int POP = -10000;
 
-	// ERROR，解析出错
-	public static final int ERROR = -3000000;
+	// ERROR，解析出错，抛出异常
+	// state = ERROR - 错误码
+	// state = ERROR - 1 // 出错，并返回错误码为1的异常信息。
+	public static final int ERROR = -1000000;
 
 	public List<Token> scan(String charStream) throws ParseException {
 		List<Token> tokens = new ArrayList<Token>();
@@ -30,7 +38,7 @@ public abstract class DfaScanner {
 
 		// 逐字解析 ----
 		int i = 0;
-		int p = 0;
+		int[] stack = new int[3];
 		for(;;) {
 			if (remain.length() > 0) { // 先处理残存字符
 				ch = remain.charAt(0);
@@ -46,22 +54,34 @@ public abstract class DfaScanner {
 			buffer.append(ch); // 将字符加入缓存
 			state = next(state, ch); // 从状态机图中取下一状态
 			if (state <= ERROR) {
-				throw new ParseException("DFAScanner.state.error, error code: " + state, offset - buffer.length());
+				throw new ParseException("DFAScanner.state.error, error code: " + (ERROR - state), offset - buffer.length());
 			}
 			if (state <= POP) {
-				p --;
-				if (p < 0) {
+				int n = - (state % POP);
+				int p = (state - n) / POP - 1;
+				if (p >= stack.length) {
 					throw new ParseException("DFAScanner.mismatch.stack", offset - buffer.length());
 				}
-				if (p == 0) {
+				stack[p] = stack[p] --;
+				if (stack[p] < 0) {
+					throw new ParseException("DFAScanner.mismatch.stack", offset - buffer.length());
+				}
+				if (stack[p] == 0) {
 					state = BREAK;
 				} else {
-					state = POP - state;
+					state = n;
 					continue;
 				}
 			} else if (state <= PUSH) {
-				p ++;
-				state = PUSH - state;
+				int n = - (state % POP);
+				int p = (state - n) / POP - 1;
+				if (p >= stack.length) {
+					int[] newStack = new int[p];
+					System.arraycopy(stack, 0, newStack, 0, stack.length);
+					stack = newStack;
+				}
+				stack[p] = stack[p] ++;
+				state = n;
 				continue;
 			}
 			if (state <= BREAK) { // 负数表示接收状态

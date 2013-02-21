@@ -90,14 +90,20 @@ public class DefaultParser implements Parser {
 	// END，结束片段，包含当前字符
 	private static final int E = DfaScanner.BREAK;
 
-	// BREAK，打断片段，不包含当前字符
+	// BREAK，结束片段，并退回一个字符，即不包含当前字符
 	private static final int B = DfaScanner.BREAK - 1;
 
-	// PUSH，压栈
+	// PUSH，压栈1，并回到状态4
 	private static final int P = DfaScanner.PUSH - 4;
 
-	// POP，弹栈
+	// POP，弹栈1，并回到状态4
 	private static final int O = DfaScanner.POP - 4;
+
+	// PUSH，压栈2，并回到状态7
+	private static final int P2 = DfaScanner.PUSH * 2 - 7;
+
+	// POP，弹栈2，并回到状态7
+	private static final int O2 = DfaScanner.POP * 2 - 7;
 
 	// 插值语法状态机图
 	// 行表示状态
@@ -112,9 +118,9 @@ public class DefaultParser implements Parser {
 		/* 3.指名 */ { B, 3, B, B, B, B, P, B, B, B, B, B, B, B, B, B, B, B, }, // 指令名
 		/* 4.指参 */ { 4, 4, 4, 4, 4, 4, P, O, 4, 4, 4, 4, 14, 16, 18, 4, 4, 4, }, // 指令参数
 		
-		/* 5.插值 */ { 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, }, // 插值提示符
-		/* 6.非滤 */ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, }, // 非过滤插值
-		/* 7.插参 */ { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, E, 20, 22, 24, 7, 7, 7, }, // 插值参数
+		/* 5.插值 */ { 1, 1, B, B, 6, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, }, // 插值提示符
+		/* 6.非滤 */ { 1, 1, B, B, 1, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, }, // 非过滤插值
+		/* 7.插参 */ { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, P2, O2, 20, 22, 24, 7, 7, 7, }, // 插值参数
 		
 		/* 8.转义 */ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, }, // 井号美元号转义
 		/* 9.行注 */ { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, B, 9, }, // 双井号行注释
