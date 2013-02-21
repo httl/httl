@@ -16,6 +16,7 @@
 package httl;
 
 import httl.internal.util.BeanFactory;
+import httl.internal.util.CollectionUtils;
 import httl.internal.util.ConfigUtils;
 import httl.internal.util.DelegateMap;
 import httl.internal.util.StringUtils;
@@ -136,22 +137,21 @@ public abstract class Engine {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static Properties initProperties(String configPath, Properties configProperties) {
-		final Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, (Map) System.getProperties(), false);
-		final Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, System.getenv(), true);
+		Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, (Map) System.getProperties(), false);
+		Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, System.getenv(), true);
 		Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
 				configProperties, systemProperties, systemEnv);
-		final String modes = properties.getProperty(MODES_KEY);
-		String[] modeArray = StringUtils.splitByComma(modes);
-		if(modeArray.length > 0) {
-			Object[] configs = new Object[modeArray.length + 5];
+		String[] modes = StringUtils.splitByComma(properties.getProperty(MODES_KEY));
+		if(CollectionUtils.isNotEmpty(modes)) {
+			Object[] configs = new Object[modes.length + 5];
 			configs[0] = HTTL_DEFAULT_PROPERTIES;
-			for (int i = 0; i < modeArray.length; i ++) {
-				configs[i + 1] = HTTL_PREFIX + modeArray[i] + PROPERTIES_SUFFIX;
+			for (int i = 0; i < modes.length; i ++) {
+				configs[i + 1] = HTTL_PREFIX + modes[i] + PROPERTIES_SUFFIX;
 			}
-			configs[modeArray.length + 1] = configPath;
-			configs[modeArray.length + 2] = configProperties;
-			configs[modeArray.length + 3] = systemProperties;
-			configs[modeArray.length + 4] = systemEnv;
+			configs[modes.length + 1] = configPath;
+			configs[modes.length + 2] = configProperties;
+			configs[modes.length + 3] = systemProperties;
+			configs[modes.length + 4] = systemEnv;
 			properties = ConfigUtils.mergeProperties(configs);
 		}
 		properties.setProperty(ENGINE_NAME, configPath);
