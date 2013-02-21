@@ -136,8 +136,8 @@ public abstract class Engine {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static Properties initProperties(String configPath, Properties configProperties) {
-		final Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, (Map) System.getProperties());
-		final Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, System.getenv());
+		final Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, (Map) System.getProperties(), false);
+		final Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, System.getenv(), true);
 		Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
 				configProperties, systemProperties, systemEnv);
 		final String modes = properties.getProperty(MODES_KEY);

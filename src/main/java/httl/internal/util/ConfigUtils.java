@@ -150,16 +150,26 @@ public final class ConfigUtils {
 		return document;
 	}
 
-	private static String normalizeKey(String key) {
-		return key.replace('_', '.');
-	}
-
-	public static Map<String, String> filterWithPrefix(String prefix, Map<String, String> input) {
+	public static Map<String, String> filterWithPrefix(String prefix, Map<String, String> input, boolean escape) {
 		Map<String, String> ret = new HashMap<String, String>();
 		for (Map.Entry<String, String> entry : input.entrySet()) {
-			String key = normalizeKey(entry.getKey());
+			String key = entry.getKey();
+			if (escape) {
+				key = key.replace('_', '.');
+			}
 			if(key.startsWith(prefix)) {
-				ret.put(key.substring(prefix.length()), entry.getValue());
+				key = key.substring(prefix.length());
+				String value = entry.getValue();
+				if (escape) {
+					if (value.startsWith(PLUS)) {
+						key += PLUS;
+						value = value.substring(PLUS.length());
+					} else if (value.startsWith(MINUS)) {
+						key += MINUS;
+						value = value.substring(MINUS.length());
+					}
+				}
+				ret.put(key, value);
 			}
 		}
 		return ret;
