@@ -145,13 +145,13 @@ public abstract class Engine {
 		if(modeArray.length > 0) {
 			Object[] configs = new Object[modeArray.length + 5];
 			configs[0] = HTTL_DEFAULT_PROPERTIES;
-			for (int i = 0; i < modeArray.length; ++i) {
-				configs[1 + i] = HTTL_PREFIX + modeArray[i] + PROPERTIES_SUFFIX;
+			for (int i = 0; i < modeArray.length; i ++) {
+				configs[i + 1] = HTTL_PREFIX + modeArray[i] + PROPERTIES_SUFFIX;
 			}
-			configs[1 + modeArray.length] = configPath;
-			configs[1 + modeArray.length + 1] = configProperties;
-			configs[1 + modeArray.length + 2] = systemProperties;
-			configs[1 + modeArray.length + 3] = systemEnv;
+			configs[modeArray.length + 1] = configPath;
+			configs[modeArray.length + 2] = configProperties;
+			configs[modeArray.length + 3] = systemProperties;
+			configs[modeArray.length + 4] = systemEnv;
 			properties = ConfigUtils.mergeProperties(configs);
 		}
 		properties.setProperty(ENGINE_NAME, configPath);
