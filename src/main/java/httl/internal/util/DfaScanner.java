@@ -62,7 +62,7 @@ public abstract class DfaScanner {
 				if (p >= stack.length) {
 					throw new ParseException("DFAScanner.mismatch.stack", offset - buffer.length());
 				}
-				stack[p] = stack[p] --;
+				stack[p] = stack[p] - 1;
 				if (stack[p] < 0) {
 					throw new ParseException("DFAScanner.mismatch.stack", offset - buffer.length());
 				}
@@ -80,7 +80,7 @@ public abstract class DfaScanner {
 					System.arraycopy(stack, 0, newStack, 0, stack.length);
 					stack = newStack;
 				}
-				stack[p] = stack[p] ++;
+				stack[p] = stack[p] + 1;
 				state = n;
 				continue;
 			}
