@@ -133,23 +133,6 @@ public final class ConfigUtils {
 		return null;
 	}
 
-	public static Document getDocument(String dataSource) throws Exception {
-		return getDocument(new ByteArrayInputStream(dataSource.getBytes()));
-	}
-
-	public static Document getDocument(File dataFile) throws Exception {
-		return getDocument(new FileInputStream(dataFile));
-	}
-
-	public static Document getDocument(InputStream dataInputStream) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setIgnoringComments(true);
-		factory.setIgnoringElementContentWhitespace(true);
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document document = builder.parse(dataInputStream);
-		return document;
-	}
-
 	public static Map<String, String> filterWithPrefix(String prefix, Map<String, String> input, boolean escape) {
 		Map<String, String> ret = new HashMap<String, String>();
 		for (Map.Entry<String, String> entry : input.entrySet()) {

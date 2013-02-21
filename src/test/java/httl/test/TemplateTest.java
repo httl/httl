@@ -149,7 +149,7 @@ public class TemplateTest extends TestCase {
 				List<String> list = loader.list(suffixes[0]);
 				assertTrue(list.size() > 0);
 			}
-			Object[] maps = new Object[] {context, model/*, json*/, null};
+			Object[] maps = new Object[] {context, model, json, null};
 			for (Object map : maps) {
 				if (map instanceof String) continue; // FIXME JSON格式的Map没有顺序，断言失败
 				if (! profile) {
@@ -250,5 +250,4 @@ public class TemplateTest extends TestCase {
 			}
 		}
 	}
-
 }
