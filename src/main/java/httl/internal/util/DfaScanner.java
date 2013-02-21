@@ -6,7 +6,7 @@ import java.util.List;
 
 public abstract class DfaScanner {
 
-	// BREAK，结束片段，最多回退100个字符
+	// BREAK，结束片段，并回到起始状态，最多可回退100个字符，退回的字符将重新读取
 	// state = BREAK - 退回字符数
 	// state = BREAK - 1 // 结束并退回1个字符，即不包含当前字符
 	public static final int BREAK = -1;

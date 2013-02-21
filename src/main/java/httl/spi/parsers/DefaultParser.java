@@ -93,16 +93,16 @@ public class DefaultParser implements Parser {
 	// BREAK，结束片段，并退回一个字符，即不包含当前字符
 	private static final int B = DfaScanner.BREAK - 1;
 
-	// PUSH，压栈1，并回到状态4
+	// PUSH，压栈1，即指令小括号栈，并回到状态4
 	private static final int P = DfaScanner.PUSH - 4;
 
-	// POP，弹栈1，并回到状态4
+	// POP，弹栈1，即指令小括号栈，并回到状态4
 	private static final int O = DfaScanner.POP - 4;
 
-	// PUSH，压栈2，并回到状态7
+	// PUSH，压栈2，即插值大括号栈，并回到状态7
 	private static final int P2 = DfaScanner.PUSH * 2 - 7;
 
-	// POP，弹栈2，并回到状态7
+	// POP，弹栈2，即插值大括号栈，并回到状态7
 	private static final int O2 = DfaScanner.POP * 2 - 7;
 
 	// 插值语法状态机图
