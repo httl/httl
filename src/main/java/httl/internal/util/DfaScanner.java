@@ -73,8 +73,8 @@ public abstract class DfaScanner {
 					continue;
 				}
 			} else if (state <= PUSH) {
-				int n = - (state % POP);
-				int p = (state - n) / POP - 1;
+				int n = - (state % PUSH);
+				int p = (state - n) / PUSH - 1;
 				if (p >= stack.length) {
 					int[] newStack = new int[p];
 					System.arraycopy(stack, 0, newStack, 0, stack.length);
