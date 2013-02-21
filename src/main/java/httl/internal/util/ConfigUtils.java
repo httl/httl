@@ -50,6 +50,8 @@ public final class ConfigUtils {
 
 	private static final String PLUS = "+";
 
+	private static final String MINUS = "-";
+
 	private static final String COMMA = ",";
 
 	public static boolean isInteger(String value) {
@@ -183,6 +185,7 @@ public final class ConfigUtils {
 		Properties result = new Properties();
 		for (Map<Object, Object> properties : list) {
 			Map<Object, Object> plusConfigs = new HashMap<Object, Object>();
+			Map<Object, Object> minusConfigs = new HashMap<Object, Object>();
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
@@ -190,8 +193,21 @@ public final class ConfigUtils {
 					if (StringUtils.isNotEmpty(value)) {
 						plusConfigs.put(key, value);
 					}
+				} else if (key.endsWith(MINUS)) {
+					if (StringUtils.isNotEmpty(value)) {
+						minusConfigs.put(key, value);
+					}
 				} else {
 					result.setProperty(key, value);
+				}
+			}
+			for (Map.Entry<Object, Object> entry : minusConfigs.entrySet()) {
+				String key = (String) entry.getKey();
+				String value = (String) entry.getValue();
+				String k = key.substring(0, key.length() - MINUS.length());
+				String v = result.getProperty(k);
+				if (StringUtils.isNotEmpty(v) && v.contains(value)) {
+					result.setProperty(k, StringUtils.removeCommaValue(v, value));
 				}
 			}
 			for (Map.Entry<Object, Object> entry : plusConfigs.entrySet()) {

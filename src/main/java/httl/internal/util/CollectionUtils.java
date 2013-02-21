@@ -40,6 +40,27 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 public class CollectionUtils {
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T[] remove(T[] values, T value) {
+		if (values != null && value != null) {
+			for (int i = 0; i < values.length; i ++) {
+				T v = values[i];
+				if (value.equals(v)) {
+					T[] newValues = (T[]) Array.newInstance(values.getClass().getComponentType(), values.length - 1);
+					if (i > 0) {
+						System.arraycopy(values, 0, newValues, 0, i);
+					}
+					if (i < values.length - 1) {
+						System.arraycopy(values, i + 1, newValues, i, values.length - 1 - i);
+					}
+					values = newValues;
+					i --;
+				}
+			}
+		}
+		return values;
+	}
 
 	public static <K, V> Map<K, V> merge(Map<K, V> c1, Map<K, V> c2) {
 		if (c1 == null || c1.size() == 0) {

@@ -1135,12 +1135,31 @@ public class StringUtils {
 		return location;
 	}
 
+	public static String removeCommaValue(String values, String value) {
+		return StringUtils.joinByComma(CollectionUtils.remove(StringUtils.splitByComma(values), value));
+	}
+
+	public static String joinByComma(String[] values) {
+		return joinBy(values, ",");
+	}
+
+	public static String joinBy(String[] values, String sep) {
+		StringBuilder buf = new StringBuilder();
+		for (String value : values) {
+			if (buf.length() > 0) {
+				buf.append(sep);
+			}
+			buf.append(value);
+		}
+		return buf.toString();
+	}
+
 	private static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*\\,\\s*");
 
 	public static String[] splitByComma(String name) {
 		return name == null ? new String[0] : COMMA_SPLIT_PATTERN.split(name);
 	}
-
+	
 	public static String splitCamelName(String name, String split) {
 		return splitCamelName(name, split, false);
 	}
