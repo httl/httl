@@ -27,6 +27,9 @@ import httl.spi.Loader;
 import httl.spi.loaders.ClasspathLoader;
 import httl.spi.loaders.MultiLoader;
 import httl.spi.parsers.templates.AdaptiveTemplate;
+import httl.test.method.A1;
+import httl.test.method.A1B1;
+import httl.test.method.A1B2;
 import httl.test.model.Book;
 import httl.test.model.Model;
 import httl.test.model.User;
@@ -49,7 +52,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -58,7 +61,27 @@ import org.junit.Test;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class TemplateTest extends TestCase {
+public class TemplateTest {
+
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void test_overloadMethod() throws Exception {
+		Engine engine = Engine.getEngine("httl-text.properties");
+		Template template = engine.getTemplate("/templates/overload_method.httl", Locale.CHINA, "UTF-8");
+
+		StringWriter writer = new StringWriter();
+
+		Map<String, Object> context  = new HashMap<String, Object>();
+		context.put("a1", new A1());
+		context.put("a1b1", new A1B1());
+		context.put("a1b2", new A1B2());
+		template.render(context, writer);
+
+
+		String expected = IOUtils.readToString(new InputStreamReader(TemplateTest.class.getClassLoader().getResourceAsStream("comment/results/overload_method.httl.txt"), "UTF-8"));
+		assertEquals(expected, writer.toString());
+	}
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -188,8 +211,8 @@ public class TemplateTest extends TestCase {
 						}
 						Template template = _engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
 						if (! profile) {
-							super.assertEquals(AdaptiveTemplate.class, template.getClass());
-							super.assertEquals(Locale.CHINA, template.getLocale());
+							assertEquals(AdaptiveTemplate.class, template.getClass());
+							assertEquals(Locale.CHINA, template.getLocale());
 						}
 						UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 						StringWriter actualWriter = new StringWriter();
@@ -231,10 +254,10 @@ public class TemplateTest extends TestCase {
 									&& ! template.getSource().contains("read(")) {
 								expected = expected.replace("<!--", "").replace("-->", "");
 							}
-							super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
-							super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
+							assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
+							assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
 							if ("set_parameters.httl".equals(file.getName())) {
-								super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
+								assertEquals(file.getName(), "abc", Context.getContext().get("title"));
 							}
 						}
 					}
