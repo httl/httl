@@ -51,7 +51,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -60,7 +60,7 @@ import org.junit.Test;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class TemplateTest extends TestCase {
+public class TemplateTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -190,8 +190,8 @@ public class TemplateTest extends TestCase {
 						}
 						Template template = _engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
 						if (! profile) {
-							super.assertEquals(AdaptiveTemplate.class, template.getClass());
-							super.assertEquals(Locale.CHINA, template.getLocale());
+							assertEquals(AdaptiveTemplate.class, template.getClass());
+							assertEquals(Locale.CHINA, template.getLocale());
 						}
 						UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 						StringWriter actualWriter = new StringWriter();
@@ -233,10 +233,10 @@ public class TemplateTest extends TestCase {
 									&& ! template.getSource().contains("read(")) {
 								expected = expected.replace("<!--", "").replace("-->", "");
 							}
-							super.assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
-							super.assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
+							assertEquals(file.getName(), expected, actualWriter.getBuffer().toString().replace("\r", ""));
+							assertEquals(file.getName(), expected, new String(actualStream.toByteArray()).replace("\r", ""));
 							if ("set_parameters.httl".equals(file.getName())) {
-								super.assertEquals(file.getName(), "abc", Context.getContext().get("title"));
+								assertEquals(file.getName(), "abc", Context.getContext().get("title"));
 							}
 						}
 					}
@@ -267,7 +267,7 @@ public class TemplateTest extends TestCase {
 			dir += "/";
 		}
 		File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-		super.assertTrue(directory.isDirectory());
+		assertTrue(directory.isDirectory());
 		File[] files = directory.listFiles();
 		for (int i = 0, n = files.length; i < n; i ++) {
 			File file = files[i];
@@ -292,7 +292,7 @@ public class TemplateTest extends TestCase {
 					for (String part : expected)  {
 						assertTrue(StringUtils.isNotEmpty(part));
 						part = StringUtils.unescapeString(part).trim();
-						super.assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
+						assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
 					}
 				}
 			}
