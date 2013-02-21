@@ -1,12 +1,12 @@
 11111111111
-<!--macro="xxx(String aaa)"-->
+<!--#macro(xxx(String aaa))-->
 BEGIN
 ${aaa}
 END
-<!--end="macro"-->
+<!--#end-->
 22222222222
-<!--set="aaa = 'AAA'"-->
+<!--#set(aaa = 'AAA')-->
 ${xxx(aaa)}
 33333333333
-<!--set="aaa = 'BBB'"-->
+<!--#set(aaa = 'BBB')-->
 ${xxx(aaa)}

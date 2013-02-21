@@ -133,7 +133,7 @@ public class TemplateTest extends TestCase {
 		model.setBooks2(books2);
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
-		String[] configs = new String[] { "httl-text.properties", "httl-comment.properties", "httl-javassist.properties", "httl-attribute.properties" };
+		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-attribute.properties" };
 		for (String config : configs) {
 			Engine engine = Engine.getEngine(config);
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);
@@ -184,7 +184,7 @@ public class TemplateTest extends TestCase {
 						}
 						Engine _engine = engine;
 						if ("extends_default.httl".equals(file.getName())) {
-							_engine = Engine.getEngine("httl-extends.properties");
+							_engine = Engine.getEngine("httl-comment-extends.properties");
 						}
 						Template template = _engine.getTemplate("/templates/" + file.getName(), Locale.CHINA, encoding);
 						if (! profile) {
@@ -226,7 +226,7 @@ public class TemplateTest extends TestCase {
 							}
 							String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
 							expected = expected.replace("\r", "");
-							if ("httl-text.properties".equals(config) 
+							if ("httl-comment-text.properties".equals(config) 
 									&& ! "comment_cdata_escape.httl".equals(file.getName())
 									&& ! template.getSource().contains("read(")) {
 								expected = expected.replace("<!--", "").replace("-->", "");
