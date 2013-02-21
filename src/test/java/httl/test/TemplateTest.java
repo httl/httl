@@ -133,7 +133,7 @@ public class TemplateTest extends TestCase {
 		model.setBooks2(books2);
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
-		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-attribute.properties" };
+		String[] configs = new String[] { /*"httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties",*/ "httl-attribute.properties" };
 		for (String config : configs) {
 			Engine engine = Engine.getEngine(config);
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);

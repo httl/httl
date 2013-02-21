@@ -123,95 +123,76 @@ public class AttributeSyntaxFilter extends AbstractFilter {
 	public String filter(String key, String value) {
 		Source source = new Source(value);
 		OutputDocument document = new OutputDocument(source);
-		replaceChildren(source, document);
+		replaceChildren(source, source, document);
 		return document.toString();
 	}
 
 	// 替换子元素中的指令属性
-	private void replaceChildren(Segment segment, OutputDocument document) {
+	private void replaceChildren(Source source, Segment segment, OutputDocument document) {
 		// 迭代子元素，逐个查找
 		List<Element> elements = segment.getChildElements();
 		if (elements != null) {
 			for (Element element : elements) {
 				if (element != null) {
 					// ---- 标签属性处理 ----
-					List<String> blockDirectiveNames = new ArrayList<String>();
-					List<String> blockDirectiveValues = new ArrayList<String>();
-					List<Attribute> blockDirectiveAttributes = new ArrayList<Attribute>();
-					String lineDirectiveName = null;
-					String lineDirectiveValue = null;
+					List<String> directiveNames = new ArrayList<String>();
+					List<String> directiveValues = new ArrayList<String>();
+					List<Attribute> directiveAttributes = new ArrayList<Attribute>();
 					// 迭代标签属性，查找指令属性
 					Attributes attributes = element.getAttributes();
 					if (attributes != null) {
 						for (Attribute attribute : attributes) {
 							if (attribute != null) {
 								String name = attribute.getName();
-								if (name != null && (isDirective(name) || (attributeNamespace != null && name.startsWith(attributeNamespace)))) { // 识别名称空间
+								if (name != null && (isDirective(name) || (attributeNamespace != null && name.startsWith(attributeNamespace)) && isDirective(name.substring(attributeNamespace.length())))) { // 识别名称空间
 									String directiveName = attributeNamespace != null ? name.substring(attributeNamespace.length()) : name;
-									if (directiveName.matches("^[a-z|A-Z|0-9|_|\\.]+$")) { // 符合命名
-										String value = attribute.getValue();
-										if (isBlockDirective(directiveName)) {
-											blockDirectiveNames.add(directiveName);
-											blockDirectiveValues.add(value);
-											blockDirectiveAttributes.add(attribute);
-										} else {
-											if (lineDirectiveName != null)
-												throw new RuntimeException("一个标签上只能有一个<b>行指令</b>属性! 出现两个行指令属性: " + lineDirectiveName + "和" + directiveName + ", 请检查标签:" + element.getStartTag().toString());
-											lineDirectiveName = directiveName;
-											lineDirectiveValue = value;
-										}
-									}
+									String value = attribute.getValue();
+									directiveNames.add(directiveName);
+									directiveValues.add(value);
+									directiveAttributes.add(attribute);
 								}
 							}
 						}
 					}
-					// ---- 块指令处理 ----
-					if (blockDirectiveNames.size() > 0) {
+					// ---- 指令处理 ----
+					if (directiveNames.size() > 0) {
 						StringBuffer buf = new StringBuffer();
-						for (int i = 0; i < blockDirectiveNames.size(); i ++) { // 按顺序添加块指令
-							String blockDirectiveName = (String)blockDirectiveNames.get(i);
-							String blockDirectiveValue = (String)blockDirectiveValues.get(i);
+						for (int i = 0; i < directiveNames.size(); i ++) { // 按顺序添加块指令
+							String directiveName = (String)directiveNames.get(i);
+							String directiveValue = (String)directiveValues.get(i);
 							buf.append("#");
-							buf.append(blockDirectiveName);
+							buf.append(directiveName);
 							buf.append("(");
-							buf.append(blockDirectiveValue);
+							buf.append(directiveValue);
 							buf.append(")");
 						}
 						document.insert(element.getBegin(), buf.toString()); // 插入块指令
 					}
-					// ---- 行指令处理 ----
-					if (lineDirectiveName != null) { // 如果是行指令, 替换整个标签内容.
-						StringBuffer buf = new StringBuffer();
-						buf.append("#");
-						buf.append(lineDirectiveName);
-						buf.append("(");
-						buf.append(lineDirectiveValue);
-						buf.append(")");
-						document.replace(element.getBegin(), element.getEnd(), buf.toString()); // 替换为行指令
-					} else { // 否则表示全为块指令
-						for (int i = 0; i < blockDirectiveAttributes.size(); i ++) {
-							Attribute attribute = (Attribute)blockDirectiveAttributes.get(i);
-							document.remove(attribute); // 移除属性
-						}
-						replaceChildren(element, document); // 递归处理子标签
+					// ---- 指令属性处理 ----
+					for (int i = 0; i < directiveAttributes.size(); i ++) {
+						Attribute attribute = (Attribute)directiveAttributes.get(i);
+						document.remove(new Segment(source, attribute.getBegin() - 1, attribute.getEnd())); // 移除属性
 					}
+					replaceChildren(source, element, document); // 递归处理子标签
 					// ---- 结束指令处理 ----
-					if (blockDirectiveNames.size() > 0) {
+					if (directiveNames.size() > 0) {
 						StringBuffer buf = new StringBuffer();
-						for (int i = blockDirectiveNames.size() - 1; i >= 0; i --) { // 倒序添加结束指令
-							String blockDirectiveName = (String)blockDirectiveNames.get(i);
-							buf.append("#");
-							buf.append(endDirective);
-							buf.append("(");
-							buf.append(blockDirectiveName);
-							buf.append(")");
+						for (int i = directiveNames.size() - 1; i >= 0; i --) { // 倒序添加结束指令
+							String directiveName = (String)directiveNames.get(i);
+							if (isBlockDirective(directiveName)) {
+								buf.append("#");
+								buf.append(endDirective);
+								buf.append("(");
+								buf.append(directiveName);
+								buf.append(")");
+							}
 						}
 						document.insert(element.getEnd(), buf.toString()); // 插入结束指令
 					}
 					// 清理临时容器
-					blockDirectiveNames.clear();
-					blockDirectiveValues.clear();
-					blockDirectiveAttributes.clear();
+					directiveNames.clear();
+					directiveValues.clear();
+					directiveAttributes.clear();
 				}
 			}
 		}
