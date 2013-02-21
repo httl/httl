@@ -27,6 +27,9 @@ import httl.spi.Loader;
 import httl.spi.loaders.ClasspathLoader;
 import httl.spi.loaders.MultiLoader;
 import httl.spi.parsers.templates.AdaptiveTemplate;
+import httl.test.method.A1;
+import httl.test.method.A1B1;
+import httl.test.method.A1B2;
 import httl.test.model.Book;
 import httl.test.model.Model;
 import httl.test.model.User;
@@ -61,6 +64,25 @@ import org.junit.Test;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class TemplateTest {
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void test_overloadMethod() throws Exception {
+		Engine engine = Engine.getEngine("httl-text.properties");
+		Template template = engine.getTemplate("/templates/overload_method.httl", Locale.CHINA, "UTF-8");
+
+		StringWriter writer = new StringWriter();
+
+		Map<String, Object> context  = new HashMap<String, Object>();
+		context.put("a1", new A1());
+		context.put("a1b1", new A1B1());
+		context.put("a1b2", new A1B2());
+		template.render(context, writer);
+
+
+		String expected = IOUtils.readToString(new InputStreamReader(TemplateTest.class.getClassLoader().getResourceAsStream("comment/results/overload_method.httl.txt"), "UTF-8"));
+		assertEquals(expected, writer.toString());
+	}
 
 	@SuppressWarnings("unchecked")
 	@Test
