@@ -17,6 +17,7 @@ package httl.spi.listeners;
 
 import httl.Context;
 import httl.internal.util.Reqiured;
+import httl.internal.util.UrlUtils;
 import httl.spi.Codec;
 import httl.spi.Listener;
 
@@ -42,25 +43,61 @@ public class DumpListener implements Listener {
 
 	private Codec dumpCodec;
 
+	private boolean dumpOnce;
+
+	private boolean dumpOverride;
+
+	/**
+	 * httl.properties: dump.directory=/tmp/dump
+	 */
 	@Reqiured
 	public void setDumpDirectory(String dumpDirectory) {
 		this.dumpDirectory = new File(dumpDirectory);
 	}
 
+	/**
+	 * httl.properties: dump.codec=$json.codec
+	 */
 	@Reqiured
 	public void setDumpCodec(Codec dumpCodec) {
 		this.dumpCodec = dumpCodec;
 	}
 
+	/**
+	 * httl.properties: dump.once=true
+	 */
+	public void setDumpOnce(boolean dumpOnce) {
+		this.dumpOnce = dumpOnce;
+	}
+
+	/**
+	 * httl.properties: dump.override=true
+	 */
+	public void setDumpOverride(boolean dumpOverride) {
+		this.dumpOverride = dumpOverride;
+	}
+
 	public void render(Context context) throws IOException, ParseException {
-		if (dumpDirectory == null || dumpCodec == null)
+		if (dumpDirectory == null || dumpCodec == null) {
 			return;
-		String prefix = context.getTemplate().getName() + "/" + DateUtils.format(new Date(), "yyyyMMddHHmmssSSS");
+		}
+		File file;
+		String prefix = UrlUtils.removeSuffix(context.getTemplate().getName());
 		String suffix = "." + dumpCodec.getFormat();
-		File file = new File(dumpDirectory, prefix + suffix);
-		int i = 2;
-		while (file.exists()) {
-			file = new File(dumpDirectory, prefix + "-" + (i ++) + suffix);
+		file = new File(dumpDirectory, prefix + suffix);
+		if (dumpOnce) {
+			if (file.exists()) {
+				return;
+			}
+		} else {
+			if (! dumpOverride) {
+				prefix += "-" + DateUtils.format(new Date(), "yyyyMMddHHmmssSSS");
+				file = new File(dumpDirectory, prefix + suffix);
+				int i = 2;
+				while (file.exists()) {
+					file = new File(dumpDirectory, prefix + "-" + (i ++) + suffix);
+				}
+			}
 		}
 		FileWriter out = new FileWriter(file);
 		try {

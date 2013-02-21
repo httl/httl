@@ -78,6 +78,17 @@ public class UrlUtils {
 		return n;
 	}
 	
+	public static String removeSuffix(String name) {
+		int i = name.lastIndexOf('.');
+		if (i > 0) {
+			int j = name.lastIndexOf('/');
+			if (i > j) {
+				return name.substring(i);
+			}
+		}
+		return name;
+	}
+	
 	public static String cleanName(String name) {
 		if (StringUtils.isEmpty(name)) {
 			throw new IllegalArgumentException("name == null");
