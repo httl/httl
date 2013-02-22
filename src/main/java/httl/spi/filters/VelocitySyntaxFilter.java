@@ -47,23 +47,23 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 	private static final int O = DfaScanner.POP - 4;
 
 	// PUSH，压栈2，即插值大括号栈，并回到状态7，即插值参数
-	private static final int P2 = DfaScanner.PUSH * 2 - 7;
+	private static final int P2 = DfaScanner.PUSH - 7;
 
 	// POP，弹栈2，即插值大括号栈，并回到状态7，即插值参数
-	private static final int O2 = DfaScanner.POP * 2 - 7;
+	private static final int O2 = DfaScanner.POP - 7;
 
 	// PUSH，压栈3，即插值小括号栈，并回到状态28，即插值参数
-	private static final int P3 = DfaScanner.PUSH * 3 - 28;
+	private static final int P3 = DfaScanner.PUSH - 28;
 
 	// POP，弹栈3，即插值小括号栈，并回到状态28，即插值参数，栈空回到状态29，即点号连接
-	private static final int O3 = DfaScanner.POP * 3 - 28 - DfaScanner.EMPTY * 29;
+	private static final int O3 = DfaScanner.POP - 28 - DfaScanner.EMPTY * 29;
 
 	// 插值语法状态机图
 	// 行表示状态
 	// 行列交点表示, 在该状态时, 遇到某类型的字符时, 切换到的下一状态(数组行号)
 	// E/B/T表示接收前面经过的字符为一个片断, R表示错误状态(这些状态均为负数)
 	static final int states[][] = {
-				  // 0.\s, 1.a-z, 2.#, 3.$, 4.!, 5.*, 6.(, 7.), 8.[, 9.], 10.{, 11.}, 12.", 13.', 14.`, 15.\, 16.\n, 17.., 18.其它
+				  // 0.\s, 1.a-z, 2.#, 3.$, 4.!, 5.*, 6.(, 7.), 8.[, 9.], 10.{, 11.}, 12.", 13.', 14.`, 15.\, 16.\r\n, 17.., 18.其它
 		/* 0.起始 */ { 1, 1, 2, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, }, // 初始状态或上一片断刚接收完成状态
 		/* 1.文本 */ { 1, 1, B, B, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, }, // 非指令文本内容
 		
@@ -104,7 +104,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 
 	static int getCharType(char ch) {
 		switch (ch) {
-			case ' ': case '\t': case '\r': case '\f': case '\b':
+			case ' ': case '\t': case '\f': case '\b':
 				return 0;
 			case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : 
 			case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' : 
@@ -139,7 +139,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 				return 14;
 			case '\\' : 
 				return 15;
-			case '\n':
+			case '\r': case '\n':
 				return 16;
 			case '.':
 				return 17;
