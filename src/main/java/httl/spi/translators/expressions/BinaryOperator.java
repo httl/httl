@@ -103,7 +103,7 @@ public final class BinaryOperator extends Operator {
 			leftCode = "(" + leftCode + ")";
 		}
 		String name = getName();
-		Map<String, Class<?>> types = getParameterTypes();
+		Map<String, Class<?>> types = getVariableTypes();
 		String rightCode = rightParameter.getCode();
 		if (StringUtils.isFunction(name)) {
 			name =  name.substring(1);
@@ -368,7 +368,7 @@ public final class BinaryOperator extends Operator {
 				|| "&&".equals(name)) {
 			return boolean.class;
 		}
-		Map<String, Class<?>> types = getParameterTypes();
+		Map<String, Class<?>> types = getVariableTypes();
 		Class<?> leftType = leftParameter.getReturnType();
 		if (StringUtils.isFunction(name)) {
 			name =  name.substring(1);
@@ -631,7 +631,7 @@ public final class BinaryOperator extends Operator {
 							if (Map.class.isAssignableFrom(leftType)
 									&& (rightTypes == null || rightTypes.length == 0 
 											|| (rightTypes.length == 1 && rightTypes[0] == null))) {
-								Map<String, Class<?>> types = getParameterTypes();
+								Map<String, Class<?>> types = getVariableTypes();
 								String var = getGenericVariableName(leftParameter);
 								if (var != null) {
 									Class<?> t = types.get(var + ":1"); // Map<K,V>第二个泛型 
@@ -698,7 +698,7 @@ public final class BinaryOperator extends Operator {
 							if (Map.class.isAssignableFrom(leftType)
 									&& (rightTypes == null || rightTypes.length == 0 
 											|| (rightTypes.length == 1 && rightTypes[0] == null))) {
-								Map<String, Class<?>> types = getParameterTypes();
+								Map<String, Class<?>> types = getVariableTypes();
 								String var = getGenericVariableName(leftParameter);
 								if (var != null) {
 									Class<?> t = types.get(var + ":1"); // Map<K,V>第二个泛型 

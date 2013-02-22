@@ -41,7 +41,7 @@ public abstract class Node implements Serializable {
 		return offset;
 	}
 
-	public Map<String, Class<?>> getParameterTypes() {
+	public Map<String, Class<?>> getVariableTypes() {
 		return parameterTypes;
 	}
 

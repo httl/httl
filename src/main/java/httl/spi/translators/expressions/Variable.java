@@ -50,7 +50,7 @@ public final class Variable extends Node {
 	}
 
 	public Class<?> getReturnType() throws ParseException {
-		Class<?> type = getParameterTypes().get(name);
+		Class<?> type = getVariableTypes().get(name);
 		if (type == null && defaultType != null) {
 			return defaultType;
 		}

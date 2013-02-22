@@ -65,7 +65,7 @@ public final class UnaryOperator extends Operator {
 			return ClassUtils.forName(getPackages(), type);
 		} else if (StringUtils.isFunction(getName())) {
 			String name = getName().substring(1);
-			Class<?> t = getParameterTypes().get(name);
+			Class<?> t = getVariableTypes().get(name);
 			if (t != null && Expression.class.isAssignableFrom(t)) {
 				return Object.class;
 			} else {
@@ -111,9 +111,9 @@ public final class UnaryOperator extends Operator {
 			return "(" + getName() + ")(" + parameter.getCode() + ")";
 		} else if (StringUtils.isFunction(getName())) {
 			String name = getName().substring(1);
-			Class<?> t = getParameterTypes().get(name);
+			Class<?> t = getVariableTypes().get(name);
 			if (t != null && Expression.class.isAssignableFrom(t)) {
-				return "(" + name + " == null ? null : " + name + ".evaluate(" + CollectionUtils.class.getName() + ".toMap(" + name + ".getParameterTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " )))";
+				return "(" + name + " == null ? null : " + name + ".evaluate(" + CollectionUtils.class.getName() + ".toMap(" + name + ".getVariableTypes().keySet(), new Object" + (parameter.getCode().length() == 0 ? "[0]" : "[] { " + parameter.getCode() + " }") + " )))";
 			} else {
 				name = ClassUtils.filterJavaKeyword(name);
 				Collection<Class<?>> functions = getFunctions();
