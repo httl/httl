@@ -24,9 +24,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import static org.junit.Assert.*;
 
 /**
@@ -35,13 +40,45 @@ import static org.junit.Assert.*;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @author Jerry Lee (oldratlee AT gmail DOT com)
  */
+@RunWith(Parameterized.class)
 public class ExceptionTest {
+	static boolean profile = "true".equals(System.getProperty("profile"));
+
+	@Parameterized.Parameters
+	public static Collection<Object[]> prepareData() throws Exception {
+		if (!profile)
+			System.out.println("========httl-exception.properties========");
+		Engine engine = Engine.getEngine("httl-exception.properties");
+
+		String dir = engine.getProperty("template.directory", "");
+		if (dir.length() > 0 && dir.startsWith("/")) {
+			dir = dir.substring(1);
+		}
+		if (dir.length() > 0 && ! dir.endsWith("/")) {
+			dir += "/";
+		}
+		File directory = new File(ExceptionTest.class.getClassLoader().getResource(dir + "templates/").getFile());
+		assertTrue(directory.isDirectory());
+
+		final List<Object[]> retTestData = new ArrayList<Object[]>();
+		File[] files = directory.listFiles();
+		for (int i = 0, n = files.length; i < n; i ++) {
+			File file = files[i];
+			retTestData.add(new Object[]{file.getName()});
+		}
+
+		return retTestData;
+	}
+
+	public ExceptionTest(String templateName) {
+		this.templateName = templateName;
+	}
+
+	private String templateName;
 
 	@Test
 	public void testException() throws Exception {
 		boolean profile = "true".equals(System.getProperty("profile"));
-		if (! profile)
-			System.out.println("========httl-exception.properties========");
 		Engine engine = Engine.getEngine("httl-exception.properties");
 		String dir = engine.getProperty("template.directory", "");
 		if (dir.length() > 0 && dir.startsWith("/")) {
@@ -50,37 +87,29 @@ public class ExceptionTest {
 		if (dir.length() > 0 && ! dir.endsWith("/")) {
 			dir += "/";
 		}
-		File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-		assertTrue(directory.isDirectory());
-		File[] files = directory.listFiles();
-		for (int i = 0, n = files.length; i < n; i ++) {
-			File file = files[i];
-			System.out.println(file.getName());
-			URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
-			if (url == null) {
-				throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName() + ".txt");
-			}
-			File result = new File(url.getFile());
-			if (! result.exists()) {
-				throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
-			}
-			try {
-				engine.getTemplate("/templates/" + file.getName());
-				fail(file.getName());
-			} catch (ParseException e) {
-				if (! profile) {
-					String message = e.getMessage();
-					assertTrue(StringUtils.isNotEmpty(message));
-					List<String> expected = IOUtils.readLines(new FileReader(result));
-					assertTrue(expected != null && expected.size() > 0);
-					for (String part : expected)  {
-						assertTrue(StringUtils.isNotEmpty(part));
-						part = StringUtils.unescapeString(part).trim();
-						assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
-					}
+		URL url = this.getClass().getClassLoader().getResource(dir + "results/" + templateName + ".txt");
+		if (url == null) {
+			throw new FileNotFoundException("Not found file: " + dir + "results/" + templateName + ".txt");
+		}
+		File result = new File(url.getFile());
+		if (! result.exists()) {
+			throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
+		}
+		try {
+			engine.getTemplate("/templates/" + templateName);
+			fail(templateName);
+		} catch (ParseException e) {
+			if (! profile) {
+				String message = e.getMessage();
+				assertTrue(StringUtils.isNotEmpty(message));
+				List<String> expected = IOUtils.readLines(new FileReader(result));
+				assertTrue(expected != null && expected.size() > 0);
+				for (String part : expected)  {
+					assertTrue(StringUtils.isNotEmpty(part));
+					part = StringUtils.unescapeString(part).trim();
+					assertTrue(templateName + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
 				}
 			}
 		}
 	}
-
 }

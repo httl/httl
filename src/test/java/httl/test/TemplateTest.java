@@ -65,6 +65,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(Parameterized.class) 
 public class TemplateTest {
+	static boolean profile = "true".equals(System.getProperty("profile"));
 
     @Parameters
     public static Collection<Object[]> prepareData() throws Exception {
@@ -174,7 +175,6 @@ public class TemplateTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testTemplate() throws Exception {
-		boolean profile = "true".equals(System.getProperty("profile"));
 		String include = System.getProperty("includes");
 		String exclude = System.getProperty("excludes");
 		Set<String> includes = new HashSet<String>();
