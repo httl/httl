@@ -19,9 +19,8 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class ScriptTest {
 
@@ -34,7 +33,7 @@ public class ScriptTest {
 		Bindings bindings = engine.createBindings();
 		bindings.put("user", "liangfei"); // 设置执行变量
 		String result = (String) engine.eval("#set(String welcome, String page, String user)${welcome}, ${user}, this is ${page} page."); // 执行表达式
-		Assert.assertEquals("hello, liangfei, this is test page.", result);
+		assertEquals("hello, liangfei, this is test page.", result);
 	}
 
 }

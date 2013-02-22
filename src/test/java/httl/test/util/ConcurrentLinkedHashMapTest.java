@@ -19,8 +19,8 @@ import httl.internal.util.ConcurrentLinkedHashMap;
 
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class ConcurrentLinkedHashMapTest {
 
@@ -28,17 +28,17 @@ public class ConcurrentLinkedHashMapTest {
 	public void testLru() {
 		Map<String, String> map = new ConcurrentLinkedHashMap<String, String>(2);
 		map.put("a", "1");
-		Assert.assertEquals(1, map.size());
-		Assert.assertEquals("1", map.get("a"));
+		assertEquals(1, map.size());
+		assertEquals("1", map.get("a"));
 		map.put("b", "2");
-		Assert.assertEquals(2, map.size());
-		Assert.assertEquals("1", map.get("a"));
-		Assert.assertEquals("2", map.get("b"));
+		assertEquals(2, map.size());
+		assertEquals("1", map.get("a"));
+		assertEquals("2", map.get("b"));
 		map.put("c", "3");
-		Assert.assertEquals(2, map.size());
-		Assert.assertNull(map.get("a"));
-		Assert.assertEquals("2", map.get("b"));
-		Assert.assertEquals("3", map.get("c"));
+		assertEquals(2, map.size());
+		assertNull(map.get("a"));
+		assertEquals("2", map.get("b"));
+		assertEquals("3", map.get("c"));
 	}
 
 }

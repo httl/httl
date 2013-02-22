@@ -18,21 +18,21 @@ package httl.test.util;
 import java.text.DecimalFormat;
 
 import httl.internal.util.StringUtils;
-import junit.framework.Assert;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class StringUtilsTest {
 	static boolean profile = "true".equals(System.getProperty("profile"));
 
 	@Test
 	public void testEscapeString() {
-		Assert.assertEquals("a\\\"b\\\"c\\\'d\\\'e\\\\1\\t2\\n3\\r4\\b5\\f6", StringUtils.escapeString("a\"b\"c\'d\'e\\1\t2\n3\r4\b5\f6"));
+		assertEquals("a\\\"b\\\"c\\\'d\\\'e\\\\1\\t2\\n3\\r4\\b5\\f6", StringUtils.escapeString("a\"b\"c\'d\'e\\1\t2\n3\r4\b5\f6"));
 	}
 
 	@Test
 	public void testUnescapeString() {
-		Assert.assertEquals("a\"b\"c\'d\'e\\1\t2\n3\r4\b5\f6", StringUtils.unescapeString("a\\\"b\\\"c\\\'d\\\'e\\\\1\\t2\\n3\\r4\\b5\\f6"));
+		assertEquals("a\"b\"c\'d\'e\\1\t2\n3\r4\b5\f6", StringUtils.unescapeString("a\\\"b\\\"c\\\'d\\\'e\\\\1\\t2\\n3\\r4\\b5\\f6"));
 	}
 
 	@Test
@@ -52,54 +52,54 @@ public class StringUtilsTest {
 
 	@Test
 	public void testEscapeXmlChar() {
-		Assert.assertEquals("abcd", new String(StringUtils.escapeXml("abcd".toCharArray())));
-		Assert.assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", new String(StringUtils.escapeXml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d".toCharArray())));
+		assertEquals("abcd", new String(StringUtils.escapeXml("abcd".toCharArray())));
+		assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", new String(StringUtils.escapeXml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d".toCharArray())));
 	}
 
 	@Test
 	public void testEscapeXml() {
-		Assert.assertEquals("abcd", StringUtils.escapeXml("abcd"));
-		Assert.assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", StringUtils.escapeXml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d"));
+		assertEquals("abcd", StringUtils.escapeXml("abcd"));
+		assertEquals("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d", StringUtils.escapeXml("a<table border=\"0\" color=\'red\'>b&lt;c</table>d"));
 	}
 
 	@Test
 	public void testUnescapeXml() {
-		Assert.assertEquals("abcd", StringUtils.unescapeXml("abcd"));
-		Assert.assertEquals("a<table border=\"0\" color=\'red\'>b&lt;c</table>d", StringUtils.unescapeXml("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d"));
+		assertEquals("abcd", StringUtils.unescapeXml("abcd"));
+		assertEquals("a<table border=\"0\" color=\'red\'>b&lt;c</table>d", StringUtils.unescapeXml("a&lt;table border=&quot;0&quot; color=&apos;red&apos;&gt;b&amp;lt;c&lt;/table&gt;d"));
 	}
 
 	@Test
 	public void testTrimBlankLine() {
-		Assert.assertEquals("12345678", StringUtils.trimBlankLine("12345678"));
-		Assert.assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f ")));
-		Assert.assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\n\t\r\b\f ")));
-		Assert.assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n")));
-		Assert.assertEquals(StringUtils.escapeString("\t\n"), StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n\t\n")));
-		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));
-		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f ")));
-		Assert.assertEquals(StringUtils.escapeString("\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\n\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t ")));
+		assertEquals("12345678", StringUtils.trimBlankLine("12345678"));
+		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f ")));
+		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\n\t\r\b\f ")));
+		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n")));
+		assertEquals(StringUtils.escapeString("\t\n"), StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n\t\n")));
+		assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));
+		assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f ")));
+		assertEquals(StringUtils.escapeString("\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\n\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t ")));
 	}
 
 	@Test
 	public void testClearBlankLine() {
-		Assert.assertEquals("12345678", StringUtils.clearBlankLine("12345678"));
-		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));
-		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine("\n\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t\n\n")));
-		Assert.assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine(" \t\n\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t\n\n \t")));
+		assertEquals("12345678", StringUtils.clearBlankLine("12345678"));
+		assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));
+		assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine("\n\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t\n\n")));
+		assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.clearBlankLine(" \t\n\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t\n\n \t")));
 	}
 
 	@Test
 	public void testClearBlank() {
-		Assert.assertEquals("12345678", StringUtils.clearBlank("12345678"));
-		Assert.assertEquals("12345678", StringUtils.clearBlank("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8"));
-		Assert.assertEquals("12345678", StringUtils.clearBlank(" 1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8 "));
+		assertEquals("12345678", StringUtils.clearBlank("12345678"));
+		assertEquals("12345678", StringUtils.clearBlank("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8"));
+		assertEquals("12345678", StringUtils.clearBlank(" 1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8 "));
 	}
 
 	@Test
 	public void testCompressBlank() {
-		Assert.assertEquals("12345678", StringUtils.clearBlank("12345678"));
-		Assert.assertEquals("1 2 3 4 5 6 7 8", StringUtils.compressBlank("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8"));
-		Assert.assertEquals(" 1 2 3 4 5 6 7 8 ", StringUtils.compressBlank(" 1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8 "));
+		assertEquals("12345678", StringUtils.clearBlank("12345678"));
+		assertEquals("1 2 3 4 5 6 7 8", StringUtils.compressBlank("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8"));
+		assertEquals(" 1 2 3 4 5 6 7 8 ", StringUtils.compressBlank(" 1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8 "));
 	}
 
 }
