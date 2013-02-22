@@ -54,7 +54,6 @@ import httl.spi.parsers.templates.WriterTemplate;
 import httl.spi.translators.expressions.ExpressionImpl;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -194,14 +193,7 @@ public class DefaultParser implements Parser {
 			return states[state][getCharType(ch)];
 		}
 	};
-	
-	public static void main(String[] args) throws Exception {
-		List<Token> tokens = scanner.scan(IOUtils.readToString(new InputStreamReader(DefaultParser.class.getClassLoader().getResourceAsStream("text.httl"))));
-		for (Token token : tokens) {
-			System.out.println(token.getMessage().replace("\n", "\\n").replace("\r", "\\r") + "\n");
-		}
-	}
-	
+
 	private String doParse(Resource resource, boolean stream, String source, Translator translator, 
 							 List<String> parameters, List<Class<?>> parameterTypes, 
 							 Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
@@ -235,7 +227,7 @@ public class DefaultParser implements Parser {
 					name = message.substring(1);
 					value = "";
 				}
-				if (! (name.startsWith(varDirective) || name.startsWith(setDirective)
+				if (! (name.startsWith(legacySetDirective) || name.startsWith(setDirective)
 						|| name.startsWith(ifDirective) || name.startsWith(elseifDirective)
 						|| name.startsWith(elseDirective) || name.startsWith(foreachDirective)
 						|| name.startsWith(breakifDirective) || name.startsWith(macroDirective)
@@ -293,7 +285,7 @@ public class DefaultParser implements Parser {
 							String key = getMacroPath(resource.getName(), var);
 							String es = macro.toString();
 							if (StringUtils.isNotEmpty(param)) {
-								es = getDiretive(varDirective, param) + es;
+								es = getDiretive(legacySetDirective, param) + es;
 							}
 							macros.put(var, parseClass(new StringResource(getEngine(), key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), types, stream, macroParameterStart));
 							Class<?> cls = types.get(var);
@@ -366,15 +358,15 @@ public class DefaultParser implements Parser {
 		return buf.toString();
 	}
 
-	private static final Pattern ASSIGN_PATTERN = Pattern.compile(";\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)");
+	private static final Pattern DEFINE_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
+
+	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)[^=]");
 
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+");
 
-	private static final Pattern VAR_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
-
 	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
 
-	private String varDirective = "var";
+	private String legacySetDirective = "var";
 
 	private String setDirective = "set";
 
@@ -473,13 +465,6 @@ public class DefaultParser implements Parser {
 	 */
 	public void setImportSizers(String[] importSizers) {
 		this.importSizers = importSizers;
-	}
-
-	/**
-	 * httl.properties: var.directive=var
-	 */
-	public void setVarDirective(String varDirective) {
-		this.varDirective = varDirective;
 	}
 
 	/**
@@ -1565,106 +1550,108 @@ public class DefaultParser implements Parser {
 			buf.append("	if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") break;\n");
-		} else if (setDirective.equals(name)) {
-			Matcher matcher = ASSIGN_PATTERN.matcher(";" + value);
-			List<Object[]> list = new ArrayList<Object[]>();
-			Object[] pre = null;
-			while (matcher.find()) {
-				if (pre != null) {
-					pre[4] = value.substring(((Integer) pre[3]) - 1, matcher.start() - 1).trim();
-				}
-				Object[] item = new Object[6];
-				if (matcher.group(2) == null || matcher.group(2).length() == 0) {
-					item[0] = null;
-					item[1] = matcher.group(1);
-				} else {
-					item[0] = matcher.group(1);
-					item[1] = matcher.group(2);
-				}
-				item[2] = matcher.group(3);
-				item[3] = matcher.end();
-				item[5] = matcher.start(1) - 1; // 减掉前面追加的分号
-				list.add(item);
-				pre = item;
-			}
-			if (pre != null) {
-				pre[4] = value.substring(((Integer) pre[3]) - 1).trim();
-			}
-			if (list.isEmpty()) {
-				throw new ParseException("Not found \"=\" in set", offset);
-			}
-			for (Object[] item : list) {
-				String type = (String) item[0];
-				String var = (String) item[1];
-				String oper = (String) item[2];
-				int end = (Integer) item[3];
-				String expr = (String) item[4];
-				int start = (Integer) item[5];
-				Expression expression = translator.translate(expr, types, offset + end);
-				getVariables.addAll(expression.getParameterTypes().keySet());
-				if (StringUtils.isEmpty(type)) {
-					type = expression.getReturnType().getCanonicalName();
-				}
-				Class<?> clazz = ClassUtils.forName(importPackages, type);
-				Class<?> cls = types.get(var);
-				if (cls != null && ! cls.equals(clazz)) {
-					throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset + start);
-				}
-				types.put(var, clazz);
-				setVariables.add(var);
-				buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
-				String ctx = null;
-				if (":=".equals(oper)) {
-					ctx = "($context.getParent() != null ? $context.getParent() : $context)";
-					returnTypes.put(var, clazz);
-				} else if (! ".=".equals(oper)) {
-					ctx = "$context";
-				}
-				if (StringUtils.isNotEmpty(ctx)) {
-					buf.append("	" + ctx + ".put(\"");
-					buf.append(var);
-					buf.append("\", ");
-					buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
-					buf.append(");\n");
-				}
-			}
-		} else if (varDirective.equals(name)) {
+		} else if (setDirective.equals(name) || legacySetDirective.equals(name)) {
 			if (StringUtils.isEmpty(value)) {
-				throw new ParseException("The #" + varDirective + " parameters == null!", begin);
+				throw new ParseException("The #" + name + " parameters == null!", begin);
 			}
-			value = BLANK_PATTERN.matcher(value).replaceAll(" ");
-			List<String> vs = new ArrayList<String>();
-			List<Integer> os = new ArrayList<Integer>();
-			Matcher matcher = VAR_PATTERN.matcher(value);
-			while (matcher.find()) {
-				StringBuffer rep = new StringBuffer();
-				matcher.appendReplacement(rep, "$1");
-				String v = rep.toString();
-				vs.add(v);
-				os.add(offset + matcher.end(1) - v.length());
-			}
-			for (int n = 0; n < vs.size(); n ++) {
-				String v = vs.get(n).trim();
-				int o = os.get(n);
-				String var;
-				String type;
-				int i = v.lastIndexOf(' ');
-				if (i <= 0) {
-					type = defaultVariableType == null ? Object.class.getSimpleName() : defaultVariableType.getCanonicalName();
-					var = v;
-				} else {
-					type = v.substring(0, i).trim();
-					var = v.substring(i + 1).trim();
+			if (value.contains("=")) {
+				Matcher matcher = ASSIGN_PATTERN.matcher("," + value);
+				List<Object[]> list = new ArrayList<Object[]>();
+				Object[] pre = null;
+				while (matcher.find()) {
+					if (pre != null) {
+						pre[4] = value.substring(((Integer) pre[3]) - 1, matcher.start() - 1).trim();
+					}
+					Object[] item = new Object[6];
+					if (matcher.group(2) == null || matcher.group(2).length() == 0) {
+						item[0] = null;
+						item[1] = matcher.group(1);
+					} else {
+						item[0] = matcher.group(1);
+						item[1] = matcher.group(2);
+					}
+					item[2] = matcher.group(3);
+					item[3] = matcher.end(3);
+					item[5] = matcher.start(1) - 1; // 减掉前面追加的分号
+					list.add(item);
+					pre = item;
 				}
-				type = parseGenericType(type, var, types, o);
-				Class<?> clazz = ClassUtils.forName(importPackages, type);
-				Class<?> cls = types.get(var);
-				if (cls != null && ! cls.equals(clazz)) {
-					throw new ParseException("Defined different type to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), o);
+				if (pre != null) {
+					pre[4] = value.substring(((Integer) pre[3]) - 1).trim();
 				}
-				types.put(var, clazz);
-				parameters.add(var);
-				parameterTypes.add(clazz);
+				if (list.isEmpty()) {
+					throw new ParseException("Not found \"=\" in set", offset);
+				}
+				for (Object[] item : list) {
+					String type = (String) item[0];
+					String var = (String) item[1];
+					String oper = (String) item[2];
+					int end = (Integer) item[3];
+					String expr = (String) item[4];
+					int start = (Integer) item[5];
+					Expression expression = translator.translate(expr, types, offset + end);
+					getVariables.addAll(expression.getParameterTypes().keySet());
+					if (StringUtils.isEmpty(type)) {
+						type = expression.getReturnType().getCanonicalName();
+					}
+					Class<?> clazz = ClassUtils.forName(importPackages, type);
+					Class<?> cls = types.get(var);
+					if (cls != null && ! cls.equals(clazz)) {
+						throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset + start);
+					}
+					types.put(var, clazz);
+					setVariables.add(var);
+					buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
+					String ctx = null;
+					if (":=".equals(oper)) {
+						ctx = "($context.getParent() != null ? $context.getParent() : $context)";
+						returnTypes.put(var, clazz);
+					} else if (! ".=".equals(oper)) {
+						ctx = "$context";
+					}
+					if (StringUtils.isNotEmpty(ctx)) {
+						buf.append("	" + ctx + ".put(\"");
+						buf.append(var);
+						buf.append("\", ");
+						buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
+						buf.append(");\n");
+					}
+				}
+			} else {
+				value = BLANK_PATTERN.matcher(value).replaceAll(" ");
+				List<String> vs = new ArrayList<String>();
+				List<Integer> os = new ArrayList<Integer>();
+				Matcher matcher = DEFINE_PATTERN.matcher(value);
+				while (matcher.find()) {
+					StringBuffer rep = new StringBuffer();
+					matcher.appendReplacement(rep, "$1");
+					String v = rep.toString();
+					vs.add(v);
+					os.add(offset + matcher.end(1) - v.length());
+				}
+				for (int n = 0; n < vs.size(); n ++) {
+					String v = vs.get(n).trim();
+					int o = os.get(n);
+					String var;
+					String type;
+					int i = v.lastIndexOf(' ');
+					if (i <= 0) {
+						type = defaultVariableType == null ? Object.class.getSimpleName() : defaultVariableType.getCanonicalName();
+						var = v;
+					} else {
+						type = v.substring(0, i).trim();
+						var = v.substring(i + 1).trim();
+					}
+					type = parseGenericType(type, var, types, o);
+					Class<?> clazz = ClassUtils.forName(importPackages, type);
+					Class<?> cls = types.get(var);
+					if (cls != null && ! cls.equals(clazz)) {
+						throw new ParseException("Defined different type to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), o);
+					}
+					types.put(var, clazz);
+					parameters.add(var);
+					parameterTypes.add(clazz);
+				}
 			}
 		}else {
 			throw new ParseException("Unsupported directive " + name, begin);

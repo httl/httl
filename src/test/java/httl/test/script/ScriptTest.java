@@ -33,7 +33,7 @@ public class ScriptTest {
 		engine.put("page", "test"); // 设置引擎变量
 		Bindings bindings = engine.createBindings();
 		bindings.put("user", "liangfei"); // 设置执行变量
-		String result = (String) engine.eval("<!--#var(String welcome, String page, String user)-->${welcome}, ${user}, this is ${page} page."); // 执行表达式
+		String result = (String) engine.eval("#set(String welcome, String page, String user)${welcome}, ${user}, this is ${page} page."); // 执行表达式
 		Assert.assertEquals("hello, liangfei, this is test page.", result);
 	}
 
