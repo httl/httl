@@ -61,13 +61,13 @@ import org.junit.runners.Parameterized.Parameters;
  * TemplateTest
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @author Jerry Lee (oldratlee AT gmail DOT com)
  */
 @RunWith(Parameterized.class) 
 public class TemplateTest {
 
     @Parameters
-    public static Collection<Object[]> prepareData() throws Exception {  
-    	List<Object[]> tests = new ArrayList<Object[]>();
+    public static Collection<Object[]> prepareData() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		format.setTimeZone(TimeZone.getTimeZone("+0"));
 		User user = new User("liangfei", "admin", "Y");
@@ -113,6 +113,7 @@ public class TemplateTest {
 		context.put("books2", books2);
 		context.put("booklist2", Arrays.asList(books2));
 		context.put("bookmap2", bookmap2);
+
 		Model model = new Model();
 		model.setChinese("中文");
 		model.setImpvar("abcxyz");
@@ -128,11 +129,15 @@ public class TemplateTest {
 		model.setBooks2(books2);
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
+
+	    final List<Object[]> retTestData = new ArrayList<Object[]>();
 		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-attribute.properties" };
 		for (String config : configs) {
 			Engine engine = Engine.getEngine(config);
+
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);
 			String json = codecs[0].toString("context", context);
+
 			Object[] maps = new Object[] {context, model, json, null};
 			for (Object map : maps) {
 				String dir = engine.getProperty("template.directory", "");
@@ -147,11 +152,11 @@ public class TemplateTest {
 				File[] files = directory.listFiles();
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
-					tests.add(new Object[] {config, map, file.getName()});
+					retTestData.add(new Object[]{config, map, file.getName()});
 				}
 			}
 		} 
-        return tests;  
+        return retTestData;
     }
 
 	private String config;
