@@ -1148,16 +1148,7 @@ public class DefaultParser implements Parser {
 	}
 	
 	private String getTypeName(Class<?> type) {
-		Class<?> pkgClass = type.isArray() ? type.getComponentType() : type;
-		String pkgName = pkgClass.getPackage() == null ? null : pkgClass.getPackage().getName();
-		String typeName;
-		if (pkgName != null && ("java.lang".equals(pkgName) 
-				|| (importPackageSet != null && importPackageSet.contains(pkgName)))) {
-			typeName = type.getSimpleName();
-		} else {
-			typeName = type.getCanonicalName();
-		}
-		return typeName;
+		return type.getCanonicalName();
 	}
 
 	private String toTypeCode(Map<String, Class<?>> types) {
