@@ -11,20 +11,21 @@ public abstract class DfaScanner {
 	// state = BREAK - 1 // 结束并退回1个字符，即不包含当前字符
 	public static final int BREAK = -1;
 
-	// PUSH，压栈，最多100个栈
+	// PUSH，压栈，并回到指定状态，最多100个栈
 	// state = PUSH * 第几个栈 - 压栈后回到状态数
 	// state = PUSH * 2 - 4 // 压入第2个栈，压栈后回到状态4
 	public static final int PUSH = -100;
 
-	// POP，弹栈，如果栈为空，则结束片段
-	// state = POP * 第几个栈 - 弹栈后回到状态数
-	// state = POP * 2 - 4 // 弹出第2个栈，弹栈后回到状态4
-	public static final int POP = -10000;
+	// POP，弹栈，并回到指定状态，栈空回到起始状态0，表示结束片段
+	// state = POP * 第几个栈 - 弹栈后回到状态数 - EMPTY * 栈空回到状态数
+	// state = POP * 2 - 4 - EMPTY * 5 // 弹出第2个栈，弹栈后回到状态4，栈空回到状态5
+	public static final int POP = -1000000;
+	public static final int EMPTY = 10000;
 
 	// ERROR，解析出错，抛出异常
 	// state = ERROR - 错误码
 	// state = ERROR - 1 // 出错，并返回错误码为1的异常信息。
-	public static final int ERROR = -1000000;
+	public static final int ERROR = -100000000;
 
 	public List<Token> scan(String charStream) throws ParseException {
 		List<Token> tokens = new ArrayList<Token>();
@@ -59,15 +60,23 @@ public abstract class DfaScanner {
 			if (state <= POP) {
 				int n = - (state % POP);
 				int p = (state - n) / POP - 1;
+				int e = 0;
+				if (n > EMPTY) {
+					e = (n - n % EMPTY) / EMPTY;
+					n = n % EMPTY;
+				}
 				if (p >= stack.length) {
 					throw new ParseException("DFAScanner.mismatch.stack", offset - buffer.length());
 				}
-				stack[p] = stack[p] - 1;
-				if (stack[p] < 0) {
+				if (stack[p] <= 0) {
 					throw new ParseException("DFAScanner.mismatch.stack", offset - buffer.length());
 				}
+				stack[p] = stack[p] - 1;
 				if (stack[p] == 0) {
-					state = BREAK;
+					state = e;
+					if (state == 0) {
+						state = BREAK;
+					}
 				} else {
 					state = n;
 					continue;

@@ -1,0 +1,7 @@
+<table>
+  #foreach($book in $books)
+  <tr>
+    <td>$book.class.name</td>
+  </tr>
+  #end
+</table>
