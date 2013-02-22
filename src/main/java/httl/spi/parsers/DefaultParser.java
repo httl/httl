@@ -202,11 +202,13 @@ public class DefaultParser implements Parser {
 		LinkedStack<String> valueStack = new LinkedStack<String>();
 		StringBuffer macro = null;
 		int macroParameterStart = 0;
+		String filterKey = null;
 		VolatileReference<Filter> filterReference = new VolatileReference<Filter>();
 		filterReference.set(textFilter);
 		StringBuffer buf = new StringBuffer();
 		List<Token> tokens = scanner.scan(source);
-		for (Token token : tokens) {
+		for (int t = 0; t < tokens.size(); t ++) {
+			Token token = tokens.get(t);
 			String message = token.getMessage();
 			int offset = token.getOffset();
 			if (message.length() > 1 && message.charAt(0) == '#'
@@ -232,7 +234,7 @@ public class DefaultParser implements Parser {
 						|| name.startsWith(elseDirective) || name.startsWith(foreachDirective)
 						|| name.startsWith(breakifDirective) || name.startsWith(macroDirective)
 						|| name.startsWith(endDirective))) {
-					throw new ParseException("Unsupported directive #" + name + ".", offset);
+					throw new ParseException("Unsupported directive #" + name + " ", offset);
 				}
 				if (endDirective.equals(name)) {
 					if (nameStack.isEmpty()) {
@@ -350,10 +352,20 @@ public class DefaultParser implements Parser {
 				if (message.startsWith("#[") && message.endsWith("]#")) {
 					message = message.substring(2, message.length() - 2);
 				} else {
+					int r = t + 1;
+					while (r < tokens.size()) { // 将被状态机打散的非指令#和$合到文本中
+						String m = tokens.get(r).getMessage();
+						if ("#".equals(m) || "$".equals(m)) {
+							message += m;
+							t = r;
+						}
+						r ++;
+					}
 					message = filterEscape(message);
 				}
-				buf.append(getTextCode(message, filterReference, textFields, getVariables, seq, stream, false));
+				buf.append(getTextCode(message, filterReference, filterKey, textFields, getVariables, seq, stream, false));
 			}
+			filterKey = message;
 		}
 		return buf.toString();
 	}
@@ -362,7 +374,7 @@ public class DefaultParser implements Parser {
 
 	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)[^=]");
 
-	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+");
+	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
 	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
 
@@ -471,56 +483,56 @@ public class DefaultParser implements Parser {
 	 * httl.properties: set.directive=set
 	 */
 	public void setSetDirective(String setDirective) {
-		this.setDirective = setDirective;
+		this.setDirective = setDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: if.directive=if
 	 */
 	public void setIfDirective(String ifDirective) {
-		this.ifDirective = ifDirective;
+		this.ifDirective = ifDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: elseif.directive=elseif
 	 */
 	public void setElseifDirective(String elseifDirective) {
-		this.elseifDirective = elseifDirective;
+		this.elseifDirective = elseifDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: else.directive=else
 	 */
 	public void setElseDirective(String elseDirective) {
-		this.elseDirective = elseDirective;
+		this.elseDirective = elseDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: foreach.directive=foreach
 	 */
 	public void setForeachDirective(String foreachDirective) {
-		this.foreachDirective = foreachDirective;
+		this.foreachDirective = foreachDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: breakif.directive=breakif
 	 */
 	public void setBreakifDirective(String breakifDirective) {
-		this.breakifDirective = breakifDirective;
+		this.breakifDirective = breakifDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: macro.directive=macro
 	 */
 	public void setMacroDirective(String macroDirective) {
-		this.macroDirective = macroDirective;
+		this.macroDirective = macroDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: end.directive=end
 	 */
 	public void setEndDirective(String endDirective) {
-		this.endDirective = endDirective;
+		this.endDirective = endDirective.toLowerCase();
 	}
 
 	/**
@@ -1225,16 +1237,17 @@ public class DefaultParser implements Parser {
 
 	private String filterEscape(String source) {
 		StringBuffer buf = new StringBuffer();
-		Matcher matcher = ESCAPE_PATTERN.matcher(source);
+		Matcher matcher = ESCAPE_PATTERN.matcher(source + "#"); // 预加#号简化正则表达式
 		while(matcher.find()) {
-			String slash = matcher.group();
+			String escape = matcher.group();
+			String slash = escape.substring(0, escape.length() - 1);
+			String symbol = escape.substring(escape.length() - 1);
 			int length = slash.length();
 			int half = (length - length % 2) / 2;
-			slash = slash.substring(0, half);
-			matcher.appendReplacement(buf, Matcher.quoteReplacement(slash));
+			matcher.appendReplacement(buf, Matcher.quoteReplacement(slash.substring(0, half) + symbol));
 		}
 		matcher.appendTail(buf);
-		return buf.toString();
+		return buf.toString().substring(0, buf.length() - 1); // 减掉预加的#号
 	}
 	
 	private String getExpressionPart(String symbol, String expr, String code, Class<?> returnType, boolean stream, Set<String> getVariables, StringBuilder textFields, AtomicInteger seq) {
@@ -1263,7 +1276,7 @@ public class DefaultParser implements Parser {
 				code = IOUtils.class.getName() + ".readToString((" + code + ").getReader())";
 			}
 			getVariables.add(formatterVariable);
-			String key = getTextPart(expr, null, textFields, seq, stream, true);
+			String key = getTextPart(expr, null, null, textFields, seq, stream, true);
 			if (! stream && Object.class.equals(returnType)) {
 				String pre = "";
 				String var = "$obj" + TMP_VAR_SEQ.getAndIncrement();
@@ -1330,24 +1343,24 @@ public class DefaultParser implements Parser {
 				if (! nofilter && valueFilter != null) {
 					str = valueFilter.filter(expression, str);
 				}
-				return "	$output.write(" + getTextPart(str, null, textFields, seq, stream, false) + ");\n";
+				return "	$output.write(" + getTextPart(str, null, null, textFields, seq, stream, false) + ");\n";
 			} finally {
 				Context.popContext();
 			}
 		}
 	}
 
-	private void appendText(StringBuilder buf, String txt, Filter filter, StringBuilder textFields, AtomicInteger seq, boolean stream, boolean string) {
-		String part = getTextPart(txt, filter, textFields, seq, stream, string);
+	private void appendText(StringBuilder buf, String txt, Filter filter, String filterKey, StringBuilder textFields, AtomicInteger seq, boolean stream, boolean string) {
+		String part = getTextPart(txt, filter, filterKey, textFields, seq, stream, string);
 		if (StringUtils.isNotEmpty(part)) {
 			buf.append("	$output.write(" + part + ");\n");
 		}
 	}
 	
-	private String getTextPart(String txt, Filter filter, StringBuilder textFields, AtomicInteger seq, boolean stream, boolean string) {
+	private String getTextPart(String txt, Filter filter, String filterKey, StringBuilder textFields, AtomicInteger seq, boolean stream, boolean string) {
 		if (StringUtils.isNotEmpty(txt)) {
 			if (filter != null) {
-				txt = filter.filter(txt, txt);
+				txt = filter.filter(filterKey, txt);
 			}
 			String var = "$TXT" + seq.incrementAndGet();
 			if (string) {
@@ -1377,7 +1390,7 @@ public class DefaultParser implements Parser {
 		return "";
 	}
 
-	private String getTextCode(String txt, VolatileReference<Filter> filterReference, StringBuilder textFields, Set<String> getVariables, AtomicInteger seq, boolean stream, boolean string) {
+	private String getTextCode(String txt, VolatileReference<Filter> filterReference, String filterKey, StringBuilder textFields, Set<String> getVariables, AtomicInteger seq, boolean stream, boolean string) {
 		if (StringUtils.isNotEmpty(txt)) {
 			Filter filter = filterReference.get();
 			StringBuilder buf = new StringBuilder();
@@ -1414,7 +1427,7 @@ public class DefaultParser implements Parser {
 						int begin = 0;
 						for (Map.Entry<Integer, Set<String>> entry : switchesd.entrySet()) {
 							int end = entry.getKey();
-							appendText(buf, txt.substring(begin, end), filter, textFields, seq, stream, false);
+							appendText(buf, txt.substring(begin, end), filter, filterKey, textFields, seq, stream, false);
 							begin = end;
 							for (String location : entry.getValue()) {
 								if (textLocations != null && textLocations.contains(location)) {
@@ -1433,7 +1446,7 @@ public class DefaultParser implements Parser {
 					}
 				}
 			}
-			appendText(buf, txt, filter, textFields, seq, stream, false);
+			appendText(buf, txt, filter, filterKey, textFields, seq, stream, false);
 			return buf.toString();
 		}
 		return "";

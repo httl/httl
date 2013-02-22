@@ -1,4 +1,21 @@
+/*
+ * Copyright 2011-2013 HTTL Team.
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package httl.spi.filters;
+
+import httl.spi.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +27,16 @@ import net.htmlparser.jericho.OutputDocument;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 
+/**
+ * AttributeSyntaxFilter. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.parsers.AbstractParser#setTemplateFilter(Filter)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public class AttributeSyntaxFilter extends AbstractFilter {
 
-	private String varDirective = "var";
+	private String legacySetDirective = "var";
 
 	private String setDirective = "set";
 
@@ -33,66 +57,59 @@ public class AttributeSyntaxFilter extends AbstractFilter {
 	private String attributeNamespace;
 
 	/**
-	 * httl.properties: var.directive=var
-	 */
-	public void setVarDirective(String varDirective) {
-		this.varDirective = varDirective;
-	}
-
-	/**
 	 * httl.properties: set.directive=set
 	 */
 	public void setSetDirective(String setDirective) {
-		this.setDirective = setDirective;
+		this.setDirective = setDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: if.directive=if
 	 */
 	public void setIfDirective(String ifDirective) {
-		this.ifDirective = ifDirective;
+		this.ifDirective = ifDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: elseif.directive=elseif
 	 */
 	public void setElseifDirective(String elseifDirective) {
-		this.elseifDirective = elseifDirective;
+		this.elseifDirective = elseifDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: else.directive=else
 	 */
 	public void setElseDirective(String elseDirective) {
-		this.elseDirective = elseDirective;
+		this.elseDirective = elseDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: foreach.directive=foreach
 	 */
 	public void setForeachDirective(String foreachDirective) {
-		this.foreachDirective = foreachDirective;
+		this.foreachDirective = foreachDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: breakif.directive=breakif
 	 */
 	public void setBreakifDirective(String breakifDirective) {
-		this.breakifDirective = breakifDirective;
+		this.breakifDirective = breakifDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: macro.directive=macro
 	 */
 	public void setMacroDirective(String macroDirective) {
-		this.macroDirective = macroDirective;
+		this.macroDirective = macroDirective.toLowerCase();
 	}
 
 	/**
 	 * httl.properties: end.directive=end
 	 */
 	public void setEndDirective(String endDirective) {
-		this.endDirective = endDirective;
+		this.endDirective = endDirective.toLowerCase();
 	}
 
 	/**
@@ -106,7 +123,7 @@ public class AttributeSyntaxFilter extends AbstractFilter {
 	}
 
 	private boolean isDirective(String name) {
-		return varDirective.equals(name) || setDirective.equals(name) 
+		return legacySetDirective.equals(name) || setDirective.equals(name) 
 				 ||ifDirective.equals(name) || elseifDirective.equals(name)
 				 || elseDirective.equals(name) || foreachDirective.equals(name)
 				 || breakifDirective.equals(name) || macroDirective.equals(name) 

@@ -912,49 +912,53 @@ public class StringUtils {
 		}
 		return value;
 	}
-
-	public static String trimBlankLine(String value) {
-		if (StringUtils.isEmpty(value)) {
+	
+	public static String trimBlankLine(String value, boolean left, boolean right) {
+		if (StringUtils.isEmpty(value) || (! left && ! right)) {
 			return value;
 		}
 		int len = value.length();
 		int len1 = len - 1;
 		int start = 0;
-		loop: for (int i = 0; i < len; i ++) {
-			char ch = value.charAt(i);
-			switch (ch) {
-				case ' ':
-				case '\t':
-				case '\r':
-				case '\b':
-				case '\f':
-					if (i < len1) {
-						continue;
-					}
-				case '\n':
-					start = i + 1;
-				default:
-					break loop;
+		if (left) {
+			loop: for (int i = 0; i < len; i ++) {
+				char ch = value.charAt(i);
+				switch (ch) {
+					case ' ':
+					case '\t':
+					case '\r':
+					case '\b':
+					case '\f':
+						if (i < len1) {
+							continue;
+						}
+					case '\n':
+						start = i + 1;
+					default:
+						break loop;
+				}
 			}
 		}
 		int end = len;
-		loop: for (int i = len1; i > start; i --) {
-			char ch = value.charAt(i);
-			switch (ch) {
-				case ' ':
-				case '\t':
-				case '\r':
-				case '\b':
-				case '\f':
-					if (i == start + 1) {
-						end = start;
+		if (right) {
+			loop: for (int i = len1; i > start; i --) {
+				char ch = value.charAt(i);
+				switch (ch) {
+					case ' ':
+					case '\t':
+					case '\r':
+					case '\b':
+					case '\f':
+						if (i == start + 1) {
+							end = start;
+							break loop;
+						}
+						continue;
+					case '\n':
+						end = i + 1;
+					default:
 						break loop;
-					}
-					continue;
-				case '\n':
-					end = i + 1;
-				default:
-					break loop;
+				}
 			}
 		}
 		if (start > 0 || end < len) {
@@ -964,6 +968,18 @@ public class StringUtils {
 			return value.substring(start, end);
 		}
 		return value;
+	}
+
+	public static String trimBlankLine(String value) {
+		return trimBlankLine(value, true, true);
+	}
+
+	public static String trimLeftBlankLine(String value) {
+		return trimBlankLine(value, true, false);
+	}
+
+	public static String trimRightBlankLine(String value) {
+		return trimBlankLine(value, false, true);
 	}
 
 	public static String clearBlankLine(String value) {
