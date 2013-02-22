@@ -142,7 +142,7 @@ public class FileMethod {
 		if (template == null) {
 			throw new IllegalArgumentException("display context template == null");
 		}
-		return engine.getExpression(expr, template.getParameterTypes());
+		return engine.getExpression(expr, template.getVariableTypes());
 	}
 
 	public Template render(Resource resource) throws IOException, ParseException {

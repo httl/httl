@@ -130,7 +130,7 @@ public class ExpressionImpl implements Expression, Serializable {
 	private Map<String, Object> convertMap(Object context) throws ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
 			try {
-				context = mapConverter.convert(context, getParameterType());
+				context = mapConverter.convert(context, getRootType());
 			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
@@ -253,12 +253,12 @@ public class ExpressionImpl implements Expression, Serializable {
 
 	private volatile Class<?> parameterType;
 
-	public Class<?> getParameterType() {
+	public Class<?> getRootType() {
 		if (parameterType == null) {
 			synchronized (this) {
 				if (parameterType == null) {
 					try {
-						parameterType = BeanMapConverter.getBeanClass(md5, getParameterTypes(), compiler);
+						parameterType = BeanMapConverter.getBeanClass(md5, getVariableTypes(), compiler);
 					} catch (ParseException e) {
 						parameterType = void.class;
 						throw new RuntimeException(e.getMessage(), e);
@@ -269,7 +269,7 @@ public class ExpressionImpl implements Expression, Serializable {
 		return parameterType;
 	}
 
-	public Map<String, Class<?>> getParameterTypes() {
+	public Map<String, Class<?>> getVariableTypes() {
 		return parameterTypes;
 	}
 	

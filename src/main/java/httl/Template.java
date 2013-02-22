@@ -74,11 +74,11 @@ public interface Template extends Resource, Expression {
 	void render(Object context, Object out) throws IOException, ParseException;
 
 	/**
-	 * Get the template set to context types.
+	 * Get the template export to context types.
 	 * 
-	 * @return context types
+	 * @return export types
 	 */
-	Map<String, Class<?>> getContextTypes();
+	Map<String, Class<?>> getExportTypes();
 
 	/**
 	 * Get the macro templates.

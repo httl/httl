@@ -82,12 +82,12 @@ public class ResourceTemplate implements Template {
 		return resource.getEngine();
 	}
 
-	public Class<?> getParameterType() {
+	public Class<?> getRootType() {
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Class<?>> getParameterTypes() {
+	public Map<String, Class<?>> getVariableTypes() {
 		return Collections.EMPTY_MAP;
 	}
 
@@ -104,7 +104,7 @@ public class ResourceTemplate implements Template {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Class<?>> getContextTypes() {
+	public Map<String, Class<?>> getExportTypes() {
 		return Collections.EMPTY_MAP;
 	}
 

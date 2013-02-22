@@ -1327,14 +1327,14 @@ public class DefaultParser implements Parser {
 		}
 		if (symbol.charAt(0) == '$') {
 			Expression expr = translator.translate(expression, types, offset);
-			getVariables.addAll(expr.getParameterTypes().keySet());
+			getVariables.addAll(expr.getVariableTypes().keySet());
 			String code = expr.getCode();
 			Class<?> returnType = expr.getReturnType();
 			return getExpressionPart(symbol, expression, code, returnType, stream, getVariables, textFields, seq);
 		} else {
 			boolean nofilter = "#!".equals(symbol);
 			Expression expr = translator.translate(expression, Collections.EMPTY_MAP, offset);
-			getVariables.addAll(expr.getParameterTypes().keySet());
+			getVariables.addAll(expr.getVariableTypes().keySet());
 			ResourceTemplate template = new ResourceTemplate(resource);
 			UnsafeStringWriter writer = new UnsafeStringWriter();
 			Context.pushContext(Collections.EMPTY_MAP, writer, template);
@@ -1478,7 +1478,7 @@ public class DefaultParser implements Parser {
 				throw new ParseException("The if expression == null!", begin);
 			}
 			Expression expr = translator.translate(value, types, offset);
-			getVariables.addAll(expr.getParameterTypes().keySet());
+			getVariables.addAll(expr.getVariableTypes().keySet());
 			buf.append("	if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") {\n");
@@ -1487,7 +1487,7 @@ public class DefaultParser implements Parser {
 				throw new ParseException("The elseif expression == null!", begin);
 			}
 			Expression expr = translator.translate(value, types, offset);
-			getVariables.addAll(expr.getParameterTypes().keySet());
+			getVariables.addAll(expr.getVariableTypes().keySet());
 			if (comment) {
 				buf.append("	} ");
 			}
@@ -1513,7 +1513,7 @@ public class DefaultParser implements Parser {
 			int start = matcher.start(1);
 			int end = matcher.end(1);
 			Expression expression = translator.translate(value.substring(end).trim(), types, offset + end);
-			getVariables.addAll(expression.getParameterTypes().keySet());
+			getVariables.addAll(expression.getVariableTypes().keySet());
 			Class<?> returnType = expression.getReturnType();
 			String code = expression.getCode();
 			String[] tokens = value.substring(0, start).trim().split("\\s+");
@@ -1566,7 +1566,7 @@ public class DefaultParser implements Parser {
 				throw new ParseException("The breakif expression == null!", begin);
 			}
 			Expression expr = translator.translate(value, types, offset);
-			getVariables.addAll(expr.getParameterTypes().keySet());
+			getVariables.addAll(expr.getVariableTypes().keySet());
 			buf.append("	if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") break;\n");
@@ -1610,7 +1610,7 @@ public class DefaultParser implements Parser {
 					String expr = (String) item[4];
 					int start = (Integer) item[5];
 					Expression expression = translator.translate(expr, types, offset + end);
-					getVariables.addAll(expression.getParameterTypes().keySet());
+					getVariables.addAll(expression.getVariableTypes().keySet());
 					if (StringUtils.isEmpty(type)) {
 						type = expression.getReturnType().getCanonicalName();
 					}

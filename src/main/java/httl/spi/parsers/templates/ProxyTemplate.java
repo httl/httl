@@ -110,12 +110,12 @@ public class ProxyTemplate implements Template {
 		return template.getReader();
 	}
 
-	public Class<?> getParameterType() {
-		return template.getParameterType();
+	public Class<?> getRootType() {
+		return template.getRootType();
 	}
 
-	public Map<String, Class<?>> getParameterTypes() {
-		return template.getParameterTypes();
+	public Map<String, Class<?>> getVariableTypes() {
+		return template.getVariableTypes();
 	}
 
 	public Class<?> getReturnType() {
@@ -138,8 +138,8 @@ public class ProxyTemplate implements Template {
 		return template.getEngine();
 	}
 
-	public Map<String, Class<?>> getContextTypes() {
-		return template.getContextTypes();
+	public Map<String, Class<?>> getExportTypes() {
+		return template.getExportTypes();
 	}
 
 	public Map<String, Template> getMacros() {

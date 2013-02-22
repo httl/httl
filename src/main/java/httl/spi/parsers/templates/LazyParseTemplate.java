@@ -144,10 +144,10 @@ public class LazyParseTemplate extends ResourceTemplate {
 		return template.getReader();
 	}
 
-	public Map<String, Class<?>> getParameterTypes() {
+	public Map<String, Class<?>> getVariableTypes() {
 		if (template == null)
-			return parameterTypes == null ? super.getParameterTypes() : parameterTypes;
-		return template.getParameterTypes();
+			return parameterTypes == null ? super.getVariableTypes() : parameterTypes;
+		return template.getVariableTypes();
 	}
 
 	public Class<?> getReturnType() {
@@ -168,10 +168,10 @@ public class LazyParseTemplate extends ResourceTemplate {
 		return template.getCode();
 	}
 
-	public Map<String, Class<?>> getContextTypes() {
+	public Map<String, Class<?>> getExportTypes() {
 		if (template == null)
-			return super.getContextTypes();
-		return template.getContextTypes();
+			return super.getExportTypes();
+		return template.getExportTypes();
 	}
 
 	public int getOffset() {
