@@ -210,7 +210,7 @@ public class DefaultParser implements Parser {
 		for (int t = 0; t < tokens.size(); t ++) {
 			Token token = tokens.get(t);
 			String message = token.getMessage();
-			int offset = token.getOffset();
+			int offset = token.getOffset() + 1;
 			if (message.length() > 1 && message.charAt(0) == '#'
 					&& message.charAt(1) >= 'a' && message.charAt(1) <= 'z') {
 				int s = message.indexOf('(');
