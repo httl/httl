@@ -28,7 +28,6 @@ import httl.spi.Codec;
 import httl.spi.Loader;
 import httl.spi.loaders.ClasspathLoader;
 import httl.spi.loaders.MultiLoader;
-import httl.spi.parsers.templates.AdaptiveTemplate;
 import httl.test.model.Book;
 import httl.test.model.Model;
 import httl.test.model.User;
@@ -224,10 +223,6 @@ public class TemplateTest {
 				_engine = Engine.getEngine("httl-comment-extends.properties");
 			}
 			Template template = _engine.getTemplate("/templates/" + templateName, Locale.CHINA, encoding);
-			if (! profile) {
-				assertEquals(AdaptiveTemplate.class, template.getClass());
-				//assertEquals(Locale.CHINA, template.getLocale());
-			}
 			UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 			StringWriter actualWriter = new StringWriter();
 			if ("extends_var.httl".equals(templateName)) {

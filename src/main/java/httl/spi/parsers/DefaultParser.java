@@ -986,12 +986,18 @@ public class DefaultParser implements Parser {
 					declare.append("	" + typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
 				}
 			}
-			if (defaultVariableType != null) {
-				for (String var : getVariables) {
-					if (! defined.contains(var) && ! types.containsKey(var)) {
-						defined.add(var);
-						declare.append(getTypeCode(defaultVariableType, var));
+			for (String var : getVariables) {
+				if (! defined.contains(var)) {
+					Class<?> type = types.get(var);
+					if (type == null) {
+						if (defaultVariableType != null) {
+							type = defaultVariableType;
+						} else {
+							type = Object.class;
+						}
 					}
+					defined.add(var);
+					declare.append(getTypeCode(type, var));
 				}
 			}
 			StringBuilder funtionFileds = new StringBuilder();
@@ -1553,6 +1559,7 @@ public class DefaultParser implements Parser {
 				code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
 			}
 			setVariables.add(foreachVariable);
+			setVariables.add(var);
 			buf.append(getForeachCode(type, clazz, var, code));
 		} else if (breakifDirective.equals(name)) {
 			if (StringUtils.isEmpty(value)) {
@@ -1734,9 +1741,9 @@ public class DefaultParser implements Parser {
 		String name = "_i_" + var;
 		buf.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator((" + foreachVariable + " = new " + ForeachStatus.class.getName() + "(" + foreachVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
 		if (clazz.isPrimitive()) {
-			buf.append("	" + type + " " + var + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next());\n");
+			buf.append("	" + var + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next());\n");
 		} else {
-			buf.append("	" + type + " " + var + " = (" + type + ") " + name + ".next();\n");
+			buf.append("	" + var + " = (" + type + ") " + name + ".next();\n");
 		}
 		return buf.toString();
 	}

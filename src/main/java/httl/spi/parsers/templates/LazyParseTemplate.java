@@ -59,9 +59,7 @@ public class LazyParseTemplate extends ResourceTemplate {
 			synchronized (this) {
 				if (template == null) {
 					Map<String, Class<?>> types = context == null ? null : new TypeMap(convertMap(context));
-					if (parameterTypes != null) {
-						types = types == null ? parameterTypes : new DelegateMap<String, Class<?>>(types, parameterTypes);
-					}
+					types = new DelegateMap<String, Class<?>>(types, parameterTypes);
 					template = parser.parse(getResource(), types);
 				}
 			}

@@ -1,10 +1,9 @@
 package httl.test.util;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
 import httl.internal.util.CollectionUtils;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class CollectionUtilsTest {
 
