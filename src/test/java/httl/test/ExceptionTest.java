@@ -26,16 +26,16 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * ExceptionTest
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @author Jerry Lee (oldratlee AT gmail DOT com)
  */
-public class ExceptionTest extends TestCase {
+public class ExceptionTest {
 
 	@Test
 	public void testException() throws Exception {
@@ -51,11 +51,11 @@ public class ExceptionTest extends TestCase {
 			dir += "/";
 		}
 		File directory = new File(this.getClass().getClassLoader().getResource(dir + "templates/").getFile());
-		super.assertTrue(directory.isDirectory());
+		assertTrue(directory.isDirectory());
 		File[] files = directory.listFiles();
 		for (int i = 0, n = files.length; i < n; i ++) {
 			File file = files[i];
-				System.out.println(file.getName());
+			System.out.println(file.getName());
 			URL url = this.getClass().getClassLoader().getResource(dir + "results/" + file.getName() + ".txt");
 			if (url == null) {
 				throw new FileNotFoundException("Not found file: " + dir + "results/" + file.getName() + ".txt");
@@ -76,7 +76,7 @@ public class ExceptionTest extends TestCase {
 					for (String part : expected)  {
 						assertTrue(StringUtils.isNotEmpty(part));
 						part = StringUtils.unescapeString(part).trim();
-						super.assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
+						assertTrue(file.getName() + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
 					}
 				}
 			}
