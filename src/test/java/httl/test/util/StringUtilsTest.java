@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 public class StringUtilsTest {
+	static boolean profile = "true".equals(System.getProperty("profile"));
 
 	@Test
 	public void testEscapeString() {
@@ -38,7 +39,8 @@ public class StringUtilsTest {
 	public void testEscapeXmlPerformance() {
 		String html = "a<table border=\"0\" color=\'red\'>b&lt;c</table>d";
 		//char[] html = "a<table border=\"0\" color=\'red\'>b&lt;c</table>d".toCharArray();
-		int count = 10000000;
+
+		int count = profile ? 10 * 1000 * 1000 : 1000;
 		long start = System.nanoTime();
 		for (int i = 0; i < count; i ++) {
 			StringUtils.escapeXml(html);
