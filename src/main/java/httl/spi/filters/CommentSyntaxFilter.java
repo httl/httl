@@ -28,17 +28,17 @@ import httl.spi.Filter;
  */
 public class CommentSyntaxFilter extends AbstractFilter {
 	
-	private boolean removeDirectiveBlank;
+	private boolean removeDirectiveBlankLine;
 
 	private String commentLeft;
 
 	private String commentRight;
 
 	/**
-	 * httl.properties: remove.directive.blank=true
+	 * httl.properties: remove.directive.blank.line=true
 	 */
-	public void setRemoveDirectiveBlank(boolean removeDirectiveBlank) {
-		this.removeDirectiveBlank = removeDirectiveBlank;
+	public void setRemoveDirectiveBlankLine(boolean removeDirectiveBlankLine) {
+		this.removeDirectiveBlankLine = removeDirectiveBlankLine;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class CommentSyntaxFilter extends AbstractFilter {
 			value = value.substring(0, value.length() - commentLeft.length());
 			right = true;
 		}
-		if (removeDirectiveBlank && (left || right)) {
+		if (removeDirectiveBlankLine && (left || right)) {
 			value = StringUtils.trimBlankLine(value, left, right);
 		}
 		return value;

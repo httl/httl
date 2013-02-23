@@ -110,8 +110,8 @@ public class DefaultEngine extends Engine {
 	// httl.properties: instantiated content
 	private Map<String, Object> properties;
 
-	// httl.properties: runtime.variable.type=false
-	private boolean runtimeVariableType;
+	// httl.properties: use.render.variable.type=false
+	private boolean useRenderVariableType;
 
 	public DefaultEngine() {
 		this.stringLoader = new StringLoader(this);
@@ -292,7 +292,7 @@ public class DefaultEngine extends Engine {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
-		if (runtimeVariableType) {
+		if (useRenderVariableType) {
 			return new LazyParseTemplate(parser, resource, parameterTypes, mapConverter);
 		} else {
 			return parser.parse(resource, parameterTypes);
@@ -490,10 +490,10 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * httl.properties: runtime.variable.type=false
+	 * httl.properties: use.render.variable.type=false
 	 */
-	public void setRuntimeVariableType(boolean runtimeVariableType) {
-		this.runtimeVariableType = runtimeVariableType;
+	public void setUseRenderVariableType(boolean useRenderVariableType) {
+		this.useRenderVariableType = useRenderVariableType;
 	}
 
 	/**
