@@ -171,41 +171,29 @@ public final class ConfigUtils {
 		}
 		Properties result = new Properties();
 		for (Map<Object, Object> properties : list) {
-			Map<Object, Object> plusConfigs = new HashMap<Object, Object>();
-			Map<Object, Object> minusConfigs = new HashMap<Object, Object>();
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String) entry.getKey();
 				String value = (String) entry.getValue();
-				if (key.endsWith(PLUS)) {
+				if (key.endsWith(MINUS)) {
 					if (StringUtils.isNotEmpty(value)) {
-						plusConfigs.put(key, value);
+						String k = key.substring(0, key.length() - MINUS.length());
+						String v = result.getProperty(k);
+						if (StringUtils.isNotEmpty(v) && v.contains(value)) {
+							result.setProperty(k, StringUtils.removeCommaValue(v, value));
+						}
 					}
-				} else if (key.endsWith(MINUS)) {
+				} else if (key.endsWith(PLUS)) {
 					if (StringUtils.isNotEmpty(value)) {
-						minusConfigs.put(key, value);
+						String k = key.substring(0, key.length() - PLUS.length());
+						String v = result.getProperty(k);
+						if (StringUtils.isNotEmpty(v)) {
+							result.setProperty(k, v + COMMA + value);
+						} else {
+							result.setProperty(k, value);
+						}
 					}
 				} else {
 					result.setProperty(key, value);
-				}
-			}
-			for (Map.Entry<Object, Object> entry : minusConfigs.entrySet()) {
-				String key = (String) entry.getKey();
-				String value = (String) entry.getValue();
-				String k = key.substring(0, key.length() - MINUS.length());
-				String v = result.getProperty(k);
-				if (StringUtils.isNotEmpty(v) && v.contains(value)) {
-					result.setProperty(k, StringUtils.removeCommaValue(v, value));
-				}
-			}
-			for (Map.Entry<Object, Object> entry : plusConfigs.entrySet()) {
-				String key = (String) entry.getKey();
-				String value = (String) entry.getValue();
-				String k = key.substring(0, key.length() - PLUS.length());
-				String v = result.getProperty(k);
-				if (StringUtils.isNotEmpty(v)) {
-					result.setProperty(k, v + COMMA + value);
-				} else {
-					result.setProperty(k, value);
 				}
 			}
 		}
