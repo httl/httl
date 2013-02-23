@@ -195,7 +195,7 @@ public class DefaultParser implements Parser {
 	};
 
 	private String doParse(Resource resource, boolean stream, String source, Translator translator, 
-							 List<String> parameters, List<Class<?>> parameterTypes, 
+							 List<String> defVariables, List<Class<?>> defVariableTypes, 
 							 Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
 							 Map<String, Class<?>> returnTypes, Map<String, Class<?>> macros, StringBuilder textFields, AtomicInteger seq) throws IOException, ParseException {
 		LinkedStack<String> nameStack = new LinkedStack<String>();
@@ -261,7 +261,7 @@ public class DefaultParser implements Parser {
 							String param;
 							if (i > 0) {
 								if (! startValue.endsWith(")")) {
-									throw new ParseException("Invalid macro parameters " + startValue, macroParameterStart + i);
+									throw new ParseException("Invalid macro defVariables " + startValue, macroParameterStart + i);
 								}
 								var = startValue.substring(0, i).trim();
 								param = startValue.substring(i + 1, startValue.length() - 1).trim();
@@ -302,7 +302,7 @@ public class DefaultParser implements Parser {
 							} else if (StringUtils.isNotEmpty(set)) {
 								getVariables.add(var);
 								String setValue = set + " " + var + ".evaluate()";
-								String code = getStatementCode(setDirective, setValue, offset, exprOffset, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
+								String code = getStatementCode(setDirective, setValue, offset, exprOffset, translator, setVariables, getVariables, types, returnTypes, defVariables, defVariableTypes, true);
 								buf.append(code);
 							}
 							macro = null;
@@ -335,7 +335,7 @@ public class DefaultParser implements Parser {
 							macro = new StringBuffer();
 							macroParameterStart = exprOffset;
 						} else {
-							String code = getStatementCode(name, value, offset, exprOffset, translator, setVariables, getVariables, types, returnTypes, parameters, parameterTypes, true);
+							String code = getStatementCode(name, value, offset, exprOffset, translator, setVariables, getVariables, types, returnTypes, defVariables, defVariableTypes, true);
 							buf.append(code);
 						}
 					}
@@ -793,17 +793,17 @@ public class DefaultParser implements Parser {
 		return "#" + name + "(" + value + ")";
 	}
 
-	public Template parse(Resource resource, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
+	public Template parse(Resource resource, Map<String, Class<?>> defVariableTypes) throws IOException, ParseException {
 		try {
 			Template writerTemplate = null;
 			Template streamTemplate = null;
 			if (isOutputWriter || ! isOutputStream) {
-				Class<?> clazz = parseClass(resource, parameterTypes, false, 0);
+				Class<?> clazz = parseClass(resource, defVariableTypes, false, 0);
 				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
 						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
 			if (isOutputStream) {
-				Class<?> clazz = parseClass(resource, parameterTypes, true, 0);
+				Class<?> clazz = parseClass(resource, defVariableTypes, true, 0);
 				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
 						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
 			}
@@ -900,8 +900,8 @@ public class DefaultParser implements Parser {
 			for (String macro : importMacroTemplates.keySet()) {
 				types.put(macro, Template.class);
 			}
-			List<String> parameters = new ArrayList<String>();
-			List<Class<?>> parameterTypes = new ArrayList<Class<?>>();
+			List<String> defVariables = new ArrayList<String>();
+			List<Class<?>> defVariableTypes = new ArrayList<Class<?>>();
 			Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
 			StringBuilder textFields = new StringBuilder();
 			String source = IOUtils.readToString(resource.getReader());
@@ -910,7 +910,7 @@ public class DefaultParser implements Parser {
 			}
 			String src = source;
 			AtomicInteger seq = new AtomicInteger();
-			String code = doParse(resource, stream, src, translator, parameters, parameterTypes, setVariables, getVariables, types, returnTypes, macros, textFields, seq);
+			String code = doParse(resource, stream, src, translator, defVariables, defVariableTypes, setVariables, getVariables, types, returnTypes, macros, textFields, seq);
 			int i = name.lastIndexOf('.');
 			String packageName = i < 0 ? "" : name.substring(0, i);
 			String className = i < 0 ? name : name.substring(i + 1);
@@ -945,7 +945,7 @@ public class DefaultParser implements Parser {
 				declare.append("	" + MultiFormatter.class.getName() + " " + defaultFormatterVariable + " = getFormatter($context, \"" + formatterVariable + "\");\n");
 				declare.append("	" + MultiFormatter.class.getName() + " " + formatterVariable + " = " + defaultFormatterVariable + ";\n");
 			}
-			for (String var : parameters) {
+			for (String var : defVariables) {
 				if (getVariables.contains(var) && ! defined.contains(var)) {
 					defined.add(var);
 					declare.append(getTypeCode(types.get(var), var));
@@ -998,6 +998,8 @@ public class DefaultParser implements Parser {
 					}
 					defined.add(var);
 					declare.append(getTypeCode(type, var));
+					defVariables.add(var);
+					defVariableTypes.add(type);
 				}
 			}
 			StringBuilder funtionFileds = new StringBuilder();
@@ -1042,7 +1044,7 @@ public class DefaultParser implements Parser {
 				textFields.append("private static final " + String.class.getSimpleName() + " $CODE = " + StringCache.class.getName() +  ".getAndRemove(\"" + methodCodeId + "\");\n");
 			}
 			
-			textFields.append("private static final " + Map.class.getName() + " $PTS = " + toTypeCode(parameters, parameterTypes) + ";\n");
+			textFields.append("private static final " + Map.class.getName() + " $PTS = " + toTypeCode(defVariables, defVariableTypes) + ";\n");
 			textFields.append("private static final " + Map.class.getName() + " $CTS = " + toTypeCode(returnTypes) + ";\n");
 			
 			String sorceCode = "package " + packageName + ";\n" 
@@ -1311,21 +1313,25 @@ public class DefaultParser implements Parser {
 		return buf.toString();
 	}
 
+	private Expression translateExpression(String expression, Set<String> getVariables, Map<String, Class<?>> types, int offset) throws ParseException {
+		Expression expr = translator.translate(expression, types, offset);
+		getVariables.addAll(expr.getVariableTypes().keySet());
+		return expr;
+	}
+
 	@SuppressWarnings("unchecked")
 	private String getExpressionCode(String symbol, String expression, Translator translator, StringBuilder textFields, Set<String> getVariables, Map<String, Class<?>> types, int offset, AtomicInteger seq, boolean stream, Resource resource) throws IOException, ParseException {
 		if (StringUtils.isEmpty(expression)) {
 			return "";
 		}
 		if (symbol.charAt(0) == '$') {
-			Expression expr = translator.translate(expression, types, offset);
-			getVariables.addAll(expr.getVariableTypes().keySet());
+			Expression expr = translateExpression(expression, getVariables, types, offset);
 			String code = expr.getCode();
 			Class<?> returnType = expr.getReturnType();
 			return getExpressionPart(symbol, expression, code, returnType, stream, getVariables, textFields, seq);
 		} else {
 			boolean nofilter = "#!".equals(symbol);
-			Expression expr = translator.translate(expression, Collections.EMPTY_MAP, offset);
-			getVariables.addAll(expr.getVariableTypes().keySet());
+			Expression expr = translateExpression(expression, getVariables, Collections.EMPTY_MAP, offset);
 			ResourceTemplate template = new ResourceTemplate(resource);
 			UnsafeStringWriter writer = new UnsafeStringWriter();
 			Context.pushContext().setWriter(writer).setTemplate(template);
@@ -1460,7 +1466,7 @@ public class DefaultParser implements Parser {
 	
 	private String getStatementCode(String name, String value, int begin, int offset,
 									Translator translator, Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
-									Map<String, Class<?>> returnTypes, List<String> parameters, List<Class<?>> parameterTypes, boolean comment) throws IOException, ParseException {
+									Map<String, Class<?>> returnTypes, List<String> defVariables, List<Class<?>> defVariableTypes, boolean comment) throws IOException, ParseException {
 		name = name == null ? null : name.trim();
 		value = value == null ? null : value.trim();
 		StringBuilder buf = new StringBuilder();
@@ -1468,8 +1474,7 @@ public class DefaultParser implements Parser {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The if expression == null!", begin);
 			}
-			Expression expr = translator.translate(value, types, offset);
-			getVariables.addAll(expr.getVariableTypes().keySet());
+			Expression expr = translateExpression(value, getVariables, types, offset);
 			buf.append("	if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") {\n");
@@ -1477,8 +1482,7 @@ public class DefaultParser implements Parser {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The elseif expression == null!", begin);
 			}
-			Expression expr = translator.translate(value, types, offset);
-			getVariables.addAll(expr.getVariableTypes().keySet());
+			Expression expr = translateExpression(value, getVariables, types, offset);
 			if (comment) {
 				buf.append("	} ");
 			}
@@ -1503,8 +1507,7 @@ public class DefaultParser implements Parser {
 			}
 			int start = matcher.start(1);
 			int end = matcher.end(1);
-			Expression expression = translator.translate(value.substring(end).trim(), types, offset + end);
-			getVariables.addAll(expression.getVariableTypes().keySet());
+			Expression expression = translateExpression(value.substring(end).trim(), getVariables, types, offset + end);
 			Class<?> returnType = expression.getReturnType();
 			String code = expression.getCode();
 			String[] tokens = value.substring(0, start).trim().split("\\s+");
@@ -1548,20 +1551,19 @@ public class DefaultParser implements Parser {
 				}
 				code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
 			}
-			buf.append(getForeachCode(clazz, type, var, expression.getCode(), setVariables, getVariables, parameters, types, returnTypes, offset));
+			buf.append(getForeachCode(clazz, type, var, expression.getCode(), setVariables, getVariables, defVariables, types, returnTypes, offset));
 			setVariables.add(foreachVariable);
 		} else if (breakifDirective.equals(name)) {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The breakif expression == null!", begin);
 			}
-			Expression expr = translator.translate(value, types, offset);
-			getVariables.addAll(expr.getVariableTypes().keySet());
+			Expression expr = translateExpression(value, getVariables, types, offset);
 			buf.append("	if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") break;\n");
 		} else if (setDirective.equals(name) || legacySetDirective.equals(name)) {
 			if (StringUtils.isEmpty(value)) {
-				throw new ParseException("The #" + name + " parameters == null!", begin);
+				throw new ParseException("The #" + name + " defVariables == null!", begin);
 			}
 			if (value.contains("=")) {
 				Matcher matcher = ASSIGN_PATTERN.matcher("," + value);
@@ -1598,8 +1600,7 @@ public class DefaultParser implements Parser {
 					int end = (Integer) item[3];
 					String expr = (String) item[4];
 					int start = (Integer) item[5];
-					Expression expression = translator.translate(expr, types, offset + end);
-					getVariables.addAll(expression.getVariableTypes().keySet());
+					Expression expression = translateExpression(expr, getVariables, types, offset + end);
 					Class<?> clazz;
 					if (StringUtils.isEmpty(type)) {
 						clazz = expression.getReturnType();
@@ -1607,7 +1608,7 @@ public class DefaultParser implements Parser {
 					} else {
 						clazz = ClassUtils.forName(importPackages, type);
 					}
-					buf.append(getSetCode(clazz, type, var, oper, expression.getCode(), setVariables, getVariables, parameters, types, returnTypes, offset + start));
+					buf.append(getSetCode(clazz, type, var, oper, expression.getCode(), setVariables, getVariables, defVariables, types, returnTypes, offset + start));
 				}
 			} else {
 				value = BLANK_PATTERN.matcher(value).replaceAll(" ");
@@ -1641,8 +1642,8 @@ public class DefaultParser implements Parser {
 						throw new ParseException("Defined different type to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), o);
 					}
 					types.put(var, clazz);
-					parameters.add(var);
-					parameterTypes.add(clazz);
+					defVariables.add(var);
+					defVariableTypes.add(clazz);
 				}
 			}
 		}else {
@@ -1653,7 +1654,7 @@ public class DefaultParser implements Parser {
 	
 	private String getSetCode(Class<?> clazz, String type, String var, String oper, 
 			String code, Set<String> setVariables, Set<String> getVariables, 
-			List<String> parameters, Map<String, Class<?>> types, Map<String, 
+			List<String> defVariables, Map<String, Class<?>> types, Map<String, 
 			Class<?>> returnTypes, int offset) throws ParseException {
 		Class<?> cls = types.get(var);
 		if (cls != null && ! cls.equals(clazz)) {
@@ -1739,7 +1740,7 @@ public class DefaultParser implements Parser {
 
 	private String getForeachCode(Class<?> clazz, String type, String var, 
 			String code, Set<String> setVariables, Set<String> getVariables, 
-			List<String> parameters, Map<String, Class<?>> types, Map<String, 
+			List<String> defVariables, Map<String, Class<?>> types, Map<String, 
 			Class<?>> returnTypes, int offset) throws ParseException {
 		StringBuilder buf = new StringBuilder();
 		String name = "_i_" + var;
@@ -1750,7 +1751,7 @@ public class DefaultParser implements Parser {
 		} else {
 			varCode = name + ".next()";
 		}
-		buf.append(getSetCode(clazz, type, var, "=", varCode, setVariables, getVariables, parameters, types, returnTypes, offset));
+		buf.append(getSetCode(clazz, type, var, "=", varCode, setVariables, getVariables, defVariables, types, returnTypes, offset));
 		return buf.toString();
 	}
 
