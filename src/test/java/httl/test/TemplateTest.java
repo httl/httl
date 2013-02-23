@@ -161,13 +161,13 @@ public class TemplateTest {
 
 	private String config;
 	
-	private Object map;
+	private Object data;
     
     private String templateName;
 
-    public TemplateTest(String config, Object map, String templateName) {
+    public TemplateTest(String config, Object data, String templateName) {
 		this.config = config;
-		this.map = map;
+		this.data = data;
 		this.templateName = templateName;
 	}
 
@@ -204,12 +204,10 @@ public class TemplateTest {
 		}
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
-			//if (! "switch_filter.httl".equals(templateName)) continue; // 指定模板测试
-			if (map instanceof String) continue; // FIXME JSON格式的Map没有顺序，断言失败
-			if ("httl-javassist.properties".equals(config)  // FIXME javassist的foreach 1..3编译不过
-					&& "list.httl".equals(templateName)) continue;
+			//if (! "for_chars.httl".equals(templateName)) continue; // 指定模板测试
+			if (data instanceof String) continue; // FIXME JSON数据的Map没有排序，导致断言失败，暂先跳过
 			if (! profile)
-				System.out.println(config + ": " + (map == null ? "null" : map.getClass().getSimpleName()) + " => " + templateName);
+				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
 			if (excludes.contains(templateName) || 
 					(includes.size() > 0 && ! includes.contains(templateName))) {
 				continue;
@@ -226,28 +224,28 @@ public class TemplateTest {
 			UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 			StringWriter actualWriter = new StringWriter();
 			if ("extends_var.httl".equals(templateName)) {
-				if (map instanceof Map) {
-					((Map<String, Object>) map).put("extends", "default.httl");
-				} else if (map instanceof Model) {
-					((Model) map).setExtends("default.httl");
+				if (data instanceof Map) {
+					((Map<String, Object>) data).put("extends", "default.httl");
+				} else if (data instanceof Model) {
+					((Model) data).setExtends("default.httl");
 				}
 			}
 			try {
-				template.render(map, actualWriter);
-				template.render(map, actualStream);
+				template.render(data, actualWriter);
+				template.render(data, actualStream);
 			} catch (Throwable e) {
 				System.out.println("\n================================\n" + template.getCode() + "\n================================\n");
 				e.printStackTrace();
 				throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
 			}
 			if ("extends_var.httl".equals(templateName)) {
-				if (map instanceof Map) {
-					((Map<String, Object>) map).remove("extends");
-				} else if (map instanceof Model) {
-					((Model) map).setExtends(null);
+				if (data instanceof Map) {
+					((Map<String, Object>) data).remove("extends");
+				} else if (data instanceof Model) {
+					((Model) data).setExtends(null);
 				}
 			}
-			if (! profile && map != null) {
+			if (! profile && data != null) {
 				URL url = this.getClass().getClassLoader().getResource(dir + "results/" + templateName + ".txt");
 				if (url == null) {
 					throw new FileNotFoundException("Not found file: " + dir + "results/" + templateName + ".txt");

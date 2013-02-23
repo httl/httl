@@ -1,4 +1,4 @@
 
-{"isLogin":"Y","name":"liangfei","role":"admin"}
+{"isLogin":"Y","name":"liangfei","role":"admin","class":"httl.test.model.User"}
 liangfei
 liangfei

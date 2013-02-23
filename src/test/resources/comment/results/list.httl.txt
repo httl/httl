@@ -6,7 +6,7 @@
 
 3
 
-[1,2,3,4]
+[1, 2, 3, 4]
 
 1
 
@@ -16,7 +16,7 @@
 
 4
 
-[a, b, c]
+abc
 
 a
 
@@ -24,7 +24,7 @@ b
 
 c
 
-[a,b,c,d]
+abcd
 
 a
 
@@ -33,6 +33,26 @@ b
 c
 
 d
+
+[aa, bb, cc]
+
+aa
+
+bb
+
+cc
+
+[Monday, Tuesday, Wednesday, Thursday, Friday]
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+Friday
 
 [aa, bb, cc]
 

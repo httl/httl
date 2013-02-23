@@ -16,15 +16,14 @@
 package httl.spi.translators.expressions;
 
 import httl.Template;
-import httl.spi.Translator;
-import httl.spi.sequences.CharacterSequence;
-import httl.spi.sequences.IntegerSequence;
-import httl.spi.sequences.StringSequence;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.CollectionUtils;
 import httl.internal.util.MapEntry;
+import httl.internal.util.StringSequence;
 import httl.internal.util.StringUtils;
+import httl.spi.Translator;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -210,7 +209,7 @@ public final class BinaryOperator extends Operator {
 			}
 			Class<?> rightType = rightParameter.getReturnType();
 			if (List.class.isAssignableFrom(leftType)) {
-				if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
+				if (int[].class == rightType) {
 					return CollectionUtils.class.getName() + ".subList(" + leftCode + ", " + rightCode + ")";
 				} else if (int.class.equals(rightType)) {
 					if (leftParameter instanceof Variable) {
@@ -225,7 +224,7 @@ public final class BinaryOperator extends Operator {
 					throw new ParseException("The \"[]\" index type: " + rightType + " must be int!", getOffset());
 				}
 			} else if (leftType.isArray()) {
-				if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
+				if (int[].class == rightType) {
 					return CollectionUtils.class.getName() + ".subArray(" + leftCode + ", " + rightCode + ")";
 				} else if (int.class.equals(rightType)) {
 					return getNotNullCode(leftCode, leftCode + "[" + rightCode + "]");
@@ -237,13 +236,15 @@ public final class BinaryOperator extends Operator {
 		} else if (name.equals("..")) {
 			if (leftType == int.class || leftType == Integer.class 
 					|| leftType == short.class  || leftType == Short.class
-					|| leftType == long.class || leftType == Long.class ) {
-				return "new " + IntegerSequence.class.getName() + "(" + leftCode + ", " + rightCode + ")";
-			} else if (leftType == char.class || leftType == Character.class) {
-				return "new " + CharacterSequence.class.getName() + "(" + leftCode + ", " + rightCode + ")";
+					|| leftType == long.class || leftType == Long.class
+					|| leftType == char.class || leftType == Character.class) {
+				return CollectionUtils.class.getName() + ".createSequence(" + leftCode + ", " + rightCode + ")";
 			} else if (leftType == String.class 
-						&& leftCode.length() >= 2 && leftCode.startsWith("\"") && leftCode.endsWith("\"")
-						&& rightCode.length() >= 2 && rightCode.startsWith("\"") && rightCode.endsWith("\"")) {
+						&& leftCode.length() >= 2 && rightCode.length() >= 2 
+						&& (leftCode.startsWith("\"") || leftCode.startsWith("\'"))
+						&& (leftCode.endsWith("\"") || leftCode.endsWith("\'"))
+						&& (rightCode.startsWith("\"") || rightCode.startsWith("\'"))
+						&& (rightCode.endsWith("\"") || rightCode.endsWith("\'"))) {
 				StringBuilder buf = new StringBuilder();
 				for (String s : getSequence(leftCode.substring(1, leftCode.length() - 1), 
 						rightCode.substring(1, rightCode.length() - 1))) {
@@ -461,12 +462,10 @@ public final class BinaryOperator extends Operator {
 		} else if ("..".equals(name)) {
 			if (leftType == int.class || leftType == Integer.class 
 					|| leftType == short.class  || leftType == Short.class
-					|| leftType == long.class || leftType == Long.class ) {
-				return IntegerSequence.class;
-			} else if (leftType == char.class || leftType == Character.class) {
-				return CharacterSequence.class;
-			} else if (leftType == String.class) {
-				return StringSequence.class;
+					|| leftType == long.class || leftType == Long.class
+					|| leftType == char.class || leftType == Character.class
+					|| leftType == String.class) {
+				return Array.newInstance(leftType, 0).getClass();
 			} else {
 				throw new ParseException("The operator \"..\" unsupported parameter type " + leftType, getOffset());
 			}
@@ -483,7 +482,7 @@ public final class BinaryOperator extends Operator {
 			}
 			Class<?> rightType = rightParameter.getReturnType();
 			if (List.class.isAssignableFrom(leftType)) {
-				if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
+				if (int[].class == rightType) {
 					return List.class;
 				} else if (int.class.equals(rightType)) {
 					String var = getGenericVariableName(leftParameter);
@@ -498,7 +497,7 @@ public final class BinaryOperator extends Operator {
 					throw new ParseException("The \"[]\" index type: " + rightType.getName() + " must be int!", getOffset());
 				}
 			} else if (leftType.isArray()) {
-				if (IntegerSequence.class.equals(rightType) || int[].class == rightType) {
+				if (int[].class == rightType) {
 					return leftType;
 				} else if (int.class.equals(rightType)) {
 					return leftType.getComponentType();

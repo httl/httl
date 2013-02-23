@@ -16,7 +16,6 @@
 package httl.spi.translators;
 
 import httl.spi.Translator;
-import httl.spi.sequences.StringSequence;
 import httl.spi.translators.expressions.BinaryOperator;
 import httl.spi.translators.expressions.Bracket;
 import httl.spi.translators.expressions.Constant;
@@ -26,6 +25,7 @@ import httl.spi.translators.expressions.UnaryOperator;
 import httl.spi.translators.expressions.Variable;
 import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
+import httl.internal.util.StringSequence;
 import httl.internal.util.StringUtils;
 import httl.internal.util.Token;
 

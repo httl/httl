@@ -21,10 +21,10 @@ import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Translator;
-import httl.spi.sequences.StringSequence;
 import httl.spi.translators.expressions.ExpressionImpl;
 import httl.spi.translators.expressions.Node;
 import httl.internal.util.ClassUtils;
+import httl.internal.util.StringSequence;
 
 import java.text.ParseException;
 import java.util.ArrayList;

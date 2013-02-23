@@ -15,7 +15,6 @@
  */
 package httl.internal.util;
 
-import httl.spi.sequences.IntegerSequence;
 import httl.internal.util.iterators.BooleanArrayIterator;
 import httl.internal.util.iterators.ByteArrayIterator;
 import httl.internal.util.iterators.CharArrayIterator;
@@ -36,11 +35,151 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class CollectionUtils {
-	
+
+	public static byte[] createSequence(byte begin, byte end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		byte[] seq = new byte[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = (byte) (begin + i * sign);
+		}
+		return seq;
+	}
+
+	public static char[] createSequence(char begin, char end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		char[] seq = new char[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = (char) (begin + i * sign);
+		}
+		return seq;
+	}
+
+	public static short[] createSequence(short begin, short end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		short[] seq = new short[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = (short) (begin + i * sign);
+		}
+		return seq;
+	}
+
+	public static int[] createSequence(int begin, int end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		int[] seq = new int[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
+	public static long[] createSequence(long begin, long end) {
+		int sign = end > begin ? 1 : -1;
+		int len = (int) (Math.abs(end - begin) + 1);
+		long[] seq = new long[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
+	public static float[] createSequence(float begin, float end) {
+		int sign = end > begin ? 1 : -1;
+		int len = (int) (Math.abs(end - begin) + 1);
+		float[] seq = new float[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
+	public static double[] createSequence(double begin, double end) {
+		int sign = end > begin ? 1 : -1;
+		int len = (int) (Math.abs(end - begin) + 1);
+		double[] seq = new double[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
+	public static Byte[] createSequence(Byte begin, Byte end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		Byte[] seq = new Byte[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = (byte) (begin + i * sign);
+		}
+		return seq;
+	}
+
+	public static Character[] createSequence(Character begin, Character end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		Character[] seq = new Character[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = (char) (begin + i * sign);
+		}
+		return seq;
+	}
+
+	public static Short[] createSequence(Short begin, Short end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		Short[] seq = new Short[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = (short) (begin + i * sign);
+		}
+		return seq;
+	}
+
+	public static Integer[] createSequence(Integer begin, Integer end) {
+		int sign = end > begin ? 1 : -1;
+		int len = Math.abs(end - begin) + 1;
+		Integer[] seq = new Integer[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
+	public static Long[] createSequence(Long begin, Long end) {
+		int sign = end > begin ? 1 : -1;
+		int len = (int) (Math.abs(end - begin) + 1);
+		Long[] seq = new Long[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
+	public static Float[] createSequence(Float begin, Float end) {
+		int sign = end > begin ? 1 : -1;
+		int len = (int) (Math.abs(end - begin) + 1);
+		Float[] seq = new Float[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
+	public static Double[] createSequence(Double begin, Double end) {
+		int sign = end > begin ? 1 : -1;
+		int len = (int) (Math.abs(end - begin) + 1);
+		Double[] seq = new Double[len];
+		for (int i = 0; i < len; i ++) {
+			seq[i] = begin + i * sign;
+		}
+		return seq;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T> T[] remove(T[] values, T value) {
 		if (values != null && value != null) {
@@ -558,195 +697,6 @@ public class CollectionUtils {
 		return map;
 	}
 
-	public static boolean[] subArray(boolean[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new boolean[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new boolean[0];
-		}
-		boolean[] sub = new boolean[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-
-	public static char[] subArray(char[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new char[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new char[0];
-		}
-		char[] sub = new char[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-
-	public static byte[] subArray(byte[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new byte[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new byte[0];
-		}
-		byte[] sub = new byte[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-
-	public static short[] subArray(short[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new short[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new short[0];
-		}
-		short[] sub = new short[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-
-	public static int[] subArray(int[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new int[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new int[0];
-		}
-		int[] sub = new int[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-
-	public static long[] subArray(long[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new long[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new long[0];
-		}
-		long[] sub = new long[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-
-	public static float[] subArray(float[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new float[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new float[0];
-		}
-		float[] sub = new float[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-
-	public static double[] subArray(double[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new double[0];
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new double[0];
-		}
-		double[] sub = new double[len];
-		for (int i = begin; i < end; i ++) {
-			sub[i - begin] = array[i];
-		}
-		return sub;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static <T> T[] subArray(T[] array, IntegerSequence sequence) {
-		if (array == null || array.length == 0) {
-			return array;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(array.length, sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		T[] sub = (T[]) Array.newInstance(array.getClass().getComponentType(), len);
-		if (len > 0) {
-			for (int i = begin; i < end; i ++) {
-				sub[i - begin] = array[i];
-			}
-		}
-		return sub;
-	}
-
 	public static boolean[] subArray(boolean[] array, int[] indexs) {
 		if (array == null || array.length == 0) {
 			return array;
@@ -937,27 +887,6 @@ public class CollectionUtils {
 		return sub;
 	}
 
-	public static <T> List<T> subList(List<T> list, IntegerSequence sequence) {
-		if (list == null || list.size() == 0) {
-			return list;
-		}
-		if (sequence == null || sequence.size() == 0) {
-			return new ArrayList<T>(0);
-		}
-		int[] beginAndEnd = getIntegerSequenceBeginAndEnd(list.size(), sequence);
-		int begin = beginAndEnd[0];
-		int end = beginAndEnd[1];
-		int len = end - begin;
-		if (len == 0) {
-			return new ArrayList<T>(0);
-		}
-		List<T> sub = new ArrayList<T>(0);
-		for (int i = begin; i < end; i ++) {
-			sub.add(list.get(i));
-		}
-		return sub;
-	}
-
 	public static <T> List<T> subList(List<T> list, int[] indexs) {
 		if (list == null || list.size() == 0) {
 			return list;
@@ -975,34 +904,6 @@ public class CollectionUtils {
 			}
 		}
 		return result;
-	}
-	
-	private static int[] getIntegerSequenceBeginAndEnd(int size, IntegerSequence sequence) {
-		int begin = sequence.getBegin();
-		if (begin < 0) {
-			begin = size + begin;
-		}
-		if (begin < 0) {
-			begin = 0;
-		}
-		if (begin >= size) {
-			begin = size - 1;
-		}
-		int end = sequence.getEnd();
-		if (end < 0) {
-			end = size + end;
-		}
-		if (end < 0) {
-			end = 0;
-		}
-		if (end >= size) {
-			end = size - 1;
-		}
-		if (begin < end) {
-			return new int[] {begin, end + 1};
-		} else {
-			return new int[] {end, begin + 1};
-		}
 	}
 	
 }

@@ -6,8 +6,8 @@ ${[1..4]}
 <!--#foreach(i in [1..4])-->
 ${i}
 <!--#end-->
-${['a', 'b', 'c']}
-<!--#foreach(c in ['a', 'b', 'c'])-->
+${[`a`, `b`, `c`]}
+<!--#foreach(c in [`a`, `b`, `c`])-->
 ${c}
 <!--#end-->
 ${`a`..`d`}
@@ -20,5 +20,13 @@ ${s}
 <!--#end-->
 ${"Monday" .. "Friday"}
 <!--#foreach(s in "Monday" .. "Friday")-->
+${s}
+<!--#end-->
+${['aa', 'bb', 'cc']}
+<!--#foreach(s in ['aa', 'bb', 'cc'])-->
+${s}
+<!--#end-->
+${'Monday' .. 'Friday'}
+<!--#foreach(s in 'Monday' .. 'Friday')-->
 ${s}
 <!--#end-->
