@@ -20,7 +20,7 @@ import httl.internal.util.StringUtils;
 /**
  * CompressBlankFilter. (SPI, Singleton, ThreadSafe)
  * 
- * httl.spi.parsers.AbstractParser#setTextFilter(Filter)
+ * httl.spi.parsers.DefaultParser#setTextFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

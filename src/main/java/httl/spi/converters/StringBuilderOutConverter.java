@@ -25,7 +25,7 @@ import java.text.ParseException;
 /**
  * StringBuilderOutConverter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setOutConverter(Converter)
+ * @see httl.spi.parsers.DefaultParser#setOutConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

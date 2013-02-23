@@ -22,8 +22,8 @@ import java.text.ParseException;
  * Object Converter. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.translators.DefaultTranslator#setMapConverter(Converter)
- * @see httl.spi.parsers.AbstractParser#setMapConverter(Converter)
- * @see httl.spi.parsers.AbstractParser#setOutConverter(Converter)
+ * @see httl.spi.parsers.DefaultParser#setMapConverter(Converter)
+ * @see httl.spi.parsers.DefaultParser#setOutConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

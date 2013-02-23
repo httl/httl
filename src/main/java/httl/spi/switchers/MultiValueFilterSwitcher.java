@@ -22,7 +22,7 @@ import httl.internal.util.Reqiured;
 /**
  * MultiValueFilterSwitcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setValueFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.DefaultParser#setValueFilterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

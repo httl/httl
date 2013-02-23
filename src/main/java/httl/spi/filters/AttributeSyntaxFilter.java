@@ -30,7 +30,7 @@ import net.htmlparser.jericho.Source;
 /**
  * AttributeSyntaxFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTemplateFilter(Filter)
+ * @see httl.spi.parsers.DefaultParser#setTemplateFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

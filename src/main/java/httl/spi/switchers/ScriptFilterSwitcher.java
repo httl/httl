@@ -24,8 +24,8 @@ import httl.spi.Filter;
 /**
  * ScriptFilterSwitcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTextFilterSwitcher(Switcher)
- * @see httl.spi.parsers.AbstractParser#setValueFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.DefaultParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.DefaultParser#setValueFilterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

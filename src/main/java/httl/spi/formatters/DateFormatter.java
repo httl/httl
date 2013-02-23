@@ -25,7 +25,7 @@ import java.util.TimeZone;
 /**
  * DateFormatter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setFormatter(Formatter)
+ * @see httl.spi.parsers.DefaultParser#setFormatter(Formatter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

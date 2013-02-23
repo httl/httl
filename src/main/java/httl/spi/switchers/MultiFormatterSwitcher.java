@@ -22,7 +22,7 @@ import httl.internal.util.Reqiured;
 /**
  * MultiFormatterSwitcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setFormatterSwitcher(Switcher)
+ * @see httl.spi.parsers.DefaultParser#setFormatterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

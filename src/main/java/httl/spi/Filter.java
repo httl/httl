@@ -18,9 +18,9 @@ package httl.spi;
 /**
  * Text Filter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setTemplateFilter(Filter)
- * @see httl.spi.parsers.AbstractParser#setTextFilter(Filter)
- * @see httl.spi.parsers.AbstractParser#setValueFilter(Filter)
+ * @see httl.spi.parsers.DefaultParser#setTemplateFilter(Filter)
+ * @see httl.spi.parsers.DefaultParser#setTextFilter(Filter)
+ * @see httl.spi.parsers.DefaultParser#setValueFilter(Filter)
  * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)

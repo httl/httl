@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
  * BeanMapConverter. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.translators.DefaultTranslator#setMapConverter(Converter)
- * @see httl.spi.parsers.AbstractParser#setMapConverter(Converter)
+ * @see httl.spi.parsers.DefaultParser#setMapConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

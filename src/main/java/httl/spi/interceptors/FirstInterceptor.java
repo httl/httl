@@ -25,7 +25,7 @@ import java.text.ParseException;
 /**
  * FirstInterceptor. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setInterceptor(Interceptor)
+ * @see httl.spi.parsers.DefaultParser#setInterceptor(Interceptor)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

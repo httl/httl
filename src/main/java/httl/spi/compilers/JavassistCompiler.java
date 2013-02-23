@@ -36,7 +36,7 @@ import javassist.NotFoundException;
 /**
  * JavassistCompiler. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.AbstractParser#setCompiler(Compiler)
+ * @see httl.spi.parsers.DefaultParser#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
