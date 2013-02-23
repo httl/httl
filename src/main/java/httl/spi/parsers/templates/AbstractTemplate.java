@@ -166,7 +166,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 			synchronized (this) {
 				if (parameterType == null) {
 					try {
-						parameterType = BeanMapConverter.getBeanClass(getName(), getVariableTypes(), compiler);
+						parameterType = BeanMapConverter.getBeanClass(getName(), getVariableTypes(), compiler, null);
 					} catch (ParseException e) {
 						parameterType = void.class;
 						throw new RuntimeException(e.getMessage(), e);

@@ -67,7 +67,7 @@ public final class Context implements Map<String, Object> {
 	public static Context getContext() {
 		Context context = LOCAL.get();
 		if (context == null) {
-			context = new Context(null, null, null, null);
+			context = new Context(null, null);
 			LOCAL.set(context);
 		}
 		return context;
@@ -75,27 +75,17 @@ public final class Context implements Map<String, Object> {
 
 	/**
 	 * Push the current context to thread local.
-	 * @param map - current current
-	 * @param out - current out
-	 * @param template - current template
 	 */
-	public static Context pushContext(Map<String, Object> map, Writer out, Template template) {
-		return doPushContext(map, out, template);
+	public static Context pushContext() {
+		return pushContext(null);
 	}
 
 	/**
 	 * Push the current context to thread local.
-	 * @param map - current current
-	 * @param out - current out
-	 * @param template - current template
+	 * @param current - current variables
 	 */
-	public static Context pushContext(Map<String, Object> map, OutputStream out, Template template) {
-		return doPushContext(map, out, template);
-	}
-
-	// do push
-	private static Context doPushContext(Map<String, Object> map, Object out, Template template) {
-		Context context = new Context(getContext(), map, out, template);
+	public static Context pushContext(Map<String, Object> current) {
+		Context context = new Context(getContext(), current);
 		LOCAL.set(context);
 		return context;
 	}
@@ -143,16 +133,11 @@ public final class Context implements Map<String, Object> {
 	// The current engine.
 	private Engine engine;
 
-	private Context(Context parent, Map<String, Object> current, Object out, Template template) {
+	private Context(Context parent, Map<String, Object> current) {
 		this.thread = Thread.currentThread().getId();
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
 		this.parent = parent;
 		this.current = current;
-		this.out = out;
-		this.template = template;
-		if (template != null) {
-			doSetEngine(template.getEngine());
-		}
 	}
 
 	// Check the cross-thread use.
@@ -215,7 +200,7 @@ public final class Context implements Map<String, Object> {
 		checkThread();
 		this.template = template;
 		if (template != null) {
-			setEngine(template.getEngine());
+			doSetEngine(template.getEngine());
 		}
 		return this;
 	}

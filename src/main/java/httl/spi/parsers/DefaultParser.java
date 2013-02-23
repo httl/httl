@@ -1328,7 +1328,7 @@ public class DefaultParser implements Parser {
 			getVariables.addAll(expr.getVariableTypes().keySet());
 			ResourceTemplate template = new ResourceTemplate(resource);
 			UnsafeStringWriter writer = new UnsafeStringWriter();
-			Context.pushContext(Collections.EMPTY_MAP, writer, template);
+			Context.pushContext().setWriter(writer).setTemplate(template);
 			try {
 				Object value = expr.evaluate(Collections.EMPTY_MAP);
 				if (value instanceof Expression) {
@@ -1537,7 +1537,6 @@ public class DefaultParser implements Parser {
 				throw new ParseException("Illegal: " + value, offset);
 			}
 			Class<?> clazz = ClassUtils.forName(importPackages, type);
-			types.put(var, clazz);
 			if (Map.class.isAssignableFrom(returnType)) {
 				Class<?> keyType = types.get(varname + ":0");
 				if (keyType != null) {
@@ -1549,9 +1548,8 @@ public class DefaultParser implements Parser {
 				}
 				code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
 			}
+			buf.append(getForeachCode(clazz, type, var, expression.getCode(), setVariables, getVariables, parameters, types, returnTypes, offset));
 			setVariables.add(foreachVariable);
-			setVariables.add(var);
-			buf.append(getForeachCode(type, clazz, var, code));
 		} else if (breakifDirective.equals(name)) {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The breakif expression == null!", begin);
@@ -1602,31 +1600,14 @@ public class DefaultParser implements Parser {
 					int start = (Integer) item[5];
 					Expression expression = translator.translate(expr, types, offset + end);
 					getVariables.addAll(expression.getVariableTypes().keySet());
+					Class<?> clazz;
 					if (StringUtils.isEmpty(type)) {
-						type = expression.getReturnType().getCanonicalName();
+						clazz = expression.getReturnType();
+						type = clazz.getCanonicalName();
+					} else {
+						clazz = ClassUtils.forName(importPackages, type);
 					}
-					Class<?> clazz = ClassUtils.forName(importPackages, type);
-					Class<?> cls = types.get(var);
-					if (cls != null && ! cls.equals(clazz)) {
-						throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset + start);
-					}
-					types.put(var, clazz);
-					setVariables.add(var);
-					buf.append("	" + var + " = (" + type + ")(" + expression.getCode() + ");\n");
-					String ctx = null;
-					if (":=".equals(oper)) {
-						ctx = "($context.getParent() != null ? $context.getParent() : $context)";
-						returnTypes.put(var, clazz);
-					} else if (! ".=".equals(oper)) {
-						ctx = "$context";
-					}
-					if (StringUtils.isNotEmpty(ctx)) {
-						buf.append("	" + ctx + ".put(\"");
-						buf.append(var);
-						buf.append("\", ");
-						buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
-						buf.append(");\n");
-					}
+					buf.append(getSetCode(clazz, type, var, oper, expression.getCode(), setVariables, getVariables, parameters, types, returnTypes, offset + start));
 				}
 			} else {
 				value = BLANK_PATTERN.matcher(value).replaceAll(" ");
@@ -1666,6 +1647,35 @@ public class DefaultParser implements Parser {
 			}
 		}else {
 			throw new ParseException("Unsupported directive " + name, begin);
+		}
+		return buf.toString();
+	}
+	
+	private String getSetCode(Class<?> clazz, String type, String var, String oper, 
+			String code, Set<String> setVariables, Set<String> getVariables, 
+			List<String> parameters, Map<String, Class<?>> types, Map<String, 
+			Class<?>> returnTypes, int offset) throws ParseException {
+		Class<?> cls = types.get(var);
+		if (cls != null && ! cls.equals(clazz)) {
+			throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset);
+		}
+		types.put(var, clazz);
+		setVariables.add(var);
+		StringBuilder buf = new StringBuilder();
+		buf.append("	" + var + " = (" + type + ")(" + code + ");\n");
+		String ctx = null;
+		if (":=".equals(oper)) {
+			ctx = "($context.getParent() != null ? $context.getParent() : $context)";
+			returnTypes.put(var, clazz);
+		} else if (! ".=".equals(oper)) {
+			ctx = "$context";
+		}
+		if (StringUtils.isNotEmpty(ctx)) {
+			buf.append("	" + ctx + ".put(\"");
+			buf.append(var);
+			buf.append("\", ");
+			buf.append(ClassUtils.class.getName() + ".boxed(" + var + ")");
+			buf.append(");\n");
 		}
 		return buf.toString();
 	}
@@ -1723,19 +1733,24 @@ public class DefaultParser implements Parser {
 		return type.substring(0, i);
 	}
 	
-	private String getConditionCode(Expression expression) throws IOException, ParseException {
+	private String getConditionCode(Expression expression) throws ParseException {
 		return StringUtils.getConditionCode(expression.getReturnType(), expression.getCode(), importSizers);
 	}
 
-	private String getForeachCode(String type, Class<?> clazz, String var, String code) {
+	private String getForeachCode(Class<?> clazz, String type, String var, 
+			String code, Set<String> setVariables, Set<String> getVariables, 
+			List<String> parameters, Map<String, Class<?>> types, Map<String, 
+			Class<?>> returnTypes, int offset) throws ParseException {
 		StringBuilder buf = new StringBuilder();
 		String name = "_i_" + var;
 		buf.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator((" + foreachVariable + " = new " + ForeachStatus.class.getName() + "(" + foreachVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
+		String varCode;
 		if (clazz.isPrimitive()) {
-			buf.append("	" + var + " = " + ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next());\n");
+			varCode = ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next())";
 		} else {
-			buf.append("	" + var + " = (" + type + ") " + name + ".next();\n");
+			varCode = name + ".next()";
 		}
+		buf.append(getSetCode(clazz, type, var, "=", varCode, setVariables, getVariables, parameters, types, returnTypes, offset));
 		return buf.toString();
 	}
 

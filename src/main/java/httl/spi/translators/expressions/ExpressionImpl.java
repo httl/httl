@@ -258,7 +258,7 @@ public class ExpressionImpl implements Expression, Serializable {
 			synchronized (this) {
 				if (parameterType == null) {
 					try {
-						parameterType = BeanMapConverter.getBeanClass(md5, getVariableTypes(), compiler);
+						parameterType = BeanMapConverter.getBeanClass(md5, getVariableTypes(), compiler, null);
 					} catch (ParseException e) {
 						parameterType = void.class;
 						throw new RuntimeException(e.getMessage(), e);

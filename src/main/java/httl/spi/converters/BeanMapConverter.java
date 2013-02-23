@@ -20,6 +20,7 @@ import httl.internal.util.MapSupport;
 import httl.internal.util.StringUtils;
 import httl.spi.Compiler;
 import httl.spi.Converter;
+import httl.spi.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -43,11 +44,20 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 
 	private Compiler compiler;
 
+	private Logger logger;
+
 	/**
 	 * httl.properties: compiler=httl.spi.compilers.JdkCompiler
 	 */
 	public void setCompiler(Compiler compiler) {
 		this.compiler = compiler;
+	}
+
+	/**
+	 * httl.properties: logger=httl.spi.loggers.Log4jLogger
+	 */
+	public void setLogger(Logger logger) {
+		this.logger = logger;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -59,7 +69,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		Class<?> wrapperClass = BEAN_WRAPPERS.get(beanClass);
 		if (wrapperClass == null) {
 			try {
-				wrapperClass = getMapClass(beanClass, compiler);
+				wrapperClass = getMapClass(beanClass, compiler, logger);
 				Class<?> old = BEAN_WRAPPERS.putIfAbsent(beanClass, wrapperClass);
 				if (old != null) {
 					wrapperClass = old;
@@ -77,7 +87,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		}
 	}
 	
-	public static Class<?> getBeanClass(String className, Map<String, Class<?>> properties, Compiler compiler) throws ParseException {
+	public static Class<?> getBeanClass(String className, Map<String, Class<?>> properties, Compiler compiler, Logger logger) throws ParseException {
 		StringBuilder fields = new StringBuilder();
 		StringBuilder gets = new StringBuilder();
 		StringBuilder sets = new StringBuilder();
@@ -101,10 +111,13 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		code.append(gets);
 		code.append(sets);
 		code.append("}\n");
+		if (logger != null && logger.isDebugEnabled()) {
+			logger.debug(code.toString());
+		}
 		return compiler.compile(code.toString());
 	}
 
-	public static Class<?> getMapClass(Class<?> beanClass, Compiler compiler) throws ParseException {
+	public static Class<?> getMapClass(Class<?> beanClass, Compiler compiler, Logger logger) throws ParseException {
 		StringBuilder keys = new StringBuilder();
 		StringBuilder gets = new StringBuilder();
 		StringBuilder clss = new StringBuilder();
@@ -126,7 +139,11 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 				if (gets.length() > 0) {
 					gets.append("else ");
 				}
-				gets.append("if (\"" + key + "\".equals(key)) return bean." + name + "();\n");
+				String call = "bean." + name + "()";
+				if (method.getReturnType().isPrimitive()) {
+					call = ClassUtils.class.getName() + ".boxed(" + call + ")";
+				}
+				gets.append("if (\"" + key + "\".equals(key)) return " + call + ";\n");
 				clss.append("else if (\"" + key + ".class\".equals(key)) return " + method.getReturnType().getCanonicalName() + ".class;\n");
 			} else if (name.length() > 3 && name.startsWith("set")
 					&& Modifier.isPublic(method.getModifiers())
@@ -136,7 +153,13 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 				if (puts.length() > 0) {
 					puts.append("else ");
 				}
-				puts.append("if (\"" + key + "\".equals(key)) bean." + name + "((" + ClassUtils.getBoxedClass(method.getParameterTypes()[0]).getCanonicalName() + ") value);\n");
+				String var;
+				if (method.getParameterTypes()[0].isPrimitive()) {
+					var = ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(method.getParameterTypes()[0]).getCanonicalName() + ") value)";
+				} else {
+					var = "(" + method.getParameterTypes()[0].getCanonicalName() + ") value";
+				}
+				puts.append("if (\"" + key + "\".equals(key)) bean." + name + "(" + var + ");\n");
 			}
 		}
 		StringBuilder code = new StringBuilder();
@@ -145,7 +168,9 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		code.append("public class " + className + " extends " + MapSupport.class.getName() + " {\n");
 		code.append("private " + beanClass.getCanonicalName() + " bean;\n");
 		code.append("public " + className + "(" + beanClass.getCanonicalName() + " bean) {\n");
-		code.append("super(new String[] {" + keys + "});\n");
+		if (keys.length() > 0) {
+			code.append("super(new String[] {" + keys + "});\n");
+		}
 		code.append("this.bean = bean;\n");
 		code.append("}\n");
 		code.append("public Object get(Object key) {\n");
@@ -159,6 +184,9 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		code.append("return old;\n");
 		code.append("}\n");
 		code.append("}\n");
+		if (logger != null && logger.isDebugEnabled()) {
+			logger.debug(code.toString());
+		}
 		return compiler.compile(code.toString());
 	}
 
