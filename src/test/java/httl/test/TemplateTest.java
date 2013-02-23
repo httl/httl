@@ -136,7 +136,7 @@ public class TemplateTest {
 			Engine engine = Engine.getEngine(config);
 
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);
-			String json = codecs[0].toString("context", context);
+			String json = codecs[0].toString("context", model);
 
 			Object[] maps = new Object[] {context, model, json, null};
 			for (Object map : maps) {
@@ -205,9 +205,9 @@ public class TemplateTest {
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
 			//if (! "for_chars.httl".equals(templateName)) continue; // 指定模板测试
-			if (data instanceof String) continue; // FIXME JSON数据的Map没有排序，导致断言失败，暂先跳过
 			if (! profile)
 				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
+			if ("httl-velocity.properties".equals(config) && (data == null || data instanceof String)) continue;
 			if (excludes.contains(templateName) || 
 					(includes.size() > 0 && ! includes.contains(templateName))) {
 				continue;
@@ -245,7 +245,7 @@ public class TemplateTest {
 					((Model) data).setExtends(null);
 				}
 			}
-			if (! profile && data != null) {
+			if (! profile && data != null && ! (data instanceof String)) { // FIXME JSON数据的Map没有排序，导致断言失败，暂先跳过
 				URL url = this.getClass().getClassLoader().getResource(dir + "results/" + templateName + ".txt");
 				if (url == null) {
 					throw new FileNotFoundException("Not found file: " + dir + "results/" + templateName + ".txt");
