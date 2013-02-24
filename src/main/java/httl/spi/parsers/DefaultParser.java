@@ -194,6 +194,20 @@ public class DefaultParser implements Parser {
 		}
 	};
 
+	private boolean isDirective(String message) {
+		if (message.length() > 1 && message.charAt(0) == '#'
+				&& message.charAt(1) >= 'a' && message.charAt(1) <= 'z') {
+			int i = message.indexOf('(');
+			String name = (i > 0 ? message.substring(1, i) : message.substring(1));
+ 			return name.startsWith(legacySetDirective) || name.startsWith(setDirective)
+					|| name.startsWith(ifDirective) || name.startsWith(elseifDirective)
+					|| name.startsWith(elseDirective) || name.startsWith(foreachDirective)
+					|| name.startsWith(breakifDirective) || name.startsWith(macroDirective)
+					|| name.startsWith(endDirective);
+		}
+		return false;
+	}
+
 	private String doParse(Resource resource, boolean stream, String source, Translator translator, 
 							 List<String> defVariables, List<Class<?>> defVariableTypes, 
 							 Set<String> setVariables, Set<String> getVariables, Map<String, Class<?>> types, 
@@ -211,8 +225,7 @@ public class DefaultParser implements Parser {
 			Token token = tokens.get(t);
 			String message = token.getMessage();
 			int offset = token.getOffset() + 1;
-			if (message.length() > 1 && message.charAt(0) == '#'
-					&& message.charAt(1) >= 'a' && message.charAt(1) <= 'z') {
+			if (isDirective(message)) {
 				int s = message.indexOf('(');
 				String name;
 				String value;
@@ -228,13 +241,6 @@ public class DefaultParser implements Parser {
 					exprOffset = token.getOffset() + message.length();
 					name = message.substring(1);
 					value = "";
-				}
-				if (! (name.startsWith(legacySetDirective) || name.startsWith(setDirective)
-						|| name.startsWith(ifDirective) || name.startsWith(elseifDirective)
-						|| name.startsWith(elseDirective) || name.startsWith(foreachDirective)
-						|| name.startsWith(breakifDirective) || name.startsWith(macroDirective)
-						|| name.startsWith(endDirective))) {
-					throw new ParseException("Unsupported directive #" + name + " ", offset);
 				}
 				if (endDirective.equals(name)) {
 					if (nameStack.isEmpty()) {
