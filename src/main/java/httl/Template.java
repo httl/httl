@@ -83,7 +83,7 @@ public interface Template extends Resource, Expression {
 	/**
 	 * Get the macro template.
 	 * 
-	 * @param macro name
+	 * @param name - macro name
 	 * @return macro template
 	 */
 	Template getMacro(String name);
