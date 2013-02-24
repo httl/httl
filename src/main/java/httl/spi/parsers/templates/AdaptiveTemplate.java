@@ -167,6 +167,14 @@ public class AdaptiveTemplate implements Template, Serializable {
 	
 	private Map<String, Template> macros;
 
+	public Template getMacro(String name) {
+		Template macro = getMacros().get(name);
+		if (macro == null) {
+			throw new IllegalStateException("No such macro " + name + " in template " + getName());
+		}
+		return macro;
+	}
+
 	public Map<String, Template> getMacros() {
 		if (macros == null) { // allow duplicate on concurrent
 			Map<String, Template> map = new HashMap<String, Template>();

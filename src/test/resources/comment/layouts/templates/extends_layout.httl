@@ -11,7 +11,7 @@
     <table>
       <tr>
         <td>
-          <!--#macro($!crumbs)-->
+          <!--#macro($!crumbs(String home))-->
             <a href="/">Home</a>
           <!--#end-->
         </td>

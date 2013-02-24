@@ -277,6 +277,14 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	public Engine getEngine() {
 		return engine;
 	}
+	
+	public Template getMacro(String name) {
+		Template macro = getMacros().get(name);
+		if (macro == null) {
+			throw new IllegalStateException("No such macro " + name + " in template " + getName());
+		}
+		return macro;
+	}
 
 	public Map<String, Template> getMacros() {
 		return macros;

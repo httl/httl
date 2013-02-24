@@ -142,6 +142,10 @@ public class ProxyTemplate implements Template {
 		return template.getExportTypes();
 	}
 
+	public Template getMacro(String name) {
+		return template.getMacro(name);
+	}
+
 	public Map<String, Template> getMacros() {
 		return template.getMacros();
 	}

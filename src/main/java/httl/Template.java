@@ -81,6 +81,14 @@ public interface Template extends Resource, Expression {
 	Map<String, Class<?>> getExportTypes();
 
 	/**
+	 * Get the macro template.
+	 * 
+	 * @param macro name
+	 * @return macro template
+	 */
+	Template getMacro(String name);
+
+	/**
 	 * Get the macro templates.
 	 * 
 	 * @return macro templates

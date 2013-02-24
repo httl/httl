@@ -11,7 +11,8 @@ ${aaa}
 <!--#end-->
 22222222222
 <!--#set(aaa = "AAA")-->
-${xxx(aaa)}
+${xxx}
 33333333333
 <!--#set(aaa = "BBB")-->
 ${xxx(aaa)}
+${xxx("CCC")}

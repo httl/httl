@@ -195,6 +195,10 @@ public final class BinaryOperator extends Operator {
 					}
 				}
 			}
+			if (Template.class.isAssignableFrom(leftType)
+					&& ! hasMethod(Template.class, name, rightTypes)) {
+				return getNotNullCode(leftCode, leftCode + ".getMacro(\"" + name + "\").evaluate(" + CollectionUtils.class.getName() + ".toMap(" + leftCode + ".getMacro(\"" + name + "\").getVariableTypes().keySet(), new Object" + (rightCode.length() == 0 ? "[0]" : "[] { " + rightCode + " }") + " ))");
+			}
 			return getNotNullCode(leftCode, getMethodName(leftType, name, rightTypes, leftCode, rightCode));
 		} else if (name.equals("[")) {
 			if (Map.class.isAssignableFrom(leftType)) {
@@ -457,6 +461,10 @@ public final class BinaryOperator extends Operator {
 					} catch (NoSuchMethodException e) {
 					}
 				}
+			}
+			if (Template.class.isAssignableFrom(leftType)
+					&& ! hasMethod(Template.class, name, rightTypes)) {
+				return Object.class;
 			}
 			return getReturnType(leftType, name, rightTypes);
 		} else if ("..".equals(name)) {

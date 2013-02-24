@@ -108,6 +108,10 @@ public class ResourceTemplate implements Template {
 		return Collections.EMPTY_MAP;
 	}
 
+	public Template getMacro(String name) {
+		throw new IllegalStateException("No such macro " + name + " in template " + getName());
+	}
+
 	@SuppressWarnings("unchecked")
 	public Map<String, Template> getMacros() {
 		return Collections.EMPTY_MAP;
