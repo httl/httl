@@ -170,10 +170,10 @@ public final class Context implements Map<String, Object> {
 	}
 
 	/**
-	 * Get the parent template.
+	 * Get the super template.
 	 * 
 	 * @see #getContext()
-	 * @return parent template
+	 * @return super template
 	 */
 	public Template getSuper() {
 		checkThread();
@@ -229,7 +229,7 @@ public final class Context implements Map<String, Object> {
 		doSetEngine(engine);
 		return this;
 	}
-	
+
 	private void doSetEngine(Engine engine) {
 		if (engine != null) {
 			if (parent != null && parent.getEngine() == null) {
@@ -285,8 +285,7 @@ public final class Context implements Map<String, Object> {
 	 * @return current writer
 	 */
 	public Writer getWriter() {
-		checkThread();
-		return (Writer) out;
+		return (Writer) getOut();
 	}
 
 	/**

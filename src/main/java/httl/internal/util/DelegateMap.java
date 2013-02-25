@@ -57,19 +57,7 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 				return value;
 			}
 		}
-		V value = doGet(key);
-		if (value != null) {
-			return value;
-		}
 		return parent == null ? null : parent.get(key);
-	}
-	
-	protected V doGet(Object key) {
-		return null;
-	}
-	
-	protected Map<K, V> newMap() {
-		return new HashMap<K, V>();
 	}
 
 	public Set<Map.Entry<K, V>> entrySet() {
@@ -145,14 +133,14 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 
 	public V put(K key, V value) {
 		if (writable == null) {
-			writable = newMap();
+			writable = new HashMap<K, V>();
 		}
 		return writable.put(key, value);
 	}
 
 	public void putAll(Map<? extends K, ? extends V> map) {
 		if (writable == null) {
-			writable = newMap();
+			writable = new HashMap<K, V>();
 		}
 		writable.putAll(map);
 	}

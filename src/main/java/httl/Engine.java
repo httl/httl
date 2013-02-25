@@ -491,8 +491,12 @@ public abstract class Engine {
 		return new DelegateMap<String, Object>(parent, current) {
 			private static final long serialVersionUID = 1L;
 			@Override
-			protected Object doGet(Object key) {
-				return parent == null ? Engine.this.getVariable((String) key) : null;
+			public Object get(Object key) {
+				Object value = super.get(key);
+				if (value == null && parent == null) {
+					return Engine.this.getVariable((String) key);
+				}
+				return value;
 			}
 		};
 	}
