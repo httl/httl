@@ -15,6 +15,7 @@
  */
 package httl.spi.loggers;
 
+import httl.internal.util.Version;
 import httl.spi.Logger;
 
 /**
@@ -57,11 +58,20 @@ public class MultiLogger implements Logger {
 		}
 	}
 
+	private String appendEnvInfo(Throwable e) {
+		return appendEnvInfo(e == null ? "" : e.getMessage());
+	}
+
+	private String appendEnvInfo(String msg) {
+		return msg + ", httl: " + Version.getVersion() + ", jvm: " + System.getProperty("java.version")
+				+ ", os: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch");
+	}
+
 	public void trace(String msg, Throwable e) {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.trace(msg, e);
+					logger.trace(appendEnvInfo(msg), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -72,7 +82,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.trace(e);
+					logger.trace(appendEnvInfo(e), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -83,7 +93,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.trace(msg);
+					logger.trace(appendEnvInfo(msg));
 				}
 			}
 		} catch (Throwable t) {
@@ -94,7 +104,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.debug(msg, e);
+					logger.debug(appendEnvInfo(msg), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -105,7 +115,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.debug(e);
+					logger.debug(appendEnvInfo(e), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -116,7 +126,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.debug(msg);
+					logger.debug(appendEnvInfo(msg));
 				}
 			}
 		} catch (Throwable t) {
@@ -127,7 +137,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.info(msg, e);
+					logger.info(appendEnvInfo(msg), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -138,7 +148,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.info(e);
+					logger.info(appendEnvInfo(e), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -149,7 +159,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.info(msg);
+					logger.info(appendEnvInfo(msg));
 				}
 			}
 		} catch (Throwable t) {
@@ -160,7 +170,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.warn(msg, e);
+					logger.warn(appendEnvInfo(msg), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -171,7 +181,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.warn(e);
+					logger.warn(appendEnvInfo(e), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -182,7 +192,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.warn(msg);
+					logger.warn(appendEnvInfo(msg));
 				}
 			}
 		} catch (Throwable t) {
@@ -193,7 +203,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.error(msg, e);
+					logger.error(appendEnvInfo(msg), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -204,7 +214,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.error(e);
+					logger.error(appendEnvInfo(e), e);
 				}
 			}
 		} catch (Throwable t) {
@@ -215,7 +225,7 @@ public class MultiLogger implements Logger {
 		try {
 			if (loggers != null) {
 				for (Logger logger : loggers) {
-					logger.error(msg);
+					logger.error(appendEnvInfo(msg));
 				}
 			}
 		} catch (Throwable t) {
