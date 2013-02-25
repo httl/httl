@@ -4,3 +4,5 @@ ${u1.name}
 ----
 <!--#set(User u2 = user)-->
 ${u2.name}
+====
+${((User) user).name}
