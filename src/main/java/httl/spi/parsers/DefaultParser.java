@@ -468,7 +468,6 @@ public class DefaultParser implements Parser {
 	/**
 	 * httl.properties: parse.directory=/tmp/javacode
 	 */
-	@Reqiured
 	public void setParseDirectory(String parseDirectory) {
 		if (parseDirectory != null && parseDirectory.trim().length() > 0) {
 			File file = new File(parseDirectory);
