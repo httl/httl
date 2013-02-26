@@ -30,6 +30,7 @@ import httl.internal.util.IOUtils;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.LocaleUtils;
 import httl.internal.util.OrderedMap;
+import httl.internal.util.Reqiured;
 import httl.internal.util.StringCache;
 import httl.internal.util.StringUtils;
 import httl.internal.util.Token;
@@ -53,6 +54,8 @@ import httl.spi.parsers.templates.ResourceTemplate;
 import httl.spi.parsers.templates.WriterTemplate;
 import httl.spi.translators.expressions.ExpressionImpl;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -460,6 +463,21 @@ public class DefaultParser implements Parser {
 	
 	private final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
 	
+	protected File parseDirectory;
+
+	/**
+	 * httl.properties: parse.directory=/tmp/javacode
+	 */
+	@Reqiured
+	public void setParseDirectory(String parseDirectory) {
+		if (parseDirectory != null && parseDirectory.trim().length() > 0) {
+			File file = new File(parseDirectory);
+			if (file.exists() || file.mkdirs()) {
+				this.parseDirectory = file;
+			}
+		}
+	}
+
 	private boolean isOutputStream;
 
 	private boolean isOutputWriter;
@@ -1137,12 +1155,29 @@ public class DefaultParser implements Parser {
 					+ "}\n"
 					+ "\n"
 					+ "}\n";
-			if (logger != null && logger.isDebugEnabled()) {
-				logger.debug("\n================================\n" + resource.getName() + "\n================================\n" + sorceCode + "\n================================\n");
-			}
+			logJavaCode(resource.getName(), packageName, className, sorceCode);
 			return compiler.compile(sorceCode);
 		} catch (Exception e) {
 			throw new ParseException("Filed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
+		}
+	}
+
+	private void logJavaCode(String resourceName, String packageName, String className, String sorceCode) throws IOException {
+		if (logger != null && logger.isDebugEnabled()) {
+			logger.debug("\n================================\n" + resourceName + "\n================================\n" + sorceCode + "\n================================\n");
+		}
+		if (parseDirectory != null) {
+			File javaFile = new File(parseDirectory, packageName.replace('.', '/') + "/" + className + ".java");
+			File javaDir = javaFile.getParentFile();
+			if (javaDir.exists() || javaDir.mkdirs()) {
+				FileWriter writer = new FileWriter(javaFile);
+				try {
+					writer.write(sorceCode);
+					writer.flush();
+				} finally {
+					writer.close();
+				}
+			}
 		}
 	}
 	
