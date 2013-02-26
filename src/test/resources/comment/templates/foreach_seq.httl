@@ -1,0 +1,7 @@
+<!--#set(int begin, int end)-->
+<!--#foreach(i in 1..5)-->
+${i - 1}
+<!--#end-->
+<!--#foreach(j in begin..end)-->
+${j - 1}
+<!--#end-->

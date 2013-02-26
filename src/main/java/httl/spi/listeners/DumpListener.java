@@ -52,7 +52,12 @@ public class DumpListener implements Listener {
 	 */
 	@Reqiured
 	public void setDumpDirectory(String dumpDirectory) {
-		this.dumpDirectory = new File(dumpDirectory);
+		if (dumpDirectory != null && dumpDirectory.trim().length() > 0) {
+			File file = new File(dumpDirectory);
+			if (file.exists() || file.mkdirs()) {
+				this.dumpDirectory = file;
+			}
+		}
 	}
 
 	/**

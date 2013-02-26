@@ -50,6 +50,10 @@ public class Model {
 	
 	private Map<String, Book> bookmap2;
 
+	private int begin;
+
+	private int end;
+
 	public String getExtends() {
 		return _extends;
 	}
@@ -168,6 +172,22 @@ public class Model {
 
 	public void setBookmap2(Map<String, Book> bookmap2) {
 		this.bookmap2 = bookmap2;
+	}
+
+	public int getBegin() {
+		return begin;
+	}
+
+	public void setBegin(int begin) {
+		this.begin = begin;
+	}
+
+	public int getEnd() {
+		return end;
+	}
+
+	public void setEnd(int end) {
+		this.end = end;
 	}
 
 }

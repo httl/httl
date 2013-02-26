@@ -113,6 +113,8 @@ public class TemplateTest {
 		context.put("books2", books2);
 		context.put("booklist2", Arrays.asList(books2));
 		context.put("bookmap2", bookmap2);
+		context.put("begin", 3);
+		context.put("end", 7);
 
 		Model model = new Model();
 		model.setChinese("中文");
@@ -129,6 +131,8 @@ public class TemplateTest {
 		model.setBooks2(books2);
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
+		model.setBegin(3);
+		model.setEnd(7);
 
 	    final List<Object[]> retTestData = new ArrayList<Object[]>();
 		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-attribute.properties", "httl-velocity.properties" };
@@ -204,7 +208,7 @@ public class TemplateTest {
 		}
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
-			//if (! "extends_method.httl".equals(templateName)) continue; // 指定模板测试
+			//if (! "foreach_seq.httl".equals(templateName)) continue; // 指定模板测试
 			if (! profile)
 				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
 			if ("httl-velocity.properties".equals(config) && (data == null || data instanceof String)) continue;
