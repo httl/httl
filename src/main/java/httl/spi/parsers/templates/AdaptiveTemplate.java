@@ -18,6 +18,7 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.Visitor;
 import httl.spi.Converter;
 
 import java.io.IOException;
@@ -198,6 +199,10 @@ public class AdaptiveTemplate implements Template, Serializable {
 
 	public boolean isMacro() {
 		return writerTemplate.isMacro();
+	}
+
+	public void accept(Visitor visitor) {
+		writerTemplate.accept(visitor);
 	}
 
 	@Override

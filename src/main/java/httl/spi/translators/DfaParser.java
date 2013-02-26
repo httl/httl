@@ -16,13 +16,13 @@
 package httl.spi.translators;
 
 import httl.spi.Translator;
-import httl.spi.translators.expressions.BinaryOperator;
-import httl.spi.translators.expressions.Bracket;
-import httl.spi.translators.expressions.Constant;
-import httl.spi.translators.expressions.Node;
-import httl.spi.translators.expressions.Operator;
-import httl.spi.translators.expressions.UnaryOperator;
-import httl.spi.translators.expressions.Variable;
+import httl.ast.BinaryOperator;
+import httl.ast.Bracket;
+import httl.ast.Constant;
+import httl.ast.Operator;
+import httl.ast.Parameter;
+import httl.ast.UnaryOperator;
+import httl.ast.Variable;
 import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.StringSequence;
@@ -151,7 +151,7 @@ public class DfaParser {
 
 	private final int offset;
 	
-	private final LinkedStack<Node> parameterStack = new LinkedStack<Node>();
+	private final LinkedStack<Parameter> parameterStack = new LinkedStack<Parameter>();
 
 	private final LinkedStack<Operator> operatorStack = new LinkedStack<Operator>();
 	
@@ -261,7 +261,7 @@ public class DfaParser {
 		return priority;
 	}
 	
-	public Node parse(String source, Set<String> variables) throws ParseException {
+	public Parameter parse(String source, Set<String> variables) throws ParseException {
 		List<Token> tokens = scanner.scan(source);
 		boolean beforeOperator = true;
 		for (int i = 0; i < tokens.size(); i ++) {
@@ -422,7 +422,7 @@ public class DfaParser {
 				throw new ParseException("Miss right parenthesis", offset);
 			}
 		}
-		Node result = parameterStack.pop();
+		Parameter result = parameterStack.pop();
 		if (! parameterStack.isEmpty())
 			throw new ParseException("Operator miss parameter", offset);
 		return result;

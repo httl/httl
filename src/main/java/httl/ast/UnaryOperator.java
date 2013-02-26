@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.ast;
 
 import httl.Expression;
 import httl.spi.Translator;
@@ -36,9 +36,7 @@ import java.util.Map;
  */
 public final class UnaryOperator extends Operator {
 
-	private static final long serialVersionUID = 1L;
-
-	private Node parameter;
+	private Parameter parameter;
 
 	private String[] sizers;
 	
@@ -48,11 +46,11 @@ public final class UnaryOperator extends Operator {
 		this.sizers = sizers;
 	}
 
-	public Node getParameter() {
+	public Parameter getParameter() {
 		return parameter;
 	}
 
-	public void setParameter(Node parameter) {
+	public void setParameter(Parameter parameter) {
 		this.parameter = parameter;
 	}
 

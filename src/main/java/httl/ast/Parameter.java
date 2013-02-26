@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.ast;
 
-import java.io.Serializable;
+import httl.Node;
+import httl.Visitor;
+
 import java.text.ParseException;
 import java.util.Map;
 
@@ -24,19 +26,21 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class Node implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public abstract class Parameter implements Node {
 
 	private final int offset;
 	
 	private final Map<String, Class<?>> parameterTypes;
 
-	public Node(Map<String, Class<?>> parameterTypes, int offset) {
+	public Parameter(Map<String, Class<?>> parameterTypes, int offset) {
 		this.offset = offset;
 		this.parameterTypes = parameterTypes;
 	}
-	
+
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+	}
+
 	public int getOffset() {
 		return offset;
 	}
@@ -54,7 +58,7 @@ public abstract class Node implements Serializable {
 		return getGenericVariableName(this);
 	}
 
-	protected static String getGenericVariableName(Node node) {
+	protected static String getGenericVariableName(Parameter node) {
 		if (node instanceof Variable) {
 			return ((Variable)node).getName();
 		}

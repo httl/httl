@@ -18,9 +18,11 @@ package httl.spi.translators.expressions;
 import httl.Context;
 import httl.Engine;
 import httl.Expression;
+import httl.Visitor;
 import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.spi.converters.BeanMapConverter;
+import httl.ast.Parameter;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.Digest;
 
@@ -56,7 +58,7 @@ public class ExpressionImpl implements Expression, Serializable {
 	
 	private final int offset;
 	
-	private final Node node;
+	private final Parameter node;
 
 	private final String code;
 
@@ -74,7 +76,7 @@ public class ExpressionImpl implements Expression, Serializable {
 	
 	private volatile Evaluator evaluator;
 	
-	public ExpressionImpl(String source, Set<String> variables, Map<String, Class<?>> parameterTypes, int offset, Node node, String code, Class<?> returnType, Engine engine, Compiler compiler, Converter<Object, Object> mapConverter, String[] importPackages, Map<Class<?>, Object> functions){
+	public ExpressionImpl(String source, Set<String> variables, Map<String, Class<?>> parameterTypes, int offset, Parameter node, String code, Class<?> returnType, Engine engine, Compiler compiler, Converter<Object, Object> mapConverter, String[] importPackages, Map<Class<?>, Object> functions){
 		this.engine = engine;
 		this.compiler = compiler;
 		this.mapConverter = mapConverter;
@@ -101,10 +103,15 @@ public class ExpressionImpl implements Expression, Serializable {
 		return usedParameterTypes;
 	}
 
-	public Node getNode() {
+	public Parameter getNode() {
 		return node;
 	}
-	
+
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+		node.accept(visitor);
+	}
+
 	public Object evaluate() throws ParseException {
 		return evaluate(Context.getContext());
 	}

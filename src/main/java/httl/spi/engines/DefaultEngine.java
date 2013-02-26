@@ -61,7 +61,7 @@ public class DefaultEngine extends Engine {
 	// httl.properties: loaders=httl.spi.loaders.ClasspathLoader
 	private Loader loader;
 
-	// httl.properties: parser=httl.spi.parsers.CommentParser
+	// httl.properties: parser=httl.spi.parsers.DefaultParser
 	private Parser parser;
 
 	// httl.properties: translator=httl.spi.translators.DefaultTranslator
@@ -525,7 +525,7 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * httl.properties: parser=httl.spi.parsers.CommentParser
+	 * httl.properties: parser=httl.spi.parsers.DefaultParser
 	 */
 	public void setParser(Parser parser) {
 		this.parser = parser;

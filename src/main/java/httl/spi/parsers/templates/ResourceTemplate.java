@@ -18,6 +18,7 @@ package httl.spi.parsers.templates;
 import httl.Engine;
 import httl.Resource;
 import httl.Template;
+import httl.Visitor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -134,6 +135,10 @@ public class ResourceTemplate implements Template {
 	}
 
 	public void render(Object context, Object out) throws IOException, ParseException {
+		throw new UnsupportedOperationException();
+	}
+
+	public void accept(Visitor visitor) {
 		throw new UnsupportedOperationException();
 	}
 

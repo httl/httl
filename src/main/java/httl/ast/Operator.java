@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.ast;
 
 import httl.spi.Translator;
 
@@ -25,9 +25,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class Operator extends Node {
-
-	private static final long serialVersionUID = 1L;
+public abstract class Operator extends Parameter {
 
 	private final String name;
 	

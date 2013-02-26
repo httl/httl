@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.ast;
 
 import httl.spi.Translator;
 import httl.internal.util.ClassUtils;
@@ -26,10 +26,8 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Variable extends Node {
+public final class Variable extends Parameter {
 
-	private static final long serialVersionUID = 1L;
-	
 	private Class<?> defaultType;
 
 	private final String name;

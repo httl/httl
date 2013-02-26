@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.ast;
 
 import httl.Template;
 import httl.internal.util.ClassUtils;
@@ -40,11 +40,9 @@ import java.util.Map;
  */
 public final class BinaryOperator extends Operator {
 
-	private static final long serialVersionUID = 1L;
-
-	private Node leftParameter;
+	private Parameter leftParameter;
 	
-	private Node rightParameter;
+	private Parameter rightParameter;
 	
 	private List<StringSequence> sequences;
 
@@ -61,19 +59,19 @@ public final class BinaryOperator extends Operator {
 		this.sizers = sizers;
 	}
 
-	public Node getLeftParameter() {
+	public Parameter getLeftParameter() {
 		return leftParameter;
 	}
 
-	public void setLeftParameter(Node leftParameter) {
+	public void setLeftParameter(Parameter leftParameter) {
 		this.leftParameter = leftParameter;
 	}
 
-	public Node getRightParameter() {
+	public Parameter getRightParameter() {
 		return rightParameter;
 	}
 
-	public void setRightParameter(Node rightParameter) {
+	public void setRightParameter(Parameter rightParameter) {
 		this.rightParameter = rightParameter;
 	}
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.ast;
 
 import java.text.ParseException;
 
@@ -22,9 +22,7 @@ import java.text.ParseException;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Constant extends Node {
-
-	private static final long serialVersionUID = 1L;
+public final class Constant extends Parameter {
 
 	public static final Constant NULL = new Constant(null, null, "null");
 

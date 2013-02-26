@@ -22,7 +22,7 @@ import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Translator;
 import httl.spi.translators.expressions.ExpressionImpl;
-import httl.spi.translators.expressions.Node;
+import httl.ast.Parameter;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.StringSequence;
 
@@ -156,7 +156,7 @@ public class DefaultTranslator implements Translator {
 			source = expressionFilter.filter(source, source);
 		}
 		Set<String> variables = new HashSet<String>();
-		Node node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importSizers, importPackages, offset).parse(source, variables);
+		Parameter node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importSizers, importPackages, offset).parse(source, variables);
 		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, mapConverter, importPackages, functions);
 	}
 

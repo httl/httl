@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.ast;
 
 import java.text.ParseException;
 
@@ -23,8 +23,6 @@ import java.text.ParseException;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class Bracket extends Operator {
-
-	private static final long serialVersionUID = 1L;
 
 	public static final Bracket ROUND = new Bracket("(");
 	

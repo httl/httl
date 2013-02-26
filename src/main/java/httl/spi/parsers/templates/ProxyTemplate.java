@@ -17,6 +17,7 @@ package httl.spi.parsers.templates;
 
 import httl.Engine;
 import httl.Template;
+import httl.Visitor;
 import httl.internal.util.UnsafeByteArrayOutputStream;
 import httl.internal.util.UnsafeStringWriter;
 
@@ -152,6 +153,10 @@ public class ProxyTemplate implements Template {
 
 	public boolean isMacro() {
 		return template.isMacro();
+	}
+
+	public void accept(Visitor visitor) {
+		template.accept(visitor);
 	}
 
 }

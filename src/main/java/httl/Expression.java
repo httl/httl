@@ -32,7 +32,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public interface Expression {
+public interface Expression extends Node {
 
 	/**
 	 * Evaluate the expression.

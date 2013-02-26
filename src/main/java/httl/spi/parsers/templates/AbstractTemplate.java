@@ -18,6 +18,7 @@ package httl.spi.parsers.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Template;
+import httl.Visitor;
 import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.spi.Filter;
@@ -183,6 +184,11 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	public InputStream getInputStream() throws IOException {
 		return new UnsafeByteArrayInputStream(getSource().getBytes(getEncoding()));
+	}
+
+	public void accept(Visitor visitor) {
+		visitor.visit(this);
+		// TODO 实现访问者递归
 	}
 
 	public Object evaluate() throws ParseException {
