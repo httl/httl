@@ -18,11 +18,11 @@ package httl.ast;
 import httl.Expression;
 
 /**
- * Set
+ * For
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Set extends Directive {
+public class For extends BlockDirective {
 
 	private Class<?> type;
 

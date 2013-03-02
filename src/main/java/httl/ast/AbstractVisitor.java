@@ -30,16 +30,16 @@ public class AbstractVisitor implements Visitor {
 			visit((Text) node);
 		} else if (node instanceof Value) {
 			visit((Value) node);
-		} else if (node instanceof Set) {
-			visit((Set) node);
+		} else if (node instanceof Var) {
+			visit((Var) node);
 		} else if (node instanceof If) {
 			visit((If) node);
 		} else if (node instanceof ElseIf) {
 			visit((ElseIf) node);
 		} else if (node instanceof Else) {
 			visit((Else) node);
-		} else if (node instanceof Foreach) {
-			visit((Foreach) node);
+		} else if (node instanceof For) {
+			visit((For) node);
 		} else if (node instanceof BreakIf) {
 			visit((BreakIf) node);
 		} else if (node instanceof Macro) {
@@ -53,7 +53,7 @@ public class AbstractVisitor implements Visitor {
 
 	public void visit(Value node) {}
 
-	public void visit(Set node) {}
+	public void visit(Var node) {}
 
 	public void visit(If node) {}
 
@@ -61,7 +61,7 @@ public class AbstractVisitor implements Visitor {
 
 	public void visit(Else node) {}
 
-	public void visit(Foreach node) {}
+	public void visit(For node) {}
 
 	public void visit(BreakIf node) {}
 

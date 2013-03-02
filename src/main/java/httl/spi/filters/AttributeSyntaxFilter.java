@@ -15,6 +15,7 @@
  */
 package httl.spi.filters;
 
+import httl.internal.util.StringUtils;
 import httl.spi.Filter;
 
 import java.util.ArrayList;
@@ -36,80 +37,78 @@ import net.htmlparser.jericho.Source;
  */
 public class AttributeSyntaxFilter extends AbstractFilter {
 
-	private String legacySetDirective = "var";
+	private String[] varDirective = new String[] { "var" };
 
-	private String setDirective = "set";
+	private String[] ifDirective = new String[] { "if" };
 
-	private String ifDirective = "if";
+	private String[] elseifDirective = new String[] { "elseif" };
 
-	private String elseifDirective = "elseif";
+	private String[] elseDirective = new String[] { "else" };
 
-	private String elseDirective = "else";
+	private String[] forDirective = new String[] { "for" };
 
-	private String foreachDirective = "foreach";
+	private String[] breakifDirective = new String[] { "breakif" };
 
-	private String breakifDirective = "breakif";
+	private String[] macroDirective = new String[] { "macro" };
 
-	private String macroDirective = "macro";
-
-	private String endDirective = "end";
+	private String[] endDirective = new String[] { "end" };
 
 	private String attributeNamespace;
 
 	/**
-	 * httl.properties: set.directive=set
+	 * httl.properties: var.directive=var
 	 */
-	public void setSetDirective(String setDirective) {
-		this.setDirective = setDirective.toLowerCase();
+	public void setVarDirective(String[] varDirective) {
+		this.varDirective = varDirective;
 	}
 
 	/**
 	 * httl.properties: if.directive=if
 	 */
-	public void setIfDirective(String ifDirective) {
-		this.ifDirective = ifDirective.toLowerCase();
+	public void setIfDirective(String[] ifDirective) {
+		this.ifDirective = ifDirective;
 	}
 
 	/**
 	 * httl.properties: elseif.directive=elseif
 	 */
-	public void setElseifDirective(String elseifDirective) {
-		this.elseifDirective = elseifDirective.toLowerCase();
+	public void setElseifDirective(String[] elseifDirective) {
+		this.elseifDirective = elseifDirective;
 	}
 
 	/**
 	 * httl.properties: else.directive=else
 	 */
-	public void setElseDirective(String elseDirective) {
-		this.elseDirective = elseDirective.toLowerCase();
+	public void setElseDirective(String[] elseDirective) {
+		this.elseDirective = elseDirective;
 	}
 
 	/**
-	 * httl.properties: foreach.directive=foreach
+	 * httl.properties: for.directive=for
 	 */
-	public void setForeachDirective(String foreachDirective) {
-		this.foreachDirective = foreachDirective.toLowerCase();
+	public void setForDirective(String[] forDirective) {
+		this.forDirective = forDirective;
 	}
 
 	/**
 	 * httl.properties: breakif.directive=breakif
 	 */
-	public void setBreakifDirective(String breakifDirective) {
-		this.breakifDirective = breakifDirective.toLowerCase();
+	public void setBreakifDirective(String[] breakifDirective) {
+		this.breakifDirective = breakifDirective;
 	}
 
 	/**
 	 * httl.properties: macro.directive=macro
 	 */
-	public void setMacroDirective(String macroDirective) {
-		this.macroDirective = macroDirective.toLowerCase();
+	public void setMacroDirective(String[] macroDirective) {
+		this.macroDirective = macroDirective;
 	}
 
 	/**
 	 * httl.properties: end.directive=end
 	 */
-	public void setEndDirective(String endDirective) {
-		this.endDirective = endDirective.toLowerCase();
+	public void setEndDirective(String[] endDirective) {
+		this.endDirective = endDirective;
 	}
 
 	/**
@@ -123,18 +122,17 @@ public class AttributeSyntaxFilter extends AbstractFilter {
 	}
 
 	private boolean isDirective(String name) {
-		return legacySetDirective.equals(name) || setDirective.equals(name) 
-				 ||ifDirective.equals(name) || elseifDirective.equals(name)
-				 || elseDirective.equals(name) || foreachDirective.equals(name)
-				 || breakifDirective.equals(name) || macroDirective.equals(name) 
-				 || endDirective.equals(name);
+		return StringUtils.inArray(name, varDirective)
+				|| StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseifDirective)
+				|| StringUtils.inArray(name, elseDirective) || StringUtils.inArray(name, forDirective)
+				|| StringUtils.inArray(name, breakifDirective) || StringUtils.inArray(name, macroDirective)
+				|| StringUtils.inArray(name, endDirective);
 	}
 
-	// 是否为块指令判断
 	private boolean isBlockDirective(String name) {
-		return ifDirective.equals(name) || elseifDirective.equals(name)
-				 || elseDirective.equals(name) || foreachDirective.equals(name)
-				  || macroDirective.equals(name);
+		return StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseifDirective) 
+				|| StringUtils.inArray(name, elseDirective) || StringUtils.inArray(name, forDirective)
+				|| StringUtils.inArray(name, macroDirective);
 	}
 
 	public String filter(String key, String value) {
@@ -198,7 +196,7 @@ public class AttributeSyntaxFilter extends AbstractFilter {
 							String directiveName = (String)directiveNames.get(i);
 							if (isBlockDirective(directiveName)) {
 								buf.append("#");
-								buf.append(endDirective);
+								buf.append(endDirective[0]);
 								buf.append("(");
 								buf.append(directiveName);
 								buf.append(")");

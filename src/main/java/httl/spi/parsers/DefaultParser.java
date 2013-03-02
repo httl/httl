@@ -25,12 +25,11 @@ import httl.internal.util.CharCache;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.CollectionUtils;
 import httl.internal.util.DfaScanner;
-import httl.internal.util.ForeachStatus;
+import httl.internal.util.Status;
 import httl.internal.util.IOUtils;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.LocaleUtils;
 import httl.internal.util.OrderedMap;
-import httl.internal.util.Reqiured;
 import httl.internal.util.StringCache;
 import httl.internal.util.StringUtils;
 import httl.internal.util.Token;
@@ -202,13 +201,23 @@ public class DefaultParser implements Parser {
 				&& message.charAt(1) >= 'a' && message.charAt(1) <= 'z') {
 			int i = message.indexOf('(');
 			String name = (i > 0 ? message.substring(1, i) : message.substring(1));
- 			return name.startsWith(legacySetDirective) || name.startsWith(setDirective)
-					|| name.startsWith(ifDirective) || name.startsWith(elseifDirective)
-					|| name.startsWith(elseDirective) || name.startsWith(foreachDirective)
-					|| name.startsWith(breakifDirective) || name.startsWith(macroDirective)
-					|| name.startsWith(endDirective);
+ 			return isDirectiveName(name);
 		}
 		return false;
+	}
+
+	private boolean isDirectiveName(String name) {
+		return StringUtils.inArray(name, varDirective)
+				|| StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseifDirective)
+				|| StringUtils.inArray(name, elseDirective) || StringUtils.inArray(name, forDirective)
+				|| StringUtils.inArray(name, breakifDirective) || StringUtils.inArray(name, macroDirective)
+				|| StringUtils.inArray(name, endDirective);
+	}
+
+	private boolean isBlockDirectiveName(String name) {
+		return StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseifDirective) 
+				|| StringUtils.inArray(name, elseDirective) || StringUtils.inArray(name, forDirective)
+				|| StringUtils.inArray(name, macroDirective);
 	}
 
 	private String doParse(Resource resource, boolean stream, String source, Translator translator, 
@@ -245,26 +254,26 @@ public class DefaultParser implements Parser {
 					name = message.substring(1);
 					value = "";
 				}
-				if (endDirective.equals(name)) {
+				if (StringUtils.inArray(name, endDirective)) {
 					if (nameStack.isEmpty()) {
 						throw new ParseException("The #end directive without start directive.", offset);
 					}
 					String startName = nameStack.pop();
 					String startValue = valueStack.pop();
-					while(elseifDirective.equals(startName) || elseDirective.equals(startName)) {
+					while(StringUtils.inArray(startName, elseifDirective) || StringUtils.inArray(startName, elseDirective)) {
 						if (nameStack.isEmpty()) {
 							throw new ParseException("The #" + startName + " directive without #if directive.", offset);
 						}
 						String oldStartName = startName;
 						startName = nameStack.pop();
 						startValue = valueStack.pop();  
-						if (! ifDirective.equals(startName) && ! elseifDirective.equals(startName)) {
+						if (! StringUtils.inArray(startName, ifDirective) && ! StringUtils.inArray(startName, elseifDirective)) {
 							throw new ParseException("The #" + oldStartName + " directive without #if directive.", offset);
 						}
 					}
 					if (macro != null) {
-						if (macroDirective.equals(startName) && 
-								! nameStack.toList().contains(macroDirective)) {
+						if (StringUtils.inArray(startName, macroDirective) && 
+								! CollectionUtils.containsAny(nameStack.toList(), macroDirective)) {
 							int i = startValue.indexOf('(');
 							String var;
 							String param;
@@ -296,7 +305,7 @@ public class DefaultParser implements Parser {
 							String key = getMacroPath(resource.getName(), var);
 							String es = macro.toString();
 							if (StringUtils.isNotEmpty(param)) {
-								es = getDiretive(legacySetDirective, param) + es;
+								es = getDiretive(varDirective[0], param) + es;
 							}
 							macros.put(var, parseClass(new StringResource(getEngine(), key, resource.getLocale(), resource.getEncoding(), resource.getLastModified(), es), types, stream, macroParameterStart));
 							Class<?> cls = types.get(var);
@@ -311,7 +320,7 @@ public class DefaultParser implements Parser {
 							} else if (StringUtils.isNotEmpty(set)) {
 								getVariables.add(var);
 								String setValue = set + " " + var + ".evaluate()";
-								String code = getStatementCode(setDirective, setValue, offset, exprOffset, translator, setVariables, getVariables, types, returnTypes, defVariables, defVariableTypes, true);
+								String code = getStatementCode(varDirective[0], setValue, offset, exprOffset, translator, setVariables, getVariables, types, returnTypes, defVariables, defVariableTypes, true);
 								buf.append(code);
 							}
 							macro = null;
@@ -328,16 +337,14 @@ public class DefaultParser implements Parser {
 						}
 					}
 				} else {
-					if (ifDirective.equals(name) || elseifDirective.equals(name) 
-							|| elseDirective.equals(name) || foreachDirective.equals(name)
-							|| macroDirective.equals(name)) {
+					if (isBlockDirectiveName(name)) {
 						nameStack.push(name);
 						valueStack.push(value);
 					}
 					if (macro != null) {
 						macro.append(message);
 					} else {
-						if (macroDirective.equals(name)) {
+						if (StringUtils.inArray(name, macroDirective)) {
 							if (value == null || value.trim().length() == 0) {
 								throw new ParseException("Macro name == null!", offset);
 							}
@@ -387,27 +394,25 @@ public class DefaultParser implements Parser {
 
 	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
 
-	private String legacySetDirective = "var";
+	private String[] varDirective = new String[] { "var" };
 
-	private String setDirective = "set";
+	private String[] ifDirective = new String[] { "if" };
 
-	private String ifDirective = "if";
+	private String[] elseifDirective = new String[] { "elseif" };
 
-	private String elseifDirective = "elseif";
+	private String[] elseDirective = new String[] { "else" };
 
-	private String elseDirective = "else";
+	private String[] forDirective = new String[] { "for" };
 
-	private String foreachDirective = "foreach";
+	private String[] breakifDirective = new String[] { "breakif" };
 
-	private String breakifDirective = "breakif";
+	private String[] macroDirective = new String[] { "macro" };
 
-	private String macroDirective = "macro";
+	private String[] endDirective = new String[] { "end" };
 
-	private String endDirective = "end";
+	private String forVariable = "for";
 
-	private String foreachVariable = "foreach";
-
-	private String foreachSeparator = "in";
+	private String forSeparator = "in";
 
 	private String filterVariable = "filter";
 
@@ -417,7 +422,7 @@ public class DefaultParser implements Parser {
 	
 	private String defaultFormatterVariable;
 
-	private Pattern foreachSeparatorPattern;
+	private Pattern forSeparatorPattern;
 
 	private Engine engine;
 	
@@ -503,59 +508,59 @@ public class DefaultParser implements Parser {
 	}
 
 	/**
-	 * httl.properties: set.directive=set
+	 * httl.properties: var.directive=var
 	 */
-	public void setSetDirective(String setDirective) {
-		this.setDirective = setDirective.toLowerCase();
+	public void setVarDirective(String[] varDirective) {
+		this.varDirective = varDirective;
 	}
 
 	/**
 	 * httl.properties: if.directive=if
 	 */
-	public void setIfDirective(String ifDirective) {
-		this.ifDirective = ifDirective.toLowerCase();
+	public void setIfDirective(String[] ifDirective) {
+		this.ifDirective = ifDirective;
 	}
 
 	/**
 	 * httl.properties: elseif.directive=elseif
 	 */
-	public void setElseifDirective(String elseifDirective) {
-		this.elseifDirective = elseifDirective.toLowerCase();
+	public void setElseifDirective(String[] elseifDirective) {
+		this.elseifDirective = elseifDirective;
 	}
 
 	/**
 	 * httl.properties: else.directive=else
 	 */
-	public void setElseDirective(String elseDirective) {
-		this.elseDirective = elseDirective.toLowerCase();
+	public void setElseDirective(String[] elseDirective) {
+		this.elseDirective = elseDirective;
 	}
 
 	/**
-	 * httl.properties: foreach.directive=foreach
+	 * httl.properties: for.directive=for
 	 */
-	public void setForeachDirective(String foreachDirective) {
-		this.foreachDirective = foreachDirective.toLowerCase();
+	public void setForDirective(String[] forDirective) {
+		this.forDirective = forDirective;
 	}
 
 	/**
 	 * httl.properties: breakif.directive=breakif
 	 */
-	public void setBreakifDirective(String breakifDirective) {
-		this.breakifDirective = breakifDirective.toLowerCase();
+	public void setBreakifDirective(String[] breakifDirective) {
+		this.breakifDirective = breakifDirective;
 	}
 
 	/**
 	 * httl.properties: macro.directive=macro
 	 */
-	public void setMacroDirective(String macroDirective) {
-		this.macroDirective = macroDirective.toLowerCase();
+	public void setMacroDirective(String[] macroDirective) {
+		this.macroDirective = macroDirective;
 	}
 
 	/**
 	 * httl.properties: end.directive=end
 	 */
-	public void setEndDirective(String endDirective) {
-		this.endDirective = endDirective.toLowerCase();
+	public void setEndDirective(String[] endDirective) {
+		this.endDirective = endDirective;
 	}
 
 	/**
@@ -722,17 +727,17 @@ public class DefaultParser implements Parser {
 	}
 
 	/**
-	 * httl.properties: foreach.separator=in
+	 * httl.properties: for.separator=in
 	 */
-	public void setForeachSeparator(String foreachSeparator) {
-		this.foreachSeparator = foreachSeparator;
+	public void setForSeparator(String forSeparator) {
+		this.forSeparator = forSeparator;
 	}
 
 	/**
-	 * httl.properties: foreach.variable=foreach
+	 * httl.properties: for.variable=for
 	 */
-	public void setForeachVariable(String foreachVariable) {
-		this.foreachVariable = foreachVariable;
+	public void setForVariable(String forVariable) {
+		this.forVariable = forVariable;
 	}
 	
 	/**
@@ -781,7 +786,7 @@ public class DefaultParser implements Parser {
 	 * init.
 	 */
 	public void init() {
-		foreachSeparatorPattern = Pattern.compile("(\\s+" + Pattern.quote(foreachSeparator) + "\\s+)");
+		forSeparatorPattern = Pattern.compile("(\\s+" + Pattern.quote(forSeparator) + "\\s+)");
 		defaultFilterVariable = "$" + filterVariable;
 		defaultFormatterVariable = "$" + formatterVariable;
 		if (importVariables != null && importVariables.length > 0) {
@@ -917,7 +922,7 @@ public class DefaultParser implements Parser {
 			types.put(filterVariable, Filter.class);
 			types.put(defaultFormatterVariable, Formatter.class);
 			types.put(formatterVariable, Formatter.class);
-			types.put(foreachVariable, ForeachStatus.class);
+			types.put(forVariable, Status.class);
 			StringBuilder macroFields = new StringBuilder();
 			StringBuilder macroInits = new StringBuilder();
 			for (String macro : importMacroTemplates.keySet()) {
@@ -1496,10 +1501,10 @@ public class DefaultParser implements Parser {
 	}
 
 	private String getStatementEndCode(String name) throws IOException, ParseException {
-		if (ifDirective.equals(name) || elseifDirective.equals(name) || elseDirective.equals(name)) {
+		if (StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseifDirective) || StringUtils.inArray(name, elseifDirective)) {
 			return "	}\n"; // 插入结束指令
-		} else if (foreachDirective.equals(name)) {
-			return "	" + foreachVariable + ".increment();\n	}\n	" + foreachVariable + " = " + foreachVariable + ".getParent();\n"; // 插入结束指令
+		} else if (StringUtils.inArray(name, forDirective)) {
+			return "	" + forVariable + ".increment();\n	}\n	" + forVariable + " = " + forVariable + ".getParent();\n"; // 插入结束指令
 		}
 		return "";
 	}
@@ -1510,7 +1515,7 @@ public class DefaultParser implements Parser {
 		name = name == null ? null : name.trim();
 		value = value == null ? null : value.trim();
 		StringBuilder buf = new StringBuilder();
-		if (ifDirective.equals(name)) {
+		if (StringUtils.inArray(name, ifDirective)) {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The if expression == null!", begin);
 			}
@@ -1518,7 +1523,7 @@ public class DefaultParser implements Parser {
 			buf.append("	if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") {\n");
-		} else if (elseifDirective.equals(name)) {
+		} else if (StringUtils.inArray(name, elseifDirective)) {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The elseif expression == null!", begin);
 			}
@@ -1529,7 +1534,7 @@ public class DefaultParser implements Parser {
 			buf.append("else if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") {\n");
-		} else if (elseDirective.equals(name)) {
+		} else if (StringUtils.inArray(name, elseDirective)) {
 			if (StringUtils.isNotEmpty(value)) {
 				throw new ParseException("Unsupported else expression " + value, offset);
 			}
@@ -1537,13 +1542,13 @@ public class DefaultParser implements Parser {
 				buf.append("	} ");
 			}
 			buf.append("else {\n");
-		} else if (foreachDirective.equals(name)) {
+		} else if (StringUtils.inArray(name, forDirective)) {
 			if (StringUtils.isEmpty(value)) {
-				throw new ParseException("The foreach expression == null!", begin);
+				throw new ParseException("The for expression == null!", begin);
 			}
-			Matcher matcher = foreachSeparatorPattern.matcher(value);
+			Matcher matcher = forSeparatorPattern.matcher(value);
 			if (! matcher.find()) {
-				throw new ParseException("Not found \"in\" in foreach", offset);
+				throw new ParseException("Not found \"in\" in for", offset);
 			}
 			int start = matcher.start(1);
 			int end = matcher.end(1);
@@ -1591,9 +1596,9 @@ public class DefaultParser implements Parser {
 				}
 				code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
 			}
-			buf.append(getForeachCode(clazz, type, var, expression.getCode(), setVariables, getVariables, defVariables, types, returnTypes, offset));
-			setVariables.add(foreachVariable);
-		} else if (breakifDirective.equals(name)) {
+			buf.append(getIterationCode(clazz, type, var, expression.getCode(), setVariables, getVariables, defVariables, types, returnTypes, offset));
+			setVariables.add(forVariable);
+		} else if (StringUtils.inArray(name, breakifDirective)) {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The breakif expression == null!", begin);
 			}
@@ -1601,7 +1606,7 @@ public class DefaultParser implements Parser {
 			buf.append("	if (");
 			buf.append(getConditionCode(expr));
 			buf.append(") break;\n");
-		} else if (setDirective.equals(name) || legacySetDirective.equals(name)) {
+		} else if (StringUtils.inArray(name, varDirective)) {
 			if (StringUtils.isEmpty(value)) {
 				throw new ParseException("The #" + name + " defVariables == null!", begin);
 			}
@@ -1778,13 +1783,13 @@ public class DefaultParser implements Parser {
 		return StringUtils.getConditionCode(expression.getReturnType(), expression.getCode(), importSizers);
 	}
 
-	private String getForeachCode(Class<?> clazz, String type, String var, 
+	private String getIterationCode(Class<?> clazz, String type, String var, 
 			String code, Set<String> setVariables, Set<String> getVariables, 
 			List<String> defVariables, Map<String, Class<?>> types, Map<String, 
 			Class<?>> returnTypes, int offset) throws ParseException {
 		StringBuilder buf = new StringBuilder();
 		String name = "_i_" + var;
-		buf.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator((" + foreachVariable + " = new " + ForeachStatus.class.getName() + "(" + foreachVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
+		buf.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator((" + forVariable + " = new " + Status.class.getName() + "(" + forVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
 		String varCode;
 		if (clazz.isPrimitive()) {
 			varCode = ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next())";

@@ -18,15 +18,15 @@ package httl.internal.util;
 import java.io.Serializable;
 
 /**
- * ForeachStatus. (SPI, Prototype, ThreadSafe)
+ * Status. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ForeachStatus implements Serializable {
+public class Status implements Serializable {
 
 	private static final long serialVersionUID = -6011370058720809056L;
 	
-	private final ForeachStatus parent;
+	private final Status parent;
 
 	private final Object data;
 	
@@ -36,7 +36,7 @@ public class ForeachStatus implements Serializable {
 	
 	private int index = 0;
 
-	public ForeachStatus(ForeachStatus parent, Object data) {
+	public Status(Status parent, Object data) {
 		this.parent = parent;
 		this.data = data;
 		this.size = ClassUtils.getSize(data);
@@ -47,7 +47,7 @@ public class ForeachStatus implements Serializable {
 		index ++;
 	}
 	
-	public ForeachStatus getParent() {
+	public Status getParent() {
 		return parent;
 	}
 

@@ -193,6 +193,12 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 							} else if ("evaluate".equals(name)) {
 								// 将 #evaluate("1 + 2") 转成 ${evaluate("1 + 2")}
 								message = "${evaluate(" + expression + ")}";
+							} else if ("set".equals(name)) {
+								// 将#set(x = y) 转成 #var(x = y)
+								message = "#var(" + expression + ")";
+							} else if ("foreach".equals(name)) {
+								// 将#foreach(item in list) 转成 #for(item in list)
+								message = "#for(" + expression + ")";
 							} else if ("macro".equals(name)) {
 								String[] args = expression.split("\\s+");
 								StringBuilder sb = new StringBuilder();
@@ -204,7 +210,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 										sb.append("Object ");
 										sb.append(arg);
 									}
-									// 将 #macro(name $arg1 $arg2) 转成 #macro(name(arg1, arg2))
+									// 将 #macro(name arg1 arg2) 转成 #macro(name(arg1, arg2))
 									message = "#macro(" + args[0] + (sb.length() == 0 ? "" : "(" + sb + ")") + ")";
 								}
 							} else if ("define".equals(name)) {

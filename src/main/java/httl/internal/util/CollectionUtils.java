@@ -587,6 +587,17 @@ public class CollectionUtils {
 		return ! isEmpty(values);
 	}
 
+	public static boolean containsAny(List<?> value, Object[] values) {
+		if (value != null && values != null) {
+			for (Object v : values) {
+				if (value.contains(v)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public static Iterator<Boolean> toIterator(boolean[] object) {
 		return new BooleanArrayIterator(object);
 	}

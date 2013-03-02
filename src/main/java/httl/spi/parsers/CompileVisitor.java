@@ -20,10 +20,10 @@ import httl.ast.BreakIf;
 import httl.ast.Else;
 import httl.ast.ElseIf;
 import httl.ast.End;
-import httl.ast.Foreach;
+import httl.ast.For;
 import httl.ast.If;
 import httl.ast.Macro;
-import httl.ast.Set;
+import httl.ast.Var;
 import httl.ast.Text;
 import httl.ast.Value;
 
@@ -51,7 +51,7 @@ public class CompileVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public void visit(Set node) {
+	public void visit(Var node) {
 		builder.append("	");
 		builder.append(node.getType().getCanonicalName());
 		builder.append(" ");
@@ -81,7 +81,7 @@ public class CompileVisitor extends AbstractVisitor {
 	}
 
 	@Override
-	public void visit(Foreach node) {
+	public void visit(For node) {
 		builder.append("	for(");
 		builder.append(node.getExpression().getCode());
 		builder.append(") {\n");

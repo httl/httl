@@ -18,11 +18,11 @@ package httl.ast;
 import httl.Expression;
 
 /**
- * Foreach
+ * Set
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Foreach extends BlockDirective {
+public class Var extends Directive {
 
 	private Class<?> type;
 
