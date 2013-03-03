@@ -23,7 +23,7 @@ package httl.internal.util;
  */
 public final class Token {
 
-	public static final int UNKOWN_TYPE = -1;
+	public static final int UNKNOWN_TYPE = -1;
 
 	private final String message;
 
@@ -38,7 +38,7 @@ public final class Token {
 	 * @param offset offset
 	 */
 	public Token(String message, int offset) {
-		this(message, offset, UNKOWN_TYPE);
+		this(message, offset, UNKNOWN_TYPE);
 	}
 
 	/**
