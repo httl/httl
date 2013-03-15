@@ -1698,7 +1698,12 @@ public class DefaultParser implements Parser {
 			Class<?>> returnTypes, int offset) throws ParseException {
 		Class<?> cls = types.get(var);
 		if (cls != null && ! cls.equals(clazz)) {
-			throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset);
+			if (cls.isAssignableFrom(cls)) {
+				clazz = cls;
+				type = clazz.getCanonicalName();
+			}else{
+				throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), offset);
+			}
 		}
 		types.put(var, clazz);
 		setVariables.add(var);
