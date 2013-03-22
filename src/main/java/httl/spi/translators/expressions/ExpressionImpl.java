@@ -17,17 +17,16 @@ package httl.spi.translators.expressions;
 
 import httl.Context;
 import httl.Engine;
-import httl.Expression;
+import httl.Node;
 import httl.Visitor;
+import httl.ast.Expression;
+import httl.internal.util.ClassUtils;
+import httl.internal.util.Digest;
 import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.spi.converters.BeanMapConverter;
-import httl.ast.Parameter;
-import httl.internal.util.ClassUtils;
-import httl.internal.util.Digest;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,10 +41,8 @@ import java.util.concurrent.ConcurrentMap;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class ExpressionImpl implements Expression, Serializable {
+public class ExpressionImpl implements Node {
 
-	private static final long serialVersionUID = 1L;
-	
 	private static final ConcurrentMap<String, Evaluator> EVALUATOR_CACHE = new ConcurrentHashMap<String, Evaluator>();
 
 	private final Engine engine;
@@ -58,7 +55,7 @@ public class ExpressionImpl implements Expression, Serializable {
 	
 	private final int offset;
 	
-	private final Parameter node;
+	private final Expression node;
 
 	private final String code;
 
@@ -76,7 +73,7 @@ public class ExpressionImpl implements Expression, Serializable {
 	
 	private volatile Evaluator evaluator;
 	
-	public ExpressionImpl(String source, Set<String> variables, Map<String, Class<?>> parameterTypes, int offset, Parameter node, String code, Class<?> returnType, Engine engine, Compiler compiler, Converter<Object, Object> mapConverter, String[] importPackages, Map<Class<?>, Object> functions){
+	public ExpressionImpl(String source, Set<String> variables, Map<String, Class<?>> parameterTypes, int offset, Expression node, String code, Class<?> returnType, Engine engine, Compiler compiler, Converter<Object, Object> mapConverter, String[] importPackages, Map<Class<?>, Object> functions){
 		this.engine = engine;
 		this.compiler = compiler;
 		this.mapConverter = mapConverter;
@@ -103,11 +100,11 @@ public class ExpressionImpl implements Expression, Serializable {
 		return usedParameterTypes;
 	}
 
-	public Parameter getNode() {
+	public Expression getNode() {
 		return node;
 	}
 
-	public void accept(Visitor visitor) {
+	public void accept(Visitor visitor) throws ParseException {
 		visitor.visit(this);
 		node.accept(visitor);
 	}

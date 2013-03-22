@@ -15,6 +15,8 @@
  */
 package httl;
 
+import java.text.ParseException;
+
 /**
  * Visitor. (API, Prototype, Callback, NonThreadSafe)
  * 
@@ -26,7 +28,9 @@ public interface Visitor {
 	 * Visit a node.
 	 * 
 	 * @param node - visited node
+	 * @return TODO
+	 * @throws ParseException TODO
 	 */
-	void visit(Node node);
+	boolean visit(Node node) throws ParseException;
 
 }

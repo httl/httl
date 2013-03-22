@@ -15,12 +15,11 @@
  */
 package httl.spi.translators;
 
-import httl.spi.Translator;
 import httl.ast.BinaryOperator;
 import httl.ast.Bracket;
 import httl.ast.Constant;
+import httl.ast.Expression;
 import httl.ast.Operator;
-import httl.ast.Parameter;
 import httl.ast.UnaryOperator;
 import httl.ast.Variable;
 import httl.internal.util.DfaScanner;
@@ -133,39 +132,22 @@ public class DfaParser {
 	
 	private static final Pattern BLANK_PATTERN = Pattern.compile("^(\\s+)");
 	
-	private final Translator translator;
 
 	private final Map<String, Class<?>> parameterTypes;
 
 	private final Class<?> defaultType;
 
-	private final Collection<Class<?>> functions;
-
-	private final List<StringSequence> sequences;
-
-	private final String[] getters;
-
-	private final String[] packages;
-	
-	private final String[] sizers;
-
 	private final int offset;
 	
-	private final LinkedStack<Parameter> parameterStack = new LinkedStack<Parameter>();
+	private final LinkedStack<Expression> parameterStack = new LinkedStack<Expression>();
 
 	private final LinkedStack<Operator> operatorStack = new LinkedStack<Operator>();
 	
 	private final Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
 
-	public DfaParser(Translator translator, Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] sizers, String[] packages, int offset) {
-		this.translator = translator;
+	public DfaParser(Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] sizers, String[] packages, int offset) {
 		this.parameterTypes = parameterTypes;
 		this.defaultType = defaultType;
-		this.functions = functions;
-		this.sequences = sequences;
-		this.getters = getters;
-		this.packages = packages;
-		this.sizers = sizers;
 		this.offset = offset;
 	}
 	
@@ -261,7 +243,7 @@ public class DfaParser {
 		return priority;
 	}
 	
-	public Parameter parse(String source, Set<String> variables) throws ParseException {
+	public Expression parse(String source, Set<String> variables) throws ParseException {
 		List<Token> tokens = scanner.scan(source);
 		boolean beforeOperator = true;
 		for (int i = 0; i < tokens.size(); i ++) {
@@ -293,7 +275,7 @@ public class DfaParser {
 						if (left != Bracket.ROUND) {
 							throw new ParseException("Miss left parenthesis", token.getOffset());
 						}
-						UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sizers, packages, msg, getPriority(msg, true));
+						UnaryOperator operator = new UnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
 						operatorTokens.put(operator, token);
 						operatorStack.push(operator);
 						beforeOperator = true;
@@ -309,50 +291,32 @@ public class DfaParser {
 					|| msg.startsWith("`") && msg.endsWith("`"))) {
 				if (msg.length() == 3 && msg.startsWith("`")) {
 					char value = msg.charAt(1);
-					parameterStack.push(new Constant(value, char.class, "\'" + value + "\'"));
+					parameterStack.push(new Constant(value));
 				} else {
 					String value = msg.substring(1, msg.length() - 1);
-					parameterStack.push(new Constant(value, String.class, "\"" + value + "\""));
+					parameterStack.push(new Constant(value));
 				}
 				beforeOperator = false;
 			} else if (StringUtils.isNumber(msg)) {
 				Object value;
-				Class<?> type;
-				String literal;
 				if (msg.endsWith("b") || msg.endsWith("B")) {
 					value = Byte.valueOf(msg.substring(0, msg.length() - 1));
-					type = byte.class;
-					literal = String.valueOf(value);
 				} else if (msg.endsWith("s") || msg.endsWith("S")) {
 					value = Short.valueOf(msg.substring(0, msg.length() - 1));
-					type = short.class;
-					literal = String.valueOf(value);
 				} else if (msg.endsWith("i") || msg.endsWith("I")) {
 					value = Integer.valueOf(msg.substring(0, msg.length() - 1));
-					type = int.class;
-					literal = String.valueOf(value);
 				} else if (msg.endsWith("l") || msg.endsWith("L")) {
 					value = Long.valueOf(msg.substring(0, msg.length() - 1));
-					type = long.class;
-					literal = String.valueOf(value) + "l";
 				} else if (msg.endsWith("f") || msg.endsWith("F")) {
 					value = Float.valueOf(msg.substring(0, msg.length() - 1));
-					type = float.class;
-					literal = String.valueOf(value) + "f";
 				} else if (msg.endsWith("d") || msg.endsWith("D")) {
 					value = Double.valueOf(msg.substring(0, msg.length() - 1));
-					type = double.class;
-					literal = String.valueOf(value) + "d";
 				} else if (msg.indexOf('.') >= 0) {
 					value = Double.valueOf(msg);
-					type = double.class;
-					literal = String.valueOf(value);
 				} else {
 					value = Integer.valueOf(msg);
-					type = int.class;
-					literal = String.valueOf(value);
 				}
-				parameterStack.push(new Constant(value, type, literal));
+				parameterStack.push(new Constant(value));
 				beforeOperator = false;
 			} else if ("null".equals(msg)) {
 				parameterStack.push(Constant.NULL);
@@ -363,11 +327,12 @@ public class DfaParser {
 			} else if (StringUtils.isNamed(msg)
 					&& ! "gt".equals(msg) && ! "ge".equals(msg) 
 					&& ! "lt".equals(msg) && ! "le".equals(msg)) {
-				if (defaultType == null && ! parameterTypes.containsKey(msg)) {
-					throw new ParseException("Undefined variable \"" + msg + "\". \nPlease add variable type definition #set(Xxx " + msg + ") in your template.", getTokenOffset(token) + offset);
-				}
 				variables.add(msg);
-				parameterStack.push(new Variable(translator, msg, getTokenOffset(token) + offset, parameterTypes, defaultType));
+				Class<?> type = parameterTypes.get(msg);
+				if (type == null && defaultType != null) {
+					type = defaultType;
+				}
+				parameterStack.push(new Variable(type, msg, getTokenOffset(token) + offset));
 				beforeOperator = false;
 			} else if ("(".equals(msg)) {
 				operatorStack.push(Bracket.ROUND);
@@ -383,14 +348,14 @@ public class DfaParser {
 					if (! msg.startsWith("new ") && ! StringUtils.isFunction(msg) && ! UNARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
 					}
-					UnaryOperator operator = new UnaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sizers, packages, msg, getPriority(msg, true));
+					UnaryOperator operator = new UnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
 					operatorTokens.put(operator, token);
 					operatorStack.push(operator);
 				} else {
 					if (! StringUtils.isFunction(msg) && ! BINARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
 					}
-					BinaryOperator operator = new BinaryOperator(translator, msg, getTokenOffset(token) + offset, parameterTypes, functions, sequences, getters, sizers, packages, msg, getPriority(msg, false));
+					BinaryOperator operator = new BinaryOperator(msg, getPriority(msg, false), getTokenOffset(token) + offset);
 					operatorTokens.put(operator, token);
 					while (! operatorStack.isEmpty() && ! (operatorStack.peek() instanceof Bracket)
 							&& operatorStack.peek().getPriority() >= operator.getPriority()) {
@@ -422,7 +387,7 @@ public class DfaParser {
 				throw new ParseException("Miss right parenthesis", offset);
 			}
 		}
-		Parameter result = parameterStack.pop();
+		Expression result = parameterStack.pop();
 		if (! parameterStack.isEmpty())
 			throw new ParseException("Operator miss parameter", offset);
 		return result;

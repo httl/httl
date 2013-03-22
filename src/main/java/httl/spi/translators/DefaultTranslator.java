@@ -15,16 +15,11 @@
  */
 package httl.spi.translators;
 
-import httl.Engine;
-import httl.Expression;
-import httl.spi.Compiler;
-import httl.spi.Converter;
-import httl.spi.Filter;
-import httl.spi.Translator;
-import httl.spi.translators.expressions.ExpressionImpl;
-import httl.ast.Parameter;
+import httl.ast.Expression;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.StringSequence;
+import httl.spi.Filter;
+import httl.spi.Translator;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -45,12 +40,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class DefaultTranslator implements Translator {
 
-	private Engine engine;
-
-	private Compiler compiler;
-
-	private Converter<Object, Object> mapConverter;
-
 	private Filter expressionFilter;
 
 	private Class<?> defaultVariableType;
@@ -70,27 +59,6 @@ public class DefaultTranslator implements Translator {
 	 */
 	public void setImportSizers(String[] importSizers) {
 		this.importSizers = importSizers;
-	}
-
-	/**
-	 * httl.properties: engine=httl.spi.engines.DefaultEngine
-	 */
-	public void setEngine(Engine engine) {
-		this.engine = engine;
-	}
-
-	/**
-	 * httl.properties: compiler=httl.spi.compilers.JdkCompiler
-	 */
-	public void setCompiler(Compiler compiler) {
-		this.compiler = compiler;
-	}
-
-	/**
-	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
-	 */
-	public void setMapConverter(Converter<Object, Object> mapConverter) {
-		this.mapConverter = mapConverter;
 	}
 
 	/**
@@ -132,9 +100,9 @@ public class DefaultTranslator implements Translator {
 	}
 
 	/**
-	 * httl.properties: sequences=Mon Tue Wed Thu Fri Sat Sun Mon
+	 * httl.properties: import.sequences=Mon Tue Wed Thu Fri Sat Sun Mon
 	 */
-	public void setSequences(String[] sequences) {
+	public void setImportSequences(String[] sequences) {
 		for (String s : sequences) {
 			s = s.trim();
 			if (s.length() > 0) {
@@ -156,8 +124,7 @@ public class DefaultTranslator implements Translator {
 			source = expressionFilter.filter(source, source);
 		}
 		Set<String> variables = new HashSet<String>();
-		Parameter node = new DfaParser(this, parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importSizers, importPackages, offset).parse(source, variables);
-		return new ExpressionImpl(source, variables, parameterTypes, offset, node, node.getCode(), node.getReturnType(), engine, compiler, mapConverter, importPackages, functions);
+		return new DfaParser(parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importSizers, importPackages, offset).parse(source, variables);
 	}
 
 }

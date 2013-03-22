@@ -23,6 +23,7 @@ import httl.internal.util.VolatileReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,6 +46,8 @@ public abstract class AbstractCompiler implements Compiler {
 
 	private static final ConcurrentMap<String, VolatileReference<Class<?>>> CLASS_CACHE = new ConcurrentHashMap<String, VolatileReference<Class<?>>>();
 
+	private File parseDirectory;
+
 	private File compileDirectory;
 	
 	private Logger logger;
@@ -56,6 +59,18 @@ public abstract class AbstractCompiler implements Compiler {
 	 */
 	public void setLogger(Logger logger) {
 		this.logger = logger;
+	}
+
+	/**
+	 * httl.properties: parse.directory=/tmp/javacode
+	 */
+	public void setParseDirectory(String parseDirectory) {
+		if (parseDirectory != null && parseDirectory.trim().length() > 0) {
+			File file = new File(parseDirectory);
+			if (file.exists() || file.mkdirs()) {
+				this.parseDirectory = file;
+			}
+		}
 	}
 
 	/**
@@ -84,6 +99,25 @@ public abstract class AbstractCompiler implements Compiler {
 				first = false;
 				if (logger != null && logger.isInfoEnabled()) {
 					logger.info("Compile httl template classes to directory " + compileDirectory.getAbsolutePath());
+				}
+			}
+		}
+	}
+
+	private void logJavaCode(Class<?> clazz, String sorceCode) throws IOException {
+		if (logger != null && logger.isDebugEnabled()) {
+			logger.debug("\n================================\n" + sorceCode + "\n================================\n");
+		}
+		if (parseDirectory != null) {
+			File javaFile = new File(parseDirectory, clazz.getPackage().getName().replace('.', '/') + "/" + clazz.getSimpleName() + ".java");
+			File javaDir = javaFile.getParentFile();
+			if (javaDir.exists() || javaDir.mkdirs()) {
+				FileWriter writer = new FileWriter(javaFile);
+				try {
+					writer.write(sorceCode);
+					writer.flush();
+				} finally {
+					writer.close();
 				}
 			}
 		}
@@ -129,6 +163,7 @@ public abstract class AbstractCompiler implements Compiler {
 					}
 				}
 			}
+			logJavaCode(cls, code);
 			return cls;
 		} catch (Throwable t) {
 			if (logger != null && logger.isErrorEnabled()) {

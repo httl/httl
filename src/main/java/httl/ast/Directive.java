@@ -18,6 +18,10 @@ package httl.ast;
 import httl.Node;
 import httl.Visitor;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Map;
+
 /**
  * Directive
  * 
@@ -25,8 +29,39 @@ import httl.Visitor;
  */
 public class Directive implements Node {
 
-	public void accept(Visitor visitor) {
+	private int offset;
+
+	private Node parent;
+
+	public Node getParent() {
+		return parent;
+	}
+
+	public void setParent(Node parent) {
+		this.parent = parent;
+	}
+
+	public Directive() {
+	}
+
+	public Directive(int offset) {
+		this.offset = offset;
+	}
+
+	public void accept(Visitor visitor) throws ParseException {
 		visitor.visit(this);
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public void render(Map<String, Object> context, Object out) throws IOException,
+			ParseException {
 	}
 
 }

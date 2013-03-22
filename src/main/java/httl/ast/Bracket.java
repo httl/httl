@@ -15,6 +15,7 @@
  */
 package httl.ast;
 
+
 import java.text.ParseException;
 
 /**
@@ -29,7 +30,7 @@ public class Bracket extends Operator {
 	public static final Bracket SQUARE = new Bracket("[");
 
 	private Bracket(String name) {
-		super(null, null, 0, null, null, null, name, Integer.MAX_VALUE);
+		super(name, Integer.MAX_VALUE, 0);
 	}
 
 	public Class<?> getReturnType() throws ParseException {

@@ -17,7 +17,6 @@ package httl.spi.methods;
 
 import httl.Context;
 import httl.Engine;
-import httl.Expression;
 import httl.Resource;
 import httl.Template;
 import httl.internal.util.IOUtils;
@@ -122,27 +121,6 @@ public class FileMethod {
 			Context.getContext().putAll(parameters);
 		}
 		return $extends(name, locale, encoding);
-	}
-
-	public Expression evaluate(byte[] source) throws IOException, ParseException {
-		Template template = Context.getContext().getTemplate();
-		if (template == null) {
-			throw new IllegalArgumentException("display context template == null");
-		}
-		String encoding = template.getEncoding();
-		return evaluate(encoding == null ? new String(source) : new String(source, encoding));
-	}
-
-	public Expression evaluate(char[] source) throws IOException, ParseException {
-		return evaluate(new String(source));
-	}
-
-	public Expression evaluate(String expr) throws ParseException {
-		Template template = Context.getContext().getTemplate();
-		if (template == null) {
-			throw new IllegalArgumentException("display context template == null");
-		}
-		return engine.getExpression(expr, template.getVariableTypes());
 	}
 
 	public Template render(Resource resource) throws IOException, ParseException {

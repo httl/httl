@@ -16,6 +16,7 @@
 package httl.spi.resolvers;
 
 import httl.Context;
+import httl.Template;
 import httl.spi.Resolver;
 
 /**
@@ -39,6 +40,10 @@ public class ContextResolver implements Resolver {
 		} else if ("level".equals(key)) {
 			return Context.getContext().getLevel();
 		} else {
+			Template template = Context.getContext().getTemplate();
+			if (template != null) {
+				return template.getMacros().get(key);
+			}
 			return null;
 		}
 	}

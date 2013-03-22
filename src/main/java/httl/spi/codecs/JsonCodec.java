@@ -17,7 +17,6 @@ package httl.spi.codecs;
 
 import httl.internal.util.StringUtils;
 import httl.spi.Compiler;
-import httl.spi.Logger;
 import httl.spi.codecs.json.JSON;
 import httl.spi.converters.BeanMapConverter;
 
@@ -51,10 +50,6 @@ public class JsonCodec extends AbstractCodec {
 		this.converter.setCompiler(compiler);
 	}
 
-	public void setLogger(Logger logger) {
-		this.converter.setLogger(logger);
-	}
-	
 	private boolean jsonWithClass;
 
 	protected boolean isJsonWithClass() {

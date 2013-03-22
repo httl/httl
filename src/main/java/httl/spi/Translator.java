@@ -15,7 +15,7 @@
  */
 package httl.spi;
 
-import httl.Expression;
+import httl.ast.Expression;
 
 import java.text.ParseException;
 import java.util.Map;

@@ -15,10 +15,11 @@
  */
 package httl;
 
+import java.text.ParseException;
+
 /**
  * Node. (API, Prototype, Immutable, ThreadSafe)
  * 
- * @see httl.Expression
  * @see httl.Template
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
@@ -29,7 +30,15 @@ public interface Node {
 	 * Accept a visitor.
 	 * 
 	 * @param visitor
+	 * @throws ParseException TODO
 	 */
-	void accept(Visitor visitor);
+	void accept(Visitor visitor) throws ParseException;
+
+	/**
+	 * Get the expression offset.
+	 * 
+	 * @return offset
+	 */
+	int getOffset();
 
 }

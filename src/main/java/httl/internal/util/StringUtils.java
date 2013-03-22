@@ -174,6 +174,9 @@ public class StringUtils {
 			}
 			buf.append('\'');
 			switch (c) {
+				case '\\':
+					buf.append("\\\\");
+					break;
 				case '\'':
 					buf.append("\\'");
 					break;

@@ -215,6 +215,28 @@ public class ClassUtils {
 		}
 		return clazz;
 	}
+
+	public static Class<?> getUnboxedClass(Class<?> type) {
+		if (type == Boolean.class) {
+			return boolean.class; 
+		} else if (type == Character.class) {
+			return char.class; 
+		} else if (type == Byte.class) {
+			return byte.class; 
+		} else if (type == Short.class) {
+			return short.class; 
+		} else if (type == Integer.class) {
+			return int.class; 
+		} else if (type == Long.class) {
+			return long.class; 
+		} else if (type == Float.class) {
+			return float.class; 
+		} else if (type == Double.class) {
+			return double.class; 
+		} else {
+			return type;
+		}
+	}
 	
 	public static Class<?> getBoxedClass(Class<?> type) {
 		if (type == boolean.class) {
@@ -386,6 +408,21 @@ public class ClassUtils {
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static String getMethodFullName(String name, Class<?>[] parameterTypes) {
+		StringBuilder buf = new StringBuilder();
+		buf.append(name);
+		buf.append("(");
+		if (parameterTypes != null && parameterTypes.length > 0) {
+			for (Class<?> type : parameterTypes) {
+				if (type != null) {
+					buf.append(type.getCanonicalName());
+				}
+			}
+		}
+		buf.append(")");
+		return buf.toString();
 	}
 	
 	public static Class<?> getGenericClass(Class<?> cls) {
@@ -732,7 +769,7 @@ public class ClassUtils {
 	public static <K, V> Set<Map.Entry<K, V>> entrySet(Map<K, V> map) {
 		return map == null ? null : map.entrySet();
 	}
-	
+
 	public static String filterJavaKeyword(String name) {
 		if ("abstract".equals(name) || "assert".equals(name)
 				|| "boolean".equals(name) || "break".equals(name)

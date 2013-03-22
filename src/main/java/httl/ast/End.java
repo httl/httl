@@ -21,15 +21,42 @@ package httl.ast;
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class End extends Directive {
+	
+	private String name;
 
-	private String start;
+	private Directive start;
 
-	public String getStart() {
+	public End() {
+	}
+
+	public End(int offset) {
+		super(offset);
+	}
+
+	public End(String name, int offset) {
+		super(offset);
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Directive getStart() {
 		return start;
 	}
 
-	public void setStart(String start) {
+	public void setStart(Directive start) {
 		this.start = start;
+	}
+
+	@Override
+	public String toString() {
+		return "#end";
 	}
 
 }

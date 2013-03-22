@@ -15,15 +15,15 @@
  */
 package httl.spi.formatters;
 
-import httl.Expression;
 import httl.Resource;
 import httl.Template;
-import httl.spi.Formatter;
+import httl.ast.Expression;
 import httl.internal.util.ClassComparator;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.DateUtils;
 import httl.internal.util.IOUtils;
 import httl.internal.util.StringUtils;
+import httl.spi.Formatter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -397,14 +397,6 @@ public class MultiFormatter implements Formatter<Object> {
 		}
 	}
 
-	public String toString(String key, Expression value) {
-		try {
-			return toString(key, value.evaluate());
-		} catch (ParseException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
-
 	public String toString(String key, Resource value) {
 		try {
 			return IOUtils.readToString(value.getReader());
@@ -627,14 +619,6 @@ public class MultiFormatter implements Formatter<Object> {
 		}
 	}
 
-	public char[] toChars(String key, Expression value) {
-		try {
-			return toChars(key, value.evaluate());
-		} catch (ParseException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
-
 	public char[] toChars(String key, Resource value) {
 		try {
 			return IOUtils.readToChars(value.getReader());
@@ -850,14 +834,6 @@ public class MultiFormatter implements Formatter<Object> {
 	}
 
 	public byte[] toBytes(String key, Template value) {
-		try {
-			return toBytes(key, value.evaluate());
-		} catch (ParseException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
-
-	public byte[] toBytes(String key, Expression value) {
 		try {
 			return toBytes(key, value.evaluate());
 		} catch (ParseException e) {

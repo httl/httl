@@ -167,7 +167,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 					if (message.charAt(0) == '#') { // 指令
 						boolean isDirective = false;
 						if (message.charAt(1) >= 'a' && message.charAt(1) <= 'z') {
-							// 将 #foreach($item in $list) 转成 #foreach(item in list)
+							// 将 #xxx($item) 转成 #xxx(item)
 							message = REFERENCE_PATTERN.matcher(message).replaceAll("$1");
 							isDirective = true;
 						} else if (message.length() > 2 
@@ -191,13 +191,13 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 								// 将 #parse("foo.httl") 转成 ${include("foo.httl")}
 								message = "${include(" + expression + ")}";
 							} else if ("evaluate".equals(name)) {
-								// 将 #evaluate("1 + 2") 转成 ${evaluate("1 + 2")}
-								message = "${evaluate(" + expression + ")}";
+								// 将 #evaluate("${name}") 转成 ${render("${name}")}
+								message = "${render(" + expression + ")}";
 							} else if ("set".equals(name)) {
 								// 将#set(x = y) 转成 #var(x = y)
 								message = "#var(" + expression + ")";
 							} else if ("foreach".equals(name)) {
-								// 将#foreach(item in list) 转成 #for(item in list)
+								// 将#foreach(item in list) 转成 #for(item : list)
 								message = "#for(" + expression + ")";
 							} else if ("macro".equals(name)) {
 								String[] args = expression.split("\\s+");
@@ -216,9 +216,6 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 							} else if ("define".equals(name)) {
 								// 将 #define(name) 转成 #macro(name := _macro_name)
 								message = "#macro(" + expression + " := _macro_" + expression + ")";
-							} else if ("break".equals(name)) {
-								// 将 #break 转成 #breakif(true)
-								message = "#breakif(true)";
 							} else if ("stop".equals(name)) {
 								// 删除 #stop
 								message = "";

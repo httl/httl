@@ -15,7 +15,13 @@
  */
 package httl.ast;
 
-import httl.Expression;
+import httl.internal.util.CollectionUtils;
+import httl.internal.util.Status;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * For
@@ -29,6 +35,40 @@ public class For extends BlockDirective {
 	private String name;
 
 	private Expression expression;
+
+	private String forVariable;
+
+	public For() {
+	}
+
+	public For(Class<?> type, String name, Expression expression, String forVariable, int offset) {
+		super(offset);
+		this.type = type;
+		this.name = name;
+		this.expression = expression;
+		this.forVariable = forVariable;
+	}
+
+	public void render(Map<String, Object> context, Object out) throws IOException,
+			ParseException {
+		Object list = expression.evaluate(context);
+		Status old = (Status) context.get(forVariable);
+		Status status = new Status(old, list);
+		context.put(forVariable, status);
+		for(Iterator<?> iterator = CollectionUtils.toIterator(list); iterator.hasNext();) {
+			context.put(name, iterator.next());
+			try {
+				super.render(context, out);
+			} catch (BreakException e) {
+				break;
+			}
+		}
+		if (old != null) {
+			context.put(forVariable, old);
+		} else {
+			context.remove(forVariable);
+		}
+	}
 
 	public Class<?> getType() {
 		return type;
@@ -52,6 +92,11 @@ public class For extends BlockDirective {
 
 	public void setExpression(Expression expression) {
 		this.expression = expression;
+	}
+
+	@Override
+	public String toString() {
+		return "#for(" + type.getCanonicalName() + " " + name + " : " + expression + ")";
 	}
 
 }

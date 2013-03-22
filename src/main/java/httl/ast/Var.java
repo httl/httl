@@ -15,10 +15,13 @@
  */
 package httl.ast;
 
-import httl.Expression;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Map;
 
 /**
- * Set
+ * Var
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
@@ -29,6 +32,45 @@ public class Var extends Directive {
 	private String name;
 
 	private Expression expression;
+
+	private boolean parent;
+
+	private boolean hide;
+
+	public Var() {
+	}
+
+	public Var(Class<?> type, String name, Expression expression, boolean parent, boolean hide, int offset) {
+		super(offset);
+		this.type = type;
+		this.name = name;
+		this.expression = expression;
+		this.parent = parent;
+		this.hide = hide;
+	}
+
+	public void render(Map<String, Object> context, Object out) throws IOException,
+			ParseException {
+		if (expression != null) {
+			context.put(name, expression.evaluate(context));
+		}
+	}
+
+	public boolean isParent() {
+		return parent;
+	}
+
+	public void setParent(boolean parent) {
+		this.parent = parent;
+	}
+
+	public boolean isHide() {
+		return hide;
+	}
+
+	public void setHide(boolean hide) {
+		this.hide = hide;
+	}
 
 	public Class<?> getType() {
 		return type;
@@ -52,6 +94,12 @@ public class Var extends Directive {
 
 	public void setExpression(Expression expression) {
 		this.expression = expression;
+	}
+	
+	@Override
+	public String toString() {
+		return "#var(" + type.getCanonicalName() + " " + name + 
+				(expression == null ? "" : (parent ? " := " : " = ") + expression) + ")";
 	}
 
 }

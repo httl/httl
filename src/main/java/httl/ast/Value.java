@@ -15,7 +15,14 @@
  */
 package httl.ast;
 
-import httl.Expression;
+import httl.spi.Filter;
+import httl.spi.Formatter;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.text.ParseException;
+import java.util.Map;
 
 /**
  * Value
@@ -23,8 +30,36 @@ import httl.Expression;
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class Value extends Directive {
-	
+
 	private Expression expression;
+
+	private Formatter<Object> formatter;
+
+	private Filter filter;
+
+	private boolean noFilter;
+
+	public Value() {
+	}
+
+	public Value(Expression expression, Formatter<Object> formatter, Filter filter, boolean noFilter, int offset) {
+		super(offset);
+		this.expression = expression;
+		this.formatter = formatter;
+		this.filter = filter;
+		this.noFilter = noFilter;
+	}
+
+	public void render(Map<String, Object> context, Object out) throws IOException,
+			ParseException {
+		String key = expression.toString();
+		Object value = expression.evaluate(context);
+		if (out instanceof OutputStream) {
+			((OutputStream) out).write(filter.filter(key, formatter.toBytes(key, value)));
+		} else {
+			((Writer) out).write(filter.filter(key, formatter.toString(key, value)));
+		}
+	}
 
 	public Expression getExpression() {
 		return expression;
@@ -32,6 +67,19 @@ public class Value extends Directive {
 
 	public void setExpression(Expression expression) {
 		this.expression = expression;
+	}
+
+	public boolean isNoFilter() {
+		return noFilter;
+	}
+
+	public void setNoFilter(boolean noFilter) {
+		this.noFilter = noFilter;
+	}
+
+	@Override
+	public String toString() {
+		return "$" + (noFilter ? "!" : "") + "{" + expression + "}";
 	}
 
 }

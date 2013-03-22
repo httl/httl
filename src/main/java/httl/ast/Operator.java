@@ -15,40 +15,25 @@
  */
 package httl.ast;
 
-import httl.spi.Translator;
-
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Operator. (SPI, Prototype, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class Operator extends Parameter {
+public abstract class Operator extends Expression {
 
 	private final String name;
 	
 	private final int priority;
 
-	private final Collection<Class<?>> functions;
-	
-	private final String[] packages;
+	private List<Expression> children;
 
-	public Operator(Translator translator, String source, int offset, Map<String, Class<?>> parameterTypes, Collection<Class<?>> functions, String[] packages, String name, int priority){
-		super(parameterTypes, offset);
+	public Operator(String name, int priority, int offset){
+		super(offset);
 		this.name = name;
 		this.priority = priority;
-		this.functions = functions;
-		this.packages = packages;
-	}
-
-	public Collection<Class<?>> getFunctions() {
-		return functions;
-	}
-
-	public String[] getPackages() {
-		return packages;
 	}
 	
 	public String getName() {
@@ -57,6 +42,14 @@ public abstract class Operator extends Parameter {
 	
 	public int getPriority() {
 		return priority;
+	}
+
+	public List<Expression> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<Expression> children) {
+		this.children = children;
 	}
 
 	@Override

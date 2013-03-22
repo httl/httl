@@ -15,45 +15,45 @@
  */
 package httl.ast;
 
+import httl.Node;
 import httl.Visitor;
 
 import java.text.ParseException;
+import java.util.Map;
 
 /**
- * BinaryOperator. (SPI, Prototype, ThreadSafe)
+ * Expression. (API, Prototype, Immutable, ThreadSafe)
+ * 
+ * <pre>
+ * Engine engine = Engine.getEngine();
+ * Expression expression = engine.getExpression("1 + 2");
+ * </pre>
+ * 
+ * @see httl.Engine#getExpression(String)
+ * @see httl.Engine#getExpression(String, Map)
+ * @see httl.spi.Translator#translate(String, java.util.Map, int)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class BinaryOperator extends Operator {
+public abstract class Expression implements Node {
 
-	private Expression leftParameter;
+	private final int offset;
+
+	public Expression(int offset) {
+		this.offset = offset;
+	}
 	
-	private Expression rightParameter;
-	
-	public BinaryOperator(String name, int priority, int offset){
-		super(name, priority, offset);
+	public Object evaluate(Object context) throws ParseException {
+		// TODO
+		return null;
 	}
 
 	public void accept(Visitor visitor) throws ParseException {
-		leftParameter.accept(visitor);
-		rightParameter.accept(visitor);
 		visitor.visit(this);
 	}
 
-	public Expression getLeftParameter() {
-		return leftParameter;
-	}
-
-	public void setLeftParameter(Expression leftParameter) {
-		this.leftParameter = leftParameter;
-	}
-
-	public Expression getRightParameter() {
-		return rightParameter;
-	}
-
-	public void setRightParameter(Expression rightParameter) {
-		this.rightParameter = rightParameter;
+	public int getOffset() {
+		return offset;
 	}
 
 }

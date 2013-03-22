@@ -16,10 +16,11 @@
 package httl.spi.engines;
 
 import httl.Engine;
-import httl.Expression;
 import httl.Resource;
 import httl.Template;
+import httl.ast.Expression;
 import httl.internal.util.ConfigUtils;
+import httl.internal.util.DelegateMap;
 import httl.internal.util.Digest;
 import httl.internal.util.StringUtils;
 import httl.internal.util.UrlUtils;
@@ -152,14 +153,23 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * Get variable value.
+	 * Create context map.
 	 * 
-	 * @see #getEngine()
-	 * @param key - variable key
-	 * @return variable value
+	 * @return context map
 	 */
-	public Object getVariable(String key) {
-		return resolver == null ? null : resolver.get(key);
+	public Map<String, Object> createContext(final Map<String, Object> parent, Map<String, Object> current) {
+		return new DelegateMap<String, Object>(parent, current) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public Object get(Object key) {
+				Object value = super.get(key);
+				if (value == null && parent == null
+						&& resolver != null) {
+					return resolver.get((String) key);
+				}
+				return value;
+			}
+		};
 	}
 
 	/**

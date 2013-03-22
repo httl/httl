@@ -44,20 +44,11 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 
 	private Compiler compiler;
 
-	private Logger logger;
-
 	/**
 	 * httl.properties: compiler=httl.spi.compilers.JdkCompiler
 	 */
 	public void setCompiler(Compiler compiler) {
 		this.compiler = compiler;
-	}
-
-	/**
-	 * httl.properties: logger=httl.spi.loggers.Log4jLogger
-	 */
-	public void setLogger(Logger logger) {
-		this.logger = logger;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,7 +60,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		Class<?> wrapperClass = BEAN_WRAPPERS.get(beanClass);
 		if (wrapperClass == null) {
 			try {
-				wrapperClass = getMapClass(beanClass, compiler, logger);
+				wrapperClass = getMapClass(beanClass, compiler);
 				Class<?> old = BEAN_WRAPPERS.putIfAbsent(beanClass, wrapperClass);
 				if (old != null) {
 					wrapperClass = old;
@@ -117,7 +108,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		return compiler.compile(code.toString());
 	}
 
-	public static Class<?> getMapClass(Class<?> beanClass, Compiler compiler, Logger logger) throws ParseException {
+	public static Class<?> getMapClass(Class<?> beanClass, Compiler compiler) throws ParseException {
 		StringBuilder keys = new StringBuilder();
 		StringBuilder gets = new StringBuilder();
 		StringBuilder clss = new StringBuilder();
@@ -184,9 +175,6 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		code.append("return old;\n");
 		code.append("}\n");
 		code.append("}\n");
-		if (logger != null && logger.isDebugEnabled()) {
-			logger.debug(code.toString());
-		}
 		return compiler.compile(code.toString());
 	}
 

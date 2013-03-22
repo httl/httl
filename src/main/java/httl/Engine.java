@@ -18,7 +18,6 @@ package httl;
 import httl.internal.util.BeanFactory;
 import httl.internal.util.CollectionUtils;
 import httl.internal.util.ConfigUtils;
-import httl.internal.util.DelegateMap;
 import httl.internal.util.StringUtils;
 import httl.internal.util.Version;
 import httl.internal.util.VolatileReference;
@@ -41,7 +40,7 @@ import java.util.concurrent.ConcurrentMap;
  * @see httl.Context#getEngine()
  * @see httl.Template#getEngine()
  * @see httl.Resource#getEngine()
- * @see httl.Expression#getEngine()
+ * @see httl.ast.Expression#getEngine()
  * @see httl.spi.engines.DefaultEngine
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
@@ -246,38 +245,6 @@ public abstract class Engine {
 	 * @return config value
 	 */
 	public abstract <T> T getProperty(String key, Class<T> cls);
-
-	/**
-	 * Get variable value.
-	 * 
-	 * @see #getEngine()
-	 * @param key - variable key
-	 * @return variable value
-	 */
-	public abstract Object getVariable(String key);
-
-	/**
-	 * Get expression.
-	 * 
-	 * @see #getEngine()
-	 * @param source - expression source
-	 * @return expression instance
-	 * @throws ParseException - If the expression cannot be parsed
-	 */
-	public Expression getExpression(String source) throws ParseException {
-		return getExpression(source, null);
-	}
-
-	/**
-	 * Get expression.
-	 * 
-	 * @see #getEngine()
-	 * @param source - expression source
-	 * @param parameterTypes - expression parameter types
-	 * @return expression instance
-	 * @throws ParseException - If the expression cannot be parsed
-	 */
-	public abstract Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException;
 
 	/**
 	 * Get template resource.
@@ -487,18 +454,6 @@ public abstract class Engine {
 	 * 
 	 * @return context map
 	 */
-	public Map<String, Object> createContext(final Map<String, Object> parent, Map<String, Object> current) {
-		return new DelegateMap<String, Object>(parent, current) {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public Object get(Object key) {
-				Object value = super.get(key);
-				if (value == null && parent == null) {
-					return Engine.this.getVariable((String) key);
-				}
-				return value;
-			}
-		};
-	}
+	public abstract Map<String, Object> createContext(final Map<String, Object> parent, Map<String, Object> current);
 
 }

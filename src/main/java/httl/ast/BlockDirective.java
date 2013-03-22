@@ -17,7 +17,10 @@ package httl.ast;
 
 import httl.Visitor;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * BlockDirective
@@ -26,7 +29,42 @@ import java.util.List;
  */
 public class BlockDirective extends Directive {
 
+	private End end;
+
 	private List<Directive> children;
+
+	public BlockDirective() {
+		this(0);
+	}
+
+	public BlockDirective(int offset) {
+		super(offset);
+		end = new End();
+		end.setStart(this);
+		end.setOffset(offset);
+	}
+
+	public void render(Map<String, Object> context, Object out) throws IOException,
+			ParseException {
+		if (children != null) {
+			for (Directive directive : children) {
+				directive.render(context, out);
+			}
+		}
+	}
+
+	public void accept(Visitor visitor) throws ParseException {
+		if (visitor.visit(this)) {
+			if (children != null) {
+				for (Directive directive : children) {
+					directive.accept(visitor);
+				}
+			}
+			if (end != null) {
+				end.accept(visitor);
+			}
+		}
+	}
 
 	public List<Directive> getChildren() {
 		return children;
@@ -34,15 +72,18 @@ public class BlockDirective extends Directive {
 
 	public void setChildren(List<Directive> children) {
 		this.children = children;
+		for (Directive node : children) {
+			node.setParent(this);
+		}
 	}
 
-	public void accept(Visitor visitor) {
-		super.accept(visitor);
-		if (children != null) {
-			for (Directive directive : children) {
-				visitor.visit(directive);
-			}
-		}
+	public End getEnd() {
+		return end;
+	}
+
+	public void setEnd(End end) {
+		end.setStart(this);
+		this.end = end;
 	}
 
 }

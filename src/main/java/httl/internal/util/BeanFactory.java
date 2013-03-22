@@ -263,7 +263,7 @@ public class BeanFactory {
 		}
 		Class<?> cls = ClassUtils.forName(value);
 		if (! type.isAssignableFrom(cls)) {
-			throw new IllegalStateException("The class + " + value + " unimplemented interface " + cls.getName() + ".");
+			throw new IllegalStateException("The class " + cls.getName() + " unimplemented interface " + type.getName() + " in config " + key);
 		}
 		try {
 			String index = key + "=" + value;

@@ -17,6 +17,7 @@ package httl.spi.parsers.templates;
 
 import httl.Context;
 import httl.Engine;
+import httl.Node;
 import httl.Template;
 import httl.Visitor;
 import httl.spi.Compiler;
@@ -39,6 +40,7 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,6 +93,11 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.importMacros = importMacros;
 		this.macros = initMacros(engine, interceptor, filterSwitcher, formatterSwitcher, 
 				filter, formatter, mapConverter, outConverter, functions, importMacros);
+	}
+
+	public List<Node> getNodes() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	protected Interceptor getInterceptor() {
@@ -186,7 +193,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return new UnsafeByteArrayInputStream(getSource().getBytes(getEncoding()));
 	}
 
-	public void accept(Visitor visitor) {
+	public void accept(Visitor visitor) throws ParseException {
 		visitor.visit(this);
 		// TODO 实现访问者递归
 	}
@@ -200,16 +207,10 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	}
 
 	public Object evaluate(Object context) throws ParseException {
-		if (context instanceof Context) {
-			throw new IllegalArgumentException("Don't use the " + Context.class.getName() + " type as evaluate() parameters, it implicitly delivery.");
-		}
 		return evaluate(convertMap(context));
 	}
 
 	public void render(Object context, Object out) throws IOException, ParseException {
-		if (context instanceof Context) {
-			throw new IllegalArgumentException("Don't use the " + Context.class.getName() + " type as render() parameters, it implicitly delivery.");
-		}
 		out = convertOut(out);
 		if (out == null) {
 			throw new IllegalArgumentException("out == null");

@@ -1,22 +1,8 @@
-/*
- * Copyright 2011-2013 HTTL Team.
- *  
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *  
- *      http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package httl.ast;
 
 import httl.Engine;
 import httl.Node;
+import httl.Resource;
 import httl.Template;
 
 import java.io.IOException;
@@ -28,89 +14,65 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Macro
- * 
- * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
- */
-public class Macro extends BlockDirective implements Template {
-	
-	private String name;
+public class Root extends BlockDirective implements Template {
 
-	public Macro() {
-	}
+	private final Resource resource;
 
-	public Macro(String name, int offset) {
-		super(offset);
-		this.name = name;
+	public Root(Resource resource) {
+		this.resource = resource;
 	}
 
 	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+		return resource.getName();
 	}
 
 	public String getEncoding() {
-		// TODO Auto-generated method stub
-		return null;
+		return resource.getEncoding();
 	}
 
 	public Locale getLocale() {
-		// TODO Auto-generated method stub
-		return null;
+		return resource.getLocale();
 	}
 
 	public long getLastModified() {
-		// TODO Auto-generated method stub
-		return 0;
+		return resource.getLastModified();
 	}
 
 	public long getLength() {
-		// TODO Auto-generated method stub
-		return 0;
+		return resource.getLength();
 	}
 
 	public String getSource() {
-		return toString();
+		return resource.getSource();
 	}
 
 	public Reader getReader() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return resource.getReader();
 	}
 
 	public InputStream getInputStream() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return resource.getInputStream();
 	}
 
 	public Engine getEngine() {
-		// TODO Auto-generated method stub
-		return null;
+		return resource.getEngine();
 	}
 
 	public Object evaluate() throws ParseException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Object evaluate(Object context) throws ParseException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public void render(Object out) throws IOException, ParseException {
-		// TODO Auto-generated method stub
-		
+		render((Map<String, Object>) null, out);
 	}
 
-	public void render(Object context, Object out) throws IOException,
-			ParseException {
-		// TODO Auto-generated method stub
-		
+	@SuppressWarnings("unchecked")
+	public void render(Object context, Object out) throws IOException, ParseException {
+		render((Map<String, Object>) context, out);
 	}
 
 	public List<Node> getNodes() {
@@ -138,7 +100,7 @@ public class Macro extends BlockDirective implements Template {
 	}
 
 	public boolean isMacro() {
-		return true;
+		return false;
 	}
 
 	public Class<?> getRootType() {

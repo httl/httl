@@ -15,51 +15,46 @@
  */
 package httl.ast;
 
-import java.text.ParseException;
-
 /**
  * Constant. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Constant extends Parameter {
+public final class Constant extends Expression {
 
-	public static final Constant NULL = new Constant(null, null, "null");
+	public static final Constant NULL = new Constant(null);
 
-	public static final Constant EMPTY = new Constant(null, null, "");
+	public static final Constant EMPTY = new Constant(new Object());
 
-	public static final Constant TRUE = new Constant(true, boolean.class, "true");
+	public static final Constant TRUE = new Constant(true);
 
-	public static final Constant FALSE = new Constant(false, boolean.class, "false");
-	
+	public static final Constant FALSE = new Constant(false);
+
 	private final Object value;
 
-	private final Class<?> type;
-	
-	private final String literal;
-
-	public Constant(Object value, Class<?> type, String literal){
-		super(null, 0);
+	public Constant(Object value){
+		super(0);
 		this.value = value;
-		this.type = type;
-		this.literal = literal;
 	}
 
 	public Object getValue() {
 		return value;
 	}
 
-	public Class<?> getReturnType() throws ParseException {
-		return type;
-	}
-
-	public String getCode() throws ParseException {
-		return literal;
-	}
-
 	@Override
 	public String toString() {
-		return literal;
+		if (value instanceof String) {
+			return "\"" + value + "\"";
+		} else if (value instanceof Character) {
+			return "`" + value + "`";
+		} else if (value instanceof Long) {
+			return value + "L";
+		} else if (value instanceof Float) {
+			return value + "F";
+		} else if (value instanceof Double) {
+			return value + "D";
+		}
+		return String.valueOf(value);
 	}
 
 }

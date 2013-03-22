@@ -15,10 +15,7 @@
  */
 package httl.ast;
 
-import httl.spi.Translator;
-import httl.internal.util.ClassUtils;
-
-import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,16 +23,22 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class Variable extends Parameter {
+public final class Variable extends Expression {
 
-	private Class<?> defaultType;
+	private Class<?> type;
 
 	private final String name;
-	
-	public Variable(Translator translator, String name, int offset, Map<String, Class<?>> parameterTypes, Class<?> defaultType){
-		super(parameterTypes, offset);
+
+	public Variable(Class<?> type, String name, int offset) {
+		super(offset);
+		this.type = type;
 		this.name = name;
-		this.defaultType = defaultType;
+	}
+
+	public Map<String, Class<?>> getVariableTypes() {
+		Map<String, Class<?>> map = new HashMap<String, Class<?>>();
+		map.put(name, type);
+		return map;
 	}
 
 	public String getName() {
@@ -45,18 +48,6 @@ public final class Variable extends Parameter {
 	@Override
 	public String toString() {
 		return name;
-	}
-
-	public Class<?> getReturnType() throws ParseException {
-		Class<?> type = getVariableTypes().get(name);
-		if (type == null && defaultType != null) {
-			return defaultType;
-		}
-		return type;
-	}
-
-	public String getCode() throws ParseException {
-		return ClassUtils.filterJavaKeyword(name);
 	}
 
 }

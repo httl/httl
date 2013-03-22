@@ -85,6 +85,9 @@ public final class Context implements Map<String, Object> {
 	 * @param current - current variables
 	 */
 	public static Context pushContext(Map<String, Object> current) {
+		if (current instanceof Context) {
+			throw new IllegalArgumentException("Don't use the " + Context.class.getName() + " type as render() parameters, it implicitly delivery.");
+		}
 		Context context = new Context(getContext(), current);
 		LOCAL.set(context);
 		return context;
@@ -200,7 +203,7 @@ public final class Context implements Map<String, Object> {
 		checkThread();
 		this.template = template;
 		if (template != null) {
-			doSetEngine(template.getEngine());
+			setEngine(template.getEngine());
 		}
 		return this;
 	}
@@ -223,15 +226,10 @@ public final class Context implements Map<String, Object> {
 	 */
 	public Context setEngine(Engine engine) {
 		checkThread();
-		if (template != null && template.getEngine() != engine) {
-			throw new IllegalStateException("template.engine != context.engine");
-		}
-		doSetEngine(engine);
-		return this;
-	}
-
-	private void doSetEngine(Engine engine) {
-		if (engine != null) {
+		if (engine != null && engine != this.engine) {
+			if (template != null && template.getEngine() != engine) {
+				throw new IllegalStateException("template.engine != context.engine");
+			}
 			if (parent != null && parent.getEngine() == null) {
 				parent.setEngine(engine);
 			}
@@ -240,6 +238,7 @@ public final class Context implements Map<String, Object> {
 			}
 		}
 		this.engine = engine;
+		return this;
 	}
 
 	/**
@@ -253,39 +252,15 @@ public final class Context implements Map<String, Object> {
 		return out;
 	}
 
-	private Context setOut(Object out) {
-		checkThread();
-		this.out = out;
-		return this;
-	}
-
-	/**
-	 * Get the current output stream.
-	 * 
-	 * @see #getContext()
-	 * @return current output stream
-	 */
-	public OutputStream getOutputStream() {
-		return (OutputStream) getOut();
-	}
-
 	/**
 	 * Set the current output stream.
 	 * 
 	 * @param out - current output stream
 	 */
-	public Context setOutputStream(OutputStream out) {
-		return setOut(out);
-	}
-
-	/**
-	 * Get the current writer.
-	 * 
-	 * @see #getContext()
-	 * @return current writer
-	 */
-	public Writer getWriter() {
-		return (Writer) getOut();
+	public Context setOut(OutputStream out) {
+		checkThread();
+		this.out = out;
+		return this;
 	}
 
 	/**
@@ -293,8 +268,10 @@ public final class Context implements Map<String, Object> {
 	 * 
 	 * @param out - current writer
 	 */
-	public Context setWriter(Writer out) {
-		return setOut(out);
+	public Context setOut(Writer out) {
+		checkThread();
+		this.out = out;
+		return this;
 	}
 
 	/**
