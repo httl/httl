@@ -212,12 +212,19 @@ public class TemplateParser implements Parser {
 				type = v.substring(0, i).trim();
 				var = v.substring(i + 1).trim();
 			}
+			checkVariableName(var, offset);
 			directives.add(new Var(parseGenericType(type, o), var, null, false, false, offset));
 		}
 	}
 	
 	private boolean isNoLiteralText(Statement node) {
 		return node instanceof Text && ! ((Text) node).isLiteral();
+	}
+
+	private void checkVariableName(String var, int offset) throws ParseException {
+		if (! StringUtils.isNamed(var)) {
+			throw new ParseException("Illegal variable name " + var, offset);
+		}
 	}
 
 	private List<Statement> clean(List<Statement> nodes) throws ParseException, IOException {
@@ -314,6 +321,7 @@ public class TemplateParser implements Parser {
 							if (StringUtils.isNotEmpty(type)) {
 								clazz = ClassUtils.forName(importPackages, type);
 							}
+							checkVariableName(var, offset);
 							directives.add(new Var(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), offset));
 						}
 					} else {
@@ -370,7 +378,9 @@ public class TemplateParser implements Parser {
 						macroName = macroName.substring(macroName.startsWith("$!") ? 2 : 1);
 					}
 					if (StringUtils.isNotEmpty(set)) {
-						directives.add(new Var(Template.class, set.trim(), (Expression) expressionParser.parse(macroName, exprOffset), parent, hide, offset));
+						String var = set.trim();
+						checkVariableName(var, offset);
+						directives.add(new Var(Template.class, var, (Expression) expressionParser.parse(macroName, exprOffset), parent, hide, offset));
 					}
 					if (out) {
 						directives.add(new Value((Expression) expressionParser.parse(macroName, exprOffset), true, offset));
