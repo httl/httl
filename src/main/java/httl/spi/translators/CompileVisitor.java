@@ -593,15 +593,16 @@ public class CompileVisitor extends ASTVisitor {
 
 	@Override
 	public void visit(Break node) throws ParseException {
+		String b = node.getParent() instanceof For ? "break" : "return";
 		if (node.getExpression() == null) {
-			builder.append("	break;\n");
+			builder.append("	" + b + ";\n");
 		} else {
 			String code = popExpressionCode();
 			Class<?> returnType = popExpressionReturnType();
 			Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
 			builder.append("	if(");
 			builder.append(StringUtils.getConditionCode(returnType, code, importSizers));
-			builder.append(") break;\n");
+			builder.append(") " + b + ";\n");
 			getVariables.addAll(variableTypes.keySet());
 		}
 	}
