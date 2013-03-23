@@ -208,7 +208,7 @@ public class TemplateTest {
 		}
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
-			//if (! "for_else.httl".equals(templateName)) continue; // 指定模板测试
+			//if (! "condition_expr.httl".equals(templateName)) continue; // 指定模板测试
 			if (! profile)
 				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
 			if ("httl-velocity.properties".equals(config) && (data == null || data instanceof String)) continue;

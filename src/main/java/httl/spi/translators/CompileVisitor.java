@@ -1108,7 +1108,7 @@ public class CompileVisitor extends ASTVisitor {
 			code = "false";
 		} else if (value instanceof String) {
 			type = String.class;
-			code = "\"" + value + "\"";
+			code = "\"" + StringUtils.escapeString((String) value) + "\"";
 		} else if (value instanceof Character) {
 			type = char.class;
 			code = "'" + value + "'";

@@ -1,0 +1,5 @@
+
+<select name="logined">
+	<option value="Y" selected=&quot;selected&quot;>已登录</option>
+	<option value="N" >已退出</option>
+<select>

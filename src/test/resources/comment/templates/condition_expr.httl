@@ -1,0 +1,5 @@
+<!--#var(User user)-->
+<select name="logined">
+	<option value="Y" ${user.isLogin == 'Y' ? 'selected="selected"' : ''}>已登录</option>
+	<option value="N" ${user.isLogin == "N" ? "selected=\"selected\"" : ""}>已退出</option>
+<select>
