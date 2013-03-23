@@ -445,7 +445,12 @@ public class ClassUtils {
 				if (genericClass instanceof ParameterizedType) { // 处理多级泛型
 					return (Class<?>) ((ParameterizedType) genericClass).getRawType();
 				} else if (genericClass instanceof GenericArrayType) { // 处理数组泛型
-					return (Class<?>) ((GenericArrayType) genericClass).getGenericComponentType();
+					Class<?> componentType = (Class<?>) ((GenericArrayType) genericClass).getGenericComponentType();
+					if (componentType.isArray()) {
+						return componentType;
+					} else {
+						return Array.newInstance(componentType, 0).getClass();
+					}
 				} else if (genericClass instanceof Class) {
 					return (Class<?>) genericClass;
 				}

@@ -175,7 +175,11 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		code.append("return old;\n");
 		code.append("}\n");
 		code.append("}\n");
-		return compiler.compile(code.toString());
+		try {
+			return compiler.compile(code.toString());
+		} catch (ParseException e) {
+			throw new RuntimeException(e.getMessage() + "\n====\n" + code.toString() + "\n====\n", e);
+		}
 	}
 
 }
