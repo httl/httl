@@ -1584,6 +1584,8 @@ public class CompileVisitor extends ASTVisitor {
 				if (! (rightClass.isPrimitive() && leftClass != boolean.class)) {
 					rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
 				}
+			} else if ("==".equals(name) || "!=".equals(name)) {
+				type = boolean.class;
 			}
 			if (rightParameter instanceof Operator
 					&& ((Operator) rightParameter).getPriority() < node.getPriority()) {
