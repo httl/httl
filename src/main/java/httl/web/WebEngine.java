@@ -95,6 +95,10 @@ public class WebEngine {
 						} else {
 							config = null;
 						}
+					} else if (config.startsWith("classpath:")) {
+						config = config.substring("classpath:".length());
+					} else if (config.startsWith("file:")) {
+						config = config.substring("file:".length());
 					}
 					ENGINE = Engine.getEngine(config, addProperties(properties));
 					logConfigPath(ENGINE, servletContext, config);
