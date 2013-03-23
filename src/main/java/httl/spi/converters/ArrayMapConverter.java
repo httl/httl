@@ -1,3 +1,5 @@
+package httl.spi.converters;
+
 /*
  * Copyright 2011-2013 HTTL Team.
  *  
@@ -13,27 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.converters;
-
-import httl.internal.util.UnsafeStringWriter;
+import httl.internal.util.CollectionUtils;
 import httl.spi.Converter;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.text.ParseException;
 import java.util.Map;
 
 /**
- * StringBuilderOutConverter. (SPI, Singleton, ThreadSafe)
+ * ArrayMapConverter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setOutConverter(Converter)
+ * @see httl.spi.parsers.ExpressionParser#setMapConverter(Converter)
+ * @see httl.spi.parsers.TemplateParser#setMapConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class StringBuilderOutConverter implements Converter<StringBuilder, Writer> {
+public class ArrayMapConverter implements Converter<Object[], Map<String, Object>> {
 
-	public Writer convert(StringBuilder value, Map<String, Class<?>> types) throws IOException, ParseException {
-		return new UnsafeStringWriter(value);
+	public Map<String, Object> convert(Object[] values, Map<String, Class<?>> types)
+			throws IOException, ParseException {
+		return CollectionUtils.toMap(types.keySet(), values);
 	}
 
 }

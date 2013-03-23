@@ -52,7 +52,7 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> convert(Object bean, Class<?> type) throws IOException, ParseException {
+	public Map<String, Object> convert(Object bean, Map<String, Class<?>> types) throws IOException, ParseException {
 		if (bean == null) {
 			return null;
 		}

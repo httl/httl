@@ -216,7 +216,7 @@ public class TypeMethod {
 		if (value instanceof Map) {
 			return (Map<String, Object>) value;
 		}
-		return (Map<String, Object>) mapConverter.convert(value, (Class<Map<String, Object>>) null);
+		return (Map<String, Object>) mapConverter.convert(value, null);
 	}
 
 	public <T> T[] toArray(Collection<T> values, String type) {

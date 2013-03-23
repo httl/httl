@@ -131,7 +131,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 		} else if (out instanceof Writer) {
 			writerTemplate.render(out);
 		} else {
-			out = outConverter.convert(out, null);
+			out = outConverter.convert(out, getVariableTypes());
 			if (out instanceof OutputStream) {
 				streamTemplate.render(out);
 			} else {
@@ -147,7 +147,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 		} else if (out instanceof Writer) {
 			writerTemplate.render(context, out);
 		} else {
-			out = outConverter.convert(out, null);
+			out = outConverter.convert(out, getVariableTypes());
 			if (out instanceof OutputStream) {
 				streamTemplate.render(context, out);
 			} else {

@@ -69,7 +69,7 @@ public class LazyParseTemplate extends ResourceTemplate {
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> convertMap(Object context) throws IOException, ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
-			context = mapConverter.convert(context, null);
+			context = mapConverter.convert(context, getVariableTypes());
 		}
 		if (context == null || context instanceof Map) {
 			return (Map<String, Object>) context;

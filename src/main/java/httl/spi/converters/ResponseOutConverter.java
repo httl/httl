@@ -19,6 +19,7 @@ import httl.spi.Converter;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,7 +41,7 @@ public class ResponseOutConverter implements Converter<HttpServletResponse, Obje
 		this.outputStream = outputStream;
 	}
 
-	public Object convert(HttpServletResponse value, Class<?> type) throws IOException, ParseException {
+	public Object convert(HttpServletResponse value, Map<String, Class<?>> types) throws IOException, ParseException {
 		if (outputStream) {
 			return value.getOutputStream();
 		} else {

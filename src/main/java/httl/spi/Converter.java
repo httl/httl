@@ -17,6 +17,7 @@ package httl.spi;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
 
 /**
  * Object Converter. (SPI, Singleton, ThreadSafe)
@@ -33,11 +34,11 @@ public interface Converter<F, T> {
 	 * Convert the value.
 	 * 
 	 * @param value - origin value
-	 * @param type - convert type
+	 * @param types - convert types
 	 * @return converted value
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	T convert(F value, Class<?> type) throws IOException, ParseException;
+	T convert(F value, Map<String, Class<?>> types) throws IOException, ParseException;
 
 }

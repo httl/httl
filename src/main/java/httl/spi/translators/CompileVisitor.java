@@ -1175,7 +1175,7 @@ public class CompileVisitor extends ASTVisitor {
 			if (t != null && Template.class.isAssignableFrom(t)) {
 				variableTypes.put(name, Template.class);
 				type = Object.class;
-				code = "(" + name + " == null ? null : " + name + ".evaluate(" + CollectionUtils.class.getName() + ".toMap(" + name + ".getVariableTypes().keySet(), new Object" + (parameterCode.length() == 0 ? "[0]" : "[] { " + parameterCode + " }") + " )))";
+				code = "(" + name + " == null ? null : " + name + ".evaluate(new Object" + (parameterCode.length() == 0 ? "[0]" : "[] { " + parameterCode + " }") + "))";
 			} else {
 				name = ClassUtils.filterJavaKeyword(name);
 				type = null;
@@ -1324,7 +1324,7 @@ public class CompileVisitor extends ASTVisitor {
 				if (Template.class.isAssignableFrom(leftClass)
 						&& ! hasMethod(Template.class, name, rightTypes)) {
 					type = Object.class;
-					code = getNotNullCode(leftParameter, type, leftCode, leftCode + ".getMacro(\"" + name + "\").evaluate(" + CollectionUtils.class.getName() + ".toMap(" + leftCode + ".getMacro(\"" + name + "\").getVariableTypes().keySet(), new Object" + (rightCode.length() == 0 ? "[0]" : "[] { " + rightCode + " }") + " ))");
+					code = getNotNullCode(leftParameter, type, leftCode, leftCode + ".getMacro(\"" + name + "\").evaluate(new Object" + (rightCode.length() == 0 ? "[0]" : "[] { " + rightCode + " }") + ")");
 				} else if (Map.class.isAssignableFrom(leftClass)
 						&& rightTypes.length == 0
 						&& ! hasMethod(Map.class, name, rightTypes)) {

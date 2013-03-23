@@ -35,6 +35,8 @@ import java.util.Map;
 public class StringMapConverter implements Converter<String, Map<String, Object>> {
 
 	private final BeanMapConverter beanMapConverter = new BeanMapConverter();
+	
+	private Compiler compiler;
 
 	private String formats = "";
 
@@ -45,6 +47,7 @@ public class StringMapConverter implements Converter<String, Map<String, Object>
 	 */
 	public void setCompiler(Compiler compiler) {
 		this.beanMapConverter.setCompiler(compiler);
+		this.compiler = compiler;
 	}
 
 	public void setCodecs(Codec[] codecs) {
@@ -60,7 +63,7 @@ public class StringMapConverter implements Converter<String, Map<String, Object>
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> convert(String value, Class<?> type) throws IOException,
+	public Map<String, Object> convert(String value, Map<String, Class<?>> types) throws IOException,
 			ParseException {
 		if (StringUtils.isEmpty(value))
 			return null;
@@ -68,15 +71,18 @@ public class StringMapConverter implements Converter<String, Map<String, Object>
 			value = value.trim();
 			for (Codec codec : codecs) {
 				if (codec.isValueOf(value)) {
+					Class<?> type = BeanMapConverter.getBeanClass(String.valueOf(
+							System.identityHashCode(types)), types, compiler, null);
 					Object bean = codec.valueOf(value, type);
 					if (bean instanceof Map) {
 						return (Map<String, Object>) bean;
 					}
-					return beanMapConverter.convert(bean, type);
+					return beanMapConverter.convert(bean, types);
 				}
 			}
 		}
-		throw new IllegalArgumentException("Unsupported format of the string \"" + value + "\", only support format: " + formats + ". Please add config codecs+=com.your.YourFormatStringCodec in httl.properties.");
+		throw new IllegalArgumentException("Unsupported format of the string \"" + value + "\", only support format: "
+					+ formats + ". Please add config codecs+=com.your.YourFormatStringCodec in httl.properties.");
 	}
 
 }

@@ -15,9 +15,9 @@
  */
 package httl.spi.converters;
 
-import httl.spi.Converter;
 import httl.internal.util.ClassComparator;
 import httl.internal.util.ClassUtils;
+import httl.spi.Converter;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -57,18 +57,18 @@ public class MultiConverter implements Converter<Object, Object> {
 		}
 	}
 
-	public Object convert(Object value, Class<?> type) throws IOException, ParseException {
+	public Object convert(Object value, Map<String, Class<?>> types) throws IOException, ParseException {
 		if (value != null && converters != null) {
 			Class<?> cls = value.getClass();
 			Converter<Object, Object> converter = (Converter<Object, Object>) converters.get(cls);
 			if (converter != null) {
-				return converter.convert(value, type);
+				return converter.convert(value, types);
 			} else if (sortedConverters != null) {
 				for (Map.Entry<Class<?>, Converter<Object, Object>> entry : sortedConverters.entrySet()) {
 					if (entry.getKey().isAssignableFrom(cls)) {
 						converter = entry.getValue();
 						converters.put(cls, converter);
-						return converter.convert(value, type);
+						return converter.convert(value, types);
 					}
 				}
 			}
