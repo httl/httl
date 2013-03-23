@@ -44,4 +44,9 @@ public abstract class Operator extends Expression {
 
 	public abstract List<Expression> getChildren();
 
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 }

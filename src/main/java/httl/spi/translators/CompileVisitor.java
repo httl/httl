@@ -606,6 +606,10 @@ public class CompileVisitor extends ASTVisitor {
 	public void visit(Break node) throws ParseException {
 		String b = node.getParent() instanceof For ? "break" : "return";
 		if (node.getExpression() == null) {
+			if (! (node.getParent() instanceof If
+					|| node.getParent() instanceof Else)) {
+				throw new ParseException("Can not #break without condition. Please use #break(condition) or #if(condition) #break #end.", node.getOffset());
+			}
 			builder.append("	" + b + ";\n");
 		} else {
 			String code = popExpressionCode();
