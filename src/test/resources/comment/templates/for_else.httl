@@ -1,0 +1,34 @@
+<!--#var(Book[] books, Book[] emptybooks)-->
+<table>
+  <!--#foreach(book in books)-->
+  <tr>
+    <td>${foreach.count}</td>
+    <td>${book.title}</td>
+    <td>${book.author}</td>
+    <td>${book.publisher}</td>
+    <td>${book.publication}</td>
+    <td>${book.price}</td>
+    <td>${book.discount}%</td>
+    <td>${book.price * book.discount / 100}</td>
+  </tr>
+  <!--#else-->
+  <tr><td>AAAA</td></tr>
+  <!--#end-->
+</table>
+====
+<table>
+  <!--#foreach(book in emptybooks)-->
+  <tr>
+    <td>${foreach.count}</td>
+    <td>${book.title}</td>
+    <td>${book.author}</td>
+    <td>${book.publisher}</td>
+    <td>${book.publication}</td>
+    <td>${book.price}</td>
+    <td>${book.discount}%</td>
+    <td>${book.price * book.discount / 100}</td>
+  </tr>
+  <!--#else-->
+  <tr><td>BBBB</td></tr>
+  <!--#end-->
+</table>

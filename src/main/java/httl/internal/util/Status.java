@@ -37,9 +37,13 @@ public class Status implements Serializable {
 	private int index = 0;
 
 	public Status(Status parent, Object data) {
+		this(parent, data, ClassUtils.getSize(data));
+	}
+
+	public Status(Status parent, Object data, int size) {
 		this.parent = parent;
 		this.data = data;
-		this.size = ClassUtils.getSize(data);
+		this.size = size;
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
 	}
 
@@ -70,7 +74,11 @@ public class Status implements Serializable {
 	public int getCount() {
 		return index + 1;
 	}
-	
+
+	public boolean isEmpty() {
+		return data == null || size == 0;
+	}
+
 	public boolean isOdd() {
 		return index % 2 != 0;
 	}

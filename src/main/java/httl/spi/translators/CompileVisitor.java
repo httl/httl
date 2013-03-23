@@ -572,8 +572,15 @@ public class CompileVisitor extends ASTVisitor {
 			}
 			code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
 		}
+		int i = TMP_VAR_SEQ.incrementAndGet();
+		String dataName = "_d_" + i;
+		String sizeName = "_s_" + i;
 		String name = "_i_" + var;
-		builder.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator((" + forVariable + " = new " + Status.class.getName() + "(" + forVariable + ", " + code + ")).getData()); " + name + ".hasNext();) {\n");
+		builder.append("	Object " + dataName + " = " + code + ";\n");
+		builder.append("	int " + sizeName + " = " + ClassUtils.class.getName() + ".getSize(" + dataName + ");\n");
+		builder.append("	if (" + dataName + " != null && " + sizeName + " != 0) {\n");
+		builder.append("	" + forVariable + " = new " + Status.class.getName() + "(" + forVariable + ", " + dataName + ", " + sizeName + ");\n");
+		builder.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator(" + forVariable + ".getData()); " + name + ".hasNext();) {\n");
 		String varCode;
 		if (clazz.isPrimitive()) {
 			varCode = ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next())";
@@ -588,7 +595,7 @@ public class CompileVisitor extends ASTVisitor {
 
 	@Override
 	public void end(For node) throws ParseException {
-		builder.append("	" + forVariable + ".increment();\n	}\n	" + forVariable + " = " + forVariable + ".getParent();\n");
+		builder.append("	" + forVariable + ".increment();\n	}\n	" + forVariable + " = " + forVariable + ".getParent();\n	}\n");
 	}
 
 	@Override

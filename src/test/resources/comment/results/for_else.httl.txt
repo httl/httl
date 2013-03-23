@@ -1,0 +1,120 @@
+
+<table>
+  
+  <tr>
+    <td>1</td>
+    <td>Practical API Design</td>
+    <td>Jaroslav Tulach</td>
+    <td>Apress</td>
+    <td>2008-07-29 00:00:00</td>
+    <td>75</td>
+    <td>85%</td>
+    <td>63</td>
+  </tr>
+  
+  <tr>
+    <td>2</td>
+    <td>Effective Java</td>
+    <td>Joshua Bloch</td>
+    <td>Addison-Wesley Professional</td>
+    <td>2008-05-28 00:00:00</td>
+    <td>55</td>
+    <td>70%</td>
+    <td>38</td>
+  </tr>
+  
+  <tr>
+    <td>3</td>
+    <td>Java Concurrency in Practice</td>
+    <td>Doug Lea</td>
+    <td>Addison-Wesley Professional</td>
+    <td>2006-05-19 00:00:00</td>
+    <td>60</td>
+    <td>60%</td>
+    <td>36</td>
+  </tr>
+  
+  <tr>
+    <td>4</td>
+    <td>Java Programming Language</td>
+    <td>James Gosling</td>
+    <td>Prentice Hall</td>
+    <td>2005-08-27 00:00:00</td>
+    <td>65</td>
+    <td>75%</td>
+    <td>48</td>
+  </tr>
+  
+  <tr>
+    <td>5</td>
+    <td>Domain-Driven Design</td>
+    <td>Eric Evans</td>
+    <td>Addison-Wesley Professional</td>
+    <td>2003-08-30 00:00:00</td>
+    <td>70</td>
+    <td>80%</td>
+    <td>56</td>
+  </tr>
+  
+  <tr>
+    <td>6</td>
+    <td>Agile Project Management with Scrum</td>
+    <td>Ken Schwaber</td>
+    <td>Microsoft Press</td>
+    <td>2004-03-10 00:00:00</td>
+    <td>40</td>
+    <td>80%</td>
+    <td>32</td>
+  </tr>
+  
+  <tr>
+    <td>7</td>
+    <td>J2EE Development without EJB</td>
+    <td>Rod Johnson</td>
+    <td>Wrox</td>
+    <td>2011-09-17 00:00:00</td>
+    <td>40</td>
+    <td>70%</td>
+    <td>28</td>
+  </tr>
+  
+  <tr>
+    <td>8</td>
+    <td>Design Patterns</td>
+    <td>Erich Gamma</td>
+    <td>Addison-Wesley Professional</td>
+    <td>1994-11-10 00:00:00</td>
+    <td>60</td>
+    <td>80%</td>
+    <td>48</td>
+  </tr>
+  
+  <tr>
+    <td>9</td>
+    <td>Agile Software Development, Principles, Patterns, and Practices</td>
+    <td> Robert C. Martin</td>
+    <td>Prentice Hall</td>
+    <td>2002-10-25 00:00:00</td>
+    <td>80</td>
+    <td>75%</td>
+    <td>60</td>
+  </tr>
+  
+  <tr>
+    <td>10</td>
+    <td>Design by Contract, by Example</td>
+    <td>Richard Mitchell</td>
+    <td>Addison-Wesley Publishing Company</td>
+    <td>2001-10-22 00:00:00</td>
+    <td>50</td>
+    <td>85%</td>
+    <td>42</td>
+  </tr>
+  
+</table>
+====
+<table>
+  
+  <tr><td>BBBB</td></tr>
+  
+</table>
