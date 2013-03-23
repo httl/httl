@@ -79,8 +79,8 @@ public abstract class MultiFilter implements Filter {
 		if (filters.length == 1) {
 			return filters[0].filter(key, value);
 		}
-		for (int i = filters.length - 1; i >= 0; i --) {
-			value = filters[i].filter(key, value);
+		for (Filter filter : filters) {
+			value = filter.filter(key, value);
 		}
 		return value;
 	}

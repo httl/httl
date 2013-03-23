@@ -238,9 +238,9 @@ public class TemplateTest {
 				template.render(data, actualWriter);
 				template.render(data, actualStream);
 			} catch (Throwable e) {
-				System.out.println("\n================================\n" + template.getCode() + "\n================================\n");
+				System.out.println("\n================================\n" + template.getName() + "\n================================\n");
 				e.printStackTrace();
-				throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getCode() + "\n================================\n", e);
+				throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getName() + "\n================================\n", e);
 			}
 			if ("extends_var.httl".equals(templateName)) {
 				if (data instanceof Map) {

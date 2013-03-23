@@ -46,7 +46,7 @@ public class MultiConverter implements Converter<Object, Object> {
 			for (Converter<Object, Object> converter : converters) {
 				if (converter != null) {
 					Class<?> type = ClassUtils.getGenericClass(converter.getClass());
-					if (type != null) {
+					if (type != null && ! this.converters.containsKey(type)) {
 						this.converters.put(type, converter);
 					}
 				}

@@ -49,8 +49,7 @@ public class MultiResolver implements Resolver {
 		if (resolvers == null || resolvers.length == 0) {
 			return null;
 		}
-		for (int i = resolvers.length - 1; i >= 0; i --) {
-			Resolver resolver = resolvers[i];
+		for (Resolver resolver : resolvers) {
 			Object value = resolver.get(key);
 			if (value != null) {
 				return value;

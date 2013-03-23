@@ -446,13 +446,13 @@ public class ClassUtils {
 					return (Class<?>) ((ParameterizedType) genericClass).getRawType();
 				} else if (genericClass instanceof GenericArrayType) { // 处理数组泛型
 					return (Class<?>) ((GenericArrayType) genericClass).getGenericComponentType();
-				} else if (genericClass != null) {
+				} else if (genericClass instanceof Class) {
 					return (Class<?>) genericClass;
 				}
 			}
 		} catch (Exception e) {
 		}
-		if (cls.getSuperclass() != null) {
+		if (cls.getSuperclass() != null && cls.getSuperclass() != Object.class) {
 			return getGenericClass(cls.getSuperclass(), i);
 		} else {
 			throw new IllegalArgumentException(cls.getName() + " generic type undefined!");

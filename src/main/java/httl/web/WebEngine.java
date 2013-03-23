@@ -135,9 +135,9 @@ public class WebEngine {
 			if (! properties.containsKey(key)) {
 				String values = def.getProperty(key, "");
 				if (values.length() > 0) {
-					values = values + ",";
+					values = "," + values;
 				}
-				properties.setProperty(key, values + entry.getValue());
+				properties.setProperty(key, entry.getValue() + values);
 			}
 		}
 		for (Map.Entry<String, String> entry : setProperties.entrySet()) {

@@ -187,7 +187,7 @@ public final class ConfigUtils {
 						String k = key.substring(0, key.length() - PLUS.length());
 						String v = result.getProperty(k);
 						if (StringUtils.isNotEmpty(v)) {
-							result.setProperty(k, v + COMMA + value);
+							result.setProperty(k, value + COMMA + v);
 						} else {
 							result.setProperty(k, value);
 						}
