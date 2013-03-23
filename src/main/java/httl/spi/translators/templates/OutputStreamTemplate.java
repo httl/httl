@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.parsers.templates;
+package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
@@ -25,79 +25,79 @@ import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.Switcher;
-import httl.internal.util.UnsafeStringWriter;
+import httl.internal.util.UnsafeByteArrayOutputStream;
+import httl.internal.util.WriterOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.Map;
 
 /**
- * Writer Template. (SPI, Prototype, ThreadSafe)
+ * OutputStream Template. (SPI, Prototype, ThreadSafe)
  * 
  * @see httl.Engine#getTemplate(String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class WriterTemplate extends AbstractTemplate {
-	
+public abstract class OutputStreamTemplate extends AbstractTemplate {
+
 	private static final long serialVersionUID = 7127901461769617745L;
 
-	public WriterTemplate(Engine engine, Interceptor interceptor, Compiler compiler, 
+	public OutputStreamTemplate(Engine engine, Interceptor interceptor, Compiler compiler, 
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
 			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros){
 		super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
 	}
-
+	
 	public Class<?> getReturnType() {
-		return String.class;
+		return byte[].class;
 	}
 
 	public Object evaluate(Map<String, Object> parameters) throws ParseException {
-		UnsafeStringWriter writer = new UnsafeStringWriter();
+		UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
 		try {
-			render(parameters, writer);
+			render(parameters, output);
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		return writer.toString();
-	}
-
-	public void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException {
-		Writer writer = new OutputStreamWriter(stream);
-		render(parameters, writer);
-		writer.flush();
+		return output.toByteArray();
 	}
 
 	public void render(Map<String, Object> parameters, Writer writer) throws IOException, ParseException {
-		if (writer == null) 
-		 	throw new IllegalArgumentException("writer == null");
+		OutputStream output = new WriterOutputStream(writer);
+		render(parameters, output);
+		output.flush();
+	}
+
+	public void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException {
+		if (stream == null) 
+			throw new IllegalArgumentException("output == null");
 		if (Context.getContext().getTemplate() == this)
 			throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
-		Context context = Context.pushContext(parameters).setOut(writer).setTemplate(this);
+		Context context = Context.pushContext(parameters).setOut(stream).setTemplate(this);
 		try {
 			Interceptor interceptor = getInterceptor();
 			if (interceptor != null) {
 				interceptor.render(context, new Listener() {
 					public void render(Context context) throws IOException, ParseException {
-						_render(context, (Writer) context.getOut());
+						_render(context, (OutputStream) context.getOut());
 					}
 				});
 			} else {
-				_render(context, writer);
+				_render(context, stream);
 			}
 		} finally {
 			Context.popContext();
 		}
 	}
 
-	private void _render(Context context, Writer writer) throws IOException, ParseException {
+	private void _render(Context context, OutputStream stream) throws IOException, ParseException {
 		try {
-			doRender(context, writer);
+			doRender(context, stream);
 		} catch (RuntimeException e) {
 			throw (RuntimeException) e;
 		} catch (IOException e) {
@@ -109,6 +109,6 @@ public abstract class WriterTemplate extends AbstractTemplate {
 		}
 	}
 
-	protected abstract void doRender(Context context, Writer writer) throws Exception;
+	protected abstract void doRender(Context context, OutputStream stream) throws Exception;
 
 }

@@ -20,10 +20,10 @@ import httl.spi.Filter;
 /**
  * MultiFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setTemplateFilter(Filter)
- * @see httl.spi.parsers.DefaultParser#setTextFilter(Filter)
- * @see httl.spi.parsers.DefaultParser#setValueFilter(Filter)
- * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(Filter)
+ * @see httl.spi.parsers.TemplateParser#setTemplateFilter(Filter)
+ * @see httl.spi.parsers.TemplateParser#setTextFilter(Filter)
+ * @see httl.spi.parsers.TemplateParser#setValueFilter(Filter)
+ * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

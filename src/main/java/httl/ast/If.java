@@ -15,49 +15,22 @@
  */
 package httl.ast;
 
-import httl.internal.util.ClassUtils;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Map;
-
 /**
  * If
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class If extends BlockDirective {
+public class If extends Block {
 	
-	private Expression expression;
-	
-	private String ifVariable;
+	private final Expression expression;
 
-	public If() {
-		super();
-	}
-
-	public If(Expression expression, String ifVariable, int offset) {
+	public If(Expression expression, int offset) {
 		super(offset);
 		this.expression = expression;
-		this.ifVariable = ifVariable;
-	}
-
-	public void render(Map<String, Object> context, Object out) throws IOException,
-			ParseException {
-		if (ClassUtils.isTrue(expression.evaluate(context))) {
-			super.render(context, out);
-			context.put(ifVariable, Boolean.TRUE);
-		} else {
-			context.put(ifVariable, Boolean.FALSE);
-		}
 	}
 
 	public Expression getExpression() {
 		return expression;
-	}
-
-	public void setExpression(Expression expression) {
-		this.expression = expression;
 	}
 
 	@Override

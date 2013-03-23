@@ -21,7 +21,7 @@ import httl.Template;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.methods.FileMethod;
-import httl.spi.parsers.templates.ListenerTemplate;
+import httl.spi.translators.templates.ListenerTemplate;
 import httl.internal.util.Optional;
 import httl.internal.util.StringUtils;
 import httl.internal.util.UrlUtils;
@@ -32,7 +32,7 @@ import java.text.ParseException;
 /**
  * Extends Interceptor. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setInterceptor(Interceptor)
+ * @see httl.spi.parsers.TemplateParser#setInterceptor(Interceptor)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

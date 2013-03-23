@@ -13,17 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.expressions;
+package httl.spi.translators;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Map;
 
-/**
- * Evaluator. (SPI, Prototype, ThreadSafe)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
- */
-public interface Evaluator {
+import httl.Resource;
+import httl.Template;
+import httl.spi.Translator;
 
-	Object evaluate(Map<String, Object> parameters) throws Exception;
+/**
+ * InterpretTranslator
+ * 
+ * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
+public class InterpretTranslator implements Translator {
+
+	public Template translate(Resource resource,
+			Map<String, Class<?>> parameterTypes) throws ParseException,
+			IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

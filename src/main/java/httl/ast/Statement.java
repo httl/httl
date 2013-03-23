@@ -18,50 +18,47 @@ package httl.ast;
 import httl.Node;
 import httl.Visitor;
 
-import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
 
 /**
- * Directive
+ * Statement
  * 
  * @author liangfei
  */
-public class Directive implements Node {
+public class Statement implements Node {
 
-	private int offset;
+	private final int offset;
 
 	private Node parent;
 
-	public Node getParent() {
-		return parent;
-	}
-
-	public void setParent(Node parent) {
-		this.parent = parent;
-	}
-
-	public Directive() {
-	}
-
-	public Directive(int offset) {
+	public Statement(int offset) {
 		this.offset = offset;
 	}
 
 	public void accept(Visitor visitor) throws ParseException {
+		Expression expression = getExpression();
+		if (expression != null) {
+			expression.accept(visitor);
+		}
 		visitor.visit(this);
+	}
+	
+	protected Expression getExpression() {
+		return null;
 	}
 
 	public int getOffset() {
 		return offset;
 	}
 
-	public void setOffset(int offset) {
-		this.offset = offset;
+	public Node getParent() {
+		return parent;
 	}
 
-	public void render(Map<String, Object> context, Object out) throws IOException,
-			ParseException {
+	public void setParent(Node parent) {
+		if (this.parent != null)
+			throw new IllegalStateException("Can not modify parent.");
+		this.parent = parent;
 	}
 
 }

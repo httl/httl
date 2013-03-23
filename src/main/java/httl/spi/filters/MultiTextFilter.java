@@ -20,7 +20,7 @@ import httl.spi.Filter;
 /**
  * MultiTextFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setTextFilter(Filter)
+ * @see httl.spi.parsers.TemplateParser#setTextFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

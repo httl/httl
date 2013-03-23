@@ -18,6 +18,8 @@ package httl.ast;
 import httl.Visitor;
 
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * BinaryOperator. (SPI, Prototype, ThreadSafe)
@@ -45,6 +47,8 @@ public final class BinaryOperator extends Operator {
 	}
 
 	public void setLeftParameter(Expression leftParameter) {
+		if (this.leftParameter != null)
+			throw new IllegalStateException("Can not modify left parameter.");
 		this.leftParameter = leftParameter;
 	}
 
@@ -53,7 +57,13 @@ public final class BinaryOperator extends Operator {
 	}
 
 	public void setRightParameter(Expression rightParameter) {
+		if (this.rightParameter != null)
+			throw new IllegalStateException("Can not modify right parameter.");
 		this.rightParameter = rightParameter;
+	}
+
+	public List<Expression> getChildren() {
+		return Arrays.asList(leftParameter, rightParameter);
 	}
 
 }

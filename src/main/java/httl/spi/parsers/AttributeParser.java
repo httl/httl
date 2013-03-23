@@ -26,7 +26,7 @@ import httl.spi.filters.AttributeSyntaxFilter;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 @Deprecated
-public class AttributeParser extends DefaultParser {
+public class AttributeParser extends TemplateParser {
 
 	@Override
 	public void init() {

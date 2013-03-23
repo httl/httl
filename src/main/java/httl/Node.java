@@ -30,15 +30,22 @@ public interface Node {
 	 * Accept a visitor.
 	 * 
 	 * @param visitor
-	 * @throws ParseException TODO
+	 * @throws ParseException - If the expression cannot be parsed on runtime
 	 */
 	void accept(Visitor visitor) throws ParseException;
 
 	/**
-	 * Get the expression offset.
+	 * Get the node offset.
 	 * 
 	 * @return offset
 	 */
 	int getOffset();
+
+	/**
+	 * Get the parent node.
+	 * 
+	 * @return parent
+	 */
+	Node getParent();
 
 }

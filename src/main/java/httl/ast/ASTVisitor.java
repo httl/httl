@@ -21,47 +21,89 @@ import httl.Visitor;
 import java.text.ParseException;
 
 /**
- * TemplateVisitor
+ * ASTVisitor
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class TemplateVisitor implements Visitor {
+public abstract class ASTVisitor implements Visitor {
 
 	public boolean visit(Node node) throws ParseException {
+		if (node instanceof Statement) {
+			return visit((Statement) node);
+		} else if (node instanceof Expression) {
+			visit((Expression) node);
+		}
+		return true;
+	}
+
+	public boolean visit(Statement node) throws ParseException {
 		if (node instanceof Text) {
 			visit((Text) node);
 		} else if (node instanceof Value) {
 			visit((Value) node);
+		} else if (node instanceof Comment) {
+			visit((Comment) node);
 		} else if (node instanceof Var) {
 			visit((Var) node);
-		} else if (node instanceof If) {
+		} else if (node instanceof Break) {
+			visit((Break) node);
+		} else if (node instanceof Block) {
+			return visit((Block) node);
+		} else if (node instanceof End) {
+			visit((End) node);
+		}
+		return true;
+	}
+
+	public boolean visit(Block node) throws ParseException {
+		if (node instanceof If) {
 			return visit((If) node);
 		} else if (node instanceof Else) {
 			return visit((Else) node);
 		} else if (node instanceof For) {
 			return visit((For) node);
-		} else if (node instanceof Break) {
-			visit((Break) node);
 		} else if (node instanceof Macro) {
 			return visit((Macro) node);
-		} else if (node instanceof End) {
-			Node start = ((End) node).getStart();
-			if (start instanceof If) {
-				end((If) start);
-			} else if (start instanceof Else) {
-				end((Else) start);
-			} else if (start instanceof For) {
-				end((For) start);
-			} else if (start instanceof Macro) {
-				end((Macro) start);
-			}
 		}
 		return true;
+	}
+
+	public void visit(End node) throws ParseException {
+		Node start = node.getStart();
+		if (start instanceof If) {
+			end((If) start);
+		} else if (start instanceof Else) {
+			end((Else) start);
+		} else if (start instanceof For) {
+			end((For) start);
+		} else if (start instanceof Macro) {
+			end((Macro) start);
+		}
+	}
+
+	public void visit(Expression node) throws ParseException {
+		if (node instanceof Constant) {
+			visit((Constant) node);
+		} else if (node instanceof Variable) {
+			visit((Variable) node);
+		} else if (node instanceof Operator) {
+			visit((Operator) node);
+		}
+	}
+
+	public void visit(Operator node) throws ParseException {
+		if (node instanceof UnaryOperator) {
+			visit((UnaryOperator) node);
+		} else if (node instanceof BinaryOperator) {
+			visit((BinaryOperator) node);
+		}
 	}
 
 	public void visit(Text node) throws ParseException {}
 
 	public void visit(Value node) throws ParseException {}
+
+	public void visit(Comment node) throws ParseException {}
 
 	public void visit(Var node) throws ParseException {}
 
@@ -90,5 +132,13 @@ public class TemplateVisitor implements Visitor {
 	public void end(For node) throws ParseException {}
 
 	public void end(Macro node) throws ParseException {}
+
+	public void visit(Constant node) throws ParseException {}
+
+	public void visit(Variable node) throws ParseException {}
+
+	public void visit(UnaryOperator node) throws ParseException {}
+
+	public void visit(BinaryOperator node) throws ParseException {}
 
 }

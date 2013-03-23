@@ -15,9 +15,6 @@
  */
 package httl.ast;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Variable. (SPI, Prototype, ThreadSafe)
  * 
@@ -25,20 +22,11 @@ import java.util.Map;
  */
 public final class Variable extends Expression {
 
-	private Class<?> type;
-
 	private final String name;
 
-	public Variable(Class<?> type, String name, int offset) {
+	public Variable(String name, int offset) {
 		super(offset);
-		this.type = type;
 		this.name = name;
-	}
-
-	public Map<String, Class<?>> getVariableTypes() {
-		Map<String, Class<?>> map = new HashMap<String, Class<?>>();
-		map.put(name, type);
-		return map;
 	}
 
 	public String getName() {

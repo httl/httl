@@ -16,35 +16,32 @@
 package httl.spi.parsers;
 
 import httl.Engine;
-import httl.Resource;
+import httl.Node;
 import httl.Template;
-import httl.ast.BlockDirective;
+import httl.ast.Block;
 import httl.ast.Break;
 import httl.ast.Comment;
-import httl.ast.Directive;
 import httl.ast.Else;
 import httl.ast.End;
 import httl.ast.Expression;
 import httl.ast.For;
 import httl.ast.If;
 import httl.ast.Macro;
-import httl.ast.Root;
+import httl.ast.Statement;
 import httl.ast.Text;
 import httl.ast.Value;
 import httl.ast.Var;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.DfaScanner;
-import httl.internal.util.IOUtils;
 import httl.internal.util.LinkedStack;
+import httl.internal.util.ParameterizedTypeImpl;
 import httl.internal.util.StringUtils;
 import httl.internal.util.Token;
 import httl.spi.Filter;
-import httl.spi.Formatter;
 import httl.spi.Parser;
-import httl.spi.Translator;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +58,7 @@ import java.util.regex.Pattern;
  *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DefaultParser implements Parser {
+public class TemplateParser implements Parser {
 
 	// 单字母命名, 保证状态机图简洁
 
@@ -190,7 +187,7 @@ public class DefaultParser implements Parser {
 				|| StringUtils.inArray(name, macroDirective) || StringUtils.inArray(name, endDirective);
 	}
 	
-	private void defineVariableTypes(String value, int offset, Map<String, Class<?>> types, List<Directive> directives) throws IOException, ParseException {
+	private void defineVariableTypes(String value, int offset, List<Statement> directives) throws IOException, ParseException {
 		value = BLANK_PATTERN.matcher(value).replaceAll(" ");
 		List<String> vs = new ArrayList<String>();
 		List<Integer> os = new ArrayList<Integer>();
@@ -215,22 +212,43 @@ public class DefaultParser implements Parser {
 				type = v.substring(0, i).trim();
 				var = v.substring(i + 1).trim();
 			}
-			type = parseGenericType(type, var, types, o);
-			Class<?> clazz = ClassUtils.forName(importPackages, type);
-			Class<?> cls = types.get(var);
-			if (cls != null && ! cls.equals(clazz)) {
-				throw new ParseException("Defined different type to variable " + var + ", conflict types: " + cls.getName() + ", " + clazz.getName(), o);
-			}
-			types.put(var, clazz);
-			directives.add(new Var(clazz, var, null, false, false, offset));
+			directives.add(new Var(parseGenericType(type, o), var, null, false, false, offset));
 		}
 	}
+	
+	private boolean isNoLiteralText(Statement node) {
+		return node instanceof Text && ! ((Text) node).isLiteral();
+	}
 
-	private List<Directive> scan(String source, Map<String, Class<?>> types) throws ParseException, IOException {
-		if (types == null) {
-			types = new HashMap<String, Class<?>>();
+	private List<Statement> clean(List<Statement> nodes) throws ParseException, IOException {
+		List<Statement> result = null;
+		for (int i = 0; i < nodes.size(); i ++) {
+			if (i + 1 < nodes.size() && isNoLiteralText(nodes.get(i)) && isNoLiteralText(nodes.get(i + 1))) {
+				if (result == null) {
+					result = new ArrayList<Statement>();
+					for (int j = 0; j < i; j ++) {
+						result.add(nodes.get(j));
+					}
+				}
+				int offset = nodes.get(i).getOffset();
+				StringBuilder buf = new StringBuilder();
+				while (i < nodes.size() && isNoLiteralText(nodes.get(i))) {
+					buf.append(((Text) nodes.get(i)).getContent());
+					i ++;
+				}
+				result.add(new Text(buf.toString(), false, offset));
+			} else if (result != null) {
+				result.add(nodes.get(i));
+			}
 		}
-		List<Directive> directives = new ArrayList<Directive>();
+		if (result != null) {
+			return result;
+		}
+		return nodes;
+	}
+
+	private List<Statement> scan(String source) throws ParseException, IOException {
+		List<Statement> directives = new ArrayList<Statement>();
 		List<Token> tokens = scanner.scan(source);
 		for (int t = 0; t < tokens.size(); t ++) {
 			Token token = tokens.get(t);
@@ -293,7 +311,7 @@ public class DefaultParser implements Parser {
 							int end = (Integer) item[3];
 							String expr = (String) item[4];
 							int start = (Integer) item[5];
-							Expression expression = translator.translate(expr, types, exprOffset + end);
+							Expression expression = (Expression) expressionParser.parse(expr, exprOffset + end);
 							Class<?> clazz = null;
 							if (StringUtils.isNotEmpty(type)) {
 								clazz = ClassUtils.forName(importPackages, type);
@@ -301,27 +319,27 @@ public class DefaultParser implements Parser {
 							directives.add(new Var(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), start));
 						}
 					} else {
-						defineVariableTypes(value, exprOffset, types, directives);
+						defineVariableTypes(value, exprOffset, directives);
 					}
 				} else if (StringUtils.inArray(name, forDirective)) {
 					int i = value.indexOf(" in ");
 					String var = value.substring(0, i).trim();
 					value = value.substring(i + 4);
-					Expression expression = translator.translate(value, types, exprOffset + i + 4);
+					Expression expression = (Expression) expressionParser.parse(value, exprOffset + i + 4);
 					int j = var.indexOf(' ');
 					Class<?> type = null;
 					if (j > 0) {
 						type = ClassUtils.forName(importPackages, var.substring(0, j).trim());
 						var = var.substring(j + 1).trim();
 					}
-					directives.add(new For(type, var, expression, forVariable, offset));
+					directives.add(new For(type, var, expression, offset));
 				} else if (StringUtils.inArray(name, ifDirective)) {
-					directives.add(new If(translator.translate(value, types, exprOffset), ifVariable, offset));
+					directives.add(new If((Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, elseDirective)) {
 					directives.add(new Else(StringUtils.isEmpty(value)
-							? null : translator.translate(value, types, exprOffset), ifVariable, offset));
+							? null : (Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, breakDirective)) {
-					directives.add(new Break(translator.translate(value, types, exprOffset), offset));
+					directives.add(new Break((Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, macroDirective)) {
 					String macroName = value;
 					String macroParams = null;
@@ -354,58 +372,48 @@ public class DefaultParser implements Parser {
 						macroName = macroName.substring(macroName.startsWith("$!") ? 2 : 1);
 					}
 					if (StringUtils.isNotEmpty(set)) {
-						directives.add(new Var(Template.class, set.trim(), translator.translate(macroName, types, exprOffset), parent, hide, offset));
+						directives.add(new Var(Template.class, set.trim(), (Expression) expressionParser.parse(macroName, exprOffset), parent, hide, offset));
 					}
 					if (out) {
-						directives.add(new Value(translator.translate(macroName, types, exprOffset), formatter, valueFilter, true, offset));
+						directives.add(new Value((Expression) expressionParser.parse(macroName, exprOffset), true, offset));
 					}
 					directives.add(new Macro(macroName.trim(), offset));
 					if (StringUtils.isNotEmpty(macroParams)) {
-						defineVariableTypes(macroParams, exprOffset, types, directives);
+						defineVariableTypes(macroParams, exprOffset, directives);
 					}
 				} else if (StringUtils.inArray(name, endDirective)) {
-					directives.add(new End(value, offset));
+					directives.add(new End(offset));
 				}
 			} else if (message.endsWith("}") && (message.startsWith("${") || message.startsWith("$!{")
 					|| message.startsWith("#{") || message.startsWith("#!{"))) {
 				int i = message.indexOf('{');
-				directives.add(new Value(translator.translate(message.substring(i + 1, message.length() - 1), 
-						types, offset + i), formatter, valueFilter, message.startsWith("$!") || message.startsWith("#!"), offset));
+				directives.add(new Value((Expression) expressionParser.parse(message.substring(i + 1, message.length() - 1), 
+						offset + i), message.startsWith("$!") || message.startsWith("#!"), offset));
 			} else if (message.startsWith("##")) {
 				directives.add(new Comment(message.substring(2), false, offset));
 			} else if ((message.startsWith("#*") && message.endsWith("*#"))) {
 				directives.add(new Comment(message.substring(2, message.length() - 2), true, offset));
 			} else {
-				boolean literal = false;
+				boolean literal;
 				if (message.startsWith("#[") && message.endsWith("]#")) {
 					message = message.substring(2, message.length() - 2);
 					literal = true;
 				} else {
-					int r = t + 1;
-					while (r < tokens.size()) { // 将被状态机打散的非指令#和$合到文本中
-						String m = tokens.get(r).getMessage();
-						if ("#".equals(m) || "$".equals(m)) {
-							message += m;
-							t = r;
-						}
-						r ++;
-					}
 					message = filterEscape(message);
+					literal = false;
 				}
-				if (message.length() > 0) {
-					directives.add(new Text(message, literal, offset));
-				}
+				directives.add(new Text(message, literal, offset));
 			}
 		}
 		return directives;
 	}
 
-	private Root reduce(Resource resource, List<Directive> directives) throws ParseException {
+	private Block reduce(List<Statement> directives) throws ParseException {
 		LinkedStack<BlockDirectiveEntry> directiveStack = new LinkedStack<BlockDirectiveEntry>();
-		Root rootDirective = new Root(resource);
+		Block rootDirective = new Block(0);
 		directiveStack.push(new BlockDirectiveEntry(rootDirective));
 		for (int i = 0, n = directives.size(); i < n; i ++) {
-			Directive directive = (Directive)directives.get(i);
+			Statement directive = (Statement)directives.get(i);
 			if (directive == null)
 				continue;
 			Class<?> directiveClass = directive.getClass();
@@ -414,7 +422,7 @@ public class DefaultParser implements Parser {
 					|| directiveClass == Else.class) {
 				if (directiveStack.isEmpty())
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
-				BlockDirective blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+				Block blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 				if (blockDirective == rootDirective)
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
 				End endDirective;
@@ -424,16 +432,6 @@ public class DefaultParser implements Parser {
 					endDirective = (End) directive;
 				}
 				blockDirective.setEnd(endDirective);
-				String expectedName = endDirective.getName();
-				if (StringUtils.isNotEmpty(expectedName)) {
-					String actualName = blockDirective.getClass().getSimpleName();
-					String suffix = Directive.class.getSimpleName();
-					if (actualName.endsWith(suffix)) {
-						actualName = actualName.substring(0, actualName.length() - suffix.length());
-					}
-					if (! expectedName.equals(actualName))
-						throw new ParseException("DirectiveReducer.block.directive.invaild.end" + expectedName + ", " + actualName, directive.getOffset());
-				}
 			}
 			// 设置树
 			if (directiveClass != End.class) { // 排除EndDirective
@@ -442,33 +440,33 @@ public class DefaultParser implements Parser {
 				((BlockDirectiveEntry) directiveStack.peek()).appendInnerDirective(directive);
 			}
 			// 压栈
-			if (directive instanceof BlockDirective)
-				directiveStack.push(new BlockDirectiveEntry((BlockDirective) directive));
+			if (directive instanceof Block)
+				directiveStack.push(new BlockDirectiveEntry((Block) directive));
 		}
-		Root root = (Root) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+		Block root = (Block) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 		if (! directiveStack.isEmpty()) { // 后验条件
 			throw new ParseException("DirectiveReducer.block.directive.without.end" + root.getClass().getSimpleName(), root.getOffset());
 		}
-		return (Root) root;
+		return (Block) root;
 	}
 
 	// 指令归约辅助封装类
 	private static final class BlockDirectiveEntry {
 
-		private BlockDirective blockDirective;
+		private Block blockDirective;
 
-		private List<Directive> elements = new ArrayList<Directive>();
+		private List<Statement> elements = new ArrayList<Statement>();
 
-		BlockDirectiveEntry(BlockDirective blockDirective) {
+		BlockDirectiveEntry(Block blockDirective) {
 			this.blockDirective = blockDirective;
 		}
 
-		void appendInnerDirective(Directive innerDirective) {
+		void appendInnerDirective(Statement innerDirective) {
 			this.elements.add(innerDirective);
 		}
 
-		BlockDirective popDirective() {
-			((BlockDirective)blockDirective).setChildren(elements);
+		Block popDirective() {
+			((Block)blockDirective).setChildren(elements);
 			return blockDirective;
 		}
 
@@ -498,7 +496,7 @@ public class DefaultParser implements Parser {
 
 	private Engine engine;
 	
-	private Translator translator;
+	private Parser expressionParser;
 	
 	private String[] importMacros;
    
@@ -513,63 +511,9 @@ public class DefaultParser implements Parser {
 	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
 	private Class<?> defaultVariableType;
-	
-	private String ifVariable = "if";
-
-	private String forVariable = "for";
-
-	private Formatter<Object> formatter;
-
-	private Filter valueFilter;
-
-	private Filter textFilter;
 
 	private Filter templateFilter;
-	
-	private String outputEncoding;
 
-	/**
-	 * httl.properties: if.variable=if
-	 */
-	public void setIfVariable(String ifVariable) {
-		this.ifVariable = ifVariable;
-	}
-
-	/**
-	 * httl.properties: for.variable=for
-	 */
-	public void setForVariable(String forVariable) {
-		this.forVariable = forVariable;
-	}
-
-	/**
-	 * httl.properties: output.encoding=UTF-8
-	 */
-	public void setOutputEncoding(String outputEncoding) {
-		this.outputEncoding = outputEncoding;
-	}
-
-	/**
-	 * httl.properties: formatter=httl.spi.formatters.DateFormatter
-	 */
-	public void setFormatter(Formatter<Object> formatter) {
-		this.formatter = formatter;
-	}
-
-	/**
-	 * httl.properties: value.filter=httl.spi.filters.EscapeXmlFilter
-	 */
-	public void setValueFilter(Filter valueFilter) {
-		this.valueFilter = valueFilter;
-	}
-
-	/**
-	 * httl.properties: text.filter=httl.spi.filters.CommentSyntaxFilter
-	 */
-	public void setTextFilter(Filter textFilter) {
-		this.textFilter = textFilter;
-	}
-	
 	/**
 	 * httl.properties: template.filter=httl.spi.filters.AttributeSyntaxFilter
 	 */
@@ -648,10 +592,10 @@ public class DefaultParser implements Parser {
 	}
 
 	/**
-	 * httl.properties: translator=httl.spi.translators.DefaultTranslator
+	 * httl.properties: expression.parser=httl.spi.parsers.ExpressionParser
 	 */
-	public void setTranslator(Translator translator) {
-		this.translator = translator;
+	public void setExpressionParser(Parser expressionParser) {
+		this.expressionParser = expressionParser;
 	}
 
 	/**
@@ -713,44 +657,11 @@ public class DefaultParser implements Parser {
 		}
 	}
 
-	public Template parse(Resource resource, Map<String, Class<?>> types) throws IOException, ParseException {
-		try {
-			String source = IOUtils.readToString(resource.getReader());
-			if (templateFilter != null) {
-				source = templateFilter.filter(resource.getName(), source);
-			}
-			List<Directive> directives = scan(source, types);
-			return reduce(resource, directives);
-		} catch (IOException e) {
-			throw e;
-		} catch (Exception e) {
-			ParseException pe;
-			if (e instanceof ParseException)
-				pe = (ParseException) e;
-			else
-				pe = new ParseException("Failed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
-			if (e.getMessage() != null 
-					&& e.getMessage().contains("Occur to offset:")) {
-				throw pe;
-			}
-			int offset = pe.getErrorOffset();
-			if (offset <= 0) {
-				throw pe;
-			}
-			String location = null;
-			try {
-				Reader reader = resource.getReader();
-				try {
-					location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
-				} finally {
-					reader.close();
-				}
-			} catch (Throwable t) {
-			}
-			throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
-									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
-									 + ", stack: " + ClassUtils.toString(e), offset);
+	public Node parse(String source, int offset) throws IOException, ParseException {
+		if (templateFilter != null) {
+			source = templateFilter.filter(source, source);
 		}
+		return reduce(clean(scan(source)));
 	}
 
 	private String filterEscape(String source) {
@@ -766,6 +677,30 @@ public class DefaultParser implements Parser {
 		}
 		matcher.appendTail(buf);
 		return buf.toString().substring(0, buf.length() - 1); // 减掉预加的#号
+	}
+
+	private Type parseGenericType(String type, int offset) throws IOException, ParseException {
+		int i = type.indexOf('<');
+		if (i < 0) {
+			return ClassUtils.forName(importPackages, type);
+		}
+		if (! type.endsWith(">")) {
+			throw new ParseException("Illegal type: " + type, offset);
+		}
+		Class<?> raw = ClassUtils.forName(importPackages, type.substring(0, i));
+		String parameterType = type.substring(i + 1, type.length() - 1).trim();
+		offset = offset + 1;
+		List<String> genericTypes = new ArrayList<String>();
+		List<Integer> genericOffsets = new ArrayList<Integer>();
+		parseGenericTypeString(parameterType, offset, genericTypes, genericOffsets);
+		if (genericTypes != null && genericTypes.size() > 0) {
+			Type[] types = new Type[genericTypes.size()];
+			for (int k = 0; k < genericTypes.size(); k ++) {
+				types[k] = parseGenericType(genericTypes.get(k), genericOffsets.get(k));
+			}
+			return new ParameterizedTypeImpl(raw, types);
+		}
+		return raw;
 	}
 
 	private void parseGenericTypeString(String type, int offset, List<String> types, List<Integer> offsets) throws IOException, ParseException {
@@ -798,27 +733,4 @@ public class DefaultParser implements Parser {
 		}
 	}
 	
-	private String parseGenericType(String type, String var, Map<String, Class<?>> types, int offset) throws IOException, ParseException {
-		int i = type.indexOf('<');
-		if (i < 0) {
-			return type;
-		}
-		if (! type.endsWith(">")) {
-			throw new ParseException("Illegal type: " + type, offset);
-		}
-		String parameterType = type.substring(i + 1, type.length() - 1).trim();
-		offset = offset + 1;
-		List<String> genericTypes = new ArrayList<String>();
-		List<Integer> genericOffsets = new ArrayList<Integer>();
-		parseGenericTypeString(parameterType, offset, genericTypes, genericOffsets);
-		if (genericTypes != null && genericTypes.size() > 0) {
-			for (int k = 0; k < genericTypes.size(); k ++) {
-				String genericVar = var + ":" + k;
-				String genericType = parseGenericType(genericTypes.get(k), genericVar, types, genericOffsets.get(k));
-				types.put(genericVar, ClassUtils.forName(importPackages, genericType));
-			}
-		}
-		return type.substring(0, i);
-	}
-
 }

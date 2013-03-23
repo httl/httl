@@ -135,14 +135,14 @@ public class TemplateTest {
 		model.setEnd(7);
 
 	    final List<Object[]> retTestData = new ArrayList<Object[]>();
-		String[] configs = new String[] { "httl-comment.properties"/*, "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-attribute.properties", "httl-velocity.properties"*/ };
+		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-attribute.properties", "httl-velocity.properties" };
 		for (String config : configs) {
 			Engine engine = Engine.getEngine(config);
 
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);
 			String json = codecs[0].toString("context", model);
 
-			Object[] maps = new Object[] {context/*, model, json, null*/};
+			Object[] maps = new Object[] {context, model, json, null};
 			for (Object map : maps) {
 				String dir = engine.getProperty("template.directory", "");
 				if (dir.length() > 0 && dir.startsWith("/")) {
@@ -208,7 +208,7 @@ public class TemplateTest {
 		}
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
-			//if (! "extends_default.httl".equals(templateName)) continue; // 指定模板测试
+			//if (! "comment_cdata_escape.httl".equals(templateName)) continue; // 指定模板测试
 			if (! profile)
 				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
 			if ("httl-velocity.properties".equals(config) && (data == null || data instanceof String)) continue;
@@ -261,7 +261,6 @@ public class TemplateTest {
 				String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
 				expected = expected.replace("\r", "");
 				if ("httl-comment-text.properties".equals(config) 
-						&& ! "comment_cdata_escape.httl".equals(templateName)
 						&& ! template.getSource().contains("read(")) {
 					expected = expected.replace("<!--", "").replace("-->", "");
 				}

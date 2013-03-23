@@ -18,7 +18,8 @@ package httl.ast;
 import httl.Visitor;
 
 import java.text.ParseException;
-
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * UnaryOperator. (SPI, Prototype, ThreadSafe)
@@ -43,7 +44,14 @@ public final class UnaryOperator extends Operator {
 	}
 
 	public void setParameter(Expression parameter) {
+		if (this.parameter != null)
+			throw new IllegalStateException("Can not modify parameter.");
 		this.parameter = parameter;
+		parameter.setParent(this);
+	}
+
+	public List<Expression> getChildren() {
+		return Arrays.asList(parameter);
 	}
 
 }

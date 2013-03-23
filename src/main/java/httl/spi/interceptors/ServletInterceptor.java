@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * ServletInterceptor. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setInterceptor(Interceptor)
+ * @see httl.spi.parsers.TemplateParser#setInterceptor(Interceptor)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.parsers.templates;
+package httl.spi.translators.templates;
 
 import httl.Engine;
 import httl.Resource;
@@ -21,7 +21,7 @@ import httl.Template;
 import httl.internal.util.DelegateMap;
 import httl.internal.util.TypeMap;
 import httl.spi.Converter;
-import httl.spi.Parser;
+import httl.spi.Translator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,16 +41,16 @@ public class LazyParseTemplate extends ResourceTemplate {
 
 	private final Map<String, Class<?>> parameterTypes;
 
-	private final Parser parser;
+	private final Translator translator;
 
 	private final Converter<Object, Object> mapConverter;
 
 	private volatile Template template;
 
-	public LazyParseTemplate(Parser parser, Resource resource, Map<String, Class<?>> parameterTypes, Converter<Object, Object> mapConverter) {
+	public LazyParseTemplate(Translator translator, Resource resource, Map<String, Class<?>> parameterTypes, Converter<Object, Object> mapConverter) {
 		super(resource);
 		this.parameterTypes = parameterTypes;
-		this.parser = parser;
+		this.translator = translator;
 		this.mapConverter = mapConverter;
 	}
 	
@@ -60,7 +60,7 @@ public class LazyParseTemplate extends ResourceTemplate {
 				if (template == null) {
 					Map<String, Class<?>> types = context == null ? null : new TypeMap(convertMap(context));
 					types = new DelegateMap<String, Class<?>>(types, parameterTypes);
-					template = parser.parse(getResource(), types);
+					template = translator.translate(getResource(), types);
 				}
 			}
 		}

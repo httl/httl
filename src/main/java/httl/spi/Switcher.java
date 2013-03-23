@@ -20,9 +20,9 @@ import java.util.List;
 /**
  * Location Switcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setTextFilterSwitcher(Switcher)
- * @see httl.spi.parsers.DefaultParser#setValueFilterSwitcher(Switcher)
- * @see httl.spi.parsers.DefaultParser#setFormatterSwitcher(Switcher)
+ * @see httl.spi.parsers.TemplateParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.TemplateParser#setValueFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.TemplateParser#setFormatterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

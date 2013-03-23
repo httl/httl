@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators;
+package httl.spi.parsers;
 
-import httl.ast.Expression;
-import httl.internal.util.ClassUtils;
+import httl.Node;
 import httl.internal.util.StringSequence;
 import httl.spi.Filter;
+import httl.spi.Parser;
 import httl.spi.Translator;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -34,16 +32,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * DefaultTranslator. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
- * @see httl.spi.parsers.DefaultParser#setTranslator(Translator)
+ * @see httl.spi.parsers.TemplateParser#setTranslator(Translator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class DefaultTranslator implements Translator {
+public class ExpressionParser implements Parser {
 
 	private Filter expressionFilter;
 
-	private Class<?> defaultVariableType;
-	
 	private String[] importGetters;
 
 	private String[] importPackages;
@@ -82,13 +78,6 @@ public class DefaultTranslator implements Translator {
 		this.importPackages = importPackages;
 	}
 
-	/**
-	 * httl.properties: default.variable.type=java.lang.String
-	 */
-	public void setDefaultVariableType(String defaultVariableType) {
-		this.defaultVariableType = ClassUtils.forName(defaultVariableType);
-	}
-
 	public void setImportMethods(Object[] importMethods) {
 		for (Object function : importMethods) {
 			if (function instanceof Class) {
@@ -119,12 +108,11 @@ public class DefaultTranslator implements Translator {
 		}
 	}
 
-	public Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException {
+	public Node parse(String source, int offset) throws ParseException {
 		if (expressionFilter != null) {
 			source = expressionFilter.filter(source, source);
 		}
-		Set<String> variables = new HashSet<String>();
-		return new DfaParser(parameterTypes, defaultVariableType, functions.keySet(), sequences, importGetters, importSizers, importPackages, offset).parse(source, variables);
+		return new ExpressionScanner(functions.keySet(), sequences, importGetters, importSizers, importPackages, offset).parse(source);
 	}
 
 }

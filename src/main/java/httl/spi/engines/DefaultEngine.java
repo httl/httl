@@ -18,7 +18,6 @@ package httl.spi.engines;
 import httl.Engine;
 import httl.Resource;
 import httl.Template;
-import httl.ast.Expression;
 import httl.internal.util.ConfigUtils;
 import httl.internal.util.DelegateMap;
 import httl.internal.util.Digest;
@@ -28,11 +27,10 @@ import httl.internal.util.VolatileReference;
 import httl.spi.Converter;
 import httl.spi.Loader;
 import httl.spi.Logger;
-import httl.spi.Parser;
 import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
-import httl.spi.parsers.templates.LazyParseTemplate;
+import httl.spi.translators.templates.LazyParseTemplate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,9 +60,6 @@ public class DefaultEngine extends Engine {
 	// httl.properties: loaders=httl.spi.loaders.ClasspathLoader
 	private Loader loader;
 
-	// httl.properties: parser=httl.spi.parsers.DefaultParser
-	private Parser parser;
-
 	// httl.properties: translator=httl.spi.translators.DefaultTranslator
 	private Translator translator;
 	
@@ -76,9 +71,6 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
 	private Map<Object, Object> templateCache;
-
-	// httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
-	private Map<Object, Object> expressionCache;
 
 	// httl.properties: map.converters=httl.spi.converters.BeanMapConverter
 	private Converter<Object, Object> mapConverter;
@@ -171,57 +163,6 @@ public class DefaultEngine extends Engine {
 			}
 		};
 	}
-
-	/**
-	 * Get expression.
-	 * 
-	 * @see #getEngine()
-	 * @param source - expression source
-	 * @param parameterTypes - expression parameter types
-	 * @return expression instance
-	 * @throws ParseException - If the expression cannot be parsed
-	 */
-	@SuppressWarnings("unchecked")
-	public Expression getExpression(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
-		if (StringUtils.isEmpty(source)) {
-			throw new IllegalArgumentException("expression source == null");
-		}
-		Map<Object, Object> cache = this.expressionCache; // safe copy reference
-		if (cache == null) {
-			return translator.translate(source, parameterTypes, 0);
-		}
-		VolatileReference<Expression> reference = (VolatileReference<Expression>) cache.get(source);
-		if (reference == null) {
-			if (cache instanceof ConcurrentMap) {
-				reference = new VolatileReference<Expression>(); // quickly
-				VolatileReference<Expression> old = (VolatileReference<Expression>) ((ConcurrentMap<Object, Object>) cache).putIfAbsent(source, reference);
-				if (old != null) { // duplicate
-					reference = old;
-				}
-			} else {
-				synchronized (cache) { // cache lock
-					reference = (VolatileReference<Expression>) cache.get(source);
-					if (reference == null) { // double check
-						reference = new VolatileReference<Expression>(); // quickly
-						cache.put(source, reference);
-					}
-				}
-			}
-		}
-		assert(reference != null);
-		Expression expression = (Expression) reference.get();
-		if (expression == null) {
-			synchronized (reference) { // reference lock
-				expression = (Expression) reference.get();
-				if (expression == null) { // double check
-					expression = translator.translate(source, parameterTypes, 0); // slowly
-					reference.set(expression);
-				}
-			}
-		}
-		assert(expression != null);
-		return expression;
-	}
 	
 	/**
 	 * Get template.
@@ -303,9 +244,9 @@ public class DefaultEngine extends Engine {
 			resource = loadResource(name, locale, encoding);
 		}
 		if (useRenderVariableType) {
-			return new LazyParseTemplate(parser, resource, parameterTypes, mapConverter);
+			return new LazyParseTemplate(translator, resource, parameterTypes, mapConverter);
 		} else {
-			return parser.parse(resource, parameterTypes);
+			return translator.translate(resource, parameterTypes);
 		}
 	}
 	
@@ -514,13 +455,6 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * httl.properties: expression.cache=java.util.concurrent.ConcurrentHashMap
-	 */
-	public void setExpressionCache(Map<Object, Object> cache) {
-		this.expressionCache = cache;
-	}
-	
-	/**
 	 * httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
 	 */
 	public void setTemplateCache(Map<Object, Object> cache) {
@@ -535,14 +469,7 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * httl.properties: parser=httl.spi.parsers.DefaultParser
-	 */
-	public void setParser(Parser parser) {
-		this.parser = parser;
-	}
-
-	/**
-	 * httl.properties: translator=httl.spi.translators.DefaultTranslator
+	 * httl.properties: translator=httl.spi.translators.CompileTranslator
 	 */
 	public void setTranslator(Translator translator) {
 		this.translator = translator;

@@ -20,37 +20,21 @@ package httl.ast;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class End extends Directive {
+public class End extends Statement {
 	
-	private String name;
-
-	private Directive start;
-
-	public End() {
-	}
+	private Block start;
 
 	public End(int offset) {
 		super(offset);
 	}
 
-	public End(String name, int offset) {
-		super(offset);
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Directive getStart() {
+	public Block getStart() {
 		return start;
 	}
 
-	public void setStart(Directive start) {
+	public void setStart(Block start) {
+		if (this.start != null)
+			throw new IllegalStateException("Can not modify start.");
 		this.start = start;
 	}
 

@@ -15,12 +15,10 @@
  */
 package httl.spi;
 
-import httl.Resource;
-import httl.Template;
+import httl.Node;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
 
 /**
  * Template Parser. (SPI, Singleton, ThreadSafe)
@@ -32,11 +30,11 @@ import java.util.Map;
 public interface Parser {
 
 	/**
-	 * Parse the template.
+	 * Parse the template/expression.
 	 * 
-	 * @param resource - template resource.
-	 * @return template instance
+	 * @param source - template/expression source.
+	 * @return template/expression node
 	 */
-	Template parse(Resource resource, Map<String, Class<?>> parameterTypes) throws IOException, ParseException;
+	Node parse(String source, int offset) throws IOException, ParseException;
 
 }

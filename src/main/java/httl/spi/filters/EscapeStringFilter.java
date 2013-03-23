@@ -21,7 +21,7 @@ import httl.internal.util.StringUtils;
 /**
  * EscapeStringFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setValueFilter(Filter)
+ * @see httl.spi.parsers.TemplateParser#setValueFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

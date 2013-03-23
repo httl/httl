@@ -20,7 +20,7 @@ import httl.internal.util.StringUtils;
 /**
  * UnescapeXmlFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(httl.spi.Filter)
+ * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(httl.spi.Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

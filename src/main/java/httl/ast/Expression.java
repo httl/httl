@@ -38,14 +38,11 @@ import java.util.Map;
 public abstract class Expression implements Node {
 
 	private final int offset;
+	
+	private Expression parent;
 
 	public Expression(int offset) {
 		this.offset = offset;
-	}
-	
-	public Object evaluate(Object context) throws ParseException {
-		// TODO
-		return null;
 	}
 
 	public void accept(Visitor visitor) throws ParseException {
@@ -54,6 +51,16 @@ public abstract class Expression implements Node {
 
 	public int getOffset() {
 		return offset;
+	}
+
+	public Expression getParent() {
+		return parent;
+	}
+
+	public void setParent(Expression parent) {
+		if (this.parent != null)
+			throw new IllegalStateException("Can not modify parent.");
+		this.parent = parent;
 	}
 
 }

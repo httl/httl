@@ -1,9 +1,26 @@
-package httl.spi.parsers;
+/*
+ * Copyright 2011-2013 HTTL Team.
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package httl.spi.translators;
 
 import httl.Engine;
+import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.internal.util.ClassUtils;
+import httl.internal.util.IOUtils;
 import httl.internal.util.StringSequence;
 import httl.internal.util.StringUtils;
 import httl.spi.Compiler;
@@ -13,8 +30,9 @@ import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Parser;
 import httl.spi.Switcher;
-import httl.spi.parsers.templates.AbstractTemplate;
-import httl.spi.parsers.templates.AdaptiveTemplate;
+import httl.spi.Translator;
+import httl.spi.translators.templates.AbstractTemplate;
+import httl.spi.translators.templates.AdaptiveTemplate;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -30,9 +48,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class CompileParser implements Parser {
-
-	private final Parser parser;
+/**
+ * CompileTranslator
+ * 
+ * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
+public class CompileTranslator implements Translator {
 
 	private String forVariable = "for";
 
@@ -45,7 +66,9 @@ public class CompileParser implements Parser {
 	private String defaultFormatterVariable;
 
 	private Engine engine;
-	
+
+	private Parser templateParser;
+
 	private Compiler compiler;
 	
 	private Interceptor interceptor;
@@ -104,8 +127,11 @@ public class CompileParser implements Parser {
 
 	private String[] importGetters;
 
-	public CompileParser(Parser parser) {
-		this.parser = parser;
+	/**
+	 * httl.properties: template.parser=httl.spi.parsers.TemplateParser
+	 */
+	public void setTemplateParser(Parser parser) {
+		this.templateParser = parser;
 	}
 
 	/**
@@ -381,7 +407,7 @@ public class CompileParser implements Parser {
 		}
 	}
 
-	public Template parse(Resource resource, Map<String, Class<?>> defVariableTypes) throws IOException, ParseException {
+	public Template translate(Resource resource, Map<String, Class<?>> defVariableTypes) throws IOException, ParseException {
 		try {
 			Template writerTemplate = null;
 			Template streamTemplate = null;
@@ -469,9 +495,10 @@ public class CompileParser implements Parser {
 			if (types == null) {
 				types = new HashMap<String, Class<?>>();
 			}
-			Template root = parser.parse(resource, types);
-			CompileTemplateVisitor visitor = new CompileTemplateVisitor();
-			visitor.setTemplate(root);
+			Node root = templateParser.parse(IOUtils.readToString(resource.getReader()), 0);
+			CompileVisitor visitor = new CompileVisitor();
+			visitor.setResource(resource);
+			visitor.setNode(root);
 			visitor.setTypes(types);
 			visitor.setStream(stream);
 			visitor.setOffset(offset);

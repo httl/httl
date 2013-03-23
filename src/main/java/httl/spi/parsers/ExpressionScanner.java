@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators;
+package httl.spi.parsers;
 
 import httl.ast.BinaryOperator;
-import httl.ast.Bracket;
 import httl.ast.Constant;
 import httl.ast.Expression;
 import httl.ast.Operator;
@@ -31,6 +30,7 @@ import httl.internal.util.Token;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,11 +42,11 @@ import java.util.regex.Pattern;
 /**
  * Deterministic Finite state Automata (DFA) Expression Parser (ThreadSafe)
  * 
- * @see httl.spi.translators.DefaultTranslator
+ * @see httl.spi.parsers.ExpressionParser
  * 
  * @author Liang Fei (liangfei0201@gmail.com)
  */
-public class DfaParser {
+public class ExpressionScanner {
 
 	//单字母命名, 保证状态机图简洁
 	
@@ -132,11 +132,6 @@ public class DfaParser {
 	
 	private static final Pattern BLANK_PATTERN = Pattern.compile("^(\\s+)");
 	
-
-	private final Map<String, Class<?>> parameterTypes;
-
-	private final Class<?> defaultType;
-
 	private final int offset;
 	
 	private final LinkedStack<Expression> parameterStack = new LinkedStack<Expression>();
@@ -145,9 +140,7 @@ public class DfaParser {
 	
 	private final Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
 
-	public DfaParser(Map<String, Class<?>> parameterTypes, Class<?> defaultType, Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] sizers, String[] packages, int offset) {
-		this.parameterTypes = parameterTypes;
-		this.defaultType = defaultType;
+	public ExpressionScanner(Collection<Class<?>> functions, List<StringSequence> sequences, String[] getters, String[] sizers, String[] packages, int offset) {
 		this.offset = offset;
 	}
 	
@@ -243,7 +236,7 @@ public class DfaParser {
 		return priority;
 	}
 	
-	public Expression parse(String source, Set<String> variables) throws ParseException {
+	public Expression parse(String source) throws ParseException {
 		List<Token> tokens = scanner.scan(source);
 		boolean beforeOperator = true;
 		for (int i = 0; i < tokens.size(); i ++) {
@@ -262,9 +255,6 @@ public class DfaParser {
 					&& StringUtils.isNamed(msg) && i < tokens.size() - 1) {
 				String next = tokens.get(i + 1).getMessage().trim();
 				if ("(".equals(next)) {
-					if (parameterTypes.containsKey(msg)) {
-						variables.add(msg);
-					}
 					msg = "." + msg;
 				} else if (")".equals(next) && i > 0
 						&& i < tokens.size() - 2) {
@@ -327,12 +317,7 @@ public class DfaParser {
 			} else if (StringUtils.isNamed(msg)
 					&& ! "gt".equals(msg) && ! "ge".equals(msg) 
 					&& ! "lt".equals(msg) && ! "le".equals(msg)) {
-				variables.add(msg);
-				Class<?> type = parameterTypes.get(msg);
-				if (type == null && defaultType != null) {
-					type = defaultType;
-				}
-				parameterStack.push(new Variable(type, msg, getTokenOffset(token) + offset));
+				parameterStack.push(new Variable(msg, getTokenOffset(token) + offset));
 				beforeOperator = false;
 			} else if ("(".equals(msg)) {
 				operatorStack.push(Bracket.ROUND);
@@ -416,6 +401,23 @@ public class DfaParser {
 			parameterStack.push(operator);
 		}
 		return operator;
+	}
+
+	private static class Bracket extends Operator {
+
+		public static final Bracket ROUND = new Bracket("(");
+		
+		public static final Bracket SQUARE = new Bracket("[");
+
+		private Bracket(String name) {
+			super(name, Integer.MAX_VALUE, 0);
+		}
+
+		@SuppressWarnings("unchecked")
+		public List<Expression> getChildren() {
+			return Collections.EMPTY_LIST;
+		}
+
 	}
 
 }

@@ -21,7 +21,7 @@ import httl.spi.Switcher;
 /**
  * StyleTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.parsers.TemplateParser#setTextFilterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

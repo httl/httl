@@ -5,12 +5,19 @@ import java.lang.reflect.Type;
 
 public class ParameterizedTypeImpl implements ParameterizedType {
 
-	private Class<?> raw;
+	private Type owner;
 
-	private Class<?>[] arguments;
+	private Type raw;
 
-	public ParameterizedTypeImpl(Class<?> raw, Class<?>[] arguments) {
+	private Type[] arguments;
+
+	public ParameterizedTypeImpl(Type raw, Type[] arguments) {
+		this(raw, raw, arguments);
+	}
+
+	public ParameterizedTypeImpl(Type owner, Type raw, Type[] arguments) {
 		super();
+		this.owner = owner;
 		this.raw = raw;
 		this.arguments = arguments;
 	}
@@ -24,7 +31,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
 	}
 
 	public Type getOwnerType() {
-		return raw;
+		return owner;
 	}
 
 }

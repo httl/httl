@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.parsers.templates;
+package httl.spi.translators.templates;
 
 import httl.Engine;
 import httl.Node;
@@ -163,6 +163,10 @@ public class ProxyTemplate implements Template {
 
 	public List<Node> getNodes() {
 		return template.getNodes();
+	}
+
+	public Template getParent() {
+		return template.getParent();
 	}
 
 }

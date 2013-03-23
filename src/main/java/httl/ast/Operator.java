@@ -28,8 +28,6 @@ public abstract class Operator extends Expression {
 	
 	private final int priority;
 
-	private List<Expression> children;
-
 	public Operator(String name, int priority, int offset){
 		super(offset);
 		this.name = name;
@@ -44,17 +42,6 @@ public abstract class Operator extends Expression {
 		return priority;
 	}
 
-	public List<Expression> getChildren() {
-		return children;
-	}
+	public abstract List<Expression> getChildren();
 
-	public void setChildren(List<Expression> children) {
-		this.children = children;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-	
 }

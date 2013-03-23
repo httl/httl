@@ -15,42 +15,22 @@
  */
 package httl.ast;
 
-import httl.internal.util.ClassUtils;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Map;
-
 /**
  * BreakIf
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Break extends Directive {
+public class Break extends Statement {
 
-	private Expression expression;
-
-	public Break() {
-	}
+	private final Expression expression;
 
 	public Break(Expression expression, int offset) {
 		super(offset);
 		this.expression = expression;
 	}
 
-	public void render(Map<String, Object> context, Object out) throws IOException,
-			ParseException {
-		if (expression == null || ClassUtils.isTrue(expression.evaluate(context))) {
-			throw new BreakException();
-		}
-	}
-
 	public Expression getExpression() {
 		return expression;
-	}
-
-	public void setExpression(Expression expression) {
-		this.expression = expression;
 	}
 
 	@Override

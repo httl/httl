@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.parsers.templates;
+package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
@@ -291,6 +291,10 @@ public abstract class AbstractTemplate implements Template, Serializable {
 			throw new IllegalStateException("No such macro " + name + " in template " + getName());
 		}
 		return macro;
+	}
+
+	public Template getParent() {
+		return null;
 	}
 
 	public Map<String, Template> getMacros() {

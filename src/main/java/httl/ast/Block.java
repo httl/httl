@@ -17,46 +17,32 @@ package httl.ast;
 
 import httl.Visitor;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
-import java.util.Map;
 
 /**
- * BlockDirective
+ * Block
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class BlockDirective extends Directive {
+public class Block extends Statement {
+
+	private List<Statement> children;
 
 	private End end;
 
-	private List<Directive> children;
-
-	public BlockDirective() {
-		this(0);
-	}
-
-	public BlockDirective(int offset) {
+	public Block(int offset) {
 		super(offset);
-		end = new End();
-		end.setStart(this);
-		end.setOffset(offset);
-	}
-
-	public void render(Map<String, Object> context, Object out) throws IOException,
-			ParseException {
-		if (children != null) {
-			for (Directive directive : children) {
-				directive.render(context, out);
-			}
-		}
 	}
 
 	public void accept(Visitor visitor) throws ParseException {
+		Expression expression = getExpression();
+		if (expression != null) {
+			expression.accept(visitor);
+		}
 		if (visitor.visit(this)) {
 			if (children != null) {
-				for (Directive directive : children) {
+				for (Statement directive : children) {
 					directive.accept(visitor);
 				}
 			}
@@ -66,13 +52,15 @@ public class BlockDirective extends Directive {
 		}
 	}
 
-	public List<Directive> getChildren() {
+	public List<Statement> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Directive> children) {
+	public void setChildren(List<Statement> children) {
+		if (this.children != null)
+			throw new IllegalStateException("Can not modify children.");
 		this.children = children;
-		for (Directive node : children) {
+		for (Statement node : children) {
 			node.setParent(this);
 		}
 	}
@@ -82,8 +70,10 @@ public class BlockDirective extends Directive {
 	}
 
 	public void setEnd(End end) {
-		end.setStart(this);
+		if (this.end != null)
+			throw new IllegalStateException("Can not modify end.");
 		this.end = end;
+		end.setStart(this);
 	}
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.parsers.templates;
+package httl.spi.translators.templates;
 
 import httl.Engine;
 import httl.Node;
@@ -145,6 +145,10 @@ public class ResourceTemplate implements Template {
 	}
 
 	public List<Node> getNodes() {
+		throw new UnsupportedOperationException();
+	}
+
+	public Template getParent() {
 		throw new UnsupportedOperationException();
 	}
 

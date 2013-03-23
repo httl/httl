@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.parsers.templates;
+package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
@@ -214,6 +214,10 @@ public class AdaptiveTemplate implements Template, Serializable {
 
 	public List<Node> getNodes() {
 		return writerTemplate.getNodes();
+	}
+
+	public Template getParent() {
+		return writerTemplate.getParent();
 	}
 
 }

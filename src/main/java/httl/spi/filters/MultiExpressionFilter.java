@@ -20,7 +20,7 @@ import httl.spi.Filter;
 /**
  * MultiExpressionFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(Filter)
+ * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

@@ -15,88 +15,44 @@
  */
 package httl.ast;
 
-import httl.internal.util.CollectionUtils;
-import httl.internal.util.Status;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Iterator;
-import java.util.Map;
+import java.lang.reflect.Type;
 
 /**
  * For
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class For extends BlockDirective {
+public class For extends Block {
 
-	private Class<?> type;
+	private final Type type;
 
-	private String name;
+	private final String name;
 
-	private Expression expression;
+	private final Expression expression;
 
-	private String forVariable;
-
-	public For() {
-	}
-
-	public For(Class<?> type, String name, Expression expression, String forVariable, int offset) {
+	public For(Type type, String name, Expression expression, int offset) {
 		super(offset);
 		this.type = type;
 		this.name = name;
 		this.expression = expression;
-		this.forVariable = forVariable;
 	}
 
-	public void render(Map<String, Object> context, Object out) throws IOException,
-			ParseException {
-		Object list = expression.evaluate(context);
-		Status old = (Status) context.get(forVariable);
-		Status status = new Status(old, list);
-		context.put(forVariable, status);
-		for(Iterator<?> iterator = CollectionUtils.toIterator(list); iterator.hasNext();) {
-			context.put(name, iterator.next());
-			try {
-				super.render(context, out);
-			} catch (BreakException e) {
-				break;
-			}
-		}
-		if (old != null) {
-			context.put(forVariable, old);
-		} else {
-			context.remove(forVariable);
-		}
-	}
-
-	public Class<?> getType() {
+	public Type getType() {
 		return type;
-	}
-
-	public void setType(Class<?> type) {
-		this.type = type;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public Expression getExpression() {
 		return expression;
 	}
 
-	public void setExpression(Expression expression) {
-		this.expression = expression;
-	}
-
 	@Override
 	public String toString() {
-		return "#for(" + type.getCanonicalName() + " " + name + " : " + expression + ")";
+		String typeName = type == null ? "" : (type instanceof Class ? ((Class<?>) type).getCanonicalName() : type.toString());
+		return "#for(" + typeName + " " + name + " : " + expression + ")";
 	}
 
 }

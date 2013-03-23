@@ -15,22 +15,17 @@
  */
 package httl.ast;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.text.ParseException;
-import java.util.Map;
 
 /**
  * Text
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Text extends Directive {
+public class Text extends Statement {
 
-	private String content;
+	private final String content;
 
-	private boolean literal;
+	private final boolean literal;
 
 	public Text(String content, boolean literal, int offset) {
 		super(offset);
@@ -38,29 +33,12 @@ public class Text extends Directive {
 		this.literal = literal;
 	}
 
-	public void render(Map<String, Object> context, Object out) throws IOException,
-			ParseException {
-		if (out instanceof OutputStream) {
-			((OutputStream) out).write(content.getBytes());
-		} else {
-			((Writer) out).write(content);
-		}
-	}
-
 	public String getContent() {
 		return content;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
-	}
-
 	public boolean isLiteral() {
 		return literal;
-	}
-
-	public void setLiteral(boolean literal) {
-		this.literal = literal;
 	}
 
 	@Override

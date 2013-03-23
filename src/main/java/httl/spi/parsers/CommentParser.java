@@ -24,5 +24,5 @@ package httl.spi.parsers;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 @Deprecated
-public class CommentParser extends DefaultParser {
+public class CommentParser extends TemplateParser {
 }

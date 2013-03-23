@@ -15,29 +15,29 @@
  */
 package httl.spi;
 
-import httl.ast.Expression;
+import httl.Resource;
+import httl.Template;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
 
 /**
- * Expression Translator. (SPI, Singleton, ThreadSafe)
+ * Template Translator. (SPI, Singleton, ThreadSafe)
  * 
  * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
- * @see httl.spi.parsers.DefaultParser#setTranslator(Translator)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Translator {
 
 	/**
-	 * Translate the template expression to java expression.
+	 * Translate the resource to template.
 	 * 
-	 * @param source - expression source
-	 * @param parameterTypes - expression parameter types
-	 * @param offset - expression offset in template
-	 * @return expression instance
+	 * @param resource - template resource
+	 * @param parameterTypes - template parameter types
+	 * @return template instance
 	 */
-	Expression translate(String source, Map<String, Class<?>> parameterTypes, int offset) throws ParseException;
+	Template translate(Resource resource, Map<String, Class<?>> parameterTypes) throws ParseException, IOException;
 
 }

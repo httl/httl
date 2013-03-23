@@ -29,9 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * MultiConverter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.translators.DefaultTranslator#setMapConverter(Converter)
- * @see httl.spi.parsers.DefaultParser#setMapConverter(Converter)
- * @see httl.spi.parsers.DefaultParser#setOutConverter(Converter)
+ * @see httl.spi.parsers.ExpressionParser#setMapConverter(Converter)
+ * @see httl.spi.parsers.TemplateParser#setMapConverter(Converter)
+ * @see httl.spi.parsers.TemplateParser#setOutConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

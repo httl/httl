@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * ResponseOutConverter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setOutConverter(Converter)
+ * @see httl.spi.parsers.TemplateParser#setOutConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

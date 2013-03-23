@@ -28,8 +28,8 @@ public interface Visitor {
 	 * Visit a node.
 	 * 
 	 * @param node - visited node
-	 * @return TODO
-	 * @throws ParseException TODO
+	 * @return true - If return true then visit the children nods
+	 * @throws ParseException - If the expression cannot be parsed on runtime
 	 */
 	boolean visit(Node node) throws ParseException;
 

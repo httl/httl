@@ -131,6 +131,13 @@ public interface Template extends Node, Resource {
 	 * @return true - if this template is a macro.
 	 */
 	boolean isMacro();
+	
+	/**
+	 * Get the macro parent template.
+	 * 
+	 * @return parent template
+	 */
+	Template getParent();
 
 	/**
 	 * Get the expression root type.

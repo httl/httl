@@ -37,6 +37,10 @@ public final class Constant extends Expression {
 		this.value = value;
 	}
 
+	public String getToken() {
+		return toString();
+	}
+
 	public Object getValue() {
 		return value;
 	}

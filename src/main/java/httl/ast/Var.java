@@ -15,32 +15,26 @@
  */
 package httl.ast;
 
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Map;
+import java.lang.reflect.Type;
 
 /**
  * Var
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Var extends Directive {
+public class Var extends Statement {
 
-	private Class<?> type;
+	private final Type type;
 
-	private String name;
+	private final String name;
 
-	private Expression expression;
+	private final Expression expression;
 
-	private boolean parent;
+	private final boolean parent;
 
-	private boolean hide;
+	private final boolean hide;
 
-	public Var() {
-	}
-
-	public Var(Class<?> type, String name, Expression expression, boolean parent, boolean hide, int offset) {
+	public Var(Type type, String name, Expression expression, boolean parent, boolean hide, int offset) {
 		super(offset);
 		this.type = type;
 		this.name = name;
@@ -49,57 +43,31 @@ public class Var extends Directive {
 		this.hide = hide;
 	}
 
-	public void render(Map<String, Object> context, Object out) throws IOException,
-			ParseException {
-		if (expression != null) {
-			context.put(name, expression.evaluate(context));
-		}
-	}
-
-	public boolean isParent() {
-		return parent;
-	}
-
-	public void setParent(boolean parent) {
-		this.parent = parent;
-	}
-
-	public boolean isHide() {
-		return hide;
-	}
-
-	public void setHide(boolean hide) {
-		this.hide = hide;
-	}
-
-	public Class<?> getType() {
+	public Type getType() {
 		return type;
-	}
-
-	public void setType(Class<?> type) {
-		this.type = type;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public Expression getExpression() {
 		return expression;
 	}
 
-	public void setExpression(Expression expression) {
-		this.expression = expression;
+	public boolean isParent() {
+		return parent;
 	}
-	
+
+	public boolean isHide() {
+		return hide;
+	}
+
 	@Override
 	public String toString() {
-		return "#var(" + type.getCanonicalName() + " " + name + 
-				(expression == null ? "" : (parent ? " := " : " = ") + expression) + ")";
+		String typeName = type == null ? "" : (type instanceof Class ? ((Class<?>) type).getCanonicalName() : type.toString());
+		return "#var(" + typeName + " " + name + 
+				(expression == null ? "" : (parent ? " := " : (hide ? " .= " : " = ")) + expression) + ")";
 	}
 
 }

@@ -22,9 +22,9 @@ import httl.spi.Filter;
 /**
  * AbstractFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.DefaultParser#setTemplateFilter(Filter)
- * @see httl.spi.parsers.DefaultParser#setTextFilter(Filter)
- * @see httl.spi.translators.DefaultTranslator#setExpressionFilter(Filter)
+ * @see httl.spi.parsers.TemplateParser#setTemplateFilter(Filter)
+ * @see httl.spi.parsers.TemplateParser#setTextFilter(Filter)
+ * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
