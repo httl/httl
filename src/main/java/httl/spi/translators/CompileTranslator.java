@@ -149,7 +149,7 @@ public class CompileTranslator implements Translator {
 	}
 
 	/**
-	 * httl.properties: default.variable.type=java.lang.String
+	 * httl.properties: default.variable.type=java.lang.Object
 	 */
 	public void setDefaultVariableType(String defaultVariableType) {
 		this.defaultVariableType = ClassUtils.forName(defaultVariableType);
@@ -454,7 +454,7 @@ public class CompileTranslator implements Translator {
 				}
 			} catch (Throwable t) {
 			}
-			throw new ParseException(e.getMessage()  + ". \nOccur to offset: " + offset + 
+			throw new ParseException(e.getMessage()  + "\nOccur to offset: " + offset + 
 									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
 									 + ", stack: " + ClassUtils.toString(e), offset);
 		}

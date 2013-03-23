@@ -253,14 +253,14 @@ public class TemplateParser implements Parser {
 		for (int t = 0; t < tokens.size(); t ++) {
 			Token token = tokens.get(t);
 			String message = token.getMessage();
-			int offset = token.getOffset() + 1;
+			int offset = token.getOffset();
 			if (isDirective(message)) {
 				int s = message.indexOf('(');
 				String name;
 				String value;
 				int exprOffset;
 				if (s > 0) {
-					exprOffset = offset + s;
+					exprOffset = offset + s + 1;
 					name = message.substring(1, s);
 					if (! message.endsWith(")")) {
 						throw new ParseException("The #" + name + " directive mismatch right parentheses.", exprOffset);
@@ -284,7 +284,7 @@ public class TemplateParser implements Parser {
 							if (pre != null) {
 								pre[4] = value.substring(((Integer) pre[3]) - 1, matcher.start() - 1).trim();
 							}
-							Object[] item = new Object[6];
+							Object[] item = new Object[5];
 							if (matcher.group(2) == null || matcher.group(2).length() == 0) {
 								item[0] = null;
 								item[1] = matcher.group(1);
@@ -294,7 +294,6 @@ public class TemplateParser implements Parser {
 							}
 							item[2] = matcher.group(3);
 							item[3] = matcher.end(3);
-							item[5] = matcher.start(1) - 1; // 减掉前面追加的分号
 							list.add(item);
 							pre = item;
 						}
@@ -310,16 +309,15 @@ public class TemplateParser implements Parser {
 							String oper = (String) item[2];
 							int end = (Integer) item[3];
 							String expr = (String) item[4];
-							int start = (Integer) item[5];
 							Expression expression = (Expression) expressionParser.parse(expr, exprOffset + end);
 							Class<?> clazz = null;
 							if (StringUtils.isNotEmpty(type)) {
 								clazz = ClassUtils.forName(importPackages, type);
 							}
-							directives.add(new Var(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), start));
+							directives.add(new Var(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), offset));
 						}
 					} else {
-						defineVariableTypes(value, exprOffset, directives);
+						defineVariableTypes(value, offset, directives);
 					}
 				} else if (StringUtils.inArray(name, forDirective)) {
 					int i = value.indexOf(" in ");
@@ -388,7 +386,7 @@ public class TemplateParser implements Parser {
 					|| message.startsWith("#{") || message.startsWith("#!{"))) {
 				int i = message.indexOf('{');
 				directives.add(new Value((Expression) expressionParser.parse(message.substring(i + 1, message.length() - 1), 
-						offset + i), message.startsWith("$!") || message.startsWith("#!"), offset));
+						offset + i + 1), message.startsWith("$!") || message.startsWith("#!"), offset));
 			} else if (message.startsWith("##")) {
 				directives.add(new Comment(message.substring(2), false, offset));
 			} else if ((message.startsWith("#*") && message.endsWith("*#"))) {

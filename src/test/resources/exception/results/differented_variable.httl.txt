@@ -1,2 +1,2 @@
-Defined different type to variable user, conflict types: httl.test.model.User, httl.test.model.Book.
-line: 2, column: 10, char: B,
+Defined different type value to variable user, conflict types: httl.test.model.User, httl.test.model.Book.
+line: 2, column: 5, char: #,

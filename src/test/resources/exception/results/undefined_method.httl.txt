@@ -1,2 +1,2 @@
-No such macro "abcdefg" or import method "abcdefg" with parameters [class java.lang.String].
+No such macro "abcdefg" or import method abcdefg(java.lang.String).
 line: 2, column: 3, char: a,

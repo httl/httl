@@ -71,7 +71,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -178,7 +177,7 @@ public class CompileVisitor extends ASTVisitor {
 	
 	private String outputEncoding;
 	
-	private Class<?> defaultVariableType = Object.class;
+	private Class<?> defaultVariableType;
 	
 	private Compiler compiler;
 
@@ -463,6 +462,7 @@ public class CompileVisitor extends ASTVisitor {
 			appendVar(clazz, node.getName(), code, node.isParent(), node.isHide(), node.getOffset());
 			getVariables.addAll(variableTypes.keySet());
 		} else {
+			checkVar(clazz, node.getName(), node.getOffset());
 			types.put(node.getName(), clazz);
 			if (type instanceof ParameterizedType) {
 				Type[] args = ((ParameterizedType) type).getActualTypeArguments();
@@ -475,13 +475,17 @@ public class CompileVisitor extends ASTVisitor {
 			defVariableTypes.add(clazz);
 		}
 	}
-
-	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, int offset) throws ParseException {
-		String type = clazz.getCanonicalName();
+	
+	private void checkVar(Class<?> clazz, String var, int offset) throws ParseException {
 		Class<?> cls = types.get(var);
 		if (cls != null && ! cls.equals(clazz)) {
-			throw new ParseException("Set different type value to variable " + var + ", conflict types: " + cls.getCanonicalName() + ", " + clazz.getCanonicalName(), offset);
+			throw new ParseException("Defined different type value to variable " + var + ", conflict types: " + cls.getCanonicalName() + ", " + clazz.getCanonicalName() + ".", offset);
 		}
+	}
+
+	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, int offset) throws ParseException {
+		checkVar(clazz, var, offset);
+		String type = clazz.getCanonicalName();
 		types.put(var, clazz);
 		setVariables.add(var);
 		builder.append("	" + var + " = (" + type + ")(" + code + ");\n");
@@ -1209,7 +1213,7 @@ public class CompileVisitor extends ASTVisitor {
 					}
 				}
 				if (code == null) {
-					throw new ParseException("No such macro \"" + name + "\" or import method \"" + name + "\" with parameters " + Arrays.toString(parameterTypes), node.getOffset());
+					throw new ParseException("No such macro \"" + name + "\" or import method " + ClassUtils.getMethodFullName(name, parameterTypes) + ".", node.getOffset());
 				}
 			}
 		} else if (name.equals("[")) {
@@ -1390,8 +1394,66 @@ public class CompileVisitor extends ASTVisitor {
 					}
 				}
 				if (code == null) {
-					type = getReturnType(leftParameter, leftClass, name, rightTypes, node.getOffset());
-					code = getNotNullCode(leftParameter, type, leftCode, getMethodName(leftParameter, leftClass, name, rightTypes, leftCode, rightCode, node.getOffset()));
+					if (leftClass.isArray() && "length".equals(name)) {
+						type = int.class;
+						code = getNotNullCode(leftParameter, type, leftCode, leftCode + ".length");
+					} else {
+						try {
+							Method method = ClassUtils.searchMethod(leftClass, name, rightTypes);
+							type = method.getReturnType();
+							code = getNotNullCode(leftParameter, type, leftCode, leftCode + "." + method.getName() + "(" + rightCode + ")");
+						} catch (NoSuchMethodException e) {
+							String def = "";
+							if (StringUtils.isNamed(leftCode) && leftClass.equals(defaultVariableType)) {
+								def = " Please add variable type definition #var(Xxx user) in your template.";
+							}
+							if (rightTypes != null && rightTypes.length > 0) {
+								throw new ParseException("No such method " + ClassUtils.getMethodFullName(name, rightTypes) + " in class "
+										+ leftClass.getName() + "." + def, node.getOffset());
+							} else { // search property
+								try {
+									String getter = "get" + name.substring(0, 1).toUpperCase()
+											+ name.substring(1);
+									Method method = leftClass.getMethod(getter,
+											new Class<?>[0]);
+									type = method.getReturnType();
+									code = getNotNullCode(leftParameter, type, leftCode, leftCode + "." + method.getName() + "()");
+								} catch (NoSuchMethodException e2) {
+									try {
+										String getter = "is"
+												+ name.substring(0, 1).toUpperCase()
+												+ name.substring(1);
+										Method method = leftClass.getMethod(getter,
+												new Class<?>[0]);
+										type = method.getReturnType();
+										code = getNotNullCode(leftParameter, type, leftCode, leftCode + "." + method.getName() + "()");
+									} catch (NoSuchMethodException e3) {
+										try {
+											Field field = leftClass.getField(name);
+											type = field.getType();
+											code = getNotNullCode(leftParameter, type, leftCode, leftCode + "." + field.getName());
+										} catch (NoSuchFieldException e4) {
+											throw new ParseException(
+													"No such property "
+															+ name
+															+ " in class "
+															+ leftClass.getName()
+															+ ", because no such method get"
+															+ name.substring(0, 1)
+																	.toUpperCase()
+															+ name.substring(1)
+															+ "() or method is"
+															+ name.substring(0, 1)
+																	.toUpperCase()
+															+ name.substring(1)
+															+ "() or method " + name
+															+ "() or filed " + name + "." + def, node.getOffset());
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		} else if (name.equals(",")) {
@@ -1688,120 +1750,6 @@ public class CompileVisitor extends ASTVisitor {
 							return field != null;
 						} catch (NoSuchFieldException e4) {
 							return false;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private String getMethodName(Expression leftParameter, Class<?> leftClass, String name, Class<?>[] rightTypes, String leftCode, String rightCode, int offset) throws ParseException {
-		if (leftClass == null) {
-			throw new ParseException("No such method " + name + "("
-									 + Arrays.toString(rightTypes) + ") in null class.", offset);
-		}
-		if (leftClass.isArray() && "length".equals(name)) {
-			return leftCode + ".length";
-		}
-		try {
-			Method method = ClassUtils.searchMethod(leftClass, name, rightTypes);
-			return leftCode + "." + method.getName() + "(" + rightCode + ")";
-		} catch (NoSuchMethodException e) {
-			if (rightTypes != null && rightTypes.length > 0) {
-				throw new ParseException("No such method " + name + "("
-						+ Arrays.toString(rightTypes) + ") in class "
-						+ leftClass.getName(), offset);
-			} else { // search property
-				try {
-					String getter = "get" + name.substring(0, 1).toUpperCase()
-							+ name.substring(1);
-					Method method = leftClass.getMethod(getter,
-							new Class<?>[0]);
-					return leftCode + "." + method.getName() + "()";
-				} catch (NoSuchMethodException e2) {
-					try {
-						String getter = "is"
-								+ name.substring(0, 1).toUpperCase()
-								+ name.substring(1);
-						Method method = leftClass.getMethod(getter,
-								new Class<?>[0]);
-						return leftCode + "." + method.getName() + "()";
-					} catch (NoSuchMethodException e3) {
-						try {
-							Field field = leftClass.getField(name);
-							return field.getName();
-						} catch (NoSuchFieldException e4) {
-							throw new ParseException(
-									"No such property "
-											+ name
-											+ " in class "
-											+ leftClass.getName()
-											+ ", because no such method get"
-											+ name.substring(0, 1)
-													.toUpperCase()
-											+ name.substring(1)
-											+ "() or method is"
-											+ name.substring(0, 1)
-													.toUpperCase()
-											+ name.substring(1)
-											+ "() or method " + name
-											+ "() or filed " + name, offset);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private Class<?> getReturnType(Expression leftParameter, Class<?> leftClass, String name, Class<?>[] rightTypes, int offset) throws ParseException {
-		if (leftClass == null) {
-			return null;
-		}
-		if (leftClass.isArray() && "length".equals(name)) {
-			return int.class;
-		}
-		try {
-			Method method = ClassUtils.searchMethod(leftClass, name, rightTypes);
-			return method.getReturnType();
-		} catch (NoSuchMethodException e) {
-			if (rightTypes != null && rightTypes.length > 0) {
-				throw new ParseException("No such method " + ClassUtils.getMethodFullName(name, rightTypes) + " in class "
-						+ leftClass.getName(), offset);
-			} else { // search property
-				try {
-					String getter = "get" + name.substring(0, 1).toUpperCase()
-							+ name.substring(1);
-					Method method = leftClass.getMethod(getter,
-							new Class<?>[0]);
-					return method.getReturnType();
-				} catch (NoSuchMethodException e2) {
-					try {
-						String getter = "is"
-								+ name.substring(0, 1).toUpperCase()
-								+ name.substring(1);
-						Method method = leftClass.getMethod(getter,
-								new Class<?>[0]);
-						return method.getReturnType();
-					} catch (NoSuchMethodException e3) {
-						try {
-							Field field = leftClass.getField(name);
-							return field.getType();
-						} catch (NoSuchFieldException e4) {
-							throw new ParseException(
-									"No such property "
-											+ name
-											+ " in class "
-											+ leftClass.getName()
-											+ ", because no such method get"
-											+ name.substring(0, 1)
-													.toUpperCase()
-											+ name.substring(1)
-											+ "() or method is"
-											+ name.substring(0, 1)
-													.toUpperCase()
-											+ name.substring(1)
-											+ "() or method " + name
-											+ "() or filed " + name, offset);
 						}
 					}
 				}

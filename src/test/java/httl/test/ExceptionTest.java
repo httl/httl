@@ -107,7 +107,7 @@ public class ExceptionTest {
 				for (String part : expected)  {
 					assertTrue(StringUtils.isNotEmpty(part));
 					part = StringUtils.unescapeString(part).trim();
-					assertTrue(templateName + ", exception message: \"" + message + "\" not contains: \"" + part + "\"", message.contains(part));
+					assertTrue(templateName + ", No such: \n====\n" + part + "\n====\nin exception message:\n====\n" + message + "\n====\n", message.contains(part));
 				}
 			}
 		}
