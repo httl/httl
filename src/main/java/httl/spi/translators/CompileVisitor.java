@@ -1148,34 +1148,35 @@ public class CompileVisitor extends ASTVisitor {
 			code = node.isBoxed() ? "" : "null";
 		} else if (value.equals(Boolean.TRUE)) {
 			type = node.isBoxed() ? Boolean.class : boolean.class;
-			code = "true";
+			code = node.isBoxed() ? "Boolean.TRUE" : "true";
 		} else if (value.equals(Boolean.FALSE)) {
 			type = node.isBoxed() ? Boolean.class : boolean.class;
-			code = "false";
+			code = node.isBoxed() ? "Boolean.FALSE" : "false";
 		} else if (value instanceof String) {
 			type = String.class;
 			code = "\"" + StringUtils.escapeString((String) value) + "\"";
 		} else if (value instanceof Character) {
 			type = node.isBoxed() ? Character.class : char.class;
-			code = "'" + value + "'";
+			code = node.isBoxed() ? "Character.valueOf('" + StringUtils.escapeString(String.valueOf(value)) + "')" 
+					: "'" + StringUtils.escapeString(String.valueOf(value)) + "'";
 		} else if (value instanceof Double) {
 			type = node.isBoxed() ? Double.class : double.class;
-			code = value + "D";
+			code = node.isBoxed() ? "Double.valueOf(" + value + "d)" : value + "d";
 		} else if (value instanceof Float) {
 			type = node.isBoxed() ? Float.class : float.class;
-			code = value + "F";
+			code = node.isBoxed() ? "Float.valueOf(" + value + "f)" : value + "f";
 		} else if (value instanceof Long) {
 			type = node.isBoxed() ? Long.class : long.class;
-			code = value + "L";
+			code = node.isBoxed() ? "Long.valueOf(" + value + "l)" : value + "l";
 		} else if (value instanceof Short) {
 			type = node.isBoxed() ? Short.class : short.class;
-			code = "((short)" + value + ")";
+			code = node.isBoxed() ? "Short.valueOf((short)" + value + ")" : "((short)" + value + ")";
 		} else if (value instanceof Byte) {
 			type = node.isBoxed() ? Byte.class : byte.class;
-			code = "((byte)" + value + ")";
+			code = node.isBoxed() ? "Byte.valueOf((byte)" + value + ")" : "((byte)" + value + ")";
 		} else if (value instanceof Integer) {
 			type = node.isBoxed() ? Integer.class : int.class;
-			code = String.valueOf(value);
+			code = node.isBoxed() ? "Integer.valueOf(" + value + ")" : String.valueOf(value);
 		} else {
 			throw new ParseException("Unsupported constant " + value, node.getOffset());
 		}
