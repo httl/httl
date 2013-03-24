@@ -18,7 +18,7 @@ package httl.spi.parsers;
 import httl.Engine;
 import httl.Node;
 import httl.Template;
-import httl.ast.BlockStatement;
+import httl.ast.Block;
 import httl.ast.Break;
 import httl.ast.Comment;
 import httl.ast.Else;
@@ -212,19 +212,12 @@ public class TemplateParser implements Parser {
 				type = v.substring(0, i).trim();
 				var = v.substring(i + 1).trim();
 			}
-			checkVariableName(var, offset);
 			directives.add(new Var(parseGenericType(type, o), var, null, false, false, offset));
 		}
 	}
 	
 	private boolean isNoLiteralText(Statement node) {
 		return node instanceof Text && ! ((Text) node).isLiteral();
-	}
-
-	private void checkVariableName(String var, int offset) throws ParseException {
-		if (! StringUtils.isNamed(var)) {
-			throw new ParseException("Illegal variable name " + var + ", Can not contains any symbol.", offset);
-		}
 	}
 
 	private List<Statement> clean(List<Statement> nodes) throws ParseException, IOException {
@@ -309,7 +302,12 @@ public class TemplateParser implements Parser {
 							pre[4] = value.substring(((Integer) pre[3]) - 1).trim();
 						}
 						if (list.isEmpty()) {
-							throw new ParseException("Not found \"=\" in set", offset);
+							int i = value.indexOf('=');
+							if (i > 0) {
+								throw new ParseException("Illegal variable name " + value.substring(0, i).trim() + ", Can not contains any symbol.", offset);
+							} else {
+								throw new ParseException("Not found \"=\" in set", offset);
+							}
 						}
 						for (Object[] item : list) {
 							String type = (String) item[0];
@@ -320,9 +318,12 @@ public class TemplateParser implements Parser {
 							Expression expression = (Expression) expressionParser.parse(expr, exprOffset + end);
 							Class<?> clazz = null;
 							if (StringUtils.isNotEmpty(type)) {
-								clazz = ClassUtils.forName(importPackages, type);
+								try {
+									clazz = ClassUtils.forName(importPackages, type);
+								} catch (Exception e) {
+									throw new ParseException("No such class " + type + ", cause: " + e.getMessage(), offset);
+								}
 							}
-							checkVariableName(var, offset);
 							directives.add(new Var(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), offset));
 						}
 					} else {
@@ -330,13 +331,22 @@ public class TemplateParser implements Parser {
 					}
 				} else if (StringUtils.inArray(name, forDirective)) {
 					int i = value.indexOf(" in ");
+					int n = 4;
+					if (i < 0) {
+						i = value.indexOf(":");
+						n = 1;
+					}
 					String var = value.substring(0, i).trim();
-					value = value.substring(i + 4);
-					Expression expression = (Expression) expressionParser.parse(value, exprOffset + i + 4);
+					value = value.substring(i + n);
+					Expression expression = (Expression) expressionParser.parse(value, exprOffset + i + n);
 					int j = var.indexOf(' ');
 					Class<?> type = null;
 					if (j > 0) {
-						type = ClassUtils.forName(importPackages, var.substring(0, j).trim());
+						try {
+							type = ClassUtils.forName(importPackages, var.substring(0, j).trim());
+						} catch (Exception e) {
+							throw new ParseException("No such class " + var.substring(0, j).trim() + ", cause: " + e.getMessage(), offset);
+						}
 						var = var.substring(j + 1).trim();
 					}
 					directives.add(new For(type, var, expression, offset));
@@ -380,13 +390,13 @@ public class TemplateParser implements Parser {
 					}
 					if (StringUtils.isNotEmpty(set)) {
 						String var = set.trim();
-						checkVariableName(var, offset);
 						directives.add(new Var(Template.class, var, (Expression) expressionParser.parse(macroName, exprOffset), parent, hide, offset));
 					}
 					if (out) {
 						directives.add(new Value((Expression) expressionParser.parse(macroName, exprOffset), true, offset));
 					}
-					directives.add(new Macro(macroName.trim(), offset));
+					macroName = macroName.trim();
+					directives.add(new Macro(macroName, offset));
 					if (StringUtils.isNotEmpty(macroParams)) {
 						defineVariableTypes(macroParams, exprOffset, directives);
 					}
@@ -417,9 +427,9 @@ public class TemplateParser implements Parser {
 		return directives;
 	}
 
-	private BlockStatement reduce(List<Statement> directives) throws ParseException {
+	private Block reduce(List<Statement> directives) throws ParseException {
 		LinkedStack<BlockDirectiveEntry> directiveStack = new LinkedStack<BlockDirectiveEntry>();
-		BlockStatement rootDirective = new BlockStatement(0);
+		Block rootDirective = new Block(0);
 		directiveStack.push(new BlockDirectiveEntry(rootDirective));
 		for (int i = 0, n = directives.size(); i < n; i ++) {
 			Statement directive = (Statement)directives.get(i);
@@ -431,7 +441,7 @@ public class TemplateParser implements Parser {
 					|| directiveClass == Else.class) {
 				if (directiveStack.isEmpty())
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
-				BlockStatement blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+				Block blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 				if (blockDirective == rootDirective)
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
 				End endDirective;
@@ -449,24 +459,24 @@ public class TemplateParser implements Parser {
 				((BlockDirectiveEntry) directiveStack.peek()).appendInnerDirective(directive);
 			}
 			// 压栈
-			if (directive instanceof BlockStatement)
-				directiveStack.push(new BlockDirectiveEntry((BlockStatement) directive));
+			if (directive instanceof Block)
+				directiveStack.push(new BlockDirectiveEntry((Block) directive));
 		}
-		BlockStatement root = (BlockStatement) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+		Block root = (Block) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 		if (! directiveStack.isEmpty()) { // 后验条件
 			throw new ParseException("DirectiveReducer.block.directive.without.end" + root.getClass().getSimpleName(), root.getOffset());
 		}
-		return (BlockStatement) root;
+		return (Block) root;
 	}
 
 	// 指令归约辅助封装类
 	private static final class BlockDirectiveEntry {
 
-		private BlockStatement blockDirective;
+		private Block blockDirective;
 
 		private List<Statement> elements = new ArrayList<Statement>();
 
-		BlockDirectiveEntry(BlockStatement blockDirective) {
+		BlockDirectiveEntry(Block blockDirective) {
 			this.blockDirective = blockDirective;
 		}
 
@@ -474,16 +484,16 @@ public class TemplateParser implements Parser {
 			this.elements.add(innerDirective);
 		}
 
-		BlockStatement popDirective() {
-			((BlockStatement)blockDirective).setChildren(elements);
+		Block popDirective() throws ParseException {
+			((Block)blockDirective).setChildren(elements);
 			return blockDirective;
 		}
 
 	}
 	
-	private static final Pattern DEFINE_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
+	private static final Pattern DEFINE_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s\\w+)\\s?[,]?\\s?");
 
-	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*([_0-9a-zA-Z\\.]+)\\s*([_0-9a-zA-Z\\.]*)\\s*([:\\.]?=)[^=]");
+	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)[^=]");
 
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
@@ -691,12 +701,21 @@ public class TemplateParser implements Parser {
 	private Type parseGenericType(String type, int offset) throws IOException, ParseException {
 		int i = type.indexOf('<');
 		if (i < 0) {
-			return ClassUtils.forName(importPackages, type);
+			try {
+				return ClassUtils.forName(importPackages, type);
+			} catch (Exception e) {
+				throw new ParseException("No such class " + type + ", cause: " + e.getMessage(), offset);
+			}
 		}
 		if (! type.endsWith(">")) {
 			throw new ParseException("Illegal type: " + type, offset);
 		}
-		Class<?> raw = ClassUtils.forName(importPackages, type.substring(0, i));
+		Class<?> raw;
+		try {
+			raw = ClassUtils.forName(importPackages, type.substring(0, i));
+		} catch (Exception e) {
+			throw new ParseException("No such class " + type.substring(0, i) + ", cause: " + e.getMessage(), offset);
+		}
 		String parameterType = type.substring(i + 1, type.length() - 1).trim();
 		offset = offset + 1;
 		List<String> genericTypes = new ArrayList<String>();

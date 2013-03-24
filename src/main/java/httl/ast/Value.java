@@ -15,6 +15,8 @@
  */
 package httl.ast;
 
+import java.text.ParseException;
+
 /**
  * Value
  * 
@@ -26,8 +28,11 @@ public class Value extends Statement {
 
 	private final boolean noFilter;
 
-	public Value(Expression expression, boolean noFilter, int offset) {
+	public Value(Expression expression, boolean noFilter, int offset) throws ParseException {
 		super(offset);
+		if (expression == null) {
+			throw new ParseException("The value expression is required.", offset);
+		}
 		this.expression = expression;
 		this.noFilter = noFilter;
 	}

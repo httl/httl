@@ -17,7 +17,10 @@ package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
+import httl.Node;
+import httl.Resource;
 import httl.Template;
+import httl.internal.util.UnsafeStringWriter;
 import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.spi.Filter;
@@ -25,7 +28,6 @@ import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.Switcher;
-import httl.internal.util.UnsafeStringWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,12 +51,10 @@ public abstract class WriterTemplate extends AbstractTemplate {
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
 			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
-			Map<Class<?>, Object> functions, Map<String, Template> importMacros){
-		super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
-	}
-
-	public Class<?> getReturnType() {
-		return String.class;
+			Map<Class<?>, Object> functions, Map<String, Template> importMacros,
+			Resource resource, Template template, Node root){
+		super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, 
+				mapConverter, outConverter, functions, importMacros, resource, template, root);
 	}
 
 	public Object evaluate(Map<String, Object> parameters) throws ParseException {

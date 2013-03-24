@@ -20,7 +20,7 @@ package httl.ast;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Else extends BlockStatement {
+public class Else extends Block {
 
 	private final Expression expression;
 
@@ -35,7 +35,7 @@ public class Else extends BlockStatement {
 
 	@Override
 	public String toString() {
-		return "#else";
+		return expression == null ? "#else" : "#else(" + expression + ")";
 	}
 
 }

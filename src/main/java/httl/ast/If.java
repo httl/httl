@@ -15,17 +15,22 @@
  */
 package httl.ast;
 
+import java.text.ParseException;
+
 /**
  * If
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class If extends BlockStatement {
+public class If extends Block {
 	
 	private final Expression expression;
 
-	public If(Expression expression, int offset) {
+	public If(Expression expression, int offset) throws ParseException {
 		super(offset);
+		if (expression == null) {
+			throw new ParseException("The if expression is required.", offset);
+		}
 		this.expression = expression;
 	}
 

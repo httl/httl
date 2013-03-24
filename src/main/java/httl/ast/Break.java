@@ -15,6 +15,10 @@
  */
 package httl.ast;
 
+import httl.Node;
+
+import java.text.ParseException;
+
 /**
  * BreakIf
  * 
@@ -33,9 +37,13 @@ public class Break extends Statement {
 		return expression;
 	}
 
+	public void setParent(Node parent) throws ParseException {
+		super.setParent(parent);
+	}
+
 	@Override
 	public String toString() {
-		return "#breakif(" + expression + ")";
+		return expression == null ? "#break" : "#break(" + expression + ")";
 	}
 
 }

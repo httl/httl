@@ -47,15 +47,15 @@ public abstract class ASTVisitor implements Visitor {
 			visit((Var) node);
 		} else if (node instanceof Break) {
 			visit((Break) node);
-		} else if (node instanceof BlockStatement) {
-			return visit((BlockStatement) node);
+		} else if (node instanceof Block) {
+			return visit((Block) node);
 		} else if (node instanceof End) {
 			visit((End) node);
 		}
 		return true;
 	}
 
-	public boolean visit(BlockStatement node) throws ParseException {
+	public boolean visit(Block node) throws ParseException {
 		if (node instanceof If) {
 			return visit((If) node);
 		} else if (node instanceof Else) {

@@ -16,7 +16,6 @@
 package httl.spi.translators.templates;
 
 import httl.Engine;
-import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.Visitor;
@@ -26,7 +25,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -69,7 +67,7 @@ public class ResourceTemplate implements Template {
 		return resource.getLength();
 	}
 
-	public String getSource() {
+	public String getSource() throws IOException {
 		return resource.getSource();
 	}
 
@@ -85,34 +83,13 @@ public class ResourceTemplate implements Template {
 		return resource.getEngine();
 	}
 
-	public Class<?> getRootType() {
-		return null;
-	}
-
 	@SuppressWarnings("unchecked")
 	public Map<String, Class<?>> getVariables() {
 		return Collections.EMPTY_MAP;
 	}
 
-	public Class<?> getReturnType() {
-		return String.class;
-	}
-
-	public String getCode() {
-		return "";
-	}
-
 	public int getOffset() {
 		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<String, Class<?>> getExportTypes() {
-		return Collections.EMPTY_MAP;
-	}
-
-	public Template getMacro(String name) {
-		throw new IllegalStateException("No such macro " + name + " in template " + getName());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -141,10 +118,6 @@ public class ResourceTemplate implements Template {
 	}
 
 	public void accept(Visitor visitor) throws ParseException {
-		throw new UnsupportedOperationException();
-	}
-
-	public List<Node> getNodes() {
 		throw new UnsupportedOperationException();
 	}
 

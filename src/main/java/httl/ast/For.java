@@ -15,14 +15,17 @@
  */
 package httl.ast;
 
+import httl.internal.util.StringUtils;
+
 import java.lang.reflect.Type;
+import java.text.ParseException;
 
 /**
  * For
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class For extends BlockStatement {
+public class For extends Block {
 
 	private final Type type;
 
@@ -30,8 +33,14 @@ public class For extends BlockStatement {
 
 	private final Expression expression;
 
-	public For(Type type, String name, Expression expression, int offset) {
+	public For(Type type, String name, Expression expression, int offset) throws ParseException {
 		super(offset);
+		if (! StringUtils.isNamed(name)) {
+			throw new ParseException("Illegal foreach name " + name + ", Can not contains any symbol.", offset);
+		}
+		if (expression == null) {
+			throw new ParseException("The foreach expression is required.", offset);
+		}
 		this.type = type;
 		this.name = name;
 		this.expression = expression;

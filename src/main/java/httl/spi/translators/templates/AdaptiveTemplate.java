@@ -17,7 +17,6 @@ package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
-import httl.Node;
 import httl.Template;
 import httl.Visitor;
 import httl.spi.Converter;
@@ -31,7 +30,6 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -82,7 +80,7 @@ public class AdaptiveTemplate implements Template, Serializable {
 		return writerTemplate.getLength();
 	}
 
-	public String getSource() {
+	public String getSource() throws IOException {
 		return writerTemplate.getSource();
 	}
 
@@ -96,15 +94,6 @@ public class AdaptiveTemplate implements Template, Serializable {
 
 	public Engine getEngine() {
 		return writerTemplate.getEngine();
-	}
-
-	public Class<?> getReturnType() {
-		// Context.getOut() only OutputStream or Writer
-		if (Context.getContext().getOut() instanceof OutputStream) {
-			return streamTemplate.getReturnType();
-		} else {
-			return writerTemplate.getReturnType();
-		}
 	}
 
 	public Object evaluate() throws ParseException {
@@ -156,27 +145,11 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
 	}
 
-	public Class<?> getRootType() {
-		return writerTemplate.getRootType();
-	}
-
 	public Map<String, Class<?>> getVariables() {
 		return writerTemplate.getVariables();
 	}
 
-	public Map<String, Class<?>> getExportTypes() {
-		return writerTemplate.getExportTypes();
-	}
-	
 	private Map<String, Template> macros;
-
-	public Template getMacro(String name) {
-		Template macro = getMacros().get(name);
-		if (macro == null) {
-			throw new IllegalStateException("No such macro " + name + " in template " + getName());
-		}
-		return macro;
-	}
 
 	public Map<String, Template> getMacros() {
 		if (macros == null) { // allow duplicate on concurrent
@@ -191,10 +164,6 @@ public class AdaptiveTemplate implements Template, Serializable {
 		return macros;
 	}
 
-	public String getCode() {
-		return writerTemplate.getCode();
-	}
-
 	public int getOffset() {
 		return writerTemplate.getOffset();
 	}
@@ -207,17 +176,13 @@ public class AdaptiveTemplate implements Template, Serializable {
 		writerTemplate.accept(visitor);
 	}
 
+	public Template getParent() {
+		return writerTemplate.getParent();
+	}
+
 	@Override
 	public String toString() {
 		return writerTemplate.toString();
-	}
-
-	public List<Node> getNodes() {
-		return writerTemplate.getNodes();
-	}
-
-	public Template getParent() {
-		return writerTemplate.getParent();
 	}
 
 }

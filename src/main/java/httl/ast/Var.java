@@ -15,7 +15,10 @@
  */
 package httl.ast;
 
+import httl.internal.util.StringUtils;
+
 import java.lang.reflect.Type;
+import java.text.ParseException;
 
 /**
  * Var
@@ -30,16 +33,19 @@ public class Var extends Statement {
 
 	private final Expression expression;
 
-	private final boolean parent;
+	private final boolean export;
 
 	private final boolean hide;
 
-	public Var(Type type, String name, Expression expression, boolean parent, boolean hide, int offset) {
+	public Var(Type type, String name, Expression expression, boolean export, boolean hide, int offset) throws ParseException {
 		super(offset);
+		if (! StringUtils.isNamed(name)) {
+			throw new ParseException("Illegal variable name " + name + ", Can not contains any symbol.", offset);
+		}
 		this.type = type;
 		this.name = name;
 		this.expression = expression;
-		this.parent = parent;
+		this.export = export;
 		this.hide = hide;
 	}
 
@@ -55,8 +61,8 @@ public class Var extends Statement {
 		return expression;
 	}
 
-	public boolean isParent() {
-		return parent;
+	public boolean isExport() {
+		return export;
 	}
 
 	public boolean isHide() {
@@ -67,7 +73,7 @@ public class Var extends Statement {
 	public String toString() {
 		String typeName = type == null ? "" : (type instanceof Class ? ((Class<?>) type).getCanonicalName() : type.toString());
 		return "#var(" + typeName + " " + name + 
-				(expression == null ? "" : (parent ? " := " : (hide ? " .= " : " = ")) + expression) + ")";
+				(expression == null ? "" : (export ? " := " : (hide ? " .= " : " = ")) + expression) + ")";
 	}
 
 }

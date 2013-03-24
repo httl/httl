@@ -41,7 +41,6 @@ import httl.internal.util.ClassUtils;
 import httl.internal.util.CollectionUtils;
 import httl.internal.util.IOUtils;
 import httl.internal.util.LinkedStack;
-import httl.internal.util.LocaleUtils;
 import httl.internal.util.MapEntry;
 import httl.internal.util.OrderedMap;
 import httl.internal.util.ParameterizedTypeImpl;
@@ -131,7 +130,7 @@ public class CompileVisitor extends ASTVisitor {
 
 	private String engineName;
 
-	private String forVariable = "for";
+	private String[] forVariable = new String[] { "for" };
 
 	private String[] importGetters = new String[] { "get" };
 
@@ -185,7 +184,7 @@ public class CompileVisitor extends ASTVisitor {
 		this.compiler = compiler;
 	}
 
-	public void setForVariable(String forVariable) {
+	public void setForVariable(String[] forVariable) {
 		this.forVariable = forVariable;
 	}
 
@@ -493,7 +492,7 @@ public class CompileVisitor extends ASTVisitor {
 			if (clazz == null) {
 				clazz = returnType;
 			}
-			appendVar(clazz, node.getName(), code, node.isParent(), node.isHide(), node.getOffset());
+			appendVar(clazz, node.getName(), code, node.isExport(), node.isHide(), node.getOffset());
 			getVariables.addAll(variableTypes.keySet());
 		} else {
 			clazz = checkVar(clazz, node.getName(), node.getOffset());
@@ -621,11 +620,16 @@ public class CompileVisitor extends ASTVisitor {
 		String dataName = "_d_" + i;
 		String sizeName = "_s_" + i;
 		String name = "_i_" + var;
-		builder.append("	Object " + dataName + " = " + code + ";\n");
+		builder.append("	" + returnType.getCanonicalName() + " " + dataName + " = " + code + ";\n");
 		builder.append("	int " + sizeName + " = " + ClassUtils.class.getName() + ".getSize(" + dataName + ");\n");
 		builder.append("	if (" + dataName + " != null && " + sizeName + " != 0) {\n");
-		builder.append("	" + forVariable + " = new " + Status.class.getName() + "(" + forVariable + ", " + dataName + ", " + sizeName + ");\n");
-		builder.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator(" + forVariable + ".getData()); " + name + ".hasNext();) {\n");
+		builder.append("	");
+		for (String fv : forVariable) {
+			builder.append(ClassUtils.filterJavaKeyword(fv));
+			builder.append(" = ");
+		}
+		builder.append("new " + Status.class.getName() + "(" + ClassUtils.filterJavaKeyword(forVariable[0]) + ", " + dataName + ", " + sizeName + ");\n");
+		builder.append("	for (" + Iterator.class.getName() + " " + name + " = " + CollectionUtils.class.getName() + ".toIterator(" + dataName + "); " + name + ".hasNext();) {\n");
 		String varCode;
 		if (clazz.isPrimitive()) {
 			varCode = ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(clazz).getSimpleName() + ")" + name + ".next())";
@@ -634,13 +638,20 @@ public class CompileVisitor extends ASTVisitor {
 		}
 		appendVar(clazz, var, varCode, false, false, node.getOffset());
 		getVariables.addAll(variableTypes.keySet());
-		setVariables.add(forVariable);
+		for (String fv : forVariable) {
+			setVariables.add(fv);
+		}
 		return true;
 	}
 
 	@Override
 	public void end(For node) throws ParseException {
-		builder.append("	" + forVariable + ".increment();\n	}\n	" + forVariable + " = " + forVariable + ".getParent();\n	}\n");
+		builder.append("	" + ClassUtils.filterJavaKeyword(forVariable[0]) + ".increment();\n	}\n	");
+		for (String fv : forVariable) {
+			builder.append(ClassUtils.filterJavaKeyword(fv));
+			builder.append(" = ");
+		}
+		builder.append(ClassUtils.filterJavaKeyword(forVariable[0]) + ".getParent();\n	}\n");
 	}
 
 	@Override
@@ -717,7 +728,9 @@ public class CompileVisitor extends ASTVisitor {
 		types.put(filterVariable, Filter.class);
 		types.put(defaultFormatterVariable, Formatter.class);
 		types.put(formatterVariable, Formatter.class);
-		types.put(forVariable, Status.class);
+		for (String fv : forVariable) {
+			types.put(fv, Status.class);
+		}
 		for (String macro : importMacroTemplates.keySet()) {
 			types.put(macro, Template.class);
 		}
@@ -730,10 +743,6 @@ public class CompileVisitor extends ASTVisitor {
 
 	private String getCode() throws ParseException {
 		String name = getTemplateClassName(resource, node, stream);
-		String source = resource.getSource();
-		if (templateFilter != null) {
-			source = templateFilter.filter(resource.getName(), source);
-		}
 		String code = builder.toString();
 		int i = name.lastIndexOf('.');
 		String packageName = i < 0 ? "" : name.substring(0, i);
@@ -810,7 +819,7 @@ public class CompileVisitor extends ASTVisitor {
 				defined.add(var);
 				Class<?> type = types.get(var);
 				String typeName = getTypeName(type);
-				declare.append("	" + typeName + " " + var + " = " + ClassUtils.getInitCode(type) + ";\n");
+				declare.append("	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = " + ClassUtils.getInitCode(type) + ";\n");
 			}
 		}
 		for (String var : getVariables) {
@@ -856,19 +865,14 @@ public class CompileVisitor extends ASTVisitor {
 		}
 		
 		String methodCode = statusInit.toString() + declare + code;
+		textFields.append("private static final " + Map.class.getName() + " $VARS = " + toTypeCode(defVariables, defVariableTypes) + ";\n");
 		
-		if (sourceInClass) {
-			textFields.append("private static final " + String.class.getSimpleName() + " $SRC = \"" + StringUtils.escapeString(source) + "\";\n");
-			textFields.append("private static final " + String.class.getSimpleName() + " $CODE = \"" + StringUtils.escapeString(methodCode) + "\";\n");
-		} else {
-			String sourceCodeId = StringCache.put(source);
-			textFields.append("private static final " + String.class.getSimpleName() + " $SRC = " + StringCache.class.getName() +  ".getAndRemove(\"" + sourceCodeId + "\");\n");
-			String methodCodeId = StringCache.put(methodCode);
-			textFields.append("private static final " + String.class.getSimpleName() + " $CODE = " + StringCache.class.getName() +  ".getAndRemove(\"" + methodCodeId + "\");\n");
+		String templateName = resource.getName();
+		Node macro = node;
+		while (macro instanceof Macro) {
+			templateName += "#" + ((Macro) macro).getName();
+			macro = ((Macro) macro).getParent();
 		}
-		
-		textFields.append("private static final " + Map.class.getName() + " $PTS = " + toTypeCode(defVariables, defVariableTypes) + ";\n");
-		textFields.append("private static final " + Map.class.getName() + " $CTS = " + toTypeCode(returnTypes) + ";\n");
 		
 		String sorceCode = "package " + packageName + ";\n" 
 				+ "\n"
@@ -893,60 +897,35 @@ public class CompileVisitor extends ASTVisitor {
 				+ Converter.class.getName() + " mapConverter, "
 				+ Converter.class.getName() + " outConverter, "
 				+ Map.class.getName() + " functions, " 
-				+ Map.class.getName() + " importMacros) {\n" 
-				+ "	super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);\n"
+				+ Map.class.getName() + " importMacros, " 
+				+ Resource.class.getName() + " resource, " 
+				+ Template.class.getName() + " parent, " 
+				+ Node.class.getName() + " root) {\n" 
+				+ "	super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros, resource, parent, root);\n"
 				+ functionInits
 				+ macroInits
 				+ "}\n"
 				+ "\n"
-				+ "public void doRender(" + Context.class.getName() + " $context, " 
+				+ "protected void doRender(" + Context.class.getName() + " $context, " 
 				+ (stream ? OutputStream.class.getName() : Writer.class.getName())
 				+ " $output) throws " + Exception.class.getName() + " {\n" 
 				+ methodCode
 				+ "}\n"
 				+ "\n"
 				+ "public " + String.class.getSimpleName() + " getName() {\n"
-				+ "	return \"" + resource.getName() + "\";\n"
-				+ "}\n"
-				+ "\n"
-				+ "public " + String.class.getSimpleName() + " getEncoding() {\n"
-				+ "	return " + (resource.getEncoding() == null ? "null" : "\"" + resource.getEncoding() + "\"") + ";\n"
-				+ "}\n"
-				+ "\n"
-				+ "public " + Locale.class.getName() + " getLocale() {\n"
-				+ "	return " + (resource.getLocale() == null ? "null" : LocaleUtils.class.getName() + ".getLocale(\"" + resource.getLocale() + "\")") + ";\n"
-				+ "}\n"
-				+ "\n"
-				+ "public long getLastModified() {\n"
-				+ "	return " + resource.getLastModified() + "L;\n"
-				+ "}\n"
-				+ "\n"
-				+ "public long getLength() {\n"
-				+ "	return " + resource.getLength() + "L;\n"
-				+ "}\n"
-				+ "\n"
-				+ "public " + String.class.getSimpleName() + " getSource() {\n"
-				+ "	return $SRC;\n"
-				+ "}\n"
-				+ "\n"
-				+ "public " + String.class.getSimpleName() + " getCode() {\n"
-				+ "	return $CODE;\n"
+				+ "	return \"" + templateName + "\";\n"
 				+ "}\n"
 				+ "\n"
 				+ "public " + Map.class.getName() + " getVariables() {\n"
-				+ "	return $PTS;\n"
+				+ "	return $VARS;\n"
 				+ "}\n"
 				+ "\n"
-				+ "public " + Map.class.getName() + " getExportTypes() {\n"
-				+ "	return $CTS;\n"
-				+ "}\n"
-				+ "\n"
-				+ "public " + Map.class.getName() + " getMacroTypes() {\n"
+				+ "protected " + Map.class.getName() + " getMacroTypes() {\n"
 				+ "	return " + toTypeCode(macros) + ";\n"
 				+ "}\n"
 				+ "\n"
 				+ "public boolean isMacro() {\n"
-				+ "	return " + (offset > 0 || resource.getName().indexOf('#') >= 0) + ";\n"
+				+ "	return " + (node instanceof Macro) + ";\n"
 				+ "}\n"
 				+ "\n"
 				+ "public int getOffset() {\n"
@@ -1378,7 +1357,7 @@ public class CompileVisitor extends ASTVisitor {
 				if (Template.class.isAssignableFrom(leftClass)
 						&& ! hasMethod(Template.class, name, rightTypes)) {
 					type = Object.class;
-					code = getNotNullCode(leftParameter, type, leftCode, leftCode + ".getMacro(\"" + name + "\").evaluate(new Object" + (rightCode.length() == 0 ? "[0]" : "[] { " + rightCode + " }") + ")");
+					code = getNotNullCode(leftParameter, type, leftCode, CompileVisitor.class.getName() + ".getMacro(" + leftCode + ", \"" + name + "\").evaluate(new Object" + (rightCode.length() == 0 ? "[0]" : "[] { " + rightCode + " }") + ")");
 				} else if (Map.class.isAssignableFrom(leftClass)
 						&& rightTypes.length == 0
 						&& ! hasMethod(Map.class, name, rightTypes)) {

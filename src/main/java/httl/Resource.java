@@ -76,8 +76,9 @@ public interface Resource {
 	 * Get the template source.
 	 * 
 	 * @return source
+	 * @throws IOException - If an I/O error occurs
 	 */
-	String getSource();
+	String getSource() throws IOException;
 
 	/**
 	 * Get the template source reader.

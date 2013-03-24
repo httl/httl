@@ -15,6 +15,9 @@
  */
 package httl.ast;
 
+import httl.internal.util.StringUtils;
+
+import java.text.ParseException;
 
 /**
  * Text
@@ -27,8 +30,11 @@ public class Text extends Statement {
 
 	private final boolean literal;
 
-	public Text(String content, boolean literal, int offset) {
+	public Text(String content, boolean literal, int offset) throws ParseException {
 		super(offset);
+		if (StringUtils.isEmpty(content)) {
+			throw new ParseException("The text content == null.", offset);
+		}
 		this.content = content;
 		this.literal = literal;
 	}

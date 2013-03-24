@@ -17,7 +17,6 @@ package httl;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,53 +35,6 @@ import java.util.Map;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Template extends Node, Resource {
-
-	/**
-	 * Evaluate the expression.
-	 * 
-	 * <pre>
-	 * Context context = Context.getContext();
-	 * context.put("foo", foo);
-	 * Object result = template.evaluate();
-	 * </pre>
-	 * 
-	 * @return evaluate result
-	 * @throws ParseException - If the expression cannot be parsed on runtime
-	 */
-	Object evaluate() throws ParseException;
-
-	/**
-	 * Evaluate the expression.
-	 * 
-	 * <pre>
-	 * Map&lt;String, Object&gt; context = new HashMap&lt;String, Object&gt;();
-	 * context.put("foo", foo);
-	 * Object result = template.evaluate(context);
-	 * </pre>
-	 * 
-	 * @param context - evaluate context
-	 * @return evaluate result
-	 * @throws ParseException - If the expression cannot be parsed on runtime
-	 */
-	Object evaluate(Object context) throws ParseException;
-
-	/**
-	 * Render the template to output stream.
-	 * 
-	 * <pre>
-	 * Writer/OutputStream out = ...;
-	 * Context context = Context.getContext();
-	 * context.put("foo", foo);
-	 * template.render(out);
-	 * </pre>
-	 * 
-	 * @see httl.Context#getContext()
-	 * @see httl.Context#getOut()
-	 * @param out - output
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed on runtime
-	 */
-	void render(Object out) throws IOException, ParseException;
 
 	/**
 	 * Render the template to output stream.
@@ -104,19 +56,58 @@ public interface Template extends Node, Resource {
 	void render(Object context, Object out) throws IOException, ParseException;
 
 	/**
-	 * Get the template nodes.
+	 * Render the template to output stream.
 	 * 
-	 * @return nodes
+	 * <pre>
+	 * Writer/OutputStream out = ...;
+	 * Context context = Context.getContext();
+	 * context.put("foo", foo);
+	 * template.render(out);
+	 * </pre>
+	 * 
+	 * @see httl.Context#getContext()
+	 * @see httl.Context#getOut()
+	 * @param out - output
+	 * @throws IOException - If an I/O error occurs
+	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	List<Node> getNodes();
+	void render(Object out) throws IOException, ParseException;
 
 	/**
-	 * Get the macro template.
+	 * Evaluate the template.
 	 * 
-	 * @param name - macro name
-	 * @return macro template
+	 * <pre>
+	 * Map&lt;String, Object&gt; context = new HashMap&lt;String, Object&gt;();
+	 * context.put("foo", foo);
+	 * Object result = template.evaluate(context);
+	 * </pre>
+	 * 
+	 * @param context - evaluate context
+	 * @return evaluate result
+	 * @throws ParseException - If the expression cannot be parsed on runtime
 	 */
-	Template getMacro(String name);
+	Object evaluate(Object context) throws ParseException;
+
+	/**
+	 * Evaluate the template.
+	 * 
+	 * <pre>
+	 * Context context = Context.getContext();
+	 * context.put("foo", foo);
+	 * Object result = template.evaluate();
+	 * </pre>
+	 * 
+	 * @return evaluate result
+	 * @throws ParseException - If the expression cannot be parsed on runtime
+	 */
+	Object evaluate() throws ParseException;
+
+	/**
+	 * Get the template variables. (Ordered)
+	 * 
+	 * @return variable types
+	 */
+	Map<String, Class<?>> getVariables();
 
 	/**
 	 * Get the macro templates.
@@ -126,13 +117,6 @@ public interface Template extends Node, Resource {
 	Map<String, Template> getMacros();
 
 	/**
-	 * Get the template macro flag.
-	 * 
-	 * @return true - if this template is a macro.
-	 */
-	boolean isMacro();
-	
-	/**
 	 * Get the macro parent template.
 	 * 
 	 * @return parent template
@@ -140,38 +124,10 @@ public interface Template extends Node, Resource {
 	Template getParent();
 
 	/**
-	 * Get the expression root type.
+	 * Get the template macro flag.
 	 * 
-	 * @return root type
+	 * @return true - if this template is a macro.
 	 */
-	Class<?> getRootType();
-
-	/**
-	 * Get the expression variable types. (Ordered)
-	 * 
-	 * @return variable types
-	 */
-	Map<String, Class<?>> getVariables();
-
-	/**
-	 * Get the expression return type.
-	 * 
-	 * @return return type
-	 */
-	Class<?> getReturnType();
-
-	/**
-	 * Get the template export to context types.
-	 * 
-	 * @return export types
-	 */
-	Map<String, Class<?>> getExportTypes();
-
-	/**
-	 * Get the expression code.
-	 * 
-	 * @return code
-	 */
-	String getCode();
+	boolean isMacro();
 
 }

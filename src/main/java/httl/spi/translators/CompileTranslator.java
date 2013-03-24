@@ -55,7 +55,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class CompileTranslator implements Translator {
 
-	private String forVariable = "for";
+	private String[] forVariable = new String[] { "for" };
 
 	private String filterVariable = "filter";
 
@@ -307,7 +307,7 @@ public class CompileTranslator implements Translator {
 	/**
 	 * httl.properties: for.variable=for
 	 */
-	public void setForVariable(String forVariable) {
+	public void setForVariable(String[] forVariable) {
 		this.forVariable = forVariable;
 	}
 	
@@ -411,15 +411,16 @@ public class CompileTranslator implements Translator {
 		try {
 			Template writerTemplate = null;
 			Template streamTemplate = null;
+			Node root = templateParser.parse(IOUtils.readToString(resource.getReader()), 0);
 			if (isOutputWriter || ! isOutputStream) {
-				Class<?> clazz = parseClass(resource, defVariableTypes, false, 0);
-				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+				Class<?> clazz = parseClass(resource, root, defVariableTypes, false, 0);
+				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class, Resource.class, Template.class, Node.class)
+						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates, resource, null, root);
 			}
 			if (isOutputStream) {
-				Class<?> clazz = parseClass(resource, defVariableTypes, true, 0);
-				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates);
+				Class<?> clazz = parseClass(resource, root, defVariableTypes, true, 0);
+				streamTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class, Resource.class, Template.class, Node.class)
+						.newInstance(engine, interceptor, compiler, valueFilterSwitcher, formatterSwitcher, valueFilter, formatter, mapConverter, outConverter, functions, importMacroTemplates, resource, null, root);
 			}
 			if (writerTemplate != null && streamTemplate != null) {
 				return new AdaptiveTemplate(writerTemplate, streamTemplate, outConverter);
@@ -487,7 +488,7 @@ public class CompileTranslator implements Translator {
 		return TEMPLATE_CLASS_PREFIX + StringUtils.getVaildName(buf.toString());
 	}
 	
-	private Class<?> parseClass(Resource resource, Map<String, Class<?>> types, boolean stream, int offset) throws IOException, ParseException {
+	private Class<?> parseClass(Resource resource, Node root, Map<String, Class<?>> types, boolean stream, int offset) throws IOException, ParseException {
 		String name = getTemplateClassName(resource, stream);
 		try {
 			return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
@@ -495,7 +496,6 @@ public class CompileTranslator implements Translator {
 			if (types == null) {
 				types = new HashMap<String, Class<?>>();
 			}
-			Node root = templateParser.parse(IOUtils.readToString(resource.getReader()), 0);
 			CompileVisitor visitor = new CompileVisitor();
 			visitor.setResource(resource);
 			visitor.setNode(root);

@@ -55,9 +55,9 @@ public class Statement implements Node {
 		return parent;
 	}
 
-	public void setParent(Node parent) {
+	public void setParent(Node parent) throws ParseException {
 		if (this.parent != null)
-			throw new IllegalStateException("Can not modify parent.");
+			throw new ParseException("Can not modify parent.", getOffset());
 		this.parent = parent;
 	}
 

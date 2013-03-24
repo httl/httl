@@ -80,7 +80,7 @@ public abstract class AbstractResource implements Resource, Serializable {
 		return -1;
 	}
 
-	public String getSource() {
+	public String getSource() throws IOException {
 		try {
 			return IOUtils.readToString(getReader());
 		} catch (IOException e) {

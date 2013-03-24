@@ -132,7 +132,7 @@ public class LazyParseTemplate extends ResourceTemplate {
 		return template.getLength();
 	}
 
-	public String getSource() {
+	public String getSource() throws IOException {
 		if (template == null)
 			return super.getSource();
 		return template.getSource();
@@ -150,28 +150,10 @@ public class LazyParseTemplate extends ResourceTemplate {
 		return template.getVariables();
 	}
 
-	public Class<?> getReturnType() {
-		if (template == null)
-			return super.getReturnType();
-		return template.getReturnType();
-	}
-
 	public InputStream getInputStream() throws IOException {
 		if (template == null)
 			return super.getInputStream();
 		return template.getInputStream();
-	}
-
-	public String getCode() {
-		if (template == null)
-			return super.getCode();
-		return template.getCode();
-	}
-
-	public Map<String, Class<?>> getExportTypes() {
-		if (template == null)
-			return super.getExportTypes();
-		return template.getExportTypes();
 	}
 
 	public int getOffset() {

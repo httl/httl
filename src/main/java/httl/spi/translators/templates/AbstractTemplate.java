@@ -18,6 +18,7 @@ package httl.spi.translators.templates;
 import httl.Context;
 import httl.Engine;
 import httl.Node;
+import httl.Resource;
 import httl.Template;
 import httl.Visitor;
 import httl.spi.Compiler;
@@ -26,21 +27,18 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Switcher;
-import httl.spi.converters.BeanMapConverter;
 import httl.spi.formatters.MultiFormatter;
-import httl.internal.util.UnsafeByteArrayInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -76,11 +74,18 @@ public abstract class AbstractTemplate implements Template, Serializable {
 
 	private final Map<String, Template> macros;
 
+	private final Resource resource;
+
+	private final Template parent;
+
+	private final Node root;
+
 	public AbstractTemplate(Engine engine, Interceptor interceptor, Compiler compiler,
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
 			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
-			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
+			Map<Class<?>, Object> functions, Map<String, Template> importMacros,
+			Resource resource, Template parent, Node root) {
 		this.engine = engine;
 		this.compiler = compiler;
 		this.interceptor = interceptor;
@@ -91,13 +96,12 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		this.outConverter = outConverter;
 		this.formatter = toMultiFormatter(formatter);
 		this.importMacros = importMacros;
+		this.resource = resource;
+		this.parent = parent;
+		this.root = root;
 		this.macros = initMacros(engine, interceptor, filterSwitcher, formatterSwitcher, 
-				filter, formatter, mapConverter, outConverter, functions, importMacros);
-	}
-
-	public List<Node> getNodes() {
-		// TODO Auto-generated method stub
-		return null;
+				filter, formatter, mapConverter, outConverter, functions, importMacros, 
+				resource, parent, root);
 	}
 
 	protected Interceptor getInterceptor() {
@@ -167,35 +171,42 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		return defaultValue;
 	}
 
-	private volatile Class<?> parameterType;
+	public String getName() {
+		return resource.getName();
+	}
 
-	public Class<?> getRootType() {
-		if (parameterType == null) {
-			synchronized (this) {
-				if (parameterType == null) {
-					try {
-						parameterType = BeanMapConverter.getBeanClass(getName(), getVariables(), compiler, null);
-					} catch (ParseException e) {
-						parameterType = void.class;
-						throw new RuntimeException(e.getMessage(), e);
-					}
-				}
-			}
-		}
-		return parameterType;
+	public String getEncoding() {
+		return resource.getEncoding();
+	}
+
+	public Locale getLocale() {
+		return resource.getLocale();
+	}
+
+	public long getLastModified() {
+		return resource.getLastModified();
+	}
+
+	public long getLength() {
+		return resource.getLength();
+	}
+
+	public String getSource() throws IOException {
+		return resource.getSource();
 	}
 
 	public Reader getReader() throws IOException {
-		return new StringReader(getSource());
+		return resource.getReader();
 	}
 
 	public InputStream getInputStream() throws IOException {
-		return new UnsafeByteArrayInputStream(getSource().getBytes(getEncoding()));
+		return resource.getInputStream();
 	}
 
 	public void accept(Visitor visitor) throws ParseException {
-		visitor.visit(this);
-		// TODO 实现访问者递归
+		if (visitor.visit(this)) {
+			root.accept(visitor);
+		}
 	}
 
 	public Object evaluate() throws ParseException {
@@ -262,7 +273,8 @@ public abstract class AbstractTemplate implements Template, Serializable {
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
 			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
-			Map<Class<?>, Object> functions, Map<String, Template> importMacros) {
+			Map<Class<?>, Object> functions, Map<String, Template> importMacros,
+			Resource resource, Template parent, Node root) {
 		Map<String, Template> macros = new HashMap<String, Template>();
 		Map<String, Class<?>> macroTypes = getMacroTypes();
 		if (macroTypes == null || macroTypes.size() == 0) {
@@ -271,8 +283,10 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		for (Map.Entry<String, Class<?>> entry : macroTypes.entrySet()) {
 			try {
 				Template macro = (Template) entry.getValue()
-						.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class)
-						.newInstance(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, mapConverter, outConverter, functions, importMacros);
+						.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, 
+								Formatter.class, Converter.class, Converter.class, Map.class, Map.class, Resource.class, Template.class, Node.class)
+						.newInstance(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, 
+								mapConverter, outConverter, functions, importMacros, resource, parent, root);
 				macros.put(entry.getKey(), macro);
 			} catch (Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);
@@ -284,17 +298,9 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	public Engine getEngine() {
 		return engine;
 	}
-	
-	public Template getMacro(String name) {
-		Template macro = getMacros().get(name);
-		if (macro == null) {
-			throw new IllegalStateException("No such macro " + name + " in template " + getName());
-		}
-		return macro;
-	}
 
 	public Template getParent() {
-		return null;
+		return parent;
 	}
 
 	public Map<String, Template> getMacros() {

@@ -15,8 +15,8 @@
  */
 package httl.spi.translators.templates;
 
+import httl.Context;
 import httl.Engine;
-import httl.Node;
 import httl.Template;
 import httl.Visitor;
 import httl.internal.util.UnsafeByteArrayOutputStream;
@@ -24,10 +24,9 @@ import httl.internal.util.UnsafeStringWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
-import java.io.Writer;
 import java.text.ParseException;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ public class ProxyTemplate implements Template {
 
 	public Object evaluate(Object parameters)
 			throws ParseException {
-		if (byte[].class.equals(getReturnType())) {
+		if (Context.getContext().getOut() instanceof OutputStream) {
 			UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
 			try {
 				render(parameters, output);
@@ -80,11 +79,6 @@ public class ProxyTemplate implements Template {
 		template.render(parameters, stream);
 	}
 
-	public void render(Map<String, Object> parameters, Writer writer)
-			throws IOException, ParseException {
-		template.render(parameters, writer);
-	}
-
 	public String getName() {
 		return template.getName();
 	}
@@ -105,7 +99,7 @@ public class ProxyTemplate implements Template {
 		return template.getLength();
 	}
 
-	public String getSource() {
+	public String getSource() throws IOException {
 		return template.getSource();
 	}
 
@@ -113,20 +107,8 @@ public class ProxyTemplate implements Template {
 		return template.getReader();
 	}
 
-	public Class<?> getRootType() {
-		return template.getRootType();
-	}
-
 	public Map<String, Class<?>> getVariables() {
 		return template.getVariables();
-	}
-
-	public Class<?> getReturnType() {
-		return template.getReturnType();
-	}
-
-	public String getCode() {
-		return template.getCode();
 	}
 
 	public InputStream getInputStream() throws IOException {
@@ -141,14 +123,6 @@ public class ProxyTemplate implements Template {
 		return template.getEngine();
 	}
 
-	public Map<String, Class<?>> getExportTypes() {
-		return template.getExportTypes();
-	}
-
-	public Template getMacro(String name) {
-		return template.getMacro(name);
-	}
-
 	public Map<String, Template> getMacros() {
 		return template.getMacros();
 	}
@@ -159,10 +133,6 @@ public class ProxyTemplate implements Template {
 
 	public void accept(Visitor visitor) throws ParseException {
 		template.accept(visitor);
-	}
-
-	public List<Node> getNodes() {
-		return template.getNodes();
 	}
 
 	public Template getParent() {

@@ -15,22 +15,36 @@
  */
 package httl.ast;
 
+import httl.Node;
+import httl.internal.util.StringUtils;
+
+import java.text.ParseException;
+
 /**
  * Macro
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Macro extends BlockStatement {
+public class Macro extends Block {
 
 	private final String name;
 
-	public Macro(String name, int offset) {
+	public Macro(String name, int offset) throws ParseException {
 		super(offset);
+		if (! StringUtils.isNamed(name)) {
+			throw new ParseException("Illegal macro name " + name + ", Can not contains any symbol.", offset);
+		}
 		this.name = name;
 	}
 
 	public String getName() {
 		return name;
+	}
+
+	public void setParent(Node parent) throws ParseException {
+		if (parent.getClass() !=  Macro.class && parent.getClass() !=  Block.class)
+			throw new ParseException("Can not define macro inside the #" + parent.getClass().getSimpleName().toLowerCase() + " directive.", getOffset());
+		super.setParent(parent);
 	}
 
 	@Override

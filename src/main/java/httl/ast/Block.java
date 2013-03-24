@@ -25,13 +25,13 @@ import java.util.List;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class BlockStatement extends Statement {
+public class Block extends Statement {
 
 	private List<Statement> children;
 
 	private End end;
 
-	public BlockStatement(int offset) {
+	public Block(int offset) {
 		super(offset);
 	}
 
@@ -56,9 +56,9 @@ public class BlockStatement extends Statement {
 		return children;
 	}
 
-	public void setChildren(List<Statement> children) {
+	public void setChildren(List<Statement> children) throws ParseException {
 		if (this.children != null)
-			throw new IllegalStateException("Can not modify children.");
+			throw new ParseException("Can not modify children.", getOffset());
 		this.children = children;
 		for (Statement node : children) {
 			node.setParent(this);
@@ -69,9 +69,9 @@ public class BlockStatement extends Statement {
 		return end;
 	}
 
-	public void setEnd(End end) {
+	public void setEnd(End end) throws ParseException {
 		if (this.end != null)
-			throw new IllegalStateException("Can not modify end.");
+			throw new ParseException("Can not modify end.", this.end.getOffset());
 		this.end = end;
 		end.setStart(this);
 	}
