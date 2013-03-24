@@ -1,0 +1,2 @@
+Illegal variable name user.name, Can not contains any symbol.
+line: 2, column: 1, char: #,

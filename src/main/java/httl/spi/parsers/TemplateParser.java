@@ -223,7 +223,7 @@ public class TemplateParser implements Parser {
 
 	private void checkVariableName(String var, int offset) throws ParseException {
 		if (! StringUtils.isNamed(var)) {
-			throw new ParseException("Illegal variable name " + var, offset);
+			throw new ParseException("Illegal variable name " + var + ", Can not contains any symbol.", offset);
 		}
 	}
 
@@ -483,7 +483,7 @@ public class TemplateParser implements Parser {
 	
 	private static final Pattern DEFINE_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s[_0-9a-zA-Z]+)\\s?[,]?\\s?");
 
-	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)[^=]");
+	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*([_0-9a-zA-Z\\.]+)\\s*([_0-9a-zA-Z\\.]*)\\s*([:\\.]?=)[^=]");
 
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
