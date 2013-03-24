@@ -496,7 +496,7 @@ public class CompileVisitor extends ASTVisitor {
 			appendVar(clazz, node.getName(), code, node.isParent(), node.isHide(), node.getOffset());
 			getVariables.addAll(variableTypes.keySet());
 		} else {
-			checkVar(clazz, node.getName(), node.getOffset());
+			clazz = checkVar(clazz, node.getName(), node.getOffset());
 			types.put(node.getName(), clazz);
 			if (type instanceof ParameterizedType) {
 				Type[] args = ((ParameterizedType) type).getActualTypeArguments();
@@ -510,15 +510,22 @@ public class CompileVisitor extends ASTVisitor {
 		}
 	}
 	
-	private void checkVar(Class<?> clazz, String var, int offset) throws ParseException {
+	private Class<?> checkVar(Class<?> clazz, String var, int offset) throws ParseException {
 		Class<?> cls = types.get(var);
-		if (cls != null && ! cls.equals(clazz)) {
-			throw new ParseException("Defined different type value to variable " + var + ", conflict types: " + cls.getCanonicalName() + ", " + clazz.getCanonicalName() + ".", offset);
+		if (cls != null && ! cls.equals(clazz) 
+				&& ! cls.isAssignableFrom(clazz) 
+				&& ! clazz.isAssignableFrom(cls)) {
+			throw new ParseException("Defined different type variable " 
+				+ var + ", conflict types: " + cls.getCanonicalName() + ", " + clazz.getCanonicalName() + ".", offset);
 		}
+		if (cls != null && clazz.isAssignableFrom(cls)) {
+			return cls;
+		}
+		return clazz;
 	}
 
 	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, int offset) throws ParseException {
-		checkVar(clazz, var, offset);
+		clazz = checkVar(clazz, var, offset);
 		String type = clazz.getCanonicalName();
 		types.put(var, clazz);
 		setVariables.add(var);

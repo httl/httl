@@ -1,2 +1,2 @@
-Defined different type value to variable age, conflict types: java.lang.String, int.
+Defined different type variable age, conflict types: java.lang.String, int.
 line: 2, column: 5, char: #,

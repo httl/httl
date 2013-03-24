@@ -1,2 +1,2 @@
-Defined different type value to variable user, conflict types: httl.test.model.User, java.lang.String.
+Defined different type variable user, conflict types: httl.test.model.User, java.lang.String.
 line: 3, column: 5, char: #,
