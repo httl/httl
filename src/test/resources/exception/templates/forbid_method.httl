@@ -1,0 +1,2 @@
+<!--#var(List booklist)-->
+<!--#set(old = booklist.add(null))-->
