@@ -426,14 +426,17 @@ public class CompileVisitor extends ASTVisitor {
 						builder.append(").getReader()");
 					}
 					builder.append(", $output);\n	}");
+				} else {
+					code = "(" + code + " instance of " + Resource.class.getName() + " ? " 
+							+ IOUtils.class.getName() + ".readToString(((" + Resource.class.getName() + ")" 
+							+ code + ").getReader()) : " + code + ")";
 				}
 				builder.append(" else {\n");
-			}
-			if (Resource.class.isAssignableFrom(returnType)) {
+			} else if (Resource.class.isAssignableFrom(returnType)) {
 				if (! StringUtils.isNamed(code)) {
 					code = "(" + code + ")";
 				}
-				code = code + " == null ? null : " + IOUtils.class.getName() + ".readToString(" + code + ".getReader())";
+				code = "(" + code + " == null ? null : " + IOUtils.class.getName() + ".readToString(" + code + ".getReader()))";
 			}
 			getVariables.add(formatterVariable);
 			String key = getTextPart(code, null, null, textFields, TMP_VAR_SEQ, stream, true);
