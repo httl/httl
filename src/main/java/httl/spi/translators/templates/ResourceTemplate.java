@@ -90,7 +90,7 @@ public class ResourceTemplate implements Template {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Class<?>> getVariableTypes() {
+	public Map<String, Class<?>> getVariables() {
 		return Collections.EMPTY_MAP;
 	}
 

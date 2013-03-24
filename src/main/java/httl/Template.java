@@ -151,7 +151,7 @@ public interface Template extends Node, Resource {
 	 * 
 	 * @return variable types
 	 */
-	Map<String, Class<?>> getVariableTypes();
+	Map<String, Class<?>> getVariables();
 
 	/**
 	 * Get the expression return type.

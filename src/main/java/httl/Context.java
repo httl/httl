@@ -47,7 +47,6 @@ import java.util.Set;
  * if (value == null) value = environmentResolver.get(key); // export key=value
  * </pre>
  * 
- * @see httl.Template#evaluate(Object)
  * @see httl.Template#render(Object, Object)
  * @see httl.spi.translators.templates.WriterTemplate#render(Map, java.io.Writer)
  * @see httl.spi.translators.templates.OutputStreamTemplate#render(Map, java.io.OutputStream)

@@ -174,7 +174,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 			synchronized (this) {
 				if (parameterType == null) {
 					try {
-						parameterType = BeanMapConverter.getBeanClass(getName(), getVariableTypes(), compiler, null);
+						parameterType = BeanMapConverter.getBeanClass(getName(), getVariables(), compiler, null);
 					} catch (ParseException e) {
 						parameterType = void.class;
 						throw new RuntimeException(e.getMessage(), e);
@@ -227,7 +227,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 		if (outConverter != null && out != null
 				&& ! (out instanceof OutputStream) 
 				&& ! (out instanceof Writer)) {
-			return outConverter.convert(out, getVariableTypes());
+			return outConverter.convert(out, getVariables());
 		}
 		return out;
 	}
@@ -236,7 +236,7 @@ public abstract class AbstractTemplate implements Template, Serializable {
 	private Map<String, Object> convertMap(Object context) throws ParseException {
 		if (mapConverter != null && context != null && ! (context instanceof Map)) {
 			try {
-				context = mapConverter.convert(context, getVariableTypes());
+				context = mapConverter.convert(context, getVariables());
 			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}

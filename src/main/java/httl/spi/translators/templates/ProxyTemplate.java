@@ -117,8 +117,8 @@ public class ProxyTemplate implements Template {
 		return template.getRootType();
 	}
 
-	public Map<String, Class<?>> getVariableTypes() {
-		return template.getVariableTypes();
+	public Map<String, Class<?>> getVariables() {
+		return template.getVariables();
 	}
 
 	public Class<?> getReturnType() {

@@ -1,119 +1,119 @@
 
-&lt;table&gt;
+<table>
   
-  &lt;tr&gt;
-    &lt;td&gt;1&lt;/td&gt;
-    &lt;td&gt;Practical API Design&lt;/td&gt;
-    &lt;td&gt;Jaroslav Tulach&lt;/td&gt;
-    &lt;td&gt;Apress&lt;/td&gt;
-    &lt;td&gt;2008-07-29 00:00:00&lt;/td&gt;
-    &lt;td&gt;75&lt;/td&gt;
-    &lt;td&gt;85%&lt;/td&gt;
-    &lt;td&gt;63&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>1</td>
+    <td>Practical API Design</td>
+    <td>Jaroslav Tulach</td>
+    <td>Apress</td>
+    <td>2008-07-29 00:00:00</td>
+    <td>75</td>
+    <td>85%</td>
+    <td>63</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;2&lt;/td&gt;
-    &lt;td&gt;Effective Java&lt;/td&gt;
-    &lt;td&gt;Joshua Bloch&lt;/td&gt;
-    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
-    &lt;td&gt;2008-05-28 00:00:00&lt;/td&gt;
-    &lt;td&gt;55&lt;/td&gt;
-    &lt;td&gt;70%&lt;/td&gt;
-    &lt;td&gt;38&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>2</td>
+    <td>Effective Java</td>
+    <td>Joshua Bloch</td>
+    <td>Addison-Wesley Professional</td>
+    <td>2008-05-28 00:00:00</td>
+    <td>55</td>
+    <td>70%</td>
+    <td>38</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;3&lt;/td&gt;
-    &lt;td&gt;Java Concurrency in Practice&lt;/td&gt;
-    &lt;td&gt;Doug Lea&lt;/td&gt;
-    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
-    &lt;td&gt;2006-05-19 00:00:00&lt;/td&gt;
-    &lt;td&gt;60&lt;/td&gt;
-    &lt;td&gt;60%&lt;/td&gt;
-    &lt;td&gt;36&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>3</td>
+    <td>Java Concurrency in Practice</td>
+    <td>Doug Lea</td>
+    <td>Addison-Wesley Professional</td>
+    <td>2006-05-19 00:00:00</td>
+    <td>60</td>
+    <td>60%</td>
+    <td>36</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;4&lt;/td&gt;
-    &lt;td&gt;Java Programming Language&lt;/td&gt;
-    &lt;td&gt;James Gosling&lt;/td&gt;
-    &lt;td&gt;Prentice Hall&lt;/td&gt;
-    &lt;td&gt;2005-08-27 00:00:00&lt;/td&gt;
-    &lt;td&gt;65&lt;/td&gt;
-    &lt;td&gt;75%&lt;/td&gt;
-    &lt;td&gt;48&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>4</td>
+    <td>Java Programming Language</td>
+    <td>James Gosling</td>
+    <td>Prentice Hall</td>
+    <td>2005-08-27 00:00:00</td>
+    <td>65</td>
+    <td>75%</td>
+    <td>48</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;5&lt;/td&gt;
-    &lt;td&gt;Domain-Driven Design&lt;/td&gt;
-    &lt;td&gt;Eric Evans&lt;/td&gt;
-    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
-    &lt;td&gt;2003-08-30 00:00:00&lt;/td&gt;
-    &lt;td&gt;70&lt;/td&gt;
-    &lt;td&gt;80%&lt;/td&gt;
-    &lt;td&gt;56&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>5</td>
+    <td>Domain-Driven Design</td>
+    <td>Eric Evans</td>
+    <td>Addison-Wesley Professional</td>
+    <td>2003-08-30 00:00:00</td>
+    <td>70</td>
+    <td>80%</td>
+    <td>56</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;6&lt;/td&gt;
-    &lt;td&gt;Agile Project Management with Scrum&lt;/td&gt;
-    &lt;td&gt;Ken Schwaber&lt;/td&gt;
-    &lt;td&gt;Microsoft Press&lt;/td&gt;
-    &lt;td&gt;2004-03-10 00:00:00&lt;/td&gt;
-    &lt;td&gt;40&lt;/td&gt;
-    &lt;td&gt;80%&lt;/td&gt;
-    &lt;td&gt;32&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>6</td>
+    <td>Agile Project Management with Scrum</td>
+    <td>Ken Schwaber</td>
+    <td>Microsoft Press</td>
+    <td>2004-03-10 00:00:00</td>
+    <td>40</td>
+    <td>80%</td>
+    <td>32</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;7&lt;/td&gt;
-    &lt;td&gt;J2EE Development without EJB&lt;/td&gt;
-    &lt;td&gt;Rod Johnson&lt;/td&gt;
-    &lt;td&gt;Wrox&lt;/td&gt;
-    &lt;td&gt;2011-09-17 00:00:00&lt;/td&gt;
-    &lt;td&gt;40&lt;/td&gt;
-    &lt;td&gt;70%&lt;/td&gt;
-    &lt;td&gt;28&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>7</td>
+    <td>J2EE Development without EJB</td>
+    <td>Rod Johnson</td>
+    <td>Wrox</td>
+    <td>2011-09-17 00:00:00</td>
+    <td>40</td>
+    <td>70%</td>
+    <td>28</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;8&lt;/td&gt;
-    &lt;td&gt;Design Patterns&lt;/td&gt;
-    &lt;td&gt;Erich Gamma&lt;/td&gt;
-    &lt;td&gt;Addison-Wesley Professional&lt;/td&gt;
-    &lt;td&gt;1994-11-10 00:00:00&lt;/td&gt;
-    &lt;td&gt;60&lt;/td&gt;
-    &lt;td&gt;80%&lt;/td&gt;
-    &lt;td&gt;48&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>8</td>
+    <td>Design Patterns</td>
+    <td>Erich Gamma</td>
+    <td>Addison-Wesley Professional</td>
+    <td>1994-11-10 00:00:00</td>
+    <td>60</td>
+    <td>80%</td>
+    <td>48</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;9&lt;/td&gt;
-    &lt;td&gt;Agile Software Development, Principles, Patterns, and Practices&lt;/td&gt;
-    &lt;td&gt; Robert C. Martin&lt;/td&gt;
-    &lt;td&gt;Prentice Hall&lt;/td&gt;
-    &lt;td&gt;2002-10-25 00:00:00&lt;/td&gt;
-    &lt;td&gt;80&lt;/td&gt;
-    &lt;td&gt;75%&lt;/td&gt;
-    &lt;td&gt;60&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>9</td>
+    <td>Agile Software Development, Principles, Patterns, and Practices</td>
+    <td> Robert C. Martin</td>
+    <td>Prentice Hall</td>
+    <td>2002-10-25 00:00:00</td>
+    <td>80</td>
+    <td>75%</td>
+    <td>60</td>
+  </tr>
   
-  &lt;tr&gt;
-    &lt;td&gt;10&lt;/td&gt;
-    &lt;td&gt;Design by Contract, by Example&lt;/td&gt;
-    &lt;td&gt;Richard Mitchell&lt;/td&gt;
-    &lt;td&gt;Addison-Wesley Publishing Company&lt;/td&gt;
-    &lt;td&gt;2001-10-22 00:00:00&lt;/td&gt;
-    &lt;td&gt;50&lt;/td&gt;
-    &lt;td&gt;85%&lt;/td&gt;
-    &lt;td&gt;42&lt;/td&gt;
-  &lt;/tr&gt;
+  <tr>
+    <td>10</td>
+    <td>Design by Contract, by Example</td>
+    <td>Richard Mitchell</td>
+    <td>Addison-Wesley Publishing Company</td>
+    <td>2001-10-22 00:00:00</td>
+    <td>50</td>
+    <td>85%</td>
+    <td>42</td>
+  </tr>
   
-&lt;/table&gt;
+</table>
 
 
-&lt;div&gt;
+<div>
 VVV
-&lt;/div&gt;
+</div>

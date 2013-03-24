@@ -375,7 +375,7 @@ public class CompileVisitor extends ASTVisitor {
 		Class<?> returnType = popExpressionReturnType();
 		Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
 		getVariables.addAll(variableTypes.keySet());
-		if (nofilter && Template.class.isAssignableFrom(returnType)) {
+		if (Template.class.isAssignableFrom(returnType)) {
 			if (! StringUtils.isNamed(code)) {
 				code = "(" + code + ")";
 			}
@@ -399,12 +399,7 @@ public class CompileVisitor extends ASTVisitor {
 			}
 			builder.append(", $output);\n");
 		} else {
-			if (Template.class.isAssignableFrom(returnType)) {
-				if (! StringUtils.isNamed(code)) {
-					code = "(" + code + ")";
-				}
-				code = code + " == null ? null : " + code + ".evaluate()";
-			} else if (Resource.class.isAssignableFrom(returnType)) {
+			if (Resource.class.isAssignableFrom(returnType)) {
 				if (! StringUtils.isNamed(code)) {
 					code = "(" + code + ")";
 				}
@@ -892,7 +887,7 @@ public class CompileVisitor extends ASTVisitor {
 				+ "	return $CODE;\n"
 				+ "}\n"
 				+ "\n"
-				+ "public " + Map.class.getName() + " getVariableTypes() {\n"
+				+ "public " + Map.class.getName() + " getVariables() {\n"
 				+ "	return $PTS;\n"
 				+ "}\n"
 				+ "\n"
