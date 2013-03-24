@@ -40,3 +40,17 @@
 12
 12.5
 13
+byte
+java.lang.Byte
+short
+java.lang.Short
+int
+java.lang.Integer
+long
+java.lang.Long
+float
+java.lang.Float
+double
+java.lang.Double
+double
+int

@@ -40,3 +40,17 @@ ${11d.format("###,##0.###")}
 ${12D.format("###,##0.###")}
 ${12.5.format("###,##0.###")}
 ${13.format("###,##0.###")}
+${1b.class.name}
+${2B.class.name}
+${3s.class.name}
+${4S.class.name}
+${5i.class.name}
+${6I.class.name}
+${7l.class.name}
+${8L.class.name}
+${9f.class.name}
+${10F.class.name}
+${11d.class.name}
+${12D.class.name}
+${12.5.class.name}
+${13.class.name}
