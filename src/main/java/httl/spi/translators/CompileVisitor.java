@@ -399,6 +399,36 @@ public class CompileVisitor extends ASTVisitor {
 			}
 			builder.append(", $output);\n");
 		} else {
+			if (Object.class.equals(returnType)) {
+				builder.append("	if (");
+				builder.append(code);
+				builder.append(" instanceof ");
+				builder.append(Template.class.getName());
+				builder.append(") {\n	((");
+				builder.append(Template.class.getName());
+				builder.append(")");
+				builder.append(code);
+				builder.append(").render($output);\n	}");
+				if (nofilter) {
+					builder.append(" else if (");
+					builder.append(code);
+					builder.append(" instanceof ");
+					builder.append(Resource.class.getName());
+					builder.append(") {\n	");
+					builder.append(IOUtils.class.getName());
+					builder.append(".copy(((");
+					builder.append(Resource.class.getName());
+					builder.append(")");
+					builder.append(code);
+					if (stream) {
+						builder.append(").getInputStream()");
+					} else {
+						builder.append(").getReader()");
+					}
+					builder.append(", $output);\n	}");
+				}
+				builder.append(" else {\n");
+			}
 			if (Resource.class.isAssignableFrom(returnType)) {
 				if (! StringUtils.isNamed(code)) {
 					code = "(" + code + ")";
@@ -439,6 +469,9 @@ public class CompileVisitor extends ASTVisitor {
 				builder.append("	$output.write(");
 				builder.append(code);
 				builder.append(");\n");
+			}
+			if (Object.class.equals(returnType)) {
+				builder.append("	}\n");
 			}
 		}
 	}
