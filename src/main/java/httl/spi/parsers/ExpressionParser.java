@@ -284,15 +284,13 @@ public class ExpressionParser implements Parser {
 					&& (msg.startsWith("\"") && msg.endsWith("\"") 
 					|| msg.startsWith("\'") && msg.endsWith("\'") 
 					|| msg.startsWith("`") && msg.endsWith("`"))) {
-				if (msg.length() == 3 && msg.startsWith("`")) {
-					char value = msg.charAt(1);
-					parameterStack.push(new Constant(value, false, token.getOffset()));
-				} else if (msg.length() == 4 && msg.startsWith("`") && msg.endsWith("+`")) {
-					char value = msg.charAt(1);
-					parameterStack.push(new Constant(value, true, token.getOffset()));
+				String value = StringUtils.unescapeString(msg.substring(1, msg.length() - 1));
+				if (msg.startsWith("`") && value.length() == 1) {
+					parameterStack.push(new Constant(value.charAt(0), false, token.getOffset()));
+				} else if (msg.startsWith("`") && value.length() == 2 && value.charAt(0) == '\\') {
+					parameterStack.push(new Constant(value.charAt(1), true, token.getOffset()));
 				} else {
-					String value = msg.substring(1, msg.length() - 1);
-					parameterStack.push(new Constant(value, false, token.getOffset()));
+					parameterStack.push(new Constant(StringUtils.unescapeString(value), false, token.getOffset()));
 				}
 				beforeOperator = false;
 			} else if (StringUtils.isNumber(msg)) {
