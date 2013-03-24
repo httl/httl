@@ -549,25 +549,38 @@ public class ClassUtils {
 		try {
 			return currentClass.getMethod(name, parameterTypes);
 		} catch (NoSuchMethodException e) {
+			Method likeMethod = null;
 			for (Method method : currentClass.getMethods()) {
 				if (method.getName().equals(name)
 						&& parameterTypes.length == method.getParameterTypes().length
 						&& Modifier.isPublic(method.getModifiers())) {
 					if (parameterTypes.length > 0) {
 						Class<?>[] types = method.getParameterTypes();
-						boolean match = true;
+						boolean eq = true;
+						boolean like = true;
 						for (int i = 0; i < parameterTypes.length; i ++) {
-							if (! types[i].isAssignableFrom(parameterTypes[i])) {
-								match = false;
-								break;
+							if (types[i] != null && ! types[i].equals(parameterTypes[i])) {
+								eq = false;
+								if (! types[i].isAssignableFrom(parameterTypes[i])) {
+									eq = false;
+									like = false;
+									break;
+								}
 							}
 						}
-						if (! match) {
+						if (! eq) {
+							if (like && (likeMethod == null || likeMethod.getParameterTypes()[0]
+									.isAssignableFrom(method.getParameterTypes()[0]))) {
+								likeMethod = method;
+							}
 							continue;
 						}
 					}
 					return method;
 				}
+			}
+			if (likeMethod != null) {
+				return likeMethod;
 			}
 			throw e;
 		}
