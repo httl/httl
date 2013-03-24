@@ -17,13 +17,13 @@ package httl.spi.loaders;
 
 import httl.Engine;
 import httl.Resource;
-import httl.spi.Loader;
-import httl.spi.Locator;
-import httl.spi.Logger;
-import httl.spi.loaders.resources.InputStreamResource;
+import httl.internal.util.CollectionUtils;
 import httl.internal.util.LocaleUtils;
 import httl.internal.util.StringUtils;
 import httl.internal.util.UrlUtils;
+import httl.spi.Loader;
+import httl.spi.Logger;
+import httl.spi.loaders.resources.InputStreamResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,13 +45,56 @@ public abstract class AbstractLoader implements Loader {
 
 	private Logger logger;
 	
-	private Locator locator;
-	
 	private String encoding;
 
 	private boolean reloadable;
 
 	private volatile boolean first = true;
+
+	private String[] templateDirectory;
+
+	private String[] templateSuffix;
+
+	private String[] messageDirectory;
+
+	private String messageBasename;
+
+	private String[] messageSuffix;
+
+	/**
+	 * httl.properties: template.directory=/META-INF/templates
+	 */
+	public void setTemplateDirectory(String[] directory) {
+		this.templateDirectory = UrlUtils.cleanDirectory(directory);
+	}
+
+	/**
+	 * httl.properties: template.suffix=.httl
+	 */
+	public void setTemplateSuffix(String[] suffix) {
+		this.templateSuffix = suffix;
+	}
+
+	/**
+	 * httl.properties: message.directory=/META-INF/messages
+	 */
+	public void setMessageDirectory(String[] directory) {
+		this.messageDirectory = UrlUtils.cleanDirectory(directory);
+	}
+
+	/**
+	 * httl.properties: message.basename=messages
+	 */
+	public void setMessageBasename(String messageBasename) {
+		this.messageBasename = messageBasename;
+	}
+
+	/**
+	 * httl.properties: message.suffix=.properties
+	 */
+	public void setMessageSuffix(String[] suffix) {
+		this.messageSuffix = suffix;
+	}
 
 	/**
 	 * httl.properties: engine=httl.spi.engines.DefaultEngine
@@ -65,13 +108,6 @@ public abstract class AbstractLoader implements Loader {
 	 */
 	public void setLogger(Logger logger) {
 		this.logger = logger;
-	}
-
-	/**
-	 * httl.properties: locators=httl.spi.locators.TemplateLocator
-	 */
-	public void setLocator(Locator locator) {
-		this.locator = locator;
 	}
 
 	/**
@@ -103,27 +139,59 @@ public abstract class AbstractLoader implements Loader {
 		return encoding;
 	}
 
+	protected String[] root(String suffix) {
+		if (templateDirectory != null && StringUtils.endsWith(suffix, templateSuffix)) {
+			return templateDirectory;
+		} else if (messageDirectory != null && StringUtils.endsWith(suffix, messageSuffix)) {
+			return messageDirectory;
+		}
+		return null;
+	}
+
+	protected String relocate(String name, Locale locale, String[] directories) {
+		if (CollectionUtils.isNotEmpty(directories) ) {
+			for (String directory : directories) {
+				try {
+					if (doExists(name, locale, directory + name)) {
+						return name = directory + name;
+					}
+				} catch (IOException e) {
+					continue;
+				}
+			}
+			return directories[0] + name;
+		}
+		return name;
+	}
+
 	protected String toPath(String name, Locale locale) {
-		return locator == null ? name : locator.relocate(name, locale);
+		if (StringUtils.endsWith(name, templateSuffix)) {
+			name = relocate(name, locale, templateDirectory);
+		} else if (StringUtils.isNotEmpty(messageBasename) 
+				&& name.startsWith(messageBasename)
+				&& StringUtils.endsWith(name, messageSuffix)) {
+			name = relocate(name, locale, messageDirectory);
+		}
+		return LocaleUtils.appendLocale(name, locale);
 	}
 
 	public List<String> list(String suffix) throws IOException {
-		String directory = locator.root(suffix);
-		if (StringUtils.isEmpty(directory)) {
-			directory = "/";
+		String[] directories = root(suffix);
+		if (CollectionUtils.isEmpty(directories)) {
+			directories = new String[] { "/" };
 		}
-		List<String> list = doList(directory, suffix);
-		if (list == null || list.size() == 0) {
-			return new ArrayList<String>(0);
-		} else {
-			List<String> result = new ArrayList<String>(list.size());
-			for (String name : list) {
-				if (StringUtils.isNotEmpty(name)) {
-					result.add(UrlUtils.cleanName(name));
+		List<String> result = new ArrayList<String>();
+		for (String directory : directories) {
+			List<String> list = doList(directory, suffix);
+			if (CollectionUtils.isNotEmpty(list)) {
+				for (String name : list) {
+					if (StringUtils.isNotEmpty(name)) {
+						result.add(UrlUtils.cleanName(name));
+					}
 				}
 			}
-			return result;
 		}
+		return result;
 	}
 
 	public boolean exists(String name, Locale locale) {
@@ -187,7 +255,7 @@ public abstract class AbstractLoader implements Loader {
 
 	protected abstract List<String> doList(String directory, String suffix) throws IOException;
 
-	protected abstract boolean doExists(String name, Locale locale, String path) throws Exception;
+	protected abstract boolean doExists(String name, Locale locale, String path) throws IOException;
 
 	protected abstract Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException;
 

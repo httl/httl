@@ -43,7 +43,7 @@ public class UrlLoader extends AbstractLoader {
 		return new UrlResource(getEngine(), name, locale, encoding, path);
 	}
 
-	public boolean doExists(String name, Locale locale, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws IOException {
 		InputStream in = new URL(path).openStream();
 		try {
 			return in != null;

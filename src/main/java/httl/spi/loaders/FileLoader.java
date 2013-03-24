@@ -43,7 +43,7 @@ public class FileLoader extends AbstractLoader {
 		return new FileResource(getEngine(), name, locale, encoding, path);
 	}
 
-	public boolean doExists(String name, Locale locale, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws IOException {
 		return new File(path).exists();
 	}
 

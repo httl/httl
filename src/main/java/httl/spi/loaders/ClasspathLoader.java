@@ -41,7 +41,7 @@ public class ClasspathLoader extends AbstractLoader {
 		return new ClasspathResource(getEngine(), name, encoding, cleanPath(path), locale);
 	}
 
-	public boolean doExists(String name, Locale locale, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws IOException {
 		return Thread.currentThread().getContextClassLoader().getResource(cleanPath(path)) != null;
 	}
 	

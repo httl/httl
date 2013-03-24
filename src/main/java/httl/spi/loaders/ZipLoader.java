@@ -61,7 +61,7 @@ public class ZipLoader extends AbstractLoader {
 		return new ZipResource(getEngine(), name, locale, encoding, getAndCheckFile());
 	}
 
-	public boolean doExists(String name, Locale locale, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws IOException {
 		if (file != null && file.exists()) {
 			ZipFile zipFile = new ZipFile(file);
 			try {

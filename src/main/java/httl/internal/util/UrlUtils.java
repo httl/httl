@@ -116,6 +116,14 @@ public class UrlUtils {
 		}
 		return name;
 	}
+	
+	public static String[] cleanDirectory(String[] names) {
+		String[] result = new String[names.length];
+		for (int i = 0; i < names.length; i ++) {
+			result[i] = cleanDirectory(names[i]);
+		}
+		return result;
+	}
 
 	public static String cleanDirectory(String name) {
 		if (StringUtils.isEmpty(name)) {

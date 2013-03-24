@@ -35,9 +35,9 @@ public interface Translator {
 	 * Translate the resource to template.
 	 * 
 	 * @param resource - template resource
-	 * @param parameterTypes - template parameter types
+	 * @param types - template parameter types
 	 * @return template instance
 	 */
-	Template translate(Resource resource, Map<String, Class<?>> parameterTypes) throws ParseException, IOException;
+	Template translate(Resource resource, Map<String, Class<?>> types) throws ParseException, IOException;
 
 }

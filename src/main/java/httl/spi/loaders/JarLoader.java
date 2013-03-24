@@ -61,7 +61,7 @@ public class JarLoader extends AbstractLoader {
 		return new JarResource(getEngine(), name, locale, encoding, getAndCheckFile());
 	}
 
-	public boolean doExists(String name, Locale locale, String path) throws Exception {
+	public boolean doExists(String name, Locale locale, String path) throws IOException {
 		if (file != null && file.exists()) {
 			JarFile jarFile = new JarFile(file);
 			try {
