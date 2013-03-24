@@ -1,0 +1,2 @@
+Can not call void method setRole in class httl.test.model.User
+line: 2, column: 7, char: .,

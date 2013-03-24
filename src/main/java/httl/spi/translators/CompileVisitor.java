@@ -1445,6 +1445,9 @@ public class CompileVisitor extends ASTVisitor {
 							Method method = ClassUtils.searchMethod(leftClass, name, rightTypes);
 							type = method.getReturnType();
 							code = getNotNullCode(leftParameter, type, leftCode, leftCode + "." + method.getName() + "(" + rightCode + ")");
+							if (type == void.class) {
+								throw new ParseException("Can not call void method " + method.getName() + " in class " + leftClass.getName(), node.getOffset());
+							}
 						} catch (NoSuchMethodException e) {
 							String def = "";
 							if (StringUtils.isNamed(leftCode) && leftClass.equals(defaultVariableType)) {
@@ -1461,6 +1464,9 @@ public class CompileVisitor extends ASTVisitor {
 											new Class<?>[0]);
 									type = method.getReturnType();
 									code = getNotNullCode(leftParameter, type, leftCode, leftCode + "." + method.getName() + "()");
+									if (type == void.class) {
+										throw new ParseException("Can not call void method " + method.getName() + " in class " + leftClass.getName(), node.getOffset());
+									}
 								} catch (NoSuchMethodException e2) {
 									try {
 										String getter = "is"
@@ -1470,6 +1476,9 @@ public class CompileVisitor extends ASTVisitor {
 												new Class<?>[0]);
 										type = method.getReturnType();
 										code = getNotNullCode(leftParameter, type, leftCode, leftCode + "." + method.getName() + "()");
+										if (type == void.class) {
+											throw new ParseException("Can not call void method " + method.getName() + " in class " + leftClass.getName(), node.getOffset());
+										}
 									} catch (NoSuchMethodException e3) {
 										try {
 											Field field = leftClass.getField(name);

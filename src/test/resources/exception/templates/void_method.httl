@@ -1,0 +1,2 @@
+<!--#var(User user)-->
+${user.setRole("x")}

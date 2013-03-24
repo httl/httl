@@ -68,5 +68,5 @@ public class User implements Serializable {
 	public void setIsLogin(String isLogin) {
 		this.isLogin = isLogin;
 	}
-
+	
 }
