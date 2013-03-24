@@ -278,7 +278,8 @@ public class TemplateParser implements Parser {
 					name = message.substring(1);
 					value = "";
 					if (! StringUtils.inArray(name, elseDirective)
-							&& ! StringUtils.inArray(name, endDirective)) {
+							&& ! StringUtils.inArray(name, endDirective)
+							&& ! StringUtils.inArray(name, breakDirective)) {
 						throw new ParseException("Not found parameter expression the #" + name + " directive.", offset);
 					}
 				}
@@ -345,7 +346,7 @@ public class TemplateParser implements Parser {
 					directives.add(new Else(StringUtils.isEmpty(value)
 							? null : (Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, breakDirective)) {
-					directives.add(new Break((Expression) expressionParser.parse(value, exprOffset), offset));
+					directives.add(new Break(StringUtils.isBlank(value) ? null : (Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, macroDirective)) {
 					String macroName = value;
 					String macroParams = null;
