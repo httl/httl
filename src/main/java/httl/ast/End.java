@@ -22,17 +22,17 @@ package httl.ast;
  */
 public class End extends Statement {
 	
-	private Block start;
+	private BlockStatement start;
 
 	public End(int offset) {
 		super(offset);
 	}
 
-	public Block getStart() {
+	public BlockStatement getStart() {
 		return start;
 	}
 
-	public void setStart(Block start) {
+	public void setStart(BlockStatement start) {
 		if (this.start != null)
 			throw new IllegalStateException("Can not modify start.");
 		this.start = start;

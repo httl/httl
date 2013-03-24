@@ -1143,41 +1143,38 @@ public class CompileVisitor extends ASTVisitor {
 		Object value = node.getValue();
 		Class<?> type;
 		String code;
-		if (node == Constant.NULL) {
-			type = null;
-			code = "null";
-		} else if (node == Constant.EMPTY) {
-			type = void.class;
-			code = "";
-		} else if (node == Constant.TRUE) {
-			type = boolean.class;
+		if (value == null) {
+			type = node.isBoxed() ? void.class : null;
+			code = node.isBoxed() ? "" : "null";
+		} else if (value.equals(Boolean.TRUE)) {
+			type = node.isBoxed() ? Boolean.class : boolean.class;
 			code = "true";
-		} else if (node == Constant.FALSE) {
-			type = boolean.class;
+		} else if (value.equals(Boolean.FALSE)) {
+			type = node.isBoxed() ? Boolean.class : boolean.class;
 			code = "false";
 		} else if (value instanceof String) {
 			type = String.class;
 			code = "\"" + StringUtils.escapeString((String) value) + "\"";
 		} else if (value instanceof Character) {
-			type = char.class;
+			type = node.isBoxed() ? Character.class : char.class;
 			code = "'" + value + "'";
 		} else if (value instanceof Double) {
-			type = double.class;
+			type = node.isBoxed() ? Double.class : double.class;
 			code = value + "D";
 		} else if (value instanceof Float) {
-			type = float.class;
+			type = node.isBoxed() ? Float.class : float.class;
 			code = value + "F";
 		} else if (value instanceof Long) {
-			type = long.class;
+			type = node.isBoxed() ? Long.class : long.class;
 			code = value + "L";
 		} else if (value instanceof Short) {
-			type = short.class;
+			type = node.isBoxed() ? Short.class : short.class;
 			code = "((short)" + value + ")";
 		} else if (value instanceof Byte) {
-			type = byte.class;
+			type = node.isBoxed() ? Byte.class : byte.class;
 			code = "((byte)" + value + ")";
 		} else if (value instanceof Integer) {
-			type = int.class;
+			type = node.isBoxed() ? Integer.class : int.class;
 			code = String.valueOf(value);
 		} else {
 			throw new ParseException("Unsupported constant " + value, node.getOffset());

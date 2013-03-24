@@ -18,7 +18,7 @@ package httl.spi.parsers;
 import httl.Engine;
 import httl.Node;
 import httl.Template;
-import httl.ast.Block;
+import httl.ast.BlockStatement;
 import httl.ast.Break;
 import httl.ast.Comment;
 import httl.ast.Else;
@@ -416,9 +416,9 @@ public class TemplateParser implements Parser {
 		return directives;
 	}
 
-	private Block reduce(List<Statement> directives) throws ParseException {
+	private BlockStatement reduce(List<Statement> directives) throws ParseException {
 		LinkedStack<BlockDirectiveEntry> directiveStack = new LinkedStack<BlockDirectiveEntry>();
-		Block rootDirective = new Block(0);
+		BlockStatement rootDirective = new BlockStatement(0);
 		directiveStack.push(new BlockDirectiveEntry(rootDirective));
 		for (int i = 0, n = directives.size(); i < n; i ++) {
 			Statement directive = (Statement)directives.get(i);
@@ -430,7 +430,7 @@ public class TemplateParser implements Parser {
 					|| directiveClass == Else.class) {
 				if (directiveStack.isEmpty())
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
-				Block blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+				BlockStatement blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 				if (blockDirective == rootDirective)
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
 				End endDirective;
@@ -448,24 +448,24 @@ public class TemplateParser implements Parser {
 				((BlockDirectiveEntry) directiveStack.peek()).appendInnerDirective(directive);
 			}
 			// 压栈
-			if (directive instanceof Block)
-				directiveStack.push(new BlockDirectiveEntry((Block) directive));
+			if (directive instanceof BlockStatement)
+				directiveStack.push(new BlockDirectiveEntry((BlockStatement) directive));
 		}
-		Block root = (Block) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+		BlockStatement root = (BlockStatement) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 		if (! directiveStack.isEmpty()) { // 后验条件
 			throw new ParseException("DirectiveReducer.block.directive.without.end" + root.getClass().getSimpleName(), root.getOffset());
 		}
-		return (Block) root;
+		return (BlockStatement) root;
 	}
 
 	// 指令归约辅助封装类
 	private static final class BlockDirectiveEntry {
 
-		private Block blockDirective;
+		private BlockStatement blockDirective;
 
 		private List<Statement> elements = new ArrayList<Statement>();
 
-		BlockDirectiveEntry(Block blockDirective) {
+		BlockDirectiveEntry(BlockStatement blockDirective) {
 			this.blockDirective = blockDirective;
 		}
 
@@ -473,8 +473,8 @@ public class TemplateParser implements Parser {
 			this.elements.add(innerDirective);
 		}
 
-		Block popDirective() {
-			((Block)blockDirective).setChildren(elements);
+		BlockStatement popDirective() {
+			((BlockStatement)blockDirective).setChildren(elements);
 			return blockDirective;
 		}
 

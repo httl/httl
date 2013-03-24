@@ -558,12 +558,8 @@ public class ClassUtils {
 						boolean match = true;
 						for (int i = 0; i < parameterTypes.length; i ++) {
 							if (! types[i].isAssignableFrom(parameterTypes[i])) {
-								Class<?> boxed = ClassUtils.getBoxedClass(types[i]);
-								if (boxed == parameterTypes[i]
-										|| ! types[i].isAssignableFrom(boxed)) {
-									match = false;
-									break;
-								}
+								match = false;
+								break;
 							}
 						}
 						if (! match) {

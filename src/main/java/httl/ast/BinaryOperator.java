@@ -26,7 +26,7 @@ import java.util.List;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public final class BinaryOperator extends Operator {
+public class BinaryOperator extends Operator {
 
 	private Expression leftParameter;
 	

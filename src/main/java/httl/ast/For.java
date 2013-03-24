@@ -22,7 +22,7 @@ import java.lang.reflect.Type;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class For extends Block {
+public class For extends BlockStatement {
 
 	private final Type type;
 

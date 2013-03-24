@@ -20,7 +20,7 @@ package httl.ast;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Macro extends Block {
+public class Macro extends BlockStatement {
 
 	private final String name;
 

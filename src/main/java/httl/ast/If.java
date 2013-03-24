@@ -20,7 +20,7 @@ package httl.ast;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class If extends Block {
+public class If extends BlockStatement {
 	
 	private final Expression expression;
 
