@@ -52,11 +52,20 @@ public class ExpressionParser implements Parser {
 
 	private Filter expressionFilter;
 
+	private String[] forbidMethods;
+
 	/**
 	 * httl.properties: expression.filters=httl.spi.filters.UnescapeXmlFilter
 	 */
 	public void setExpressionFilter(Filter expressionFilter) {
 		this.expressionFilter = expressionFilter;
+	}
+
+	/**
+	 * httl.properties: import.getters=forbid.methods=add,put,save,insert,modify,update,delete,remove,clear
+	 */
+	public void setForbidMethods(String[] forbidMethods) {
+		this.forbidMethods = forbidMethods;
 	}
 
 	//单字母命名, 保证状态机图简洁
@@ -345,6 +354,14 @@ public class ExpressionParser implements Parser {
 				while (popOperator(parameterStack, operatorStack, operatorTokens, offset) != Bracket.SQUARE);
 				beforeOperator = false;
 			} else {
+				if (forbidMethods != null && StringUtils.isFunction(msg)) {
+					String method = msg.substring(1);
+					for (String forbid : forbidMethods) {
+						if (method.startsWith(forbid)) {
+							throw new ParseException("Forbid call method " + method + " by forbid.method=" + forbid + " config.", offset);
+						}
+					}
+				}
 				if (beforeOperator) {
 					if (! msg.startsWith("new ") && ! StringUtils.isFunction(msg) && ! UNARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
