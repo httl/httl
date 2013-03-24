@@ -400,6 +400,9 @@ public class CompileVisitor extends ASTVisitor {
 			builder.append(", $output);\n");
 		} else {
 			if (Object.class.equals(returnType)) {
+				if (! StringUtils.isNamed(code)) {
+					code = "(" + code + ")";
+				}
 				builder.append("	if (");
 				builder.append(code);
 				builder.append(" instanceof ");
@@ -427,7 +430,7 @@ public class CompileVisitor extends ASTVisitor {
 					}
 					builder.append(", $output);\n	}");
 				} else {
-					code = "(" + code + " instance of " + Resource.class.getName() + " ? " 
+					code = "(" + code + " instanceof " + Resource.class.getName() + " ? " 
 							+ IOUtils.class.getName() + ".readToString(((" + Resource.class.getName() + ")" 
 							+ code + ").getReader()) : " + code + ")";
 				}
