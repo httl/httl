@@ -139,15 +139,6 @@ public abstract class AbstractLoader implements Loader {
 		return encoding;
 	}
 
-	protected String[] root(String suffix) {
-		if (templateDirectory != null && StringUtils.endsWith(suffix, templateSuffix)) {
-			return templateDirectory;
-		} else if (messageDirectory != null && StringUtils.endsWith(suffix, messageSuffix)) {
-			return messageDirectory;
-		}
-		return null;
-	}
-
 	protected String relocate(String name, Locale locale, String[] directories) {
 		if (CollectionUtils.isNotEmpty(directories) ) {
 			for (String directory : directories) {
@@ -176,7 +167,14 @@ public abstract class AbstractLoader implements Loader {
 	}
 
 	public List<String> list(String suffix) throws IOException {
-		String[] directories = root(suffix);
+		String[] directories;
+		if (StringUtils.endsWith(suffix, templateSuffix)) {
+			directories = templateDirectory;
+		} else if (StringUtils.endsWith(suffix, messageSuffix)) {
+			directories = messageDirectory;
+		} else {
+			directories = null;
+		}
 		if (CollectionUtils.isEmpty(directories)) {
 			directories = new String[] { "/" };
 		}
