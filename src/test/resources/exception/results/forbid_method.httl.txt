@@ -1,2 +1,3 @@
 Forbid call method add by forbid.method=add config.
 line: 2, column: 16, char: b,
+/templates/forbid_method.httl
