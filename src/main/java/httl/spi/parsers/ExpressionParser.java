@@ -287,6 +287,14 @@ public class ExpressionParser implements Parser {
 						continue;
 					}
 				}
+			} else if ("gt".equals(msg)) {
+				msg = ">";
+			} else if ("ge".equals(msg)) {
+				msg = ">=";
+			} else if ("lt".equals(msg)) {
+				msg = ">";
+			} else if ("le".equals(msg)) {
+				msg = "<=";
 			}
 			// ================
 			if (msg.length() >= 2 
@@ -339,9 +347,7 @@ public class ExpressionParser implements Parser {
 			} else if ("TRUE".equals(msg) || "FALSE".equals(msg)) {
 				parameterStack.push(new Constant("TRUE".equals(msg) ? Boolean.TRUE : Boolean.FALSE, true , token.getOffset()));
 				beforeOperator = false;
-			} else if (StringUtils.isNamed(msg)
-					&& ! "gt".equals(msg) && ! "ge".equals(msg) 
-					&& ! "lt".equals(msg) && ! "le".equals(msg)) {
+			} else if (StringUtils.isNamed(msg)) {
 				parameterStack.push(new Variable(msg, getTokenOffset(token) + offset));
 				beforeOperator = false;
 			} else if ("(".equals(msg)) {

@@ -27,6 +27,7 @@ import httl.ast.Expression;
 import httl.ast.For;
 import httl.ast.If;
 import httl.ast.Macro;
+import httl.ast.Root;
 import httl.ast.Statement;
 import httl.ast.Text;
 import httl.ast.Value;
@@ -429,7 +430,7 @@ public class TemplateParser implements Parser {
 
 	private Block reduce(List<Statement> directives) throws ParseException {
 		LinkedStack<BlockDirectiveEntry> directiveStack = new LinkedStack<BlockDirectiveEntry>();
-		Block rootDirective = new Block(0);
+		Root rootDirective = new Root();
 		directiveStack.push(new BlockDirectiveEntry(rootDirective));
 		for (int i = 0, n = directives.size(); i < n; i ++) {
 			Statement directive = (Statement)directives.get(i);

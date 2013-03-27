@@ -103,11 +103,11 @@ public interface Template extends Node, Resource {
 	Object evaluate() throws ParseException;
 
 	/**
-	 * Get the template variables. (Ordered)
+	 * Get the template macro flag.
 	 * 
-	 * @return variable types
+	 * @return true - if this template is a macro.
 	 */
-	Map<String, Class<?>> getVariables();
+	boolean isMacro();
 
 	/**
 	 * Get the macro templates.
@@ -124,10 +124,10 @@ public interface Template extends Node, Resource {
 	Template getParent();
 
 	/**
-	 * Get the template macro flag.
+	 * Get the template variables. (Ordered)
 	 * 
-	 * @return true - if this template is a macro.
+	 * @return variable types
 	 */
-	boolean isMacro();
+	Map<String, Class<?>> getVariables();
 
 }

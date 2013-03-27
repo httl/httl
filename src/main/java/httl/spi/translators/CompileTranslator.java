@@ -31,8 +31,9 @@ import httl.spi.Interceptor;
 import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
-import httl.spi.translators.templates.AbstractTemplate;
+import httl.spi.translators.templates.CompileTemplate;
 import httl.spi.translators.templates.AdaptiveTemplate;
+import httl.spi.translators.visitors.CompileVisitor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -107,7 +108,7 @@ public class CompileTranslator implements Translator {
 
 	private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
-	private static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
+	private static final String TEMPLATE_CLASS_PREFIX = CompileTemplate.class.getPackage().getName() + ".Template_";
 	
 	private boolean isOutputStream;
 

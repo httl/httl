@@ -43,9 +43,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class OutputStreamTemplate extends AbstractTemplate {
-
-	private static final long serialVersionUID = 7127901461769617745L;
+public abstract class OutputStreamTemplate extends CompileTemplate {
 
 	public OutputStreamTemplate(Engine engine, Interceptor interceptor, Compiler compiler, 
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 

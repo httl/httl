@@ -21,23 +21,22 @@ import httl.Visitor;
 import java.text.ParseException;
 
 /**
- * ASTVisitor
+ * AstVisitor
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class ASTVisitor implements Visitor {
+public abstract class AstVisitor implements Visitor {
 
 	public boolean visit(Node node) throws ParseException {
-		if (node instanceof Statement) {
-			return visit((Statement) node);
-		} else if (node instanceof Expression) {
-			visit((Expression) node);
-		}
-		return true;
-	}
-
-	public boolean visit(Statement node) throws ParseException {
-		if (node instanceof Text) {
+		if (node instanceof Constant) {
+			visit((Constant) node);
+		} else if (node instanceof Variable) {
+			visit((Variable) node);
+		} else if (node instanceof UnaryOperator) {
+			visit((UnaryOperator) node);
+		} else if (node instanceof BinaryOperator) {
+			visit((BinaryOperator) node);
+		} else if (node instanceof Text) {
 			visit((Text) node);
 		} else if (node instanceof Value) {
 			visit((Value) node);
@@ -47,16 +46,7 @@ public abstract class ASTVisitor implements Visitor {
 			visit((Var) node);
 		} else if (node instanceof Break) {
 			visit((Break) node);
-		} else if (node instanceof Block) {
-			return visit((Block) node);
-		} else if (node instanceof End) {
-			visit((End) node);
-		}
-		return true;
-	}
-
-	public boolean visit(Block node) throws ParseException {
-		if (node instanceof If) {
+		} else if (node instanceof If) {
 			return visit((If) node);
 		} else if (node instanceof Else) {
 			return visit((Else) node);
@@ -64,40 +54,28 @@ public abstract class ASTVisitor implements Visitor {
 			return visit((For) node);
 		} else if (node instanceof Macro) {
 			return visit((Macro) node);
+		} else if (node instanceof End) {
+			Node start = ((End) node).getStart();
+			if (start instanceof If) {
+				end((If) start);
+			} else if (start instanceof Else) {
+				end((Else) start);
+			} else if (start instanceof For) {
+				end((For) start);
+			} else if (start instanceof Macro) {
+				end((Macro) start);
+			}
 		}
 		return true;
 	}
 
-	public void visit(End node) throws ParseException {
-		Node start = node.getStart();
-		if (start instanceof If) {
-			end((If) start);
-		} else if (start instanceof Else) {
-			end((Else) start);
-		} else if (start instanceof For) {
-			end((For) start);
-		} else if (start instanceof Macro) {
-			end((Macro) start);
-		}
-	}
+	public void visit(Constant node) throws ParseException {}
 
-	public void visit(Expression node) throws ParseException {
-		if (node instanceof Constant) {
-			visit((Constant) node);
-		} else if (node instanceof Variable) {
-			visit((Variable) node);
-		} else if (node instanceof Operator) {
-			visit((Operator) node);
-		}
-	}
+	public void visit(Variable node) throws ParseException {}
 
-	public void visit(Operator node) throws ParseException {
-		if (node instanceof UnaryOperator) {
-			visit((UnaryOperator) node);
-		} else if (node instanceof BinaryOperator) {
-			visit((BinaryOperator) node);
-		}
-	}
+	public void visit(UnaryOperator node) throws ParseException {}
+
+	public void visit(BinaryOperator node) throws ParseException {}
 
 	public void visit(Text node) throws ParseException {}
 
@@ -110,19 +88,19 @@ public abstract class ASTVisitor implements Visitor {
 	public void visit(Break node) throws ParseException {}
 
 	public boolean visit(If node) throws ParseException {
-		return false;
+		return true;
 	}
 
 	public boolean visit(Else node) throws ParseException {
-		return false;
+		return true;
 	}
 
 	public boolean visit(For node) throws ParseException {
-		return false;
+		return true;
 	}
 
 	public boolean visit(Macro node) throws ParseException {
-		return false;
+		return true;
 	}
 
 	public void end(If node) throws ParseException {}
@@ -132,13 +110,5 @@ public abstract class ASTVisitor implements Visitor {
 	public void end(For node) throws ParseException {}
 
 	public void end(Macro node) throws ParseException {}
-
-	public void visit(Constant node) throws ParseException {}
-
-	public void visit(Variable node) throws ParseException {}
-
-	public void visit(UnaryOperator node) throws ParseException {}
-
-	public void visit(BinaryOperator node) throws ParseException {}
 
 }

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators;
+package httl.spi.translators.visitors;
 
 import httl.Context;
 import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.ast.ASTVisitor;
+import httl.ast.AstVisitor;
 import httl.ast.BinaryOperator;
 import httl.ast.Break;
 import httl.ast.Constant;
@@ -56,7 +56,7 @@ import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Switcher;
 import httl.spi.formatters.MultiFormatter;
-import httl.spi.translators.templates.AbstractTemplate;
+import httl.spi.translators.templates.CompileTemplate;
 import httl.spi.translators.templates.OutputStreamTemplate;
 import httl.spi.translators.templates.WriterTemplate;
 
@@ -88,7 +88,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class CompileVisitor extends ASTVisitor {
+public class CompileVisitor extends AstVisitor {
 
 	private LinkedStack<Expression> nodeStack = new LinkedStack<Expression>();
 
@@ -166,7 +166,7 @@ public class CompileVisitor extends ASTVisitor {
 
 	private List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
-	private static final String TEMPLATE_CLASS_PREFIX = AbstractTemplate.class.getPackage().getName() + ".Template_";
+	private static final String TEMPLATE_CLASS_PREFIX = CompileTemplate.class.getPackage().getName() + ".Template_";
 	
 	private final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
 
@@ -620,7 +620,7 @@ public class CompileVisitor extends ASTVisitor {
 		String dataName = "_d_" + i;
 		String sizeName = "_s_" + i;
 		String name = "_i_" + var;
-		builder.append("	" + returnType.getCanonicalName() + " " + dataName + " = " + code + ";\n");
+		builder.append("	" + Object.class.getSimpleName() + " " + dataName + " = " + code + ";\n");
 		builder.append("	int " + sizeName + " = " + ClassUtils.class.getName() + ".getSize(" + dataName + ");\n");
 		builder.append("	if (" + dataName + " != null && " + sizeName + " != 0) {\n");
 		builder.append("	");
@@ -1619,15 +1619,6 @@ public class CompileVisitor extends ASTVisitor {
 		} else {
 			type = leftClass;
 			code = null;
-			if ("lt".equals(name)) {
-				name = "<";
-			} else if ("le".equals(name)) {
-				name = "<=";
-			} else if ("gt".equals(name)) {
-				name = ">";
-			} else if ("ge".equals(name)) {
-				name = ">=";
-			}
 			if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
 				if (">".equals(name)) {
 					type = boolean.class;

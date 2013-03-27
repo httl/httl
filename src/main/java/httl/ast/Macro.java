@@ -42,7 +42,7 @@ public class Macro extends Block {
 	}
 
 	public void setParent(Node parent) throws ParseException {
-		if (parent.getClass() !=  Macro.class && parent.getClass() !=  Block.class)
+		if (parent.getClass() !=  Macro.class && parent.getClass() !=  Root.class)
 			throw new ParseException("Can not define macro inside the #" + parent.getClass().getSimpleName().toLowerCase() + " directive.", getOffset());
 		super.setParent(parent);
 	}

@@ -208,7 +208,8 @@ public class TemplateTest {
 		}
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
-			//if (! "for_status.httl".equals(templateName)) continue; // 指定模板测试
+			//if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
+			//if (! "foreach.httl".equals(templateName)) continue; // 指定模板测试
 			if (! profile)
 				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
 			if ("httl-velocity.properties".equals(config) && (data == null || data instanceof String)) continue;
