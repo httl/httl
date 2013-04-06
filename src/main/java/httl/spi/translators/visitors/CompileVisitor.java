@@ -60,6 +60,7 @@ import httl.spi.translators.templates.CompileTemplate;
 import httl.spi.translators.templates.OutputStreamTemplate;
 import httl.spi.translators.templates.WriterTemplate;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.reflect.Array;
@@ -301,7 +302,7 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void visit(Text node) throws ParseException {
+	public void visit(Text node) throws IOException, ParseException {
 		String txt = node.getContent();
 		Filter filter = filterReference.get();
 		if (textFilterSwitcher != null || valueFilterSwitcher != null || formatterSwitcher != null) {
@@ -368,7 +369,7 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void visit(Value node) throws ParseException {
+	public void visit(Value node) throws IOException, ParseException {
 		boolean nofilter = node.isNoFilter();
 		String code = popExpressionCode();
 		Class<?> returnType = popExpressionReturnType();
@@ -482,7 +483,7 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void visit(Var node) throws ParseException {
+	public void visit(Var node) throws IOException, ParseException {
 		Type type = node.getType();
 		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
 		if (node.getExpression() != null) {
@@ -509,7 +510,7 @@ public class CompileVisitor extends AstVisitor {
 		}
 	}
 	
-	private Class<?> checkVar(Class<?> clazz, String var, int offset) throws ParseException {
+	private Class<?> checkVar(Class<?> clazz, String var, int offset) throws IOException, ParseException {
 		Class<?> cls = types.get(var);
 		if (cls != null && ! cls.equals(clazz) 
 				&& ! cls.isAssignableFrom(clazz) 
@@ -523,7 +524,7 @@ public class CompileVisitor extends AstVisitor {
 		return clazz;
 	}
 
-	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, int offset) throws ParseException {
+	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, int offset) throws IOException, ParseException {
 		clazz = checkVar(clazz, var, offset);
 		String type = clazz.getCanonicalName();
 		types.put(var, clazz);
@@ -546,7 +547,7 @@ public class CompileVisitor extends AstVisitor {
 	}
 	
 	@Override
-	public boolean visit(If node) throws ParseException {
+	public boolean visit(If node) throws IOException, ParseException {
 		String code = popExpressionCode();
 		Class<?> returnType = popExpressionReturnType();
 		Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
@@ -558,12 +559,12 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void end(If node) throws ParseException {
+	public void end(If node) throws IOException, ParseException {
 		builder.append("	}\n");
 	}
 
 	@Override
-	public boolean visit(Else node) throws ParseException {
+	public boolean visit(Else node) throws IOException, ParseException {
 		if (node.getExpression() == null) {
 			builder.append("	else {\n");
 		} else {
@@ -578,12 +579,12 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void end(Else node) throws ParseException {
+	public void end(Else node) throws IOException, ParseException {
 		builder.append("	}\n");
 	}
 
 	@Override
-	public boolean visit(For node) throws ParseException {
+	public boolean visit(For node) throws IOException, ParseException {
 		String var = node.getName();
 		Type type  = node.getType();
 		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
@@ -645,7 +646,7 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void end(For node) throws ParseException {
+	public void end(For node) throws IOException, ParseException {
 		builder.append("	" + ClassUtils.filterJavaKeyword(forVariable[0]) + ".increment();\n	}\n	");
 		for (String fv : forVariable) {
 			builder.append(ClassUtils.filterJavaKeyword(fv));
@@ -655,7 +656,7 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void visit(Break node) throws ParseException {
+	public void visit(Break node) throws IOException, ParseException {
 		String b = node.getParent() instanceof For ? "break" : "return";
 		if (node.getExpression() == null) {
 			if (! (node.getParent() instanceof If
@@ -675,7 +676,7 @@ public class CompileVisitor extends AstVisitor {
 	}
 
 	@Override
-	public boolean visit(Macro node) throws ParseException {
+	public boolean visit(Macro node)  throws IOException, ParseException {
 		types.put(node.getName(), Template.class);
 		CompileVisitor visitor = new CompileVisitor();
 		visitor.setResource(resource);
@@ -736,12 +737,12 @@ public class CompileVisitor extends AstVisitor {
 		}
 	}
 
-	public Class<?> compile() throws ParseException {
+	public Class<?> compile() throws IOException, ParseException {
 		String code = getCode();
 		return compiler.compile(code);
 	}
 
-	private String getCode() throws ParseException {
+	private String getCode() throws IOException, ParseException {
 		String name = getTemplateClassName(resource, node, stream);
 		String code = builder.toString();
 		int i = name.lastIndexOf('.');
@@ -1118,7 +1119,7 @@ public class CompileVisitor extends AstVisitor {
 		return types;
 	}
 
-	public void visit(Constant node) throws ParseException {
+	public void visit(Constant node) throws IOException, ParseException {
 		Object value = node.getValue();
 		Class<?> type;
 		String code;
@@ -1164,7 +1165,7 @@ public class CompileVisitor extends AstVisitor {
 		codeStack.push(code);
 	}
 
-	public void visit(Variable node) throws ParseException {
+	public void visit(Variable node) throws IOException, ParseException {
 		String name = node.getName();
 		Class<?> type = types.get(name);
 		if (type == null) {
@@ -1180,7 +1181,7 @@ public class CompileVisitor extends AstVisitor {
 		variableTypes.put(name, type);
 	}
 
-	public void visit(UnaryOperator node) throws ParseException {
+	public void visit(UnaryOperator node) throws IOException, ParseException {
 		String name = node.getName();
 		Expression parameterNode = nodeStack.pop();
 		Type parameterType = typeStack.pop();
@@ -1266,7 +1267,7 @@ public class CompileVisitor extends AstVisitor {
 		codeStack.push(code);
 	}
 
-	public void visit(BinaryOperator node) throws ParseException {
+	public void visit(BinaryOperator node) throws IOException, ParseException {
 		if (nodeStack.isEmpty()) {
 			throw new ParseException("Failed to visit binary operator " + node.getName(), node.getOffset());
 		}
@@ -1730,7 +1731,7 @@ public class CompileVisitor extends AstVisitor {
 		return macro;
 	}
 	
-	private String getNotNullCode(Node leftParameter, Type type, String leftCode, String code) throws ParseException {
+	private String getNotNullCode(Node leftParameter, Type type, String leftCode, String code) throws IOException, ParseException {
 		if (leftParameter instanceof Constant) {
 			return code;
 		}

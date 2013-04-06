@@ -17,6 +17,7 @@ package httl;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -122,6 +123,13 @@ public interface Template extends Node, Resource {
 	 * @return parent template
 	 */
 	Template getParent();
+
+	/**
+	 * Get the template nodes.
+	 * 
+	 * @return template nodes
+	 */
+	List<Node> getNodes();
 
 	/**
 	 * Get the template variables. (Ordered)

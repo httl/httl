@@ -16,8 +16,10 @@
 package httl.ast;
 
 import httl.Node;
+import httl.Template;
 import httl.Visitor;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 /**
@@ -27,7 +29,7 @@ import java.text.ParseException;
  */
 public abstract class AstVisitor implements Visitor {
 
-	public boolean visit(Node node) throws ParseException {
+	public boolean visit(Node node) throws IOException, ParseException {
 		if (node instanceof Constant) {
 			visit((Constant) node);
 		} else if (node instanceof Variable) {
@@ -54,6 +56,8 @@ public abstract class AstVisitor implements Visitor {
 			return visit((For) node);
 		} else if (node instanceof Macro) {
 			return visit((Macro) node);
+		} else if (node instanceof Template) {
+			return visit((Template) node);
 		} else if (node instanceof End) {
 			Node start = ((End) node).getStart();
 			if (start instanceof If) {
@@ -69,46 +73,50 @@ public abstract class AstVisitor implements Visitor {
 		return true;
 	}
 
-	public void visit(Constant node) throws ParseException {}
+	public void visit(Constant node) throws IOException, ParseException {}
 
-	public void visit(Variable node) throws ParseException {}
+	public void visit(Variable node) throws IOException, ParseException {}
 
-	public void visit(UnaryOperator node) throws ParseException {}
+	public void visit(UnaryOperator node) throws IOException, ParseException {}
 
-	public void visit(BinaryOperator node) throws ParseException {}
+	public void visit(BinaryOperator node) throws IOException, ParseException {}
 
-	public void visit(Text node) throws ParseException {}
+	public void visit(Text node) throws IOException, ParseException {}
 
-	public void visit(Value node) throws ParseException {}
+	public void visit(Value node) throws IOException, ParseException {}
 
-	public void visit(Comment node) throws ParseException {}
+	public void visit(Comment node) throws IOException, ParseException {}
 
-	public void visit(Var node) throws ParseException {}
+	public void visit(Var node) throws IOException, ParseException {}
 
-	public void visit(Break node) throws ParseException {}
+	public void visit(Break node) throws IOException, ParseException {}
 
-	public boolean visit(If node) throws ParseException {
+	public boolean visit(Template node) throws IOException, ParseException {
 		return true;
 	}
 
-	public boolean visit(Else node) throws ParseException {
+	public boolean visit(If node) throws IOException, ParseException {
 		return true;
 	}
 
-	public boolean visit(For node) throws ParseException {
+	public boolean visit(Else node) throws IOException, ParseException {
 		return true;
 	}
 
-	public boolean visit(Macro node) throws ParseException {
+	public boolean visit(For node) throws IOException, ParseException {
 		return true;
 	}
 
-	public void end(If node) throws ParseException {}
+	public boolean visit(Macro node) throws IOException, ParseException {
+		return true;
+	}
 
-	public void end(Else node) throws ParseException {}
+	public void end(If node) throws IOException, ParseException {}
 
-	public void end(For node) throws ParseException {}
+	public void end(Else node) throws IOException, ParseException {}
 
-	public void end(Macro node) throws ParseException {}
+	public void end(For node) throws IOException, ParseException {}
+
+	public void end(Macro node) throws IOException, ParseException {}
 
 }

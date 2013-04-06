@@ -86,12 +86,13 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 			String name = entry.getKey();
 			String type = entry.getValue().getCanonicalName();
 			String method = name.substring(0, 1).toUpperCase() + name.substring(1);
-			fields.append("private " + type + " " + name + ";\n");
+			String fname = ClassUtils.filterJavaKeyword(name);
+			fields.append("private " + type + " " + fname + ";\n");
 			gets.append("public " + type + " get" + method + "() {\n");
-			gets.append("	return " + name + ";\n");
+			gets.append("	return " + fname + ";\n");
 			gets.append("}\n");
-			sets.append("public void set" + method + "(" + type + " " + name + ") {\n");
-			sets.append("	this." + name + " = " + name + ";\n");
+			sets.append("public void set" + method + "(" + type + " " + fname + ") {\n");
+			sets.append("	this." + fname + " = " + fname + ";\n");
 			sets.append("}\n");
 		}
 		StringBuilder code = new StringBuilder();

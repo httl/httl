@@ -5,6 +5,7 @@ import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.Visitor;
+import httl.ast.Block;
 import httl.ast.Macro;
 import httl.internal.util.UnsafeStringWriter;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Locale;
 
 public abstract class AbstractTemplate implements Template {
@@ -86,13 +88,20 @@ public abstract class AbstractTemplate implements Template {
 		return parent;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Node> getNodes() {
+		return (List) ((Block) root).getChildren();
+	}
+
 	public boolean isMacro() {
 		return root instanceof Macro;
 	}
 
-	public void accept(Visitor visitor) throws ParseException {
+	public void accept(Visitor visitor) throws IOException, ParseException {
 		if (visitor.visit(this)) {
-			root.accept(visitor);
+			for (Node node : getNodes()) {
+				node.accept(visitor);
+			}
 		}
 	}
 

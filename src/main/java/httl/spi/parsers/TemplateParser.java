@@ -322,7 +322,7 @@ public class TemplateParser implements Parser {
 								try {
 									clazz = ClassUtils.forName(importPackages, type);
 								} catch (Exception e) {
-									throw new ParseException("No such class " + type + ", cause: " + e.getMessage(), offset);
+									throw new ParseException("No such class " + type + ", cause: " + ClassUtils.dumpException(e), offset);
 								}
 							}
 							directives.add(new Var(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), offset));
@@ -346,7 +346,7 @@ public class TemplateParser implements Parser {
 						try {
 							type = ClassUtils.forName(importPackages, var.substring(0, j).trim());
 						} catch (Exception e) {
-							throw new ParseException("No such class " + var.substring(0, j).trim() + ", cause: " + e.getMessage(), offset);
+							throw new ParseException("No such class " + var.substring(0, j).trim() + ", cause: " + ClassUtils.dumpException(e), offset);
 						}
 						var = var.substring(j + 1).trim();
 					}
@@ -705,7 +705,7 @@ public class TemplateParser implements Parser {
 			try {
 				return ClassUtils.forName(importPackages, type);
 			} catch (Exception e) {
-				throw new ParseException("No such class " + type + ", cause: " + e.getMessage(), offset);
+				throw new ParseException("No such class " + type + ", cause: " + ClassUtils.dumpException(e), offset);
 			}
 		}
 		if (! type.endsWith(">")) {
@@ -715,7 +715,7 @@ public class TemplateParser implements Parser {
 		try {
 			raw = ClassUtils.forName(importPackages, type.substring(0, i));
 		} catch (Exception e) {
-			throw new ParseException("No such class " + type.substring(0, i) + ", cause: " + e.getMessage(), offset);
+			throw new ParseException("No such class " + type.substring(0, i) + ", cause: " + ClassUtils.dumpException(e), offset);
 		}
 		String parameterType = type.substring(i + 1, type.length() - 1).trim();
 		offset = offset + 1;

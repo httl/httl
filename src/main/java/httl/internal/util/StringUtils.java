@@ -134,8 +134,6 @@ public class StringUtils {
 		if (value.getClass().isArray()) {
 			if (value instanceof boolean[]) {
 				return Arrays.toString((boolean[]) value);
-			} else if (value instanceof char[]) {
-				return Arrays.toString((char[]) value);
 			} else if (value instanceof byte[]) {
 				return Arrays.toString((byte[]) value);
 			} else if (value instanceof short[]) {
@@ -148,6 +146,8 @@ public class StringUtils {
 				return Arrays.toString((float[]) value);
 			} else if (value instanceof double[]) {
 				return Arrays.toString((double[]) value);
+			} else if (value instanceof char[]) {
+				return String.valueOf((char[]) value);
 			} else if (value instanceof Object[]) {
 				return Arrays.toString((Object[]) value);
 			}

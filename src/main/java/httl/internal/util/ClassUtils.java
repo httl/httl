@@ -18,6 +18,7 @@ package httl.internal.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -365,6 +366,9 @@ public class ClassUtils {
 	}
 	
 	public static boolean isTrue(Object object) {
+		if (object instanceof Boolean) {
+			return ((Boolean) object).booleanValue();
+		}
 		return getSize(object) != 0;
 	}
 	
@@ -375,7 +379,7 @@ public class ClassUtils {
 	public static int getSize(Object object) {
 		if (object == null) {
 			return 0;
-		} if (object instanceof Collection<?>) {
+		} else if (object instanceof Collection<?>) {
 			return ((Collection<?>)object).size();
 		} else if (object instanceof Map<?, ?>) {
 			return ((Map<?, ?>)object).size();
@@ -415,8 +419,14 @@ public class ClassUtils {
 		buf.append(name);
 		buf.append("(");
 		if (parameterTypes != null && parameterTypes.length > 0) {
+			boolean first = true;
 			for (Class<?> type : parameterTypes) {
 				if (type != null) {
+					if (first) {
+						first = false;
+					} else {
+						buf.append(",");
+					}
 					buf.append(type.getCanonicalName());
 				}
 			}
@@ -541,8 +551,50 @@ public class ClassUtils {
 		}
 		return method.getName() + "(" + rightCode + ")";
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public static Object searchProperty(Object leftParameter, String name) throws Exception {
+		Class<?> leftClass = leftParameter.getClass();
+		Object result;
+		if (leftParameter.getClass().isArray() && "length".equals(name)) {
+			result = Array.getLength(leftParameter);
+		} else if (leftParameter instanceof Map) {
+			result = ((Map<Object, Object>) leftParameter).get(name);
+		} else {
+			try {
+				String getter = "get" + name.substring(0, 1).toUpperCase()
+						+ name.substring(1);
+				Method method = leftClass.getMethod(getter,
+						new Class<?>[0]);
+				if (! method.isAccessible()) {
+					method.setAccessible(true);
+				}
+				result = method.invoke(leftParameter, new Object[0]);
+			} catch (NoSuchMethodException e2) {
+				try {
+					String getter = "is"
+							+ name.substring(0, 1).toUpperCase()
+							+ name.substring(1);
+					Method method = leftClass.getMethod(getter,
+							new Class<?>[0]);
+					if (! method.isAccessible()) {
+						method.setAccessible(true);
+					}
+					result = method.invoke(leftParameter, new Object[0]);
+				} catch (NoSuchMethodException e3) {
+					Field field = leftClass.getField(name);
+					result = field.get(leftParameter);
+				}
+			}
+		}
+		return result;
+	}
+
 	public static Method searchMethod(Class<?> currentClass, String name, Class<?>[] parameterTypes) throws NoSuchMethodException {
+		return searchMethod(currentClass, name, parameterTypes, false);
+	}
+
+	public static Method searchMethod(Class<?> currentClass, String name, Class<?>[] parameterTypes, boolean boxed) throws NoSuchMethodException {
 		if (currentClass == null) {
 			throw new NoSuchMethodException("class == null");
 		}
@@ -559,9 +611,16 @@ public class ClassUtils {
 						boolean eq = true;
 						boolean like = true;
 						for (int i = 0; i < parameterTypes.length; i ++) {
-							if (types[i] != null && ! types[i].equals(parameterTypes[i])) {
+							Class<?> type = types[i];
+							Class<?> parameterType = parameterTypes[i];
+							if (type != null && parameterType != null 
+									&& ! type.equals(parameterType)) {
 								eq = false;
-								if (! types[i].isAssignableFrom(parameterTypes[i])) {
+								if (boxed) {
+									type = ClassUtils.getBoxedClass(type);
+									parameterType = ClassUtils.getBoxedClass(parameterType);
+								}
+								if (! type.isAssignableFrom(parameterType)) {
 									eq = false;
 									like = false;
 									break;
@@ -786,6 +845,14 @@ public class ClassUtils {
 
 	public static <K, V> Set<Map.Entry<K, V>> entrySet(Map<K, V> map) {
 		return map == null ? null : map.entrySet();
+	}
+	
+	public static String dumpException(Throwable e) {
+		StringWriter sw = new StringWriter(160);
+		sw.write(e.getClass().getName());
+		sw.write(":\n");
+		e.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
 	}
 
 	public static String filterJavaKeyword(String name) {

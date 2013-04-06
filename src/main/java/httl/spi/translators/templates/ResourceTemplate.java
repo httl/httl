@@ -16,6 +16,7 @@
 package httl.spi.translators.templates;
 
 import httl.Engine;
+import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.Visitor;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -122,6 +124,10 @@ public class ResourceTemplate implements Template {
 	}
 
 	public Template getParent() {
+		throw new UnsupportedOperationException();
+	}
+
+	public List<Node> getNodes() {
 		throw new UnsupportedOperationException();
 	}
 

@@ -122,7 +122,7 @@ public class ExtendsInterceptor extends FirstInterceptor {
 			}
 			try {
 				Template extend = fileMethod.$extends(extendsName, template.getLocale(), template.getEncoding());
-				extend.render(null, Context.getContext().getOut());
+				extend.render(context.getOut());
 			} finally {
 				if (StringUtils.isNotEmpty(extendsNested)) {
 					if (oldNested != null) {

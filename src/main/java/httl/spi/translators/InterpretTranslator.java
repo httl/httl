@@ -15,19 +15,27 @@
  */
 package httl.spi.translators;
 
+import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
+import httl.internal.util.StringSequence;
 import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
+import httl.spi.Interceptor;
 import httl.spi.Parser;
+import httl.spi.Switcher;
 import httl.spi.Translator;
 import httl.spi.translators.templates.InterpretTemplate;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * InterpretTranslator
@@ -48,11 +56,126 @@ public class InterpretTranslator implements Translator {
 
 	private Filter valueFilter;
 
+	private Switcher<Filter> textFilterSwitcher;
+
+	private Switcher<Filter> valueFilterSwitcher;
+
+	private Switcher<Formatter<Object>> formatterSwitcher;
+
+	private String filterVariable = "filter";
+
+	private String formatterVariable = "formatter";
+
 	private String[] forVariable = new String[] { "for" };
 
 	private String ifVariable = "if";
 
 	private String outputEncoding;
+
+	private Engine engine;
+
+	private final List<StringSequence> importSequences = new CopyOnWriteArrayList<StringSequence>();
+
+	private final Map<Class<?>, Object> importMethods = new ConcurrentHashMap<Class<?>, Object>();
+
+	private String[] importPackages;
+
+	private String[] importMacros;
+   
+	private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
+
+	private Interceptor interceptor;
+
+	public void setInterceptor(Interceptor interceptor) {
+		this.interceptor = interceptor;
+	}
+
+	/**
+	 * inited.
+	 */
+	public void inited() {
+		if (importMacros != null && importMacros.length > 0) {
+			for (String importMacro : importMacros) {
+				try {
+					Template importMacroTemplate = engine.getTemplate(importMacro);
+					importMacroTemplates.putAll(importMacroTemplate.getMacros());
+				} catch (Exception e) {
+					throw new IllegalStateException(e.getMessage(), e);
+				}
+			}
+		}
+	}
+
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
+
+	public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
+		this.textFilterSwitcher = textFilterSwitcher;
+	}
+
+	public void setValueFilterSwitcher(Switcher<Filter> valueFilterSwitcher) {
+		this.valueFilterSwitcher = valueFilterSwitcher;
+	}
+
+	public void setFormatterSwitcher(Switcher<Formatter<Object>> formatterSwitcher) {
+		this.formatterSwitcher = formatterSwitcher;
+	}
+
+	public void setFilterVariable(String filterVariable) {
+		this.filterVariable = filterVariable;
+	}
+
+	public void setFormatterVariable(String formatterVariable) {
+		this.formatterVariable = formatterVariable;
+	}
+
+	/**
+	 * httl.properties: import.macros=common.httl
+	 */
+	public void setImportMacros(String[] importMacros) {
+		this.importMacros = importMacros;
+	}
+
+	/**
+	 * httl.properties: import.packages=java.util
+	 */
+	public void setImportPackages(String[] importPackages) {
+		this.importPackages = importPackages;
+	}
+
+	/**
+	 * httl.properties: import.methods=java.lang.Math
+	 */
+	public void setImportMethods(Object[] importMethods) {
+		for (Object function : importMethods) {
+			if (function instanceof Class) {
+				this.importMethods.put((Class<?>) function, function);
+			} else {
+				this.importMethods.put(function.getClass(), function);
+			}
+		}
+	}
+
+	/**
+	 * httl.properties: import.sequences=Mon Tue Wed Thu Fri Sat Sun Mon
+	 */
+	public void setImportSequences(String[] sequences) {
+		for (String s : sequences) {
+			s = s.trim();
+			if (s.length() > 0) {
+				String[] ts = s.split("\\s+");
+				List<String> sequence = new ArrayList<String>();
+				for (String t : ts) {
+					t = t.trim();
+					if (t.length() > 0) {
+						sequence.add(t);
+					}
+				}
+				this.importSequences.add(new StringSequence(sequence));
+			}
+		}
+	}
 
 	public void setMapConverter(Converter<Object, Object> mapConverter) {
 		this.mapConverter = mapConverter;
@@ -95,6 +218,7 @@ public class InterpretTranslator implements Translator {
 			IOException {
 		Node root = templateParser.parse(resource.getSource(), 0);
 		InterpretTemplate template = new InterpretTemplate(resource, root, null);
+		template.setInterceptor(interceptor);
 		template.setMapConverter(mapConverter);
 		template.setOutConverter(outConverter);
 		template.setFormatter(formatter);
@@ -103,6 +227,16 @@ public class InterpretTranslator implements Translator {
 		template.setForVariable(forVariable);
 		template.setIfVariable(ifVariable);
 		template.setOutputEncoding(outputEncoding);
+		template.setImportSequences(importSequences);
+		template.setImportMethods(importMethods);
+		template.setImportMacros(importMacroTemplates);
+		template.setImportPackages(importPackages);
+		template.setTextFilterSwitcher(textFilterSwitcher);
+		template.setValueFilterSwitcher(valueFilterSwitcher);
+		template.setFormatterSwitcher(formatterSwitcher);
+		template.setFilterVariable(filterVariable);
+		template.setFormatterVariable(formatterVariable);
+		template.init();
 		return template;
 	}
 

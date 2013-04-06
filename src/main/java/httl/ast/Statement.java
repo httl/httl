@@ -18,6 +18,7 @@ package httl.ast;
 import httl.Node;
 import httl.Visitor;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 /**
@@ -35,7 +36,7 @@ public class Statement implements Node {
 		this.offset = offset;
 	}
 
-	public void accept(Visitor visitor) throws ParseException {
+	public void accept(Visitor visitor) throws IOException, ParseException {
 		Expression expression = getExpression();
 		if (expression != null) {
 			expression.accept(visitor);

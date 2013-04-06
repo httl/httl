@@ -15,6 +15,7 @@
  */
 package httl;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 /**
@@ -30,9 +31,10 @@ public interface Node {
 	 * Accept a visitor.
 	 * 
 	 * @param visitor
+	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the expression cannot be parsed on runtime
 	 */
-	void accept(Visitor visitor) throws ParseException;
+	void accept(Visitor visitor) throws IOException, ParseException;
 
 	/**
 	 * Get the node offset.

@@ -15,6 +15,7 @@
  */
 package httl;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 /**
@@ -28,9 +29,10 @@ public interface Visitor {
 	 * Visit a node.
 	 * 
 	 * @param node - visited node
-	 * @return true - If return true then visit the children nods
+	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the expression cannot be parsed on runtime
+	 * @return true - need visit the children node.
 	 */
-	boolean visit(Node node) throws ParseException;
+	boolean visit(Node node) throws IOException, ParseException;
 
 }

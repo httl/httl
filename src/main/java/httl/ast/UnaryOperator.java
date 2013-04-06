@@ -17,6 +17,7 @@ package httl.ast;
 
 import httl.Visitor;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +35,7 @@ public class UnaryOperator extends Operator {
 		super(name, priority, offset);
 	}
 
-	public void accept(Visitor visitor) throws ParseException {
+	public void accept(Visitor visitor) throws IOException, ParseException {
 		parameter.accept(visitor);
 		visitor.visit(this);
 	}

@@ -17,6 +17,7 @@ package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
+import httl.Node;
 import httl.Template;
 import httl.Visitor;
 import httl.internal.util.UnsafeByteArrayOutputStream;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -131,12 +133,16 @@ public class ProxyTemplate implements Template {
 		return template.isMacro();
 	}
 
-	public void accept(Visitor visitor) throws ParseException {
+	public void accept(Visitor visitor) throws IOException, ParseException {
 		template.accept(visitor);
 	}
 
 	public Template getParent() {
 		return template.getParent();
+	}
+
+	public List<Node> getNodes() {
+		return template.getNodes();
 	}
 
 }

@@ -17,6 +17,7 @@ package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
+import httl.Node;
 import httl.Template;
 import httl.Visitor;
 import httl.spi.Converter;
@@ -30,6 +31,7 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -172,12 +174,16 @@ public class AdaptiveTemplate implements Template, Serializable {
 		return writerTemplate.isMacro();
 	}
 
-	public void accept(Visitor visitor) throws ParseException {
+	public void accept(Visitor visitor) throws IOException, ParseException {
 		writerTemplate.accept(visitor);
 	}
 
 	public Template getParent() {
 		return writerTemplate.getParent();
+	}
+
+	public List<Node> getNodes() {
+		return writerTemplate.getNodes();
 	}
 
 	@Override

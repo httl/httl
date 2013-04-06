@@ -499,6 +499,23 @@ public class CollectionUtils {
 		return cr;
 	}
 
+	public static boolean isIntegerArray(Object[] values) {
+		for (Object value : values) {
+			if (! (value instanceof Number)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static int[] toIntegerArray(Object[] values) {
+		int[] result = new int[values.length];
+		for (int i = 0; i < values.length; i ++) {
+			result[i] = ((Number) values[i]).intValue();
+		}
+		return result;
+	}
+
 	public static boolean isEmpty(boolean[] values) {
 		return values == null || values.length == 0;
 	}
