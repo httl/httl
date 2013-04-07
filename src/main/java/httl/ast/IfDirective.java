@@ -15,32 +15,32 @@
  */
 package httl.ast;
 
+import java.text.ParseException;
+
 /**
- * End
+ * If
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class End extends Statement {
+public class IfDirective extends BlockDirective {
 	
-	private Block start;
+	private final Expression expression;
 
-	public End(int offset) {
+	public IfDirective(Expression expression, int offset) throws ParseException {
 		super(offset);
+		if (expression == null) {
+			throw new ParseException("The if expression is required.", offset);
+		}
+		this.expression = expression;
 	}
 
-	public Block getStart() {
-		return start;
-	}
-
-	public void setStart(Block start) {
-		if (this.start != null)
-			throw new IllegalStateException("Can not modify start.");
-		this.start = start;
+	public Expression getExpression() {
+		return expression;
 	}
 
 	@Override
 	public String toString() {
-		return "#end";
+		return "#if(" + expression + ")";
 	}
 
 }

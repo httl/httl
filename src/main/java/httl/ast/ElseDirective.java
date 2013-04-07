@@ -15,43 +15,18 @@
  */
 package httl.ast;
 
-import httl.internal.util.StringUtils;
-
-import java.lang.reflect.Type;
-import java.text.ParseException;
-
 /**
- * For
+ * Else
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class For extends Block {
-
-	private final Type type;
-
-	private final String name;
+public class ElseDirective extends BlockDirective {
 
 	private final Expression expression;
 
-	public For(Type type, String name, Expression expression, int offset) throws ParseException {
+	public ElseDirective(Expression expression, int offset) {
 		super(offset);
-		if (! StringUtils.isNamed(name)) {
-			throw new ParseException("Illegal foreach name " + name + ", Can not contains any symbol.", offset);
-		}
-		if (expression == null) {
-			throw new ParseException("The foreach expression is required.", offset);
-		}
-		this.type = type;
-		this.name = name;
 		this.expression = expression;
-	}
-
-	public Type getType() {
-		return type;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public Expression getExpression() {
@@ -60,8 +35,7 @@ public class For extends Block {
 
 	@Override
 	public String toString() {
-		String typeName = type == null ? "" : (type instanceof Class ? ((Class<?>) type).getCanonicalName() : type.toString());
-		return "#for(" + typeName + " " + name + " : " + expression + ")";
+		return expression == null ? "#else" : "#else(" + expression + ")";
 	}
 
 }

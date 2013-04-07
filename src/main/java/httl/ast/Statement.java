@@ -26,7 +26,7 @@ import java.text.ParseException;
  * 
  * @author liangfei
  */
-public class Statement implements Node {
+public abstract class Statement implements Node {
 
 	private final int offset;
 
@@ -37,15 +37,7 @@ public class Statement implements Node {
 	}
 
 	public void accept(Visitor visitor) throws IOException, ParseException {
-		Expression expression = getExpression();
-		if (expression != null) {
-			expression.accept(visitor);
-		}
 		visitor.visit(this);
-	}
-	
-	protected Expression getExpression() {
-		return null;
 	}
 
 	public int getOffset() {

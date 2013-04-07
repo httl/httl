@@ -135,7 +135,7 @@ public class TemplateTest {
 		model.setEnd(7);
 
 	    final List<Object[]> retTestData = new ArrayList<Object[]>();
-		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-attribute.properties", "httl-velocity.properties" };
+		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-comment-compile.properties", "httl-comment-interpret.properties", "httl-attribute.properties" };
 		for (String config : configs) {
 			Engine engine = Engine.getEngine(config);
 
@@ -208,18 +208,21 @@ public class TemplateTest {
 		}
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
-			if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
-			if ("include_hide.httl".equals(templateName)
-					|| "overload_method.httl".equals(templateName)
-					|| "extends_default.httl".equals(templateName)) continue; // 跳过模板测试
-			//if (! "extends_var.httl".equals(templateName)) continue; // 指定模板测试
-			if (! profile)
-				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
-			if ("httl-velocity.properties".equals(config) && (data == null || data instanceof String)) continue;
+			//if (! "httl-comment-interpret.properties".equals(config)) continue; // 指定配置测试
+			//if (! "break.httl".equals(templateName)) continue; // 指定模板测试
+			//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
+			if ("httl-velocity.properties".equals(config) 
+					&& (data == null || data instanceof String)) continue;
+			if ("httl-comment-interpret.properties".equals(config) // FIXME
+					&& ("include_hide.httl".equals(templateName)
+							|| "overload_method.httl".equals(templateName)
+							|| "extends_default.httl".equals(templateName))) continue;
 			if (excludes.contains(templateName) || 
 					(includes.size() > 0 && ! includes.contains(templateName))) {
 				continue;
 			}
+			if (! profile)
+				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
 			String encoding = "UTF-8";
 			if ("gbk.httl".equals(templateName)) {
 				encoding = "GBK";

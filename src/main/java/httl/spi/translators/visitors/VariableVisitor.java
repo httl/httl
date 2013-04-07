@@ -16,7 +16,7 @@
 package httl.spi.translators.visitors;
 
 import httl.ast.AstVisitor;
-import httl.ast.Var;
+import httl.ast.SetDirective;
 import httl.ast.Variable;
 
 import java.lang.reflect.ParameterizedType;
@@ -48,7 +48,7 @@ public class VariableVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void visit(Var node) throws ParseException {
+	public void visit(SetDirective node) throws ParseException {
 		if (node.getExpression() == null) {
 			Type type = node.getType();
 			Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);

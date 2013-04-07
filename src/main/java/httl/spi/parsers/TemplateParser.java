@@ -18,20 +18,20 @@ package httl.spi.parsers;
 import httl.Engine;
 import httl.Node;
 import httl.Template;
-import httl.ast.Block;
-import httl.ast.Break;
+import httl.ast.BlockDirective;
+import httl.ast.BreakDirective;
 import httl.ast.Comment;
-import httl.ast.Else;
-import httl.ast.End;
+import httl.ast.ElseDirective;
+import httl.ast.EndDirective;
 import httl.ast.Expression;
-import httl.ast.For;
-import httl.ast.If;
-import httl.ast.Macro;
-import httl.ast.Root;
+import httl.ast.ForDirective;
+import httl.ast.IfDirective;
+import httl.ast.MacroDirective;
+import httl.ast.RootDirective;
 import httl.ast.Statement;
 import httl.ast.Text;
-import httl.ast.Value;
-import httl.ast.Var;
+import httl.ast.ValueDirective;
+import httl.ast.SetDirective;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
@@ -213,7 +213,7 @@ public class TemplateParser implements Parser {
 				type = v.substring(0, i).trim();
 				var = v.substring(i + 1).trim();
 			}
-			directives.add(new Var(parseGenericType(type, o), var, null, false, false, offset));
+			directives.add(new SetDirective(parseGenericType(type, o), var, null, false, false, offset));
 		}
 	}
 	
@@ -325,7 +325,7 @@ public class TemplateParser implements Parser {
 									throw new ParseException("No such class " + type + ", cause: " + ClassUtils.dumpException(e), offset);
 								}
 							}
-							directives.add(new Var(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), offset));
+							directives.add(new SetDirective(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), offset));
 						}
 					} else {
 						defineVariableTypes(value, offset, directives);
@@ -350,14 +350,14 @@ public class TemplateParser implements Parser {
 						}
 						var = var.substring(j + 1).trim();
 					}
-					directives.add(new For(type, var, expression, offset));
+					directives.add(new ForDirective(type, var, expression, offset));
 				} else if (StringUtils.inArray(name, ifDirective)) {
-					directives.add(new If((Expression) expressionParser.parse(value, exprOffset), offset));
+					directives.add(new IfDirective((Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, elseDirective)) {
-					directives.add(new Else(StringUtils.isEmpty(value)
+					directives.add(new ElseDirective(StringUtils.isEmpty(value)
 							? null : (Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, breakDirective)) {
-					directives.add(new Break(StringUtils.isBlank(value) ? null : (Expression) expressionParser.parse(value, exprOffset), offset));
+					directives.add(new BreakDirective(StringUtils.isBlank(value) ? null : (Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, macroDirective)) {
 					String macroName = value;
 					String macroParams = null;
@@ -391,23 +391,23 @@ public class TemplateParser implements Parser {
 					}
 					if (StringUtils.isNotEmpty(set)) {
 						String var = set.trim();
-						directives.add(new Var(Template.class, var, (Expression) expressionParser.parse(macroName, exprOffset), parent, hide, offset));
+						directives.add(new SetDirective(Template.class, var, (Expression) expressionParser.parse(macroName, exprOffset), parent, hide, offset));
 					}
 					if (out) {
-						directives.add(new Value((Expression) expressionParser.parse(macroName, exprOffset), true, offset));
+						directives.add(new ValueDirective((Expression) expressionParser.parse(macroName, exprOffset), true, offset));
 					}
 					macroName = macroName.trim();
-					directives.add(new Macro(macroName, offset));
+					directives.add(new MacroDirective(macroName, offset));
 					if (StringUtils.isNotEmpty(macroParams)) {
 						defineVariableTypes(macroParams, exprOffset, directives);
 					}
 				} else if (StringUtils.inArray(name, endDirective)) {
-					directives.add(new End(offset));
+					directives.add(new EndDirective(offset));
 				}
 			} else if (message.endsWith("}") && (message.startsWith("${") || message.startsWith("$!{")
 					|| message.startsWith("#{") || message.startsWith("#!{"))) {
 				int i = message.indexOf('{');
-				directives.add(new Value((Expression) expressionParser.parse(message.substring(i + 1, message.length() - 1), 
+				directives.add(new ValueDirective((Expression) expressionParser.parse(message.substring(i + 1, message.length() - 1), 
 						offset + i + 1), message.startsWith("$!") || message.startsWith("#!"), offset));
 			} else if (message.startsWith("##")) {
 				directives.add(new Comment(message.substring(2), false, offset));
@@ -428,9 +428,9 @@ public class TemplateParser implements Parser {
 		return directives;
 	}
 
-	private Block reduce(List<Statement> directives) throws ParseException {
+	private BlockDirective reduce(List<Statement> directives) throws ParseException {
 		LinkedStack<BlockDirectiveEntry> directiveStack = new LinkedStack<BlockDirectiveEntry>();
-		Root rootDirective = new Root();
+		RootDirective rootDirective = new RootDirective();
 		directiveStack.push(new BlockDirectiveEntry(rootDirective));
 		for (int i = 0, n = directives.size(); i < n; i ++) {
 			Statement directive = (Statement)directives.get(i);
@@ -438,46 +438,46 @@ public class TemplateParser implements Parser {
 				continue;
 			Class<?> directiveClass = directive.getClass();
 			// 弹栈
-			if (directiveClass == End.class
-					|| directiveClass == Else.class) {
+			if (directiveClass == EndDirective.class
+					|| directiveClass == ElseDirective.class) {
 				if (directiveStack.isEmpty())
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
-				Block blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+				BlockDirective blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 				if (blockDirective == rootDirective)
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
-				End endDirective;
-				if (directiveClass == Else.class) {
-					endDirective = new End(directive.getOffset());
+				EndDirective endDirective;
+				if (directiveClass == ElseDirective.class) {
+					endDirective = new EndDirective(directive.getOffset());
 				} else {
-					endDirective = (End) directive;
+					endDirective = (EndDirective) directive;
 				}
 				blockDirective.setEnd(endDirective);
 			}
 			// 设置树
-			if (directiveClass != End.class) { // 排除EndDirective
+			if (directiveClass != EndDirective.class) { // 排除EndDirective
 				if (directiveStack.isEmpty())
 					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
 				((BlockDirectiveEntry) directiveStack.peek()).appendInnerDirective(directive);
 			}
 			// 压栈
-			if (directive instanceof Block)
-				directiveStack.push(new BlockDirectiveEntry((Block) directive));
+			if (directive instanceof BlockDirective)
+				directiveStack.push(new BlockDirectiveEntry((BlockDirective) directive));
 		}
-		Block root = (Block) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+		BlockDirective root = (BlockDirective) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 		if (! directiveStack.isEmpty()) { // 后验条件
 			throw new ParseException("DirectiveReducer.block.directive.without.end" + root.getClass().getSimpleName(), root.getOffset());
 		}
-		return (Block) root;
+		return (BlockDirective) root;
 	}
 
 	// 指令归约辅助封装类
 	private static final class BlockDirectiveEntry {
 
-		private Block blockDirective;
+		private BlockDirective blockDirective;
 
 		private List<Statement> elements = new ArrayList<Statement>();
 
-		BlockDirectiveEntry(Block blockDirective) {
+		BlockDirectiveEntry(BlockDirective blockDirective) {
 			this.blockDirective = blockDirective;
 		}
 
@@ -485,8 +485,8 @@ public class TemplateParser implements Parser {
 			this.elements.add(innerDirective);
 		}
 
-		Block popDirective() throws ParseException {
-			((Block)blockDirective).setChildren(elements);
+		BlockDirective popDirective() throws ParseException {
+			((BlockDirective)blockDirective).setChildren(elements);
 			return blockDirective;
 		}
 

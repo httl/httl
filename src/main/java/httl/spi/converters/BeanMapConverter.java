@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.ParseException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -82,18 +84,22 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 		StringBuilder fields = new StringBuilder();
 		StringBuilder gets = new StringBuilder();
 		StringBuilder sets = new StringBuilder();
+		Set<String> added = new HashSet<String>();
 		for (Map.Entry<String, Class<?>> entry : properties.entrySet()) {
 			String name = entry.getKey();
 			String type = entry.getValue().getCanonicalName();
 			String method = name.substring(0, 1).toUpperCase() + name.substring(1);
 			String fname = ClassUtils.filterJavaKeyword(name);
-			fields.append("private " + type + " " + fname + ";\n");
-			gets.append("public " + type + " get" + method + "() {\n");
-			gets.append("	return " + fname + ";\n");
-			gets.append("}\n");
-			sets.append("public void set" + method + "(" + type + " " + fname + ") {\n");
-			sets.append("	this." + fname + " = " + fname + ";\n");
-			sets.append("}\n");
+			if (! added.contains(fname)) {
+				added.add(fname);
+				fields.append("private " + type + " " + fname + ";\n");
+				gets.append("public " + type + " get" + method + "() {\n");
+				gets.append("	return " + fname + ";\n");
+				gets.append("}\n");
+				sets.append("public void set" + method + "(" + type + " " + fname + ") {\n");
+				sets.append("	this." + fname + " = " + fname + ";\n");
+				sets.append("}\n");
+			}
 		}
 		StringBuilder code = new StringBuilder();
 		className = "MapBean_" + StringUtils.getVaildName(className);

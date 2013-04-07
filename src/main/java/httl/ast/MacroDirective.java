@@ -25,11 +25,11 @@ import java.text.ParseException;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Macro extends Block {
+public class MacroDirective extends BlockDirective {
 
 	private final String name;
 
-	public Macro(String name, int offset) throws ParseException {
+	public MacroDirective(String name, int offset) throws ParseException {
 		super(offset);
 		if (! StringUtils.isNamed(name)) {
 			throw new ParseException("Illegal macro name " + name + ", Can not contains any symbol.", offset);
@@ -42,7 +42,7 @@ public class Macro extends Block {
 	}
 
 	public void setParent(Node parent) throws ParseException {
-		if (parent.getClass() !=  Macro.class && parent.getClass() !=  Root.class)
+		if (parent.getClass() !=  MacroDirective.class && parent.getClass() !=  RootDirective.class)
 			throw new ParseException("Can not define macro inside the #" + parent.getClass().getSimpleName().toLowerCase() + " directive.", getOffset());
 		super.setParent(parent);
 	}

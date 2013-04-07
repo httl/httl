@@ -27,7 +27,7 @@ import java.util.List;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class UnaryOperator extends Operator {
+public abstract class UnaryOperator extends Operator {
 
 	private Expression parameter;
 	

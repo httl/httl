@@ -21,11 +21,11 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 
 /**
- * Var
+ * For
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Var extends Statement {
+public class ForDirective extends BlockDirective {
 
 	private final Type type;
 
@@ -33,20 +33,17 @@ public class Var extends Statement {
 
 	private final Expression expression;
 
-	private final boolean export;
-
-	private final boolean hide;
-
-	public Var(Type type, String name, Expression expression, boolean export, boolean hide, int offset) throws ParseException {
+	public ForDirective(Type type, String name, Expression expression, int offset) throws ParseException {
 		super(offset);
 		if (! StringUtils.isNamed(name)) {
-			throw new ParseException("Illegal variable name " + name + ", Can not contains any symbol.", offset);
+			throw new ParseException("Illegal foreach name " + name + ", Can not contains any symbol.", offset);
+		}
+		if (expression == null) {
+			throw new ParseException("The foreach expression is required.", offset);
 		}
 		this.type = type;
 		this.name = name;
 		this.expression = expression;
-		this.export = export;
-		this.hide = hide;
 	}
 
 	public Type getType() {
@@ -61,19 +58,10 @@ public class Var extends Statement {
 		return expression;
 	}
 
-	public boolean isExport() {
-		return export;
-	}
-
-	public boolean isHide() {
-		return hide;
-	}
-
 	@Override
 	public String toString() {
 		String typeName = type == null ? "" : (type instanceof Class ? ((Class<?>) type).getCanonicalName() : type.toString());
-		return "#var(" + typeName + " " + name + 
-				(expression == null ? "" : (export ? " := " : (hide ? " .= " : " = ")) + expression) + ")";
+		return "#for(" + typeName + " " + name + " : " + expression + ")";
 	}
 
 }

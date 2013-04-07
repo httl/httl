@@ -15,11 +15,45 @@
  */
 package httl.spi.parsers;
 
+import httl.ast.AddOperator;
+import httl.ast.AndOperator;
+import httl.ast.ArrayOperator;
 import httl.ast.BinaryOperator;
+import httl.ast.BitAndOperator;
+import httl.ast.BitNotOperator;
+import httl.ast.BitOrOperator;
+import httl.ast.BitXorOperator;
+import httl.ast.CastOperator;
+import httl.ast.ConditionOperator;
 import httl.ast.Constant;
+import httl.ast.DivOperator;
+import httl.ast.EntryOperator;
+import httl.ast.EqualsOperator;
 import httl.ast.Expression;
+import httl.ast.GreaterEqualsOperator;
+import httl.ast.GreaterOperator;
+import httl.ast.IndexOperator;
+import httl.ast.InstanceofOperator;
+import httl.ast.LeftShiftOperator;
+import httl.ast.LessEqualsOperator;
+import httl.ast.LessOperator;
+import httl.ast.ListOperator;
+import httl.ast.MethodOperator;
+import httl.ast.ModOperator;
+import httl.ast.MulOperator;
+import httl.ast.NegativeOperator;
+import httl.ast.NewOperator;
+import httl.ast.NotEqualsOperator;
+import httl.ast.NotOperator;
 import httl.ast.Operator;
+import httl.ast.OrOperator;
+import httl.ast.PositiveOperator;
+import httl.ast.RightShiftOperator;
+import httl.ast.SequenceOperator;
+import httl.ast.StaticMethodOperator;
+import httl.ast.SubOperator;
 import httl.ast.UnaryOperator;
+import httl.ast.UnsignShiftOperator;
 import httl.ast.Variable;
 import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
@@ -146,7 +180,7 @@ public class ExpressionParser implements Parser {
 		
 	};
 	
-	private static final Set<String> BINARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "*", "/", "%", "==", "!=", ">", ">=", "<", "<=", "gt", "ge", "lt", "le", "&&", "||", "&", "|", "^", ">>", "<<", ">>>", ",", "?", ":", "instanceof", "[", ".."}));
+	private static final Set<String> BINARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "*", "/", "%", "==", "!=", ">", ">=", "<", "<=", "gt", "ge", "lt", "le", "&&", "||", "&", "|", "^", ">>", "<<", ">>>", ",", "?", ":", "instanceof", "is", "[", ".."}));
 	
 	private static final Set<String> UNARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "!", "~", "new", "["}));
 
@@ -164,7 +198,87 @@ public class ExpressionParser implements Parser {
 		}
 		return offset;
 	}
-	
+
+	private UnaryOperator createUnaryOperator(String name, int priority, int offset) {
+		if ("+".equals(name)) {
+			return new PositiveOperator(name, priority, offset);
+		} else if ("-".equals(name)) {
+			return new NegativeOperator(name, priority, offset);
+		} else if ("!".equals(name)) {
+			return new NotOperator(name, priority, offset);
+		} else if ("~".equals(name)) {
+			return new BitNotOperator(name, priority, offset);
+		} else if ("[".equals(name)) {
+			return new ListOperator(name, priority, offset);
+		} else if (name.startsWith("new ")) {
+			return new NewOperator(name.substring(4), priority, offset);
+		} else if (StringUtils.isFunction(name)) {
+			return new StaticMethodOperator(name.substring(1), priority, offset);
+		} else if (StringUtils.isTyped(name)) {
+			return new CastOperator(name, priority, offset);
+		} else {
+			throw new UnsupportedOperationException("Unsupported unary operator " + name);
+		}
+	}
+
+	private BinaryOperator createBinaryOperator(String name, int priority, int offset) {
+		if ("+".equals(name)) {
+			return new AddOperator(name, priority, offset);
+		} else if ("-".equals(name)) {
+			return new SubOperator(name, priority, offset);
+		} else if ("*".equals(name)) {
+			return new MulOperator(name, priority, offset);
+		} else if ("/".equals(name)) {
+			return new DivOperator(name, priority, offset);
+		} else if ("%".equals(name)) {
+			return new ModOperator(name, priority, offset);
+		} else if ("==".equals(name)) {
+			return new EqualsOperator(name, priority, offset);
+		} else if ("!=".equals(name)) {
+			return new NotEqualsOperator(name, priority, offset);
+		} else if (">".equals(name)) {
+			return new GreaterOperator(name, priority, offset);
+		} else if (">=".equals(name)) {
+			return new GreaterEqualsOperator(name, priority, offset);
+		} else if ("<".equals(name)) {
+			return new LessOperator(name, priority, offset);
+		} else if ("<=".equals(name)) {
+			return new LessEqualsOperator(name, priority, offset);
+		} else if ("&&".equals(name)) {
+			return new AndOperator(name, priority, offset);
+		} else if ("||".equals(name)) {
+			return new OrOperator(name, priority, offset);
+		} else if ("&".equals(name)) {
+			return new BitAndOperator(name, priority, offset);
+		} else if ("|".equals(name)) {
+			return new BitOrOperator(name, priority, offset);
+		} else if ("^".equals(name)) {
+			return new BitXorOperator(name, priority, offset);
+		} else if (">>".equals(name)) {
+			return new RightShiftOperator(name, priority, offset);
+		} else if ("<<".equals(name)) {
+			return new LeftShiftOperator(name, priority, offset);
+		} else if (">>>".equals(name)) {
+			return new UnsignShiftOperator(name, priority, offset);
+		} else if (",".equals(name)) {
+			return new ArrayOperator(name, priority, offset);
+		} else if ("?".equals(name)) {
+			return new ConditionOperator(name, priority, offset);
+		} else if (":".equals(name)) {
+			return new EntryOperator(name, priority, offset);
+		} else if ("instanceof".equals(name)) {
+			return new InstanceofOperator(name, priority, offset);
+		} else if ("[".equals(name)) {
+			return new IndexOperator(name, priority, offset);
+		} else if ("..".equals(name)) {
+			return new SequenceOperator(name, priority, offset);
+		} else if (StringUtils.isFunction(name)) {
+			return new MethodOperator(name.substring(1), priority, offset);
+		} else {
+			throw new UnsupportedOperationException("Unsupported binary operator " + name);
+		}
+	}
+
 	private int getPriority(String operator, boolean unary) {
 		int priority = 1000;
 		if (unary && operator.startsWith("new ")) {
@@ -279,7 +393,7 @@ public class ExpressionParser implements Parser {
 						if (left != Bracket.ROUND) {
 							throw new ParseException("Miss left parenthesis", token.getOffset());
 						}
-						UnaryOperator operator = new UnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
+						UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
 						operatorTokens.put(operator, token);
 						operatorStack.push(operator);
 						beforeOperator = true;
@@ -295,6 +409,8 @@ public class ExpressionParser implements Parser {
 				msg = ">";
 			} else if ("le".equals(msg)) {
 				msg = "<=";
+			} else if ("is".equals(msg)) {
+				msg = "instanceof";
 			}
 			// ================
 			if (msg.length() >= 2 
@@ -372,14 +488,14 @@ public class ExpressionParser implements Parser {
 					if (! msg.startsWith("new ") && ! StringUtils.isFunction(msg) && ! UNARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
 					}
-					UnaryOperator operator = new UnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
+					UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
 					operatorTokens.put(operator, token);
 					operatorStack.push(operator);
 				} else {
 					if (! StringUtils.isFunction(msg) && ! BINARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
 					}
-					BinaryOperator operator = new BinaryOperator(msg, getPriority(msg, false), getTokenOffset(token) + offset);
+					BinaryOperator operator = createBinaryOperator(msg, getPriority(msg, false), getTokenOffset(token) + offset);
 					operatorTokens.put(operator, token);
 					while (! operatorStack.isEmpty() && ! (operatorStack.peek() instanceof Bracket)
 							&& operatorStack.peek().getPriority() >= operator.getPriority()) {

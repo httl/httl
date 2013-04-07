@@ -21,8 +21,8 @@ import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.Visitor;
-import httl.ast.Block;
-import httl.ast.Macro;
+import httl.ast.BlockDirective;
+import httl.ast.MacroDirective;
 import httl.internal.util.UnsafeStringWriter;
 import httl.spi.Converter;
 import httl.spi.Interceptor;
@@ -65,9 +65,9 @@ public abstract class AbstractTemplate implements Template {
 	private static String buildName(Resource resource, Node root) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(resource.getName());
-		while (root instanceof Macro) {
+		while (root instanceof MacroDirective) {
 			builder.append("#");
-			builder.append(((Macro) root).getName());
+			builder.append(((MacroDirective) root).getName());
 			root = root.getParent();
 		}
 		return builder.toString();
@@ -225,11 +225,11 @@ public abstract class AbstractTemplate implements Template {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Node> getNodes() {
-		return (List) ((Block) root).getChildren();
+		return (List) ((BlockDirective) root).getChildren();
 	}
 
 	public boolean isMacro() {
-		return root instanceof Macro;
+		return root instanceof MacroDirective;
 	}
 
 	public void accept(Visitor visitor) throws IOException, ParseException {

@@ -19,7 +19,7 @@ import httl.Context;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.ast.Macro;
+import httl.ast.MacroDirective;
 import httl.internal.util.StringSequence;
 import httl.spi.Filter;
 import httl.spi.Formatter;
@@ -89,9 +89,9 @@ public class InterpretedTemplate extends AbstractTemplate {
 		this.variables = Collections.unmodifiableMap(visitor.getVariables());
 		Map<String, Template> macros = new HashMap<String, Template>();
 		for (Node node : getNodes()) {
-			if (node instanceof Macro) {
+			if (node instanceof MacroDirective) {
 				InterpretedTemplate macro = new InterpretedTemplate(this, node, this);
-				macros.put(((Macro) node).getName(), macro);
+				macros.put(((MacroDirective) node).getName(), macro);
 			}
 		}
 		this.macros = Collections.unmodifiableMap(macros);

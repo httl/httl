@@ -15,35 +15,32 @@
  */
 package httl.ast;
 
-import httl.Node;
-
-import java.text.ParseException;
-
 /**
- * BreakIf
+ * End
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Break extends Statement {
+public class EndDirective extends Directive {
 
-	private final Expression expression;
+	private BlockDirective start;
 
-	public Break(Expression expression, int offset) {
+	public EndDirective(int offset) {
 		super(offset);
-		this.expression = expression;
 	}
 
-	public Expression getExpression() {
-		return expression;
+	public BlockDirective getStart() {
+		return start;
 	}
 
-	public void setParent(Node parent) throws ParseException {
-		super.setParent(parent);
+	public void setStart(BlockDirective start) {
+		if (this.start != null)
+			throw new IllegalStateException("Can not modify start.");
+		this.start = start;
 	}
 
 	@Override
 	public String toString() {
-		return expression == null ? "#break" : "#break(" + expression + ")";
+		return "#end";
 	}
 
 }

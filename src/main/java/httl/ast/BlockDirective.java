@@ -22,17 +22,17 @@ import java.text.ParseException;
 import java.util.List;
 
 /**
- * Block
+ * BlockDirective
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Block extends Statement {
+public abstract class BlockDirective extends Directive {
 
 	private List<Statement> children;
 
-	private End end;
+	private EndDirective end;
 
-	public Block(int offset) {
+	public BlockDirective(int offset) {
 		super(offset);
 	}
 
@@ -66,11 +66,11 @@ public class Block extends Statement {
 		}
 	}
 
-	public End getEnd() {
+	public EndDirective getEnd() {
 		return end;
 	}
 
-	public void setEnd(End end) throws ParseException {
+	public void setEnd(EndDirective end) throws ParseException {
 		if (this.end != null)
 			throw new ParseException("Can not modify end.", this.end.getOffset());
 		this.end = end;

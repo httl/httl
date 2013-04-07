@@ -193,9 +193,6 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 							} else if ("evaluate".equals(name)) {
 								// 将 #evaluate("${name}") 转成 ${render("${name}")}
 								message = "${render(" + expression + ")}";
-							} else if ("set".equals(name)) {
-								// 将#set(x = y) 转成 #var(x = y)
-								message = "#var(" + expression + ")";
 							} else if ("foreach".equals(name)) {
 								// 将#foreach(item in list) 转成 #for(item : list)
 								message = "#for(" + expression + ")";

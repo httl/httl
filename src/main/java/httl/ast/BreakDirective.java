@@ -15,16 +15,20 @@
  */
 package httl.ast;
 
+import httl.Node;
+
+import java.text.ParseException;
+
 /**
- * Else
+ * BreakIf
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class Else extends Block {
+public class BreakDirective extends LineDirective {
 
 	private final Expression expression;
 
-	public Else(Expression expression, int offset) {
+	public BreakDirective(Expression expression, int offset) {
 		super(offset);
 		this.expression = expression;
 	}
@@ -33,9 +37,13 @@ public class Else extends Block {
 		return expression;
 	}
 
+	public void setParent(Node parent) throws ParseException {
+		super.setParent(parent);
+	}
+
 	@Override
 	public String toString() {
-		return expression == null ? "#else" : "#else(" + expression + ")";
+		return expression == null ? "#break" : "#break(" + expression + ")";
 	}
 
 }
