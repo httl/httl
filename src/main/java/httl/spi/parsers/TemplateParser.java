@@ -182,7 +182,7 @@ public class TemplateParser implements Parser {
 	}
 
 	private boolean isDirectiveName(String name) {
-		return StringUtils.inArray(name, varDirective)
+		return StringUtils.inArray(name, setDirective)
 				|| StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseDirective) 
 				|| StringUtils.inArray(name, forDirective) || StringUtils.inArray(name, breakDirective) 
 				|| StringUtils.inArray(name, macroDirective) || StringUtils.inArray(name, endDirective);
@@ -277,7 +277,7 @@ public class TemplateParser implements Parser {
 						throw new ParseException("Not found parameter expression the #" + name + " directive.", offset);
 					}
 				}
-				if (StringUtils.inArray(name, varDirective)) {
+				if (StringUtils.inArray(name, setDirective)) {
 					if (value.contains("=")) {
 						Matcher matcher = ASSIGN_PATTERN.matcher("," + value);
 						List<Object[]> list = new ArrayList<Object[]>();
@@ -500,7 +500,7 @@ public class TemplateParser implements Parser {
 
 	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
 
-	private String[] varDirective = new String[] { "var" };
+	private String[] setDirective = new String[] { "var" };
 
 	private String[] ifDirective = new String[] { "if" };
 
@@ -542,10 +542,10 @@ public class TemplateParser implements Parser {
 	}
 	
 	/**
-	 * httl.properties: var.directive=var
+	 * httl.properties: set.directive=set
 	 */
-	public void setVarDirective(String[] varDirective) {
-		this.varDirective = varDirective;
+	public void setSetDirective(String[] setDirective) {
+		this.setDirective = setDirective;
 	}
 
 	/**

@@ -37,7 +37,7 @@ import net.htmlparser.jericho.Source;
  */
 public class AttributeSyntaxFilter extends AbstractFilter {
 
-	private String[] varDirective = new String[] { "var" };
+	private String[] setDirective = new String[] { "var" };
 
 	private String[] ifDirective = new String[] { "if" };
 
@@ -56,10 +56,10 @@ public class AttributeSyntaxFilter extends AbstractFilter {
 	private String attributeNamespace;
 
 	/**
-	 * httl.properties: var.directive=var
+	 * httl.properties: set.directive=set
 	 */
-	public void setVarDirective(String[] varDirective) {
-		this.varDirective = varDirective;
+	public void setSetDirective(String[] setDirective) {
+		this.setDirective = setDirective;
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class AttributeSyntaxFilter extends AbstractFilter {
 	}
 
 	private boolean isDirective(String name) {
-		return StringUtils.inArray(name, varDirective)
+		return StringUtils.inArray(name, setDirective)
 				|| StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseifDirective)
 				|| StringUtils.inArray(name, elseDirective) || StringUtils.inArray(name, forDirective)
 				|| StringUtils.inArray(name, breakifDirective) || StringUtils.inArray(name, macroDirective)

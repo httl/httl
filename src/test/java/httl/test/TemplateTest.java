@@ -208,7 +208,7 @@ public class TemplateTest {
 		}
 		long max = profile ? Long.MAX_VALUE : 1;
 		for (long m = 0; m < max; m ++) {
-			//if (! "httl-comment-interpret.properties".equals(config)) continue; // 指定配置测试
+			//if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
 			//if (! "break.httl".equals(templateName)) continue; // 指定模板测试
 			//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
 			if ("httl-velocity.properties".equals(config) 
