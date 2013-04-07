@@ -50,7 +50,7 @@ public abstract class AbstractCompiler implements Compiler {
 
 	private File compileDirectory;
 	
-	private Logger logger;
+	protected Logger logger;
 	
 	private volatile boolean first = true;
 

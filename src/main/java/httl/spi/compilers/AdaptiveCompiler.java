@@ -15,9 +15,9 @@
  */
 package httl.spi.compilers;
 
+import httl.internal.util.ClassUtils;
 import httl.spi.Compiler;
 import httl.spi.Logger;
-import httl.internal.util.ClassUtils;
 
 import java.text.ParseException;
 
@@ -72,6 +72,9 @@ public class AdaptiveCompiler implements Compiler {
 	public void init() {
 		if (compiler == null) {
 			setCompileVersion(ClassUtils.getJavaVersion());
+		}
+		if (compiler instanceof JdkCompiler) {
+			((JdkCompiler) compiler).init();
 		}
 	}
 

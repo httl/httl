@@ -1,5 +1,21 @@
+/*
+ * Copyright 2011-2013 HTTL Team.
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package httl.spi.translators.templates;
 
+import httl.Context;
 import httl.Engine;
 import httl.Node;
 import httl.Resource;
@@ -8,14 +24,27 @@ import httl.Visitor;
 import httl.ast.Block;
 import httl.ast.Macro;
 import httl.internal.util.UnsafeStringWriter;
+import httl.spi.Converter;
+import httl.spi.Interceptor;
+import httl.spi.Listener;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+/**
+ * AbstractTemplate. (SPI, Prototype, ThreadSafe)
+ * 
+ * @see httl.Engine#getTemplate(String)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public abstract class AbstractTemplate implements Template {
 
 	private final Resource resource;
@@ -42,6 +71,112 @@ public abstract class AbstractTemplate implements Template {
 			root = root.getParent();
 		}
 		return builder.toString();
+	}
+
+	private Converter<Object, Object> mapConverter;
+
+	private Converter<Object, Object> outConverter;
+	
+	private Interceptor interceptor;
+
+	private Object convertOut(Object out) throws IOException, ParseException {
+		if (outConverter != null && out != null
+				&& ! (out instanceof OutputStream) 
+				&& ! (out instanceof Writer)) {
+			return outConverter.convert(out, getVariables());
+		}
+		return out;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertMap(Object context) throws ParseException {
+		if (mapConverter != null && context != null && ! (context instanceof Map)) {
+			try {
+				context = mapConverter.convert(context, getVariables());
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+		if (context == null || context instanceof Map) {
+			return (Map<String, Object>) context;
+		} else {
+			throw new IllegalArgumentException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
+		}
+	}
+
+	public void render(Object parameters, Object out) throws IOException, ParseException {
+		Map<String, Object> map = convertMap(parameters);
+		out = convertOut(out);
+		Context context = Context.pushContext(map);
+		try {
+			context.setTemplate(this);
+			if (out instanceof OutputStream) {
+				context.setOut((OutputStream) out);
+			} else if (out instanceof Writer) {
+				context.setOut((Writer) out);
+			} else {
+				throw new IllegalArgumentException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
+			}
+			if (interceptor != null) {
+				interceptor.render(context, new Listener() {
+					public void render(Context context) throws IOException, ParseException {
+						_render(context);
+					}
+				});
+			} else {
+				_render(context);
+			}
+		} finally {
+			Context.popContext();
+		}
+	}
+
+	private void _render(Context context) throws IOException, ParseException {
+		try {
+			doRender(context);
+		} catch (RuntimeException e) {
+			throw (RuntimeException) e;
+		} catch (IOException e) {
+			throw (IOException) e;
+		} catch (ParseException e) {
+			throw (ParseException) e;
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+	protected abstract void doRender(Context context) throws Exception;
+
+	protected Resource getResource() {
+		return resource;
+	}
+
+	protected Node getRoot() {
+		return root;
+	}
+
+	protected Converter<Object, Object> getMapConverter() {
+		return mapConverter;
+	}
+
+	protected Converter<Object, Object> getOutConverter() {
+		return outConverter;
+	}
+
+	protected Interceptor getInterceptor() {
+		return interceptor;
+	}
+
+	public void setInterceptor(Interceptor interceptor) {
+		this.interceptor = interceptor;
+	}
+
+	public void setMapConverter(Converter<Object, Object> mapConverter) {
+		this.mapConverter = mapConverter;
+	}
+
+	public void setOutConverter(Converter<Object, Object> outConverter) {
+		this.outConverter = outConverter;
 	}
 
 	public String getName() {

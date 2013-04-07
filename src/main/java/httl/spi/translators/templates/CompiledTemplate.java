@@ -28,26 +28,22 @@ import httl.spi.Interceptor;
 import httl.spi.Switcher;
 import httl.spi.formatters.MultiFormatter;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * AbstractTemplate. (SPI, Prototype, ThreadSafe)
+ * CompiledTemplate. (SPI, Prototype, ThreadSafe)
  * 
  * @see httl.Engine#getTemplate(String)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class CompileTemplate extends AbstractTemplate {
+public abstract class CompiledTemplate extends AbstractTemplate {
 	
 	private final Compiler compiler;
-
-	private final Interceptor interceptor;
 
 	private final Switcher<Filter> filterSwitcher;
 	
@@ -55,39 +51,31 @@ public abstract class CompileTemplate extends AbstractTemplate {
 
 	private final Filter filter;
 
-	private final Converter<Object, Object> mapConverter;
-
-	private final Converter<Object, Object> outConverter;
-	
 	private final MultiFormatter formatter;
 
 	private final Map<String, Template> importMacros;
 
 	private final Map<String, Template> macros;
 
-	public CompileTemplate(Engine engine, Interceptor interceptor, Compiler compiler,
+	public CompiledTemplate(Engine engine, Interceptor interceptor, Compiler compiler,
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
 			Filter filter, Formatter<Object> formatter, 
 			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
 			Map<Class<?>, Object> functions, Map<String, Template> importMacros,
 			Resource resource, Template parent, Node root) {
 		super(resource, root, parent);
+		super.setMapConverter(mapConverter);
+		super.setOutConverter(outConverter);
+		super.setInterceptor(interceptor);
 		this.compiler = compiler;
-		this.interceptor = interceptor;
 		this.filterSwitcher = filterSwitcher;
 		this.formatterSwitcher = formatterSwitcher;
 		this.filter = filter;
-		this.mapConverter = mapConverter;
-		this.outConverter = outConverter;
 		this.formatter = toMultiFormatter(formatter);
 		this.importMacros = importMacros;
 		this.macros = initMacros(engine, interceptor, filterSwitcher, formatterSwitcher, 
 				filter, formatter, mapConverter, outConverter, functions, importMacros, 
 				resource, parent, root);
-	}
-
-	protected Interceptor getInterceptor() {
-		return interceptor;
 	}
 
 	protected MultiFormatter getFormatter(Context context, String key) {
@@ -153,54 +141,19 @@ public abstract class CompileTemplate extends AbstractTemplate {
 		return defaultValue;
 	}
 
-	public Object evaluate(Object context) throws ParseException {
-		return evaluate(convertMap(context));
-	}
-
-	public void render(Object context, Object out) throws IOException, ParseException {
-		out = convertOut(out);
-		if (out == null) {
-			throw new IllegalArgumentException("out == null");
-		} else if (out instanceof OutputStream) {
-			render(convertMap(context), (OutputStream) out);
-		} else if (out instanceof Writer) {
-			render(convertMap(context), (Writer) out);
+	@Override
+	protected void doRender(Context context) throws Exception {
+		if (context.getOut() instanceof OutputStream) {
+			doRender(context, (OutputStream) context.getOut());
 		} else {
-			throw new IllegalArgumentException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
-		}
-	}
-	
-	private Object convertOut(Object out) throws IOException, ParseException {
-		if (outConverter != null && out != null
-				&& ! (out instanceof OutputStream) 
-				&& ! (out instanceof Writer)) {
-			return outConverter.convert(out, getVariables());
-		}
-		return out;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertMap(Object context) throws ParseException {
-		if (mapConverter != null && context != null && ! (context instanceof Map)) {
-			try {
-				context = mapConverter.convert(context, getVariables());
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-		}
-		if (context == null || context instanceof Map) {
-			return (Map<String, Object>) context;
-		} else {
-			throw new IllegalArgumentException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
+			doRender(context, (Writer) context.getOut());
 		}
 	}
 
-	protected abstract Object evaluate(Map<String, Object> parameters) throws ParseException;
-	
-	protected abstract void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException;
-	
-	protected abstract void render(Map<String, Object> parameters, Writer writer) throws IOException, ParseException;
-	
+	protected abstract void doRender(Context context, OutputStream stream) throws Exception;
+
+	protected abstract void doRender(Context context, Writer writer) throws Exception;
+
 	protected Map<String, Template> getImportMacros() {
 		return importMacros;
 	}

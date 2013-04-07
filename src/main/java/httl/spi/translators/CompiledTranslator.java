@@ -28,11 +28,12 @@ import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
+import httl.spi.Logger;
 import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
-import httl.spi.translators.templates.CompileTemplate;
 import httl.spi.translators.templates.AdaptiveTemplate;
+import httl.spi.translators.templates.CompiledTemplate;
 import httl.spi.translators.visitors.CompileVisitor;
 
 import java.io.IOException;
@@ -50,11 +51,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * CompileTranslator
+ * CompiledTranslator
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class CompileTranslator implements Translator {
+public class CompiledTranslator implements Translator {
 
 	private String[] forVariable = new String[] { "for" };
 
@@ -74,6 +75,12 @@ public class CompileTranslator implements Translator {
 	
 	private Interceptor interceptor;
 	
+	private Logger logger;
+	
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
 	private Switcher<Filter> textFilterSwitcher;
 
 	private Switcher<Filter> valueFilterSwitcher;
@@ -108,7 +115,7 @@ public class CompileTranslator implements Translator {
 
 	private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
-	private static final String TEMPLATE_CLASS_PREFIX = CompileTemplate.class.getPackage().getName() + ".Template_";
+	private static final String TEMPLATE_CLASS_PREFIX = CompiledTemplate.class.getPackage().getName() + ".Template_";
 	
 	private boolean isOutputStream;
 
@@ -409,6 +416,9 @@ public class CompileTranslator implements Translator {
 	}
 
 	public Template translate(Resource resource, Map<String, Class<?>> defVariableTypes) throws IOException, ParseException {
+		if (logger != null && logger.isDebugEnabled()) {
+			logger.debug("Compile template " + resource.getName());
+		}
 		try {
 			Template writerTemplate = null;
 			Template streamTemplate = null;

@@ -24,10 +24,11 @@ import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
+import httl.spi.Logger;
 import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
-import httl.spi.translators.templates.InterpretTemplate;
+import httl.spi.translators.templates.InterpretedTemplate;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -38,18 +39,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * InterpretTranslator
+ * InterpretedTranslator
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class InterpretTranslator implements Translator {
+public class InterpretedTranslator implements Translator {
 
 	private Parser templateParser;
 
-	private Converter<Object, Object> mapConverter;
-
-	private Converter<Object, Object> outConverter;
-	
 	private Formatter<Object> formatter;
 
 	private Filter textFilter;
@@ -74,6 +71,8 @@ public class InterpretTranslator implements Translator {
 
 	private Engine engine;
 
+	private Class<?> defaultVariableType;
+
 	private final List<StringSequence> importSequences = new CopyOnWriteArrayList<StringSequence>();
 
 	private final Map<Class<?>, Object> importMethods = new ConcurrentHashMap<Class<?>, Object>();
@@ -85,6 +84,24 @@ public class InterpretTranslator implements Translator {
 	private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
 
 	private Interceptor interceptor;
+
+	private Converter<Object, Object> mapConverter;
+
+	private Converter<Object, Object> outConverter;
+
+	private Logger logger;
+	
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
+	public void setMapConverter(Converter<Object, Object> mapConverter) {
+		this.mapConverter = mapConverter;
+	}
+
+	public void setOutConverter(Converter<Object, Object> outConverter) {
+		this.outConverter = outConverter;
+	}
 
 	public void setInterceptor(Interceptor interceptor) {
 		this.interceptor = interceptor;
@@ -177,14 +194,6 @@ public class InterpretTranslator implements Translator {
 		}
 	}
 
-	public void setMapConverter(Converter<Object, Object> mapConverter) {
-		this.mapConverter = mapConverter;
-	}
-
-	public void setOutConverter(Converter<Object, Object> outConverter) {
-		this.outConverter = outConverter;
-	}
-
 	public void setFormatter(Formatter<Object> formatter) {
 		this.formatter = formatter;
 	}
@@ -213,11 +222,18 @@ public class InterpretTranslator implements Translator {
 		this.templateParser = templateParser;
 	}
 
+	public void setDefaultVariableType(Class<?> defaultVariableType) {
+		this.defaultVariableType = defaultVariableType;
+	}
+
 	public Template translate(Resource resource,
 			Map<String, Class<?>> parameterTypes) throws ParseException,
 			IOException {
+		if (logger != null && logger.isDebugEnabled()) {
+			logger.debug("Interprete template " + resource.getName());
+		}
 		Node root = templateParser.parse(resource.getSource(), 0);
-		InterpretTemplate template = new InterpretTemplate(resource, root, null);
+		InterpretedTemplate template = new InterpretedTemplate(resource, root, null);
 		template.setInterceptor(interceptor);
 		template.setMapConverter(mapConverter);
 		template.setOutConverter(outConverter);
@@ -236,6 +252,7 @@ public class InterpretTranslator implements Translator {
 		template.setFormatterSwitcher(formatterSwitcher);
 		template.setFilterVariable(filterVariable);
 		template.setFormatterVariable(formatterVariable);
+		template.setDefaultVariableType(defaultVariableType);
 		template.init();
 		return template;
 	}

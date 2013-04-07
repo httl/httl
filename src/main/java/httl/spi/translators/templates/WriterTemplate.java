@@ -20,20 +20,15 @@ import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.internal.util.UnsafeStringWriter;
 import httl.spi.Compiler;
 import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
-import httl.spi.Listener;
 import httl.spi.Switcher;
 
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -43,7 +38,7 @@ import java.util.Map;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public abstract class WriterTemplate extends CompileTemplate {
+public abstract class WriterTemplate extends CompiledTemplate {
 
 	public WriterTemplate(Engine engine, Interceptor interceptor, Compiler compiler, 
 			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
@@ -55,58 +50,9 @@ public abstract class WriterTemplate extends CompileTemplate {
 				mapConverter, outConverter, functions, importMacros, resource, template, root);
 	}
 
-	public Object evaluate(Map<String, Object> parameters) throws ParseException {
-		UnsafeStringWriter writer = new UnsafeStringWriter();
-		try {
-			render(parameters, writer);
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		return writer.toString();
+	protected void doRender(Context context, OutputStream stream) throws Exception {
+		throw new UnsupportedOperationException("Unsupported out type " + Writer.class.getName() 
+				+ " in compiled " + OutputStream.class.getName() + " template.");
 	}
-
-	public void render(Map<String, Object> parameters, OutputStream stream) throws IOException, ParseException {
-		Writer writer = new OutputStreamWriter(stream);
-		render(parameters, writer);
-		writer.flush();
-	}
-
-	public void render(Map<String, Object> parameters, Writer writer) throws IOException, ParseException {
-		if (writer == null) 
-		 	throw new IllegalArgumentException("writer == null");
-		if (Context.getContext().getTemplate() == this)
-			throw new IllegalStateException("The template " + getName() + " can not be recursive rendering the self template.");
-		Context context = Context.pushContext(parameters).setOut(writer).setTemplate(this);
-		try {
-			Interceptor interceptor = getInterceptor();
-			if (interceptor != null) {
-				interceptor.render(context, new Listener() {
-					public void render(Context context) throws IOException, ParseException {
-						_render(context, (Writer) context.getOut());
-					}
-				});
-			} else {
-				_render(context, writer);
-			}
-		} finally {
-			Context.popContext();
-		}
-	}
-
-	private void _render(Context context, Writer writer) throws IOException, ParseException {
-		try {
-			doRender(context, writer);
-		} catch (RuntimeException e) {
-			throw (RuntimeException) e;
-		} catch (IOException e) {
-			throw (IOException) e;
-		} catch (ParseException e) {
-			throw (ParseException) e;
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
-
-	protected abstract void doRender(Context context, Writer writer) throws Exception;
 
 }

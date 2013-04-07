@@ -46,7 +46,7 @@ public class ProxyTemplate implements Template {
 	public ProxyTemplate(Template template) {
 		this.template = template;
 	}
-
+	
 	public Object evaluate() throws ParseException {
 		return evaluate(null);
 	}

@@ -24,13 +24,11 @@ import httl.internal.util.Digest;
 import httl.internal.util.StringUtils;
 import httl.internal.util.UrlUtils;
 import httl.internal.util.VolatileReference;
-import httl.spi.Converter;
 import httl.spi.Loader;
 import httl.spi.Logger;
 import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
-import httl.spi.translators.templates.LazyParseTemplate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -72,16 +70,6 @@ public class DefaultEngine extends Engine {
 	// httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
 	private Map<Object, Object> templateCache;
 
-	// httl.properties: map.converters=httl.spi.converters.BeanMapConverter
-	private Converter<Object, Object> mapConverter;
-
-	/**
-	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
-	 */
-	public void setMapConverter(Converter<Object, Object> mapConverter) {
-		this.mapConverter = mapConverter;
-	}
-
 	// httl.properties: template.directory=/META-INF/templates
 	private String templateDirectory;
 
@@ -102,9 +90,6 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: instantiated content
 	private Map<String, Object> properties;
-
-	// httl.properties: use.render.variable.type=false
-	private boolean useRenderVariableType;
 
 	public DefaultEngine() {
 		this.stringLoader = new StringLoader(this);
@@ -243,11 +228,7 @@ public class DefaultEngine extends Engine {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
-		if (useRenderVariableType) {
-			return new LazyParseTemplate(translator, resource, parameterTypes, mapConverter);
-		} else {
-			return translator.translate(resource, parameterTypes);
-		}
+		return translator.translate(resource, parameterTypes);
 	}
 	
 	/**
@@ -438,13 +419,6 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setLocalized(boolean localized) {
 		this.localized = localized;
-	}
-
-	/**
-	 * httl.properties: use.render.variable.type=false
-	 */
-	public void setUseRenderVariableType(boolean useRenderVariableType) {
-		this.useRenderVariableType = useRenderVariableType;
 	}
 
 	/**

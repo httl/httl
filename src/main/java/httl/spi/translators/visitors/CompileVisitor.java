@@ -56,7 +56,7 @@ import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Switcher;
 import httl.spi.formatters.MultiFormatter;
-import httl.spi.translators.templates.CompileTemplate;
+import httl.spi.translators.templates.CompiledTemplate;
 import httl.spi.translators.templates.OutputStreamTemplate;
 import httl.spi.translators.templates.WriterTemplate;
 
@@ -167,7 +167,7 @@ public class CompileVisitor extends AstVisitor {
 
 	private List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
 
-	private static final String TEMPLATE_CLASS_PREFIX = CompileTemplate.class.getPackage().getName() + ".Template_";
+	private static final String TEMPLATE_CLASS_PREFIX = CompiledTemplate.class.getPackage().getName() + ".Template_";
 	
 	private final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
 

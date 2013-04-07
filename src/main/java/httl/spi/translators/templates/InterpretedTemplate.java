@@ -1,41 +1,52 @@
+/*
+ * Copyright 2011-2013 HTTL Team.
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.ast.Block;
 import httl.ast.Macro;
-import httl.ast.Statement;
 import httl.internal.util.StringSequence;
-import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Formatter;
-import httl.spi.Interceptor;
-import httl.spi.Listener;
 import httl.spi.Switcher;
 import httl.spi.translators.visitors.InterpretVisitor;
 import httl.spi.translators.visitors.VariableVisitor;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InterpretTemplate extends AbstractTemplate {
+/**
+ * InterpretedTemplate. (SPI, Prototype, ThreadSafe)
+ * 
+ * @see httl.Engine#getTemplate(String)
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
+public class InterpretedTemplate extends AbstractTemplate {
 
-	private final Map<String, Class<?>> variables;
+	private Map<String, Class<?>> variables;
 
-	private final Map<String, Template> macros;
+	private Map<String, Template> macros;
 
-	private Converter<Object, Object> mapConverter;
-
-	private Converter<Object, Object> outConverter;
-	
 	private Formatter<Object> formatter;
 
 	private Filter textFilter;
@@ -52,8 +63,6 @@ public class InterpretTemplate extends AbstractTemplate {
 
 	private String formatterVariable = "formatter";
 
-	private Interceptor interceptor;
-
 	private String[] forVariable = new String[] { "for" };
 
 	private String ifVariable = "if";
@@ -67,31 +76,30 @@ public class InterpretTemplate extends AbstractTemplate {
 	private Map<String, Template> importMacros;
 
 	private String[] importPackages;
+	
+	private Class<?> defaultVariableType;
 
-	public InterpretTemplate(Resource resource, Node root, Template parent) throws IOException, ParseException {
+	public InterpretedTemplate(Resource resource, Node root, Template parent) throws IOException, ParseException {
 		super(resource, root, parent);
-		VariableVisitor visitor = new VariableVisitor();
-		root.accept(visitor);
+	}
+	
+	public void init() throws IOException, ParseException {
+		VariableVisitor visitor = new VariableVisitor(defaultVariableType, true);
+		accept(visitor);
 		this.variables = Collections.unmodifiableMap(visitor.getVariables());
 		Map<String, Template> macros = new HashMap<String, Template>();
-		if (root instanceof Block) {
-			List<Statement> nodes = ((Block) root).getChildren();
-			for (Node node : nodes) {
-				if (node instanceof Macro) {
-					InterpretTemplate macro = new InterpretTemplate(resource, node, this);
-					macros.put(((Macro) node).getName(), macro);
-				}
+		for (Node node : getNodes()) {
+			if (node instanceof Macro) {
+				InterpretedTemplate macro = new InterpretedTemplate(this, node, this);
+				macros.put(((Macro) node).getName(), macro);
 			}
 		}
 		this.macros = Collections.unmodifiableMap(macros);
-	}
-	
-	public void init() {
 		for (Template m : macros.values()) {
-			InterpretTemplate macro = (InterpretTemplate) m;
-			macro.setInterceptor(interceptor);
-			macro.setMapConverter(mapConverter);
-			macro.setOutConverter(outConverter);
+			InterpretedTemplate macro = (InterpretedTemplate) m;
+			macro.setInterceptor(getInterceptor());
+			macro.setMapConverter(getMapConverter());
+			macro.setOutConverter(getOutConverter());
 			macro.setFormatter(formatter);
 			macro.setValueFilter(valueFilter);
 			macro.setTextFilter(textFilter);
@@ -111,32 +119,11 @@ public class InterpretTemplate extends AbstractTemplate {
 		}
 	}
 
-	private void doRender(Map<String, Object> map, final Object out) throws IOException, ParseException {
-		Context context = Context.pushContext(map).setTemplate(this);
-		if (out instanceof OutputStream) {
-			context.setOut((OutputStream) out);
-		} else if (out instanceof Writer) {
-			context.setOut((Writer) out);
-		}
-		try {
-			if (interceptor == null) {
-				_doRender(out);
-			} else {
-				interceptor.render(context, new Listener() {
-					public void render(Context context) throws IOException, ParseException {
-						_doRender(out);
-					}
-				});
-			}
-		} finally {
-			Context.popContext();
-		}
-	}
-	
-	private void _doRender(Object out) throws IOException, ParseException {
+	@Override
+	protected void doRender(Context context) throws Exception {
 		InterpretVisitor visitor = new InterpretVisitor();
 		visitor.setTemplate(this);
-		visitor.setOut(out);
+		visitor.setOut(Context.getContext().getOut());
 		visitor.setFormatter(formatter);
 		visitor.setValueFilter(valueFilter);
 		visitor.setTextFilter(textFilter);
@@ -153,44 +140,6 @@ public class InterpretTemplate extends AbstractTemplate {
 		visitor.setFilterVariable(filterVariable);
 		visitor.setFormatterVariable(formatterVariable);
 		accept(visitor);
-	}
-
-	public void render(Object context, Object out) throws IOException, ParseException {
-		out = convertOut(out);
-		if (out == null) {
-			throw new IllegalArgumentException("out == null");
-		} else if (out instanceof OutputStream) {
-			doRender(convertMap(context), (OutputStream) out);
-		} else if (out instanceof Writer) {
-			doRender(convertMap(context), (Writer) out);
-		} else {
-			throw new IllegalArgumentException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
-		}
-	}
-	
-	private Object convertOut(Object out) throws IOException, ParseException {
-		if (outConverter != null && out != null
-				&& ! (out instanceof OutputStream) 
-				&& ! (out instanceof Writer)) {
-			return outConverter.convert(out, getVariables());
-		}
-		return out;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertMap(Object context) throws ParseException {
-		if (mapConverter != null && context != null && ! (context instanceof Map)) {
-			try {
-				context = mapConverter.convert(context, getVariables());
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-		}
-		if (context == null || context instanceof Map) {
-			return (Map<String, Object>) context;
-		} else {
-			throw new IllegalArgumentException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
-		}
 	}
 
 	public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
@@ -213,10 +162,6 @@ public class InterpretTemplate extends AbstractTemplate {
 		this.formatterVariable = formatterVariable;
 	}
 
-	public void setInterceptor(Interceptor interceptor) {
-		this.interceptor = interceptor;
-	}
-
 	public void setImportMethods(Map<Class<?>, Object> importMethods) {
 		this.importMethods = importMethods;
 	}
@@ -231,14 +176,6 @@ public class InterpretTemplate extends AbstractTemplate {
 
 	public void setImportPackages(String[] importPackages) {
 		this.importPackages = importPackages;
-	}
-
-	public void setMapConverter(Converter<Object, Object> mapConverter) {
-		this.mapConverter = mapConverter;
-	}
-
-	public void setOutConverter(Converter<Object, Object> outConverter) {
-		this.outConverter = outConverter;
 	}
 
 	public void setFormatter(Formatter<Object> formatter) {
@@ -271,6 +208,10 @@ public class InterpretTemplate extends AbstractTemplate {
 
 	public Map<String, Template> getMacros() {
 		return macros;
+	}
+
+	public void setDefaultVariableType(Class<?> defaultVariableType) {
+		this.defaultVariableType = defaultVariableType;
 	}
 
 }
