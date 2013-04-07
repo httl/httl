@@ -15,11 +15,11 @@
  */
 package httl.spi.compilers;
 
-import httl.spi.Compiler;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.StringUtils;
 import httl.internal.util.UnsafeByteArrayInputStream;
 import httl.internal.util.UnsafeByteArrayOutputStream;
+import httl.spi.Compiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,8 @@ public class JdkCompiler extends AbstractCompiler {
 	private final JavaCompiler compiler;
 
 	private final DiagnosticCollector<JavaFileObject> diagnosticCollector;
+	
+	private final StandardJavaFileManager standardJavaFileManager;
 
 	private final ClassLoaderImpl classLoader;
 	
@@ -71,9 +74,9 @@ public class JdkCompiler extends AbstractCompiler {
 	private final List<String> options = new ArrayList<String>();
 
 	private final List<String> lintOptions = new ArrayList<String>();
-	
-	private boolean lintUnchecked;
 
+	private boolean lintUnchecked;
+	
 	@SuppressWarnings("resource")
 	public JdkCompiler(){
 		compiler = ToolProvider.getSystemJavaCompiler();
@@ -81,10 +84,10 @@ public class JdkCompiler extends AbstractCompiler {
 			throw new IllegalStateException("Can not get system java compiler. Please add jdk tools.jar to your classpath.");
 		}
 		diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
-		StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
+		standardJavaFileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
 		final ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
 		ClassLoader loader = contextLoader;
-		List<File> files = new ArrayList<File>();
+		Set<File> files = new HashSet<File>();
 		while (loader instanceof URLClassLoader 
 				&& (! loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
 			URLClassLoader urlClassLoader = (URLClassLoader) loader;
@@ -95,7 +98,11 @@ public class JdkCompiler extends AbstractCompiler {
 		}
 		if (files.size() > 0) {
 			try {
-				manager.setLocation(StandardLocation.CLASS_PATH, files);
+				Iterable<? extends File> list = standardJavaFileManager.getLocation(StandardLocation.CLASS_PATH);
+				for (File file : list) {
+					files.add(file);
+				}
+				standardJavaFileManager.setLocation(StandardLocation.CLASS_PATH, files);
 			} catch (IOException e) {
 				throw new IllegalStateException(e.getMessage(), e);
 			}
@@ -105,8 +112,22 @@ public class JdkCompiler extends AbstractCompiler {
 				return new ClassLoaderImpl(contextLoader);
 			}
 		});
-		javaFileManager = new JavaFileManagerImpl(manager, classLoader);
+		javaFileManager = new JavaFileManagerImpl(standardJavaFileManager, classLoader);
 		lintOptions.add("-Xlint:unchecked");
+	}
+	
+	public void init() {
+		if (logger != null && logger.isDebugEnabled()) {
+			StringBuilder buf = new StringBuilder(320);
+			buf.append("JDK Compiler classpath locations:\n");
+			buf.append("================\n");
+			for (File file : standardJavaFileManager.getLocation(StandardLocation.CLASS_PATH)) {
+				buf.append(file.getAbsolutePath());
+				buf.append("\n");
+			}
+			buf.append("================\n");
+			logger.debug(buf.toString());
+		}
 	}
 
 	/**
