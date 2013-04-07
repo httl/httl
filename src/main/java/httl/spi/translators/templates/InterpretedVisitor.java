@@ -1,4 +1,4 @@
-package httl.spi.translators.visitors;
+package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Node;
@@ -51,6 +51,7 @@ import httl.ast.ValueDirective;
 import httl.ast.Variable;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.CollectionUtils;
+import httl.internal.util.Condition;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.MapEntry;
 import httl.internal.util.Status;
@@ -78,7 +79,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class InterpretVisitor extends AstVisitor {
+public class InterpretedVisitor extends AstVisitor {
 
 	private Filter currentTextFilter;
 

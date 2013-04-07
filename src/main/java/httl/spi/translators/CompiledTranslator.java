@@ -33,8 +33,8 @@ import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
 import httl.spi.translators.templates.AdaptiveTemplate;
+import httl.spi.translators.templates.CompiledVisitor;
 import httl.spi.translators.templates.CompiledTemplate;
-import httl.spi.translators.visitors.CompileVisitor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -507,7 +507,7 @@ public class CompiledTranslator implements Translator {
 			if (types == null) {
 				types = new HashMap<String, Class<?>>();
 			}
-			CompileVisitor visitor = new CompileVisitor();
+			CompiledVisitor visitor = new CompiledVisitor();
 			visitor.setResource(resource);
 			visitor.setNode(root);
 			visitor.setTypes(types);

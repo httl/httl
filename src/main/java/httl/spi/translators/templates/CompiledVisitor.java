@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.visitors;
+package httl.spi.translators.templates;
 
 import httl.Context;
 import httl.Engine;
@@ -89,9 +89,6 @@ import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Switcher;
 import httl.spi.formatters.MultiFormatter;
-import httl.spi.translators.templates.CompiledTemplate;
-import httl.spi.translators.templates.OutputStreamTemplate;
-import httl.spi.translators.templates.WriterTemplate;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -122,7 +119,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class CompileVisitor extends AstVisitor {
+public class CompiledVisitor extends AstVisitor {
 
 	private LinkedStack<Type> typeStack = new LinkedStack<Type>();
 
@@ -329,7 +326,7 @@ public class CompileVisitor extends AstVisitor {
 		this.defaultVariableType = defaultVariableType;
 	}
 
-	public CompileVisitor() {
+	public CompiledVisitor() {
 	}
 
 	@Override
@@ -709,7 +706,7 @@ public class CompileVisitor extends AstVisitor {
 	@Override
 	public boolean visit(MacroDirective node)  throws IOException, ParseException {
 		types.put(node.getName(), Template.class);
-		CompileVisitor visitor = new CompileVisitor();
+		CompiledVisitor visitor = new CompiledVisitor();
 		visitor.setResource(resource);
 		visitor.setNode(node);
 		// visitor.setTypes(types);
@@ -2360,7 +2357,7 @@ public class CompileVisitor extends AstVisitor {
 			if (Template.class.isAssignableFrom(leftClass)
 					&& ! hasMethod(Template.class, name, rightTypes)) {
 				type = Object.class;
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, CompileVisitor.class.getName() + ".getMacro(" + leftCode + ", \"" + name + "\").evaluate(new Object" + (rightCode.length() == 0 ? "[0]" : "[] { " + rightCode + " }") + ")");
+				code = getNotNullCode(node.getLeftParameter(), type, leftCode, CompiledVisitor.class.getName() + ".getMacro(" + leftCode + ", \"" + name + "\").evaluate(new Object" + (rightCode.length() == 0 ? "[0]" : "[] { " + rightCode + " }") + ")");
 			} else if (Map.class.isAssignableFrom(leftClass)
 					&& rightTypes.length == 0
 					&& ! hasMethod(Map.class, name, rightTypes)) {

@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 
 /**
- * Var
+ * SetDirective
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

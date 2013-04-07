@@ -67,4 +67,9 @@ public abstract class BinaryOperator extends Operator {
 		return Arrays.asList(leftParameter, rightParameter);
 	}
 
+	@Override
+	public String toString() {
+		return leftParameter.toString() + " " + getName() + " " + rightParameter.toString();
+	}
+
 }

@@ -34,6 +34,8 @@ public class AdaptiveCompiler implements Compiler {
 
 	private Logger logger;
 
+	private String parseDirectory;
+
 	/**
 	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
 	 */
@@ -41,6 +43,16 @@ public class AdaptiveCompiler implements Compiler {
 		this.logger = logger;
 		if (compiler instanceof AbstractCompiler) {
 			((AbstractCompiler) compiler).setLogger(logger);
+		}
+	}
+
+	/**
+	 * httl.properties: parse.directory=/tmp
+	 */
+	public void setParseDirectory(String parseDirectory) {
+		this.parseDirectory = parseDirectory;
+		if (compiler instanceof AbstractCompiler) {
+			((AbstractCompiler) compiler).setParseDirectory(parseDirectory);
 		}
 	}
 
@@ -60,11 +72,13 @@ public class AdaptiveCompiler implements Compiler {
 		if (version == null || ClassUtils.isBeforeJava6(version)) {
 			JavassistCompiler javassistCompiler = new JavassistCompiler();
 			javassistCompiler.setLogger(logger);
+			javassistCompiler.setParseDirectory(parseDirectory);
 			compiler = javassistCompiler;
 		} else {
 			JdkCompiler jdkCompiler = new JdkCompiler();
 			jdkCompiler.setCompileVersion(version);
 			jdkCompiler.setLogger(logger);
+			jdkCompiler.setParseDirectory(parseDirectory);
 			compiler = jdkCompiler;
 		}
 	}

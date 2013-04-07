@@ -18,7 +18,6 @@ package httl.spi.translators.templates;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Translator;
-import httl.spi.translators.visitors.VariableVisitor;
 
 import java.io.IOException;
 import java.text.ParseException;

@@ -1,4 +1,4 @@
-package httl.spi.translators.visitors;
+package httl.internal.util;
 
 public class Condition {
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.translators.visitors;
+package httl.spi.translators.templates;
 
 import httl.ast.AstVisitor;
 import httl.ast.SetDirective;

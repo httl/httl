@@ -55,4 +55,9 @@ public abstract class UnaryOperator extends Operator {
 		return Arrays.asList(parameter);
 	}
 
+	@Override
+	public String toString() {
+		return getName() + " " + parameter.toString();
+	}
+
 }

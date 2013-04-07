@@ -24,8 +24,6 @@ import httl.internal.util.StringSequence;
 import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Switcher;
-import httl.spi.translators.visitors.InterpretVisitor;
-import httl.spi.translators.visitors.VariableVisitor;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -121,7 +119,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 
 	@Override
 	protected void doRender(Context context) throws Exception {
-		InterpretVisitor visitor = new InterpretVisitor();
+		InterpretedVisitor visitor = new InterpretedVisitor();
 		visitor.setTemplate(this);
 		visitor.setOut(Context.getContext().getOut());
 		visitor.setFormatter(formatter);
