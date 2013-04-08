@@ -1247,11 +1247,11 @@ public class InterpretedVisitor extends AstVisitor {
 				}
 				if (! found) {
 					try {
+						Class<?>[] types = new Class<?>[args.length];
+						for (int i = 0; i < args.length; i ++) {
+							types[i] = args[i] == null ? null : args[i].getClass();
+						}
 						try {
-							Class<?>[] types = new Class<?>[args.length];
-							for (int i = 0; i < args.length; i ++) {
-								types[i] = args[i] == null ? null : args[i].getClass();
-							}
 							Method method = ClassUtils.searchMethod(leftClass, name, types, true);
 							if (! method.isAccessible()) {
 								method.setAccessible(true);
@@ -1274,6 +1274,17 @@ public class InterpretedVisitor extends AstVisitor {
 									} else {
 										throw new ParseException("No such macro or method " + name + " in " + leftParameter.getClass().getCanonicalName(), node.getOffset());
 									}
+								} else if (leftParameter instanceof Class) {
+									Class<?> function = (Class<?>) leftParameter;
+									Method method = ClassUtils.searchMethod(function, name, types, true);
+									Class<?> type = method.getReturnType();
+									if (type == void.class) {
+										throw new ParseException("Can not call void method " + method.getName() + " in class " + function.getName(), node.getOffset());
+									}
+									if (! Modifier.isStatic(method.getModifiers())) {
+										throw new ParseException("Can not call non-static method " + method.getName() + " in class " + function.getName(), node.getOffset());
+									}
+									result = method.invoke(null, args);
 								} else {
 									throw new ParseException("No such method " + name + " in " + leftParameter.getClass().getCanonicalName(), node.getOffset());
 								}

@@ -1,0 +1,6 @@
+${user instanceof httl.test.model.User}
+${user instanceof User}
+${new httl.test.model.User("a","b","c").name}
+${new User("a","b","c").name}
+${@java.lang.Math.min(1,2)}
+${@Math.min(1,2)}

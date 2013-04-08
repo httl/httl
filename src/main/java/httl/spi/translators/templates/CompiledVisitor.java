@@ -1194,6 +1194,9 @@ public class CompiledVisitor extends AstVisitor {
 		} else if (value instanceof Integer) {
 			type = node.isBoxed() ? Integer.class : int.class;
 			code = node.isBoxed() ? "Integer.valueOf(" + value + ")" : String.valueOf(value);
+		} else if (value instanceof Class) {
+			type = node.isBoxed() ? ClassUtils.getBoxedClass((Class<?>) value) : (Class<?>) value;
+			code = ((Class<?>) value).getCanonicalName();
 		} else {
 			throw new ParseException("Unsupported constant " + value, node.getOffset());
 		}
@@ -2148,7 +2151,7 @@ public class CompiledVisitor extends AstVisitor {
 		typeStack.pop();
 		String rightCode = codeStack.pop();
 
-		Type leftType = typeStack.pop();
+		typeStack.pop();
 		String leftCode = codeStack.pop();
 
 		String name = node.getName();
@@ -2157,7 +2160,7 @@ public class CompiledVisitor extends AstVisitor {
 			leftCode = "(" + leftCode + ")";
 		}
 
-		Type type = leftType;
+		Type type = boolean.class;
 		String code = leftCode + " " + name + " " + rightCode;
 		
 		typeStack.push(type);

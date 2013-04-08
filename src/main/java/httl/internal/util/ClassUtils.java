@@ -149,6 +149,10 @@ public class ClassUtils {
 				} catch (ClassNotFoundException e2) {
 				}
 			}
+			try {
+				return _forName("java.lang." + className);
+			} catch (ClassNotFoundException e2) {
+			}
 		}
 		try {
 			return _forName(className);

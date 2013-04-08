@@ -56,6 +56,7 @@ import httl.ast.SubOperator;
 import httl.ast.UnaryOperator;
 import httl.ast.UnsignShiftOperator;
 import httl.ast.Variable;
+import httl.internal.util.ClassUtils;
 import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.StringUtils;
@@ -88,6 +89,12 @@ public class ExpressionParser implements Parser {
 	private Filter expressionFilter;
 
 	private String[] forbidMethods;
+
+	private String[] importPackages;
+
+	public void setImportPackages(String[] importPackages) {
+		this.importPackages = importPackages;
+	}
 
 	/**
 	 * httl.properties: expression.filters=httl.spi.filters.UnescapeXmlFilter
@@ -359,6 +366,10 @@ public class ExpressionParser implements Parser {
 		return priority;
 	}
 	
+	private boolean isPackageName(String msg) {
+		return StringUtils.isNamed(msg) || StringUtils.isFunction(msg);
+	}
+	
 	public Expression parse(String source, int offset) throws ParseException {
 		if (expressionFilter != null) {
 			source = expressionFilter.filter(source, source);
@@ -372,35 +383,29 @@ public class ExpressionParser implements Parser {
 			Token token = tokens.get(i);
 			String msg = token.getMessage().trim();
 			if ("new".equals(msg)) {
-				i ++;
-				token = tokens.get(i);
-				msg = token.getMessage().trim();
+				StringBuilder buf = new StringBuilder();
+				while (i + 1 < tokens.size() && isPackageName(tokens.get(i + 1).getMessage().trim())) {
+					buf.append(tokens.get(i + 1).getMessage().trim());
+					i ++;
+				} 
 				try {
-					msg = "new " + msg;
+					msg = "new " + buf.toString();
 				} catch (Exception e) {
 					throw new ParseException(e.getMessage(), token.getOffset());
 				}
-			} else if (! "null".equals(msg) && ! "true".equals(msg) && ! "false".equals(msg)
-					&& StringUtils.isNamed(msg) && i < tokens.size() - 1) {
-				String next = tokens.get(i + 1).getMessage().trim();
-				if ("(".equals(next)) {
-					msg = "." + msg;
-				} else if (")".equals(next) && i > 0
-						&& i < tokens.size() - 2) {
-					String prev = tokens.get(i - 1).getMessage().trim();
-					String after = tokens.get(i + 2).getMessage().trim();
-					if ("(".equals(prev) && ("(".equals(after) || StringUtils.isNamed(after))) {
-						Operator left = operatorStack.pop();
-						if (left != Bracket.ROUND) {
-							throw new ParseException("Miss left parenthesis", token.getOffset());
-						}
-						UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
-						operatorTokens.put(operator, token);
-						operatorStack.push(operator);
-						beforeOperator = true;
-						i ++;
-						continue;
-					}
+			} else if ("@".equals(msg)) {
+				StringBuilder buf = new StringBuilder();
+				buf.append(msg);
+				while (i + 2 < tokens.size() 
+						&& isPackageName(tokens.get(i + 1).getMessage().trim())
+						&& isPackageName(tokens.get(i + 2).getMessage().trim())) {
+					buf.append(tokens.get(i + 1).getMessage().trim());
+					i ++;
+				}
+				try {
+					msg = buf.toString();
+				} catch (Exception e) {
+					throw new ParseException(e.getMessage(), token.getOffset());
 				}
 			} else if ("gt".equals(msg)) {
 				msg = ">";
@@ -412,6 +417,43 @@ public class ExpressionParser implements Parser {
 				msg = "<=";
 			} else if ("is".equals(msg)) {
 				msg = "instanceof";
+			} else if (! "null".equals(msg) && ! "true".equals(msg) 
+					&& ! "false".equals(msg) && StringUtils.isNamed(msg)) {
+				if (i < tokens.size() - 1) {
+					String next = tokens.get(i + 1).getMessage().trim();
+					if ("(".equals(next)) {
+						msg = "." + msg;
+					} else if (")".equals(next) && i > 0
+							&& i < tokens.size() - 2) {
+						String prev = tokens.get(i - 1).getMessage().trim();
+						String after = tokens.get(i + 2).getMessage().trim();
+						if ("(".equals(prev) && ("(".equals(after) || StringUtils.isNamed(after))) {
+							Operator left = operatorStack.pop();
+							if (left != Bracket.ROUND) {
+								throw new ParseException("Miss left parenthesis", token.getOffset());
+							}
+							UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
+							operatorTokens.put(operator, token);
+							operatorStack.push(operator);
+							beforeOperator = true;
+							i ++;
+							continue;
+						}
+					}
+				}
+				if (i > 0) {
+					String pre = tokens.get(i - 1).getMessage().trim();
+					if ("is".equals(pre) || "instanceof".equals(pre)) {
+						StringBuilder buf = new StringBuilder();
+						buf.append("@");
+						buf.append(msg);
+						while (i + 1 < tokens.size() && isPackageName(tokens.get(i + 1).getMessage().trim())) {
+							buf.append(tokens.get(i + 1).getMessage().trim());
+							i ++;
+						}
+						msg = buf.toString();
+					}
+				}
 			}
 			// ================
 			if (msg.length() >= 2 
@@ -462,9 +504,12 @@ public class ExpressionParser implements Parser {
 				parameterStack.push(new Constant("true".equals(msg) ? Boolean.TRUE : Boolean.FALSE, false, token.getOffset()));
 				beforeOperator = false;
 			} else if ("TRUE".equals(msg) || "FALSE".equals(msg)) {
-				parameterStack.push(new Constant("TRUE".equals(msg) ? Boolean.TRUE : Boolean.FALSE, true , token.getOffset()));
+				parameterStack.push(new Constant("TRUE".equals(msg) ? Boolean.TRUE : Boolean.FALSE, true, token.getOffset()));
 				beforeOperator = false;
-			} else if (StringUtils.isNamed(msg)) {
+			} else if (msg.length() > 1 && msg.startsWith("@")) {
+				parameterStack.push(new Constant(ClassUtils.forName(importPackages, msg.substring(1).trim()), false, token.getOffset()));
+				beforeOperator = false;
+			} else if (StringUtils.isNamed(msg) && ! "instanceof".equals(msg)) {
 				parameterStack.push(new Variable(msg, getTokenOffset(token) + offset));
 				beforeOperator = false;
 			} else if ("(".equals(msg)) {
@@ -529,8 +574,10 @@ public class ExpressionParser implements Parser {
 			}
 		}
 		Expression result = parameterStack.pop();
-		if (! parameterStack.isEmpty())
-			throw new ParseException("Operator miss parameter", offset);
+		if (! parameterStack.isEmpty()) {
+			Expression parent = parameterStack.pop();
+			throw new ParseException("Miss parameter in the operator " + parent, parent.getOffset());
+		}
 		return result;
 	}
 
