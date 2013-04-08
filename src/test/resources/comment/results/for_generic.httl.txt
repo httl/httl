@@ -1,0 +1,21 @@
+
+
+Practical API Design
+
+Effective Java
+
+Java Concurrency in Practice
+
+Java Programming Language
+
+Domain-Driven Design
+
+Agile Project Management with Scrum
+
+J2EE Development without EJB
+
+Design Patterns
+
+Agile Software Development, Principles, Patterns, and Practices
+
+Design by Contract, by Example

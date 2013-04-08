@@ -1,3 +1,3 @@
-<!--#set(xxx = "abc", yyy = 1 + 2 * 3)-->
+<!--#set(xxx = "abc")--><!--#set(yyy = 1 + 2 * 3)-->
 ${xxx}
 ${yyy}

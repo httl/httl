@@ -1,0 +1,3 @@
+#set(List<Map<String, Object>> mapbooklist)
+#set(Map<String, Object> mapbook = mapbooklist.get(0))
+${mapbook.title}

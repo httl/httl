@@ -1,0 +1,4 @@
+#set(List<Map<String, Object>> mapbooklist)
+#for(Map<String, Object> mapbook : mapbooklist)
+${mapbook.title}
+#end

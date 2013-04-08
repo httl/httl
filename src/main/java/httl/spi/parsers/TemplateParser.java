@@ -278,54 +278,26 @@ public class TemplateParser implements Parser {
 				}
 				if (StringUtils.inArray(name, setDirective)) {
 					if (value.contains("=")) {
-						Matcher matcher = ASSIGN_PATTERN.matcher("," + value);
-						List<Object[]> list = new ArrayList<Object[]>();
-						Object[] pre = null;
-						while (matcher.find()) {
-							if (pre != null) {
-								pre[4] = value.substring(((Integer) pre[3]) - 1, matcher.start() - 1).trim();
-							}
-							Object[] item = new Object[5];
-							if (matcher.group(2) == null || matcher.group(2).length() == 0) {
-								item[0] = null;
-								item[1] = matcher.group(1);
-							} else {
-								item[0] = matcher.group(1);
-								item[1] = matcher.group(2);
-							}
-							item[2] = matcher.group(3);
-							item[3] = matcher.end(3);
-							list.add(item);
-							pre = item;
+						int i = value.indexOf('=');
+						String var = value.substring(0, i).trim();
+						String expr = value.substring(i + 1);
+						Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i);
+						boolean export = false;
+						boolean hide = false;
+						if (var.endsWith(":")) {
+							export = true;
+							var = var.substring(0, var.length() - 1).trim();
+						} else if (var.endsWith(".")) {
+							hide = true;
+							var = var.substring(0, var.length() - 1).trim();
 						}
-						if (pre != null) {
-							pre[4] = value.substring(((Integer) pre[3]) - 1).trim();
+						int j = var.lastIndexOf(' ');
+						String type = null;
+						if (j > 0) {
+							type = var.substring(0, j).trim();
+							var = var.substring(j + 1).trim();
 						}
-						if (list.isEmpty()) {
-							int i = value.indexOf('=');
-							if (i > 0) {
-								throw new ParseException("Illegal variable name " + value.substring(0, i).trim() + ", Can not contains any symbol.", offset);
-							} else {
-								throw new ParseException("Not found \"=\" in set", offset);
-							}
-						}
-						for (Object[] item : list) {
-							String type = (String) item[0];
-							String var = (String) item[1];
-							String oper = (String) item[2];
-							int end = (Integer) item[3];
-							String expr = (String) item[4];
-							Expression expression = (Expression) expressionParser.parse(expr, exprOffset + end);
-							Class<?> clazz = null;
-							if (StringUtils.isNotEmpty(type)) {
-								try {
-									clazz = ClassUtils.forName(importPackages, type);
-								} catch (Exception e) {
-									throw new ParseException("No such class " + type + ", cause: " + ClassUtils.dumpException(e), offset);
-								}
-							}
-							directives.add(new SetDirective(clazz, var, expression, ":=".equals(oper), ".=".equals(oper), offset));
-						}
+						directives.add(new SetDirective(parseGenericType(type, exprOffset), var, expression, export, hide, offset));
 					} else {
 						defineVariableTypes(value, offset, directives);
 					}
@@ -333,23 +305,19 @@ public class TemplateParser implements Parser {
 					int i = value.indexOf(" in ");
 					int n = 4;
 					if (i < 0) {
-						i = value.indexOf(":");
+						i = value.indexOf(':');
 						n = 1;
 					}
 					String var = value.substring(0, i).trim();
 					value = value.substring(i + n);
 					Expression expression = (Expression) expressionParser.parse(value, exprOffset + i + n);
-					int j = var.indexOf(' ');
-					Class<?> type = null;
+					int j = var.lastIndexOf(' ');
+					String type = null;
 					if (j > 0) {
-						try {
-							type = ClassUtils.forName(importPackages, var.substring(0, j).trim());
-						} catch (Exception e) {
-							throw new ParseException("No such class " + var.substring(0, j).trim() + ", cause: " + ClassUtils.dumpException(e), offset);
-						}
+						type = var.substring(0, j).trim();
 						var = var.substring(j + 1).trim();
 					}
-					directives.add(new ForDirective(type, var, expression, offset));
+					directives.add(new ForDirective(parseGenericType(type, exprOffset), var, expression, offset));
 				} else if (StringUtils.inArray(name, ifDirective)) {
 					directives.add(new IfDirective((Expression) expressionParser.parse(value, exprOffset), offset));
 				} else if (StringUtils.inArray(name, elseDirective)) {
@@ -492,8 +460,6 @@ public class TemplateParser implements Parser {
 	}
 	
 	private static final Pattern DEFINE_PATTERN = Pattern.compile("([\\w>\\]]\\s\\w+)\\s?[,]?\\s?");
-
-	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*([\\w<>\\[\\]]+)\\s*(\\w*)\\s*([:\\.]?=)[^=]");
 
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
@@ -687,6 +653,9 @@ public class TemplateParser implements Parser {
 	}
 
 	private Type parseGenericType(String type, int offset) throws IOException, ParseException {
+		if (StringUtils.isBlank(type)) {
+			return null;
+		}
 		int i = type.indexOf('<');
 		if (i < 0) {
 			try {
