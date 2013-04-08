@@ -46,7 +46,7 @@ public abstract class AbstractCompiler implements Compiler {
 
 	private static final ConcurrentMap<String, VolatileReference<Class<?>>> CLASS_CACHE = new ConcurrentHashMap<String, VolatileReference<Class<?>>>();
 
-	private File parseDirectory;
+	private File codeDirectory;
 
 	private File compileDirectory;
 	
@@ -62,13 +62,13 @@ public abstract class AbstractCompiler implements Compiler {
 	}
 
 	/**
-	 * httl.properties: parse.directory=/tmp/javacode
+	 * httl.properties: code.directory=/tmp/javacode
 	 */
-	public void setParseDirectory(String parseDirectory) {
-		if (parseDirectory != null && parseDirectory.trim().length() > 0) {
-			File file = new File(parseDirectory);
+	public void setCodeDirectory(String codeDirectory) {
+		if (codeDirectory != null && codeDirectory.trim().length() > 0) {
+			File file = new File(codeDirectory);
 			if (file.exists() || file.mkdirs()) {
-				this.parseDirectory = file;
+				this.codeDirectory = file;
 			}
 		}
 	}
@@ -108,8 +108,8 @@ public abstract class AbstractCompiler implements Compiler {
 		if (logger != null && logger.isDebugEnabled()) {
 			logger.debug("\n================================\n" + sorceCode + "\n================================\n");
 		}
-		if (parseDirectory != null) {
-			File javaFile = new File(parseDirectory, clazz.getPackage().getName().replace('.', '/') + "/" + clazz.getSimpleName() + ".java");
+		if (codeDirectory != null) {
+			File javaFile = new File(codeDirectory, clazz.getPackage().getName().replace('.', '/') + "/" + clazz.getSimpleName() + ".java");
 			File javaDir = javaFile.getParentFile();
 			if (javaDir.exists() || javaDir.mkdirs()) {
 				FileWriter writer = new FileWriter(javaFile);
