@@ -148,9 +148,9 @@ public class TemplateTest {
 		model.setEnd(7);
 
 	    final List<Object[]> retTestData = new ArrayList<Object[]>();
-		String[] configs = new String[] { "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-comment-compile.properties", "httl-comment-interpret.properties", "httl-attribute.properties", "httl-velocity.properties" };
+		String[] configs = new String[] { "httl.properties", "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-comment-compile.properties", "httl-comment-interpret.properties", "httl-attribute.properties", "httl-velocity.properties" };
 		for (String config : configs) {
-			if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
+			//if (! "httl.properties".equals(config)) continue; // 指定配置测试
 			Engine engine = Engine.getEngine(config);
 			
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);

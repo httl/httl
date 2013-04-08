@@ -1,8 +1,0 @@
-#var(Object[] books)
-<table>
-  #for(Object book in books)
-  <tr>
-    <td>${book}</td>
-  </tr>
-  #end
-</table>
