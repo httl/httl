@@ -55,11 +55,24 @@ public abstract class AbstractTemplate implements Template {
 
 	private final String name;
 
+	private final String encoding;
+
+	private final Locale locale;
+	
+	private final long lastModified;
+
+	private final long length;
+
 	public AbstractTemplate(Resource resource, Node root, Template parent) {
 		this.resource = resource;
 		this.root = root;
 		this.parent = parent;
 		this.name = buildName(resource, root);
+		this.encoding = resource.getEncoding();
+		this.locale = resource.getLocale();
+		// 注意：lastModified被用作缓存的更新条件，resource.getLastModified()很慢，必须缓存
+		this.lastModified = resource.getLastModified();
+		this.length = resource.getLength();
 	}
 
 	private static String buildName(Resource resource, Node root) {
@@ -184,19 +197,19 @@ public abstract class AbstractTemplate implements Template {
 	}
 
 	public String getEncoding() {
-		return resource.getEncoding();
+		return encoding;
 	}
 
 	public Locale getLocale() {
-		return resource.getLocale();
+		return locale;
 	}
 
 	public long getLastModified() {
-		return resource.getLastModified();
+		return lastModified;
 	}
 
 	public long getLength() {
-		return resource.getLength();
+		return length;
 	}
 
 	public String getSource() throws IOException {
