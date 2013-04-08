@@ -5,7 +5,7 @@ aaa.
 bbb.
 <!--#else-->
 ccc.
-<!--#end-->
+<!--#endif-->
 ----
 <!--#if(user && user.role == 'xxx')-->
 xxx.

@@ -1,6 +1,6 @@
-<!--#var(List<Book> booklist)-->
+<!--#set(List<Book> booklist)-->
 <table>
-  <!--#foreach(book in booklist)-->
+  <!--#for(book in booklist)-->
   <tr>
     <td>${foreach.count}</td>
     <td>${book.title}</td>
@@ -11,5 +11,5 @@
     <td>${book.discount}%</td>
     <td>${book.price * book.discount / 100}</td>
   </tr>
-  <!--#end-->
+  <!--#endfor-->
 </table>

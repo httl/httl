@@ -71,7 +71,8 @@ public abstract class BinaryOperator extends Operator {
 
 	@Override
 	public String toString() {
-		if (((Operator) getParent()).getPriority() < getPriority()) {
+		if (getParent() instanceof Operator 
+				&& ((Operator) getParent()).getPriority() < getPriority()) {
 			return "(" + leftParameter + " " + getName() + " " + rightParameter + ")";
 		}
 		return leftParameter + " " + getName() + " " + rightParameter;
