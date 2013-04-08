@@ -114,8 +114,8 @@ public final class Context implements Map<String, Object> {
 		LOCAL.remove();
 	}
 
-	// The current thread id
-	private final long thread;
+	// The current thread.
+	private final Thread thread;
 
 	// The context level.
 	private final int level;
@@ -136,7 +136,7 @@ public final class Context implements Map<String, Object> {
 	private Engine engine;
 
 	private Context(Context parent, Map<String, Object> current) {
-		this.thread = Thread.currentThread().getId();
+		this.thread = parent == null ? Thread.currentThread() : parent.thread;
 		this.level = parent == null ? 0 : parent.getLevel() + 1;
 		this.parent = parent;
 		this.current = current;
@@ -144,7 +144,7 @@ public final class Context implements Map<String, Object> {
 
 	// Check the cross-thread use.
 	private void checkThread() {
-		if (Thread.currentThread().getId() != thread) {
+		if (Thread.currentThread() != thread) {
 			throw new IllegalStateException("Don't cross-thread using " + Context.class.getName() + " object.");
 		}
 	}

@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,8 +65,20 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(Parameterized.class) 
 public class TemplateTest {
-	static boolean profile = "true".equals(System.getProperty("profile"));
 
+	private static final Set<String> includes = loadSystemPropertySet("includes");
+	
+	private static final Set<String> excludes = loadSystemPropertySet("excludes");
+	
+	private static Set<String> loadSystemPropertySet(String key) {
+		String value = System.getProperty(key);
+		Set<String> values = new HashSet<String>();
+		if (StringUtils.isNotEmpty(value) && ! value.startsWith("$")) {
+			values.addAll(Arrays.asList(value.split("\\,")));
+		}
+		return Collections.unmodifiableSet(values);
+	}
+	
     @Parameters
     public static Collection<Object[]> prepareData() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -144,6 +157,9 @@ public class TemplateTest {
 
 			Object[] maps = new Object[] {context, model, json, null};
 			for (Object map : maps) {
+				if ("httl-velocity.properties".equals(config) 
+						&& (map == null || map instanceof String)) continue;
+				
 				String dir = engine.getProperty("template.directory", "");
 				if (dir.length() > 0 && dir.startsWith("/")) {
 					dir = dir.substring(1);
@@ -156,7 +172,20 @@ public class TemplateTest {
 				File[] files = directory.listFiles();
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
-					retTestData.add(new Object[]{config, map, file.getName()});
+					String templateName = file.getName();
+					//if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
+					//if (! "break.httl".equals(templateName)) continue; // 指定模板测试
+					//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
+					if ("httl-comment-interpret.properties".equals(config) // FIXME
+							&& ("include_hide.httl".equals(templateName)
+									|| "overload_method.httl".equals(templateName)
+									|| "extends_default.httl".equals(templateName))) continue;
+					
+					if (excludes.contains(templateName) || 
+							(includes.size() > 0 && ! includes.contains(templateName))) {
+						continue;
+					}
+					retTestData.add(new Object[]{config, map, templateName});
 				}
 			}
 		} 
@@ -178,27 +207,16 @@ public class TemplateTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testTemplate() throws Exception {
-		String include = System.getProperty("includes");
-		String exclude = System.getProperty("excludes");
-		Set<String> includes = new HashSet<String>();
-		Set<String> excludes = new HashSet<String>();
-		if (StringUtils.isNotEmpty(include) && ! include.startsWith("$")) {
-			includes.addAll(Arrays.asList(include.split("\\,")));
-		} else if (StringUtils.isNotEmpty(exclude) && ! exclude.startsWith("$")) {
-			excludes.addAll(Arrays.asList(exclude.split("\\,")));
-		}
 		Engine engine = Engine.getEngine(config);
-		if (! profile) {
-			Loader loader = engine.getProperty("loader", Loader.class);
-			assertEquals(MultiLoader.class, loader.getClass());
-			Loader[] loaders = engine.getProperty("loaders", Loader[].class);
-			assertEquals(ClasspathLoader.class, loaders[0].getClass());
-			loader = engine.getProperty("loaders", ClasspathLoader.class);
-			assertEquals(ClasspathLoader.class, loader.getClass());
-			String[] suffixes = engine.getProperty("template.suffix", new String[] { ".httl" });
-			List<String> list = loader.list(suffixes[0]);
-			assertTrue(list.size() > 0);
-		}
+		Loader loader = engine.getProperty("loader", Loader.class);
+		assertEquals(MultiLoader.class, loader.getClass());
+		Loader[] loaders = engine.getProperty("loaders", Loader[].class);
+		assertEquals(ClasspathLoader.class, loaders[0].getClass());
+		loader = engine.getProperty("loaders", ClasspathLoader.class);
+		assertEquals(ClasspathLoader.class, loader.getClass());
+		String[] suffixes = engine.getProperty("template.suffix", new String[] { ".httl" });
+		List<String> list = loader.list(suffixes[0]);
+		assertTrue(list.size() > 0);
 		String dir = engine.getProperty("template.directory", "");
 		if (dir.length() > 0 && dir.startsWith("/")) {
 			dir = dir.substring(1);
@@ -206,84 +224,59 @@ public class TemplateTest {
 		if (dir.length() > 0 && ! dir.endsWith("/")) {
 			dir += "/";
 		}
-		long max = profile ? Long.MAX_VALUE : 1;
-		for (long m = 0; m < max; m ++) {
-			//if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
-			//if (! "break.httl".equals(templateName)) continue; // 指定模板测试
-			//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
-			if ("httl-velocity.properties".equals(config) 
-					&& (data == null || data instanceof String)) continue;
-			if ("httl-comment-interpret.properties".equals(config) // FIXME
-					&& ("include_hide.httl".equals(templateName)
-							|| "overload_method.httl".equals(templateName)
-							|| "extends_default.httl".equals(templateName))) continue;
-			if (excludes.contains(templateName) || 
-					(includes.size() > 0 && ! includes.contains(templateName))) {
-				continue;
-			}
-			if (! profile)
-				System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
-			String encoding = "UTF-8";
-			if ("gbk.httl".equals(templateName)) {
-				encoding = "GBK";
-			}
-			Engine _engine = engine;
-			if ("extends_default.httl".equals(templateName)) {
-				_engine = Engine.getEngine("httl-comment-extends.properties");
-			}
-			Template template = _engine.getTemplate("/templates/" + templateName, Locale.CHINA, encoding);
-			UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
-			StringWriter actualWriter = new StringWriter();
-			if ("extends_var.httl".equals(templateName)) {
-				if (data instanceof Map) {
-					((Map<String, Object>) data).put("extends", "default.httl");
-				} else if (data instanceof Model) {
-					((Model) data).setExtends("default.httl");
-				}
-			}
-			try {
-				template.render(data, actualWriter);
-				template.render(data, actualStream);
-			} catch (Throwable e) {
-				System.out.println("\n================================\n" + template.getName() + "\n================================\n");
-				e.printStackTrace();
-				throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getName() + "\n================================\n", e);
-			}
-			if ("extends_var.httl".equals(templateName)) {
-				if (data instanceof Map) {
-					((Map<String, Object>) data).remove("extends");
-				} else if (data instanceof Model) {
-					((Model) data).setExtends(null);
-				}
-			}
-			if (! profile && data != null && ! (data instanceof String)) { // FIXME JSON数据的Map没有排序，导致断言失败，暂先跳过
-				URL url = this.getClass().getClassLoader().getResource(dir + "results/" + templateName + ".txt");
-				if (url == null) {
-					throw new FileNotFoundException("Not found file: " + dir + "results/" + templateName + ".txt");
-				}
-				File result = new File(url.getFile());
-				if (! result.exists()) {
-					throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
-				}
-				String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
-				expected = expected.replace("\r", "");
-				if ("httl-comment-text.properties".equals(config) 
-						&& ! template.getSource().contains("read(")) {
-					expected = expected.replace("<!--", "").replace("-->", "");
-				}
-				assertEquals(templateName, expected, actualWriter.getBuffer().toString().replace("\r", ""));
-				assertEquals(templateName, expected, new String(actualStream.toByteArray()).replace("\r", ""));
-				if ("set_parameters.httl".equals(templateName)) {
-					assertEquals(templateName, "abc", Context.getContext().get("title"));
-				}
+		System.out.println(config + ": " + (data == null ? "null" : data.getClass().getSimpleName()) + " => " + templateName);
+		String encoding = "UTF-8";
+		if ("gbk.httl".equals(templateName)) {
+			encoding = "GBK";
+		}
+		Engine _engine = engine;
+		if ("extends_default.httl".equals(templateName)) {
+			_engine = Engine.getEngine("httl-comment-extends.properties");
+		}
+		Template template = _engine.getTemplate("/templates/" + templateName, Locale.CHINA, encoding);
+		UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
+		StringWriter actualWriter = new StringWriter();
+		if ("extends_var.httl".equals(templateName)) {
+			if (data instanceof Map) {
+				((Map<String, Object>) data).put("extends", "default.httl");
+			} else if (data instanceof Model) {
+				((Model) data).setExtends("default.httl");
 			}
 		}
-		if (profile) {
-			synchronized (TemplateTest.class) {
-				try {
-					TemplateTest.class.wait(20);
-				} catch (InterruptedException e) {
-				}
+		try {
+			template.render(data, actualWriter);
+			template.render(data, actualStream);
+		} catch (Throwable e) {
+			System.out.println("\n================================\n" + template.getName() + "\n================================\n");
+			e.printStackTrace();
+			throw new IllegalStateException(e.getMessage() + "\n================================\n" + template.getName() + "\n================================\n", e);
+		}
+		if ("extends_var.httl".equals(templateName)) {
+			if (data instanceof Map) {
+				((Map<String, Object>) data).remove("extends");
+			} else if (data instanceof Model) {
+				((Model) data).setExtends(null);
+			}
+		}
+		if (data != null && ! (data instanceof String)) { // FIXME JSON数据的Map没有排序，导致断言失败，暂先跳过
+			URL url = this.getClass().getClassLoader().getResource(dir + "results/" + templateName + ".txt");
+			if (url == null) {
+				throw new FileNotFoundException("Not found file: " + dir + "results/" + templateName + ".txt");
+			}
+			File result = new File(url.getFile());
+			if (! result.exists()) {
+				throw new FileNotFoundException("Not found file: " + result.getAbsolutePath());
+			}
+			String expected = IOUtils.readToString(new InputStreamReader(new FileInputStream(result), encoding));
+			expected = expected.replace("\r", "");
+			if ("httl-comment-text.properties".equals(config) 
+					&& ! template.getSource().contains("read(")) {
+				expected = expected.replace("<!--", "").replace("-->", "");
+			}
+			assertEquals(templateName, expected, actualWriter.getBuffer().toString().replace("\r", ""));
+			assertEquals(templateName, expected, new String(actualStream.toByteArray()).replace("\r", ""));
+			if ("set_parameters.httl".equals(templateName)) {
+				assertEquals(templateName, "abc", Context.getContext().get("title"));
 			}
 		}
 	}
