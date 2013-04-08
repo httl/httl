@@ -1,0 +1,9 @@
+XXX
+<!--#macro($my)-->
+AAA
+<!--#var(User user)-->
+<!--#var(Book user)-->
+${user.name}
+BBB
+<!--#end-->
+YYY

@@ -1,0 +1,3 @@
+Defined different type variable user, conflict types: httl.test.model.User, httl.test.model.Book.
+line: 5, column: 5, char: #,
+/templates/macro_error_offset.httl

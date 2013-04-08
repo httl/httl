@@ -273,7 +273,7 @@ public class TemplateParser implements Parser {
 					if (! StringUtils.inArray(name, elseDirective)
 							&& ! StringUtils.inArray(name, endDirective)
 							&& ! StringUtils.inArray(name, breakDirective)) {
-						throw new ParseException("Not found parameter expression the #" + name + " directive.", offset);
+						throw new ParseException("Not found parameter expression in the #" + name + " directive.", offset);
 					}
 				}
 				if (StringUtils.inArray(name, setDirective)) {
@@ -440,10 +440,10 @@ public class TemplateParser implements Parser {
 			if (directiveClass == EndDirective.class
 					|| directiveClass == ElseDirective.class) {
 				if (directiveStack.isEmpty())
-					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
+					throw new ParseException("Miss #end directive.", directive.getOffset());
 				BlockDirective blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 				if (blockDirective == rootDirective)
-					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
+					throw new ParseException("Miss #end directive.", directive.getOffset());
 				EndDirective endDirective;
 				if (directiveClass == ElseDirective.class) {
 					endDirective = new EndDirective(directive.getOffset());
@@ -455,7 +455,7 @@ public class TemplateParser implements Parser {
 			// 设置树
 			if (directiveClass != EndDirective.class) { // 排除EndDirective
 				if (directiveStack.isEmpty())
-					throw new ParseException("DirectiveReducer.block.directive.excrescent.end", directive.getOffset());
+					throw new ParseException("Miss #end directive.", directive.getOffset());
 				((BlockDirectiveEntry) directiveStack.peek()).appendInnerDirective(directive);
 			}
 			// 压栈
@@ -464,7 +464,7 @@ public class TemplateParser implements Parser {
 		}
 		BlockDirective root = (BlockDirective) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 		if (! directiveStack.isEmpty()) { // 后验条件
-			throw new ParseException("DirectiveReducer.block.directive.without.end" + root.getClass().getSimpleName(), root.getOffset());
+			throw new ParseException("Miss #end directive." + root.getClass().getSimpleName(), root.getOffset());
 		}
 		return (BlockDirective) root;
 	}
