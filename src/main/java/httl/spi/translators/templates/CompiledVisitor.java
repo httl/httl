@@ -62,6 +62,7 @@ import httl.ast.PositiveOperator;
 import httl.ast.RightShiftOperator;
 import httl.ast.SequenceOperator;
 import httl.ast.SetDirective;
+import httl.ast.Statement;
 import httl.ast.StaticMethodOperator;
 import httl.ast.SubOperator;
 import httl.ast.Text;
@@ -197,7 +198,7 @@ public class CompiledVisitor extends AstVisitor {
 
 	private static final String TEMPLATE_CLASS_PREFIX = CompiledTemplate.class.getPackage().getName() + ".Template_";
 	
-	private final AtomicInteger TMP_VAR_SEQ = new AtomicInteger();
+	private final AtomicInteger seq = new AtomicInteger();
 
 	private boolean sourceInClass;
 
@@ -328,6 +329,14 @@ public class CompiledVisitor extends AstVisitor {
 
 	public CompiledVisitor() {
 	}
+	
+
+	@Override
+	public boolean visit(Statement node) throws IOException, ParseException {
+		boolean result = super.visit(node);
+		filterKey = node.toString();
+		return result;
+	}
 
 	@Override
 	public void visit(Text node) throws IOException, ParseException {
@@ -366,7 +375,7 @@ public class CompiledVisitor extends AstVisitor {
 					int begin = 0;
 					for (Map.Entry<Integer, Set<String>> entry : switchesd.entrySet()) {
 						int end = entry.getKey();
-						String part = getTextPart(txt.substring(begin, end), filter, filterKey, textFields, TMP_VAR_SEQ, stream, false);
+						String part = getTextPart(txt.substring(begin, end), filter, false);
 						if (StringUtils.isNotEmpty(part)) {
 							builder.append("	$output.write(" + part + ");\n");
 						}
@@ -390,7 +399,7 @@ public class CompiledVisitor extends AstVisitor {
 				}
 			}
 		}
-		String part = getTextPart(txt, filter, filterKey, textFields, TMP_VAR_SEQ, stream, false);
+		String part = getTextPart(txt, filter, false);
 		if (StringUtils.isNotEmpty(part)) {
 			builder.append("	$output.write(" + part + ");\n");
 		}
@@ -470,10 +479,10 @@ public class CompiledVisitor extends AstVisitor {
 				code = "(" + code + " == null ? null : " + IOUtils.class.getName() + ".readToString(" + code + ".getReader()))";
 			}
 			getVariables.add(formatterVariable);
-			String key = getTextPart(code, null, null, textFields, TMP_VAR_SEQ, stream, true);
+			String key = getTextPart(node.getExpression().toString(), null, true);
 			if (! stream && Object.class.equals(returnType)) {
 				String pre = "";
-				String var = "$obj" + TMP_VAR_SEQ.getAndIncrement();
+				String var = "$obj" + seq.getAndIncrement();
 				pre = "	Object " + var + " = " + code + ";\n";
 				String charsCode = "formatter.toChars(" + key + ", (char[]) " + var + ")";
 				code = "formatter.toString(" + key + ", " + var + ")";
@@ -645,7 +654,7 @@ public class CompiledVisitor extends AstVisitor {
 			}
 			code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
 		}
-		int i = TMP_VAR_SEQ.incrementAndGet();
+		int i = seq.incrementAndGet();
 		String dataName = "_d_" + i;
 		String sizeName = "_s_" + i;
 		String name = "_i_" + var;
@@ -1092,7 +1101,7 @@ public class CompiledVisitor extends AstVisitor {
 		return TEMPLATE_CLASS_PREFIX + StringUtils.getVaildName(buf.toString());
 	}
 	
-	private String getTextPart(String txt, Filter filter, String filterKey, StringBuilder textFields, AtomicInteger seq, boolean stream, boolean string) {
+	private String getTextPart(String txt, Filter filter, boolean string) {
 		if (StringUtils.isNotEmpty(txt)) {
 			if (filter != null) {
 				txt = filter.filter(filterKey, txt);

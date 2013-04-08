@@ -6,4 +6,9 @@ public class StaticMethodOperator extends UnaryOperator {
 		super(name, priority, offset);
 	}
 
+	@Override
+	public String toString() {
+		return getName() + "(" + getParameter() + ")";
+	}
+
 }

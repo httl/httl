@@ -20,7 +20,6 @@ import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.internal.util.ClassUtils;
-import httl.internal.util.IOUtils;
 import httl.internal.util.StringSequence;
 import httl.internal.util.StringUtils;
 import httl.spi.Compiler;
@@ -33,8 +32,8 @@ import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
 import httl.spi.translators.templates.AdaptiveTemplate;
-import httl.spi.translators.templates.CompiledVisitor;
 import httl.spi.translators.templates.CompiledTemplate;
+import httl.spi.translators.templates.CompiledVisitor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -422,7 +421,11 @@ public class CompiledTranslator implements Translator {
 		try {
 			Template writerTemplate = null;
 			Template streamTemplate = null;
-			Node root = templateParser.parse(IOUtils.readToString(resource.getReader()), 0);
+			String source = resource.getSource();
+			if (templateFilter != null) {
+				source = templateFilter.filter(resource.getName(), source);
+			}
+			Node root = templateParser.parse(source, 0);
 			if (isOutputWriter || ! isOutputStream) {
 				Class<?> clazz = parseClass(resource, root, defVariableTypes, false, 0);
 				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class, Resource.class, Template.class, Node.class)

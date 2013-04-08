@@ -6,4 +6,9 @@ public class NewOperator extends UnaryOperator {
 		super(name, priority, offset);
 	}
 
+	@Override
+	public String toString() {
+		return "new " + getName() + "(" + getParameter() + ")";
+	}
+
 }

@@ -28,17 +28,16 @@ import httl.ast.ForDirective;
 import httl.ast.IfDirective;
 import httl.ast.MacroDirective;
 import httl.ast.RootDirective;
+import httl.ast.SetDirective;
 import httl.ast.Statement;
 import httl.ast.Text;
 import httl.ast.ValueDirective;
-import httl.ast.SetDirective;
 import httl.internal.util.ClassUtils;
 import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.ParameterizedTypeImpl;
 import httl.internal.util.StringUtils;
 import httl.internal.util.Token;
-import httl.spi.Filter;
 import httl.spi.Parser;
 
 import java.io.IOException;
@@ -532,15 +531,6 @@ public class TemplateParser implements Parser {
 
 	private Class<?> defaultVariableType;
 
-	private Filter templateFilter;
-
-	/**
-	 * httl.properties: template.filter=httl.spi.filters.AttributeSyntaxFilter
-	 */
-	public void setTemplateFilter(Filter templateFilter) {
-		this.templateFilter = templateFilter;
-	}
-	
 	/**
 	 * httl.properties: set.directive=set
 	 */
@@ -678,9 +668,6 @@ public class TemplateParser implements Parser {
 	}
 
 	public Node parse(String source, int offset) throws IOException, ParseException {
-		if (templateFilter != null) {
-			source = templateFilter.filter(source, source);
-		}
 		return reduce(clean(scan(source)));
 	}
 

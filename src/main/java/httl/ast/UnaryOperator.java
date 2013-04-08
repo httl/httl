@@ -59,7 +59,7 @@ public abstract class UnaryOperator extends Operator {
 
 	@Override
 	public String toString() {
-		return getName() + " " + parameter.toString();
+		return getName() + " " + parameter;
 	}
 
 }

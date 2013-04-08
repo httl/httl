@@ -46,7 +46,7 @@ public final class Constant extends Expression {
 
 	@Override
 	public String toString() {
-		return String.valueOf(value);
+		return value == null && boxed ? "" : String.valueOf(value);
 	}
 
 }

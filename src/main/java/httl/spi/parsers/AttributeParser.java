@@ -15,7 +15,9 @@
  */
 package httl.spi.parsers;
 
+import httl.spi.Translator;
 import httl.spi.filters.AttributeSyntaxFilter;
+import httl.spi.translators.CompiledTranslator;
 
 /**
  * AttributeParser. (SPI, Singleton, ThreadSafe)
@@ -28,9 +30,13 @@ import httl.spi.filters.AttributeSyntaxFilter;
 @Deprecated
 public class AttributeParser extends TemplateParser {
 
+	private Translator translator;
+
 	@Override
 	public void init() {
-		super.setTemplateFilter(new AttributeSyntaxFilter());
+		if (translator instanceof CompiledTranslator) {
+			((CompiledTranslator) translator).setTemplateFilter(new AttributeSyntaxFilter());
+		}
 		super.init();
 	}
 

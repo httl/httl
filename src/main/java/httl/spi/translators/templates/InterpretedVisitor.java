@@ -119,6 +119,8 @@ public class InterpretedVisitor extends AstVisitor {
 
 	private Object out;
 
+	private String preText;
+
 	private final LinkedStack<Object> parameterStack = new LinkedStack<Object>();
 
 	public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
@@ -247,7 +249,8 @@ public class InterpretedVisitor extends AstVisitor {
 							int end = entry.getKey();
 							String part = text.substring(begin, end);
 							if (StringUtils.isNotEmpty(part)) {
-								part = currentTextFilter == null ? part : currentTextFilter.filter(part, part);
+								part = currentTextFilter == null ? part : currentTextFilter.filter(preText, part);
+								preText = part;
 								if (out instanceof Writer) {
 									((Writer) out).write(part);
 								} else if (out instanceof OutputStream) {
@@ -274,7 +277,8 @@ public class InterpretedVisitor extends AstVisitor {
 				}
 			}
 			if (StringUtils.isNotEmpty(text)) {
-				text = currentTextFilter == null ? text : currentTextFilter.filter(text, text);
+				text = currentTextFilter == null ? text : currentTextFilter.filter(preText, text);
+				preText = text;
 				if (out instanceof Writer) {
 					((Writer) out).write(text);
 				} else if (out instanceof OutputStream) {
@@ -297,7 +301,7 @@ public class InterpretedVisitor extends AstVisitor {
 			String text = format == null ? StringUtils.toString(result) : format.toString(null, result);
 			Filter filter = (Filter) Context.getContext().get(filterVariable, valueFilter);
 			if (! node.isNoFilter() && filter != null) {
-				text =  filter.filter(text, text);
+				text =  filter.filter(node.getExpression().toString(), text);
 			}
 			try {
 				if (text != null) {
