@@ -15,6 +15,7 @@
  */
 package httl.ast;
 
+import httl.Node;
 import httl.Visitor;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ import java.util.List;
  */
 public abstract class BlockDirective extends Directive {
 
-	private List<Statement> children;
+	private List<Node> children;
 
 	private EndDirective end;
 
@@ -43,8 +44,8 @@ public abstract class BlockDirective extends Directive {
 		}
 		if (visitor.visit(this)) {
 			if (children != null) {
-				for (Statement directive : children) {
-					directive.accept(visitor);
+				for (Node node : children) {
+					node.accept(visitor);
 				}
 			}
 			if (end != null) {
@@ -53,16 +54,16 @@ public abstract class BlockDirective extends Directive {
 		}
 	}
 
-	public List<Statement> getChildren() {
+	public List<Node> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Statement> children) throws ParseException {
+	public void setChildren(List<Node> children) throws ParseException {
 		if (this.children != null)
 			throw new ParseException("Can not modify children.", getOffset());
 		this.children = children;
-		for (Statement node : children) {
-			node.setParent(this);
+		for (Node node : children) {
+			((Statement) node).setParent(this);
 		}
 	}
 

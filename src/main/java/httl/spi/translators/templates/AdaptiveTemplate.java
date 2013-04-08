@@ -182,8 +182,8 @@ public class AdaptiveTemplate implements Template, Serializable {
 		return writerTemplate.getParent();
 	}
 
-	public List<Node> getNodes() {
-		return writerTemplate.getNodes();
+	public List<Node> getChildren() {
+		return writerTemplate.getChildren();
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public interface Parser {
 	 * 
 	 * @param source - template/expression source.
 	 * @param offset - template/expression offset.
-	 * @return template/expression node
+	 * @return template/expression root node
 	 */
 	Node parse(String source, int offset) throws IOException, ParseException;
 

@@ -475,7 +475,7 @@ public class TemplateParser implements Parser {
 
 		private BlockDirective blockDirective;
 
-		private List<Statement> elements = new ArrayList<Statement>();
+		private List<Node> elements = new ArrayList<Node>();
 
 		BlockDirectiveEntry(BlockDirective blockDirective) {
 			this.blockDirective = blockDirective;

@@ -15,6 +15,8 @@
  */
 package httl.ast;
 
+import httl.Node;
+
 import java.util.List;
 
 /**
@@ -42,7 +44,7 @@ public abstract class Operator extends Expression {
 		return priority;
 	}
 
-	public abstract List<Expression> getChildren();
+	public abstract List<Node> getChildren();
 
 	@Override
 	public String toString() {

@@ -391,7 +391,7 @@ public class InterpretedVisitor extends AstVisitor {
 
 	@Override
 	public boolean visit(Template node) throws IOException, ParseException {
-		for (Node child : node.getNodes()) {
+		for (Node child : node.getChildren()) {
 			child.accept(this);
 			if (ClassUtils.isTrue(Context.getContext().get(breakVariable))) {
 				Context.getContext().remove(breakVariable);

@@ -15,6 +15,7 @@
  */
 package httl.ast;
 
+import httl.Node;
 import httl.Visitor;
 
 import java.io.IOException;
@@ -63,8 +64,9 @@ public abstract class BinaryOperator extends Operator {
 		this.rightParameter = rightParameter;
 	}
 
-	public List<Expression> getChildren() {
-		return Arrays.asList(leftParameter, rightParameter);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Node> getChildren() {
+		return (List) Arrays.asList(leftParameter, rightParameter);
 	}
 
 	@Override

@@ -141,8 +141,8 @@ public class ProxyTemplate implements Template {
 		return template.getParent();
 	}
 
-	public List<Node> getNodes() {
-		return template.getNodes();
+	public List<Node> getChildren() {
+		return template.getChildren();
 	}
 
 }

@@ -15,6 +15,7 @@
  */
 package httl.ast;
 
+import httl.Node;
 import httl.Visitor;
 
 import java.io.IOException;
@@ -51,8 +52,9 @@ public abstract class UnaryOperator extends Operator {
 		parameter.setParent(this);
 	}
 
-	public List<Expression> getChildren() {
-		return Arrays.asList(parameter);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Node> getChildren() {
+		return (List) Arrays.asList(parameter);
 	}
 
 	@Override

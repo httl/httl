@@ -333,7 +333,7 @@ public final class Context implements Map<String, Object> {
 
 	public Object put(String key, Object value) {
 		checkThread();
-		if (current == null) {
+		if (current == null) { // safe in thread local
 			current = new HashMap<String, Object>();
 		}
 		return current.put(key, value);
@@ -341,7 +341,7 @@ public final class Context implements Map<String, Object> {
 
 	public void putAll(Map<? extends String, ? extends Object> m) {
 		checkThread();
-		if (current == null) {
+		if (current == null) { // safe in thread local
 			current = new HashMap<String, Object>();
 		}
 		current.putAll(m);

@@ -24,11 +24,13 @@ import httl.internal.util.Digest;
 import httl.internal.util.StringUtils;
 import httl.internal.util.UrlUtils;
 import httl.internal.util.VolatileReference;
+import httl.spi.Converter;
 import httl.spi.Loader;
 import httl.spi.Logger;
 import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
+import httl.spi.translators.templates.LazyTemplate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -84,6 +86,12 @@ public class DefaultEngine extends Engine {
 	
 	// httl.properties: localized=true
 	private boolean localized;
+
+	// httl.properties: use.render.variable.type=false
+	private boolean useRenderVariableType;
+
+	// httl.properties: map.converters=httl.spi.converters.BeanMapConverter
+	private Converter<Object, Object> mapConverter;
 
 	// httl.properties: name
 	private String name;
@@ -227,6 +235,9 @@ public class DefaultEngine extends Engine {
 	private Template parseTemplate(Resource resource, String name, Locale locale, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
+		}
+		if (useRenderVariableType) {
+			return new LazyTemplate(translator, resource, parameterTypes, mapConverter);
 		}
 		return translator.translate(resource, parameterTypes);
 	}
@@ -419,6 +430,20 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setLocalized(boolean localized) {
 		this.localized = localized;
+	}
+
+	/**
+	 * httl.properties: use.render.variable.type=false
+	 */
+	public void setUseRenderVariableType(boolean useRenderVariableType) {
+		this.useRenderVariableType = useRenderVariableType;
+	}
+
+	/**
+	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
+	 */
+	public void setMapConverter(Converter<Object, Object> mapConverter) {
+		this.mapConverter = mapConverter;
 	}
 
 	/**

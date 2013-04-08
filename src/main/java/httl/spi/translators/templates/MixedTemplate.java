@@ -43,7 +43,7 @@ public class MixedTemplate extends ProxyTemplate {
 	private final Translator compiledTranslator;
 
 	private Template compiledTemplate;
-	
+
 	public MixedTemplate(Template template, Translator translator, Resource resource, Map<String, Class<?>> types) {
 		super(template);
 		this.compiledTranslator = translator;
@@ -83,7 +83,9 @@ public class MixedTemplate extends ProxyTemplate {
 				if (lock.tryLock()) {
 					lock.lock();
 					try {
-						compiledTemplate = compiledTranslator.translate(resource, types);
+						if (compiledTemplate == null) {
+							compiledTemplate = compiledTranslator.translate(resource, types);
+						}
 					} finally {
 						lock.unlock();
 					}

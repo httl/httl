@@ -86,7 +86,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 		accept(visitor);
 		this.variables = Collections.unmodifiableMap(visitor.getVariables());
 		Map<String, Template> macros = new HashMap<String, Template>();
-		for (Node node : getNodes()) {
+		for (Node node : getChildren()) {
 			if (node instanceof MacroDirective) {
 				InterpretedTemplate macro = new InterpretedTemplate(this, node, this);
 				macros.put(((MacroDirective) node).getName(), macro);

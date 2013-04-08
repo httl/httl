@@ -15,6 +15,7 @@
  */
 package httl.spi.parsers;
 
+import httl.Node;
 import httl.ast.AddOperator;
 import httl.ast.AndOperator;
 import httl.ast.ArrayOperator;
@@ -569,7 +570,7 @@ public class ExpressionParser implements Parser {
 		}
 
 		@SuppressWarnings("unchecked")
-		public List<Expression> getChildren() {
+		public List<Node> getChildren() {
 			return Collections.EMPTY_LIST;
 		}
 

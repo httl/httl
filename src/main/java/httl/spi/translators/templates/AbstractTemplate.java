@@ -237,7 +237,7 @@ public abstract class AbstractTemplate implements Template {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Node> getNodes() {
+	public List<Node> getChildren() {
 		return (List) ((BlockDirective) root).getChildren();
 	}
 
@@ -247,7 +247,7 @@ public abstract class AbstractTemplate implements Template {
 
 	public void accept(Visitor visitor) throws IOException, ParseException {
 		if (visitor.visit(this)) {
-			for (Node node : getNodes()) {
+			for (Node node : getChildren()) {
 				node.accept(visitor);
 			}
 		}
