@@ -491,9 +491,9 @@ public class TemplateParser implements Parser {
 
 	}
 	
-	private static final Pattern DEFINE_PATTERN = Pattern.compile("([_0-9a-zA-Z>\\]]\\s\\w+)\\s?[,]?\\s?");
+	private static final Pattern DEFINE_PATTERN = Pattern.compile("([\\w>\\]]\\s\\w+)\\s?[,]?\\s?");
 
-	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*(\\w+)\\s*(\\w*)\\s*([:\\.]?=)[^=]");
+	private static final Pattern ASSIGN_PATTERN = Pattern.compile(",\\s*([\\w<>\\[\\]]+)\\s*(\\w*)\\s*([:\\.]?=)[^=]");
 
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
