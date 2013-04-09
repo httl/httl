@@ -1415,7 +1415,7 @@ public class CompiledVisitor extends AstVisitor {
 						&& (Collection.class.isAssignableFrom(rightClass) || rightClass.isArray())
 				|| Map.class.isAssignableFrom(leftClass) && Map.class.isAssignableFrom(rightClass)) {
 			code = CollectionUtils.class.getName() + ".merge(" + leftCode+ ", " + rightCode + ")";
-			type = leftClass;
+			type = leftType;
 		} else if (rightClass.isPrimitive() && rightType != boolean.class) {
 			type = rightClass;
 		} else if (leftClass.isPrimitive() && leftClass != boolean.class) {
@@ -1472,7 +1472,7 @@ public class CompiledVisitor extends AstVisitor {
 			type = int.class;
 		}
 		
-		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
+		Class<?> clazz = (Class<?>) type;
 		String typeName = clazz.getCanonicalName();
 		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
 		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
@@ -1519,7 +1519,7 @@ public class CompiledVisitor extends AstVisitor {
 			type = int.class;
 		}
 		
-		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
+		Class<?> clazz = (Class<?>) type;
 		String typeName = clazz.getCanonicalName();
 		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
 		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
@@ -1566,7 +1566,7 @@ public class CompiledVisitor extends AstVisitor {
 			type = int.class;
 		}
 		
-		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
+		Class<?> clazz = (Class<?>) type;
 		String typeName = clazz.getCanonicalName();
 		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
 		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
@@ -1613,7 +1613,7 @@ public class CompiledVisitor extends AstVisitor {
 			type = int.class;
 		}
 		
-		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
+		Class<?> clazz = (Class<?>) type;
 		String typeName = clazz.getCanonicalName();
 		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
 		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {

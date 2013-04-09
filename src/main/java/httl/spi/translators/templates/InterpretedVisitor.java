@@ -286,7 +286,7 @@ public class InterpretedVisitor extends AstVisitor {
 				}
 			}
 		} catch (IOException e) {
-			new ParseException(e.getMessage(), node.getOffset());
+			throw new ParseException(e.getMessage(), node.getOffset());
 		}
 	}
 
@@ -312,7 +312,7 @@ public class InterpretedVisitor extends AstVisitor {
 					}
 				}
 			} catch (IOException e) {
-				new ParseException(e.getMessage(), node.getOffset());
+				throw new ParseException(e.getMessage(), node.getOffset());
 			}
 		}
 	}

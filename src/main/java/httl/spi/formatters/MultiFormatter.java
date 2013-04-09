@@ -423,8 +423,6 @@ public class MultiFormatter implements Formatter<Object> {
 			return toString(key, (byte[]) value);
 		if (value instanceof Template)
 			return toString(key, (Template) value);
-		if (value instanceof Expression)
-			return toString(key, (Expression) value);
 		if (value instanceof Resource)
 			return toString(key, (Resource) value);
 		if (formatter != null)

@@ -32,6 +32,10 @@ public class AttributeParser extends TemplateParser {
 
 	private Translator translator;
 
+	public void setTranslator(Translator translator) {
+		this.translator = translator;
+	}
+
 	@Override
 	public void init() {
 		if (translator instanceof CompiledTranslator) {
