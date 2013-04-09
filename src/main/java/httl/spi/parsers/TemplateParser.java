@@ -281,7 +281,17 @@ public class TemplateParser implements Parser {
 						int i = value.indexOf('=');
 						String var = value.substring(0, i).trim();
 						String expr = value.substring(i + 1);
-						Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i);
+						int blank = 0;
+						while (blank < expr.length()) {
+							if (! Character.isWhitespace(expr.charAt(blank))) {
+								break;
+							}
+							blank ++;
+						}
+						if (blank > 0) {
+							expr = expr.substring(blank);
+						}
+						Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + 1 + blank);
 						boolean export = false;
 						boolean hide = false;
 						if (var.endsWith(":")) {
@@ -309,8 +319,18 @@ public class TemplateParser implements Parser {
 						n = 1;
 					}
 					String var = value.substring(0, i).trim();
-					value = value.substring(i + n);
-					Expression expression = (Expression) expressionParser.parse(value, exprOffset + i + n);
+					String expr = value.substring(i + n);
+					int blank = 0;
+					while (blank < expr.length()) {
+						if (! Character.isWhitespace(expr.charAt(blank))) {
+							break;
+						}
+						blank ++;
+					}
+					if (blank > 0) {
+						expr = expr.substring(blank);
+					}
+					Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + n + blank);
 					int j = var.lastIndexOf(' ');
 					String type = null;
 					if (j > 0) {
