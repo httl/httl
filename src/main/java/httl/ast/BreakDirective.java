@@ -20,7 +20,7 @@ import httl.Node;
 import java.text.ParseException;
 
 /**
- * BreakIf
+ * BreakDirective. (SPI, Prototype, ThreadSafe)
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

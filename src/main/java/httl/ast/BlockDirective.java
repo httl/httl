@@ -23,9 +23,9 @@ import java.text.ParseException;
 import java.util.List;
 
 /**
- * BlockDirective
+ * BlockDirective. (SPI, Prototype, ThreadSafe)
  * 
- * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class BlockDirective extends Directive {
 

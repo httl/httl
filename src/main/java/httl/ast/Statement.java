@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 /**
- * Statement
+ * Statement. (SPI, Prototype, ThreadSafe)
  * 
  * @author liangfei
  */

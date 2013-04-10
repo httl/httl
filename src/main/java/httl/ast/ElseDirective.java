@@ -16,9 +16,9 @@
 package httl.ast;
 
 /**
- * Else
+ * ElseDirective. (SPI, Prototype, ThreadSafe)
  * 
- * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ElseDirective extends BlockDirective {
 

@@ -21,7 +21,7 @@ import httl.internal.util.StringUtils;
 import java.text.ParseException;
 
 /**
- * Macro
+ * MacroDirective. (SPI, Prototype, ThreadSafe)
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

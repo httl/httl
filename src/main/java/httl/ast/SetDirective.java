@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 
 /**
- * SetDirective
+ * SetDirective. (SPI, Prototype, ThreadSafe)
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

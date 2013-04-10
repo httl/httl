@@ -16,7 +16,7 @@
 package httl.ast;
 
 /**
- * RootDirective
+ * RootDirective. (SPI, Prototype, ThreadSafe)
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

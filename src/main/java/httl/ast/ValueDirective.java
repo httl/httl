@@ -18,7 +18,7 @@ package httl.ast;
 import java.text.ParseException;
 
 /**
- * Value
+ * ValueDirective. (SPI, Prototype, ThreadSafe)
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
