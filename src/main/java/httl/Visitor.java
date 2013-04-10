@@ -21,6 +21,9 @@ import java.text.ParseException;
 /**
  * Visitor. (API, Prototype, Callback, NonThreadSafe)
  * 
+ * @see httl.Node#accept(Visitor)
+ * @see httl.Template#accept(Visitor)
+ * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Visitor {

@@ -20,7 +20,7 @@ import java.text.ParseException;
 /**
  * Java Compiler. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setCompiler(Compiler)
+ * @see httl.spi.translators.CompiledTranslator#setCompiler(Compiler)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

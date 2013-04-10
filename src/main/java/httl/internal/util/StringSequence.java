@@ -27,8 +27,6 @@ import java.util.ListIterator;
 /**
  * StringSequence. (SPI, Prototype, ThreadSafe)
  * 
- * @see httl.spi.parsers.ExpressionParser#setImportSequences(String[])
- *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class StringSequence implements List<String>, Serializable {

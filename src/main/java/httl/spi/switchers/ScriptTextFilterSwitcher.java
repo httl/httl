@@ -21,7 +21,8 @@ import httl.spi.Switcher;
 /**
  * ScriptTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.translators.CompiledTranslator#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.translators.InterpretedTranslator#setTextFilterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

@@ -20,19 +20,11 @@ import httl.Visitor;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Map;
 
 /**
  * Expression. (API, Prototype, Immutable, ThreadSafe)
  * 
- * <pre>
- * Engine engine = Engine.getEngine();
- * Expression expression = engine.getExpression("1 + 2");
- * </pre>
- * 
- * @see httl.Engine#getExpression(String)
- * @see httl.Engine#getExpression(String, Map)
- * @see httl.spi.Translator#translate(String, java.util.Map, int)
+ * @see httl.spi.parsers.ExpressionParser#parse(String, int)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

@@ -63,7 +63,6 @@ import httl.internal.util.StringUtils;
 import httl.internal.util.Token;
 import httl.spi.Filter;
 import httl.spi.Parser;
-import httl.spi.Translator;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -77,10 +76,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * DefaultTranslator. (SPI, Singleton, ThreadSafe)
+ * ExpressionParser. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
- * @see httl.spi.parsers.TemplateParser#setTranslator(Translator)
+ * @see httl.spi.parsers.TemplateParser#setExpressionParser(Parser)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

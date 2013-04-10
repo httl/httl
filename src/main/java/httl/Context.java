@@ -38,18 +38,19 @@ import java.util.Set;
  * if (value == null) value = current.get(key); // render(current);
  * if (value == null) value = parent.get(key); // recursive above
  * 
+ * default resovler:
  * if (value == null) value = servletResovler.get(key); // request, response, parameter, header, session, cookie, application
  * if (value == null) value = contextResovler.get(key); // parent, super, this, engine, out, level
  * if (value == null) value = globalResovler.get(key); // GlobalResovler.put(key, value)
  * 
+ * non default resovler:
  * if (value == null) value = engineResovler.get(key); // httl.properties: key=value
  * if (value == null) value = systemResovler.get(key); // java -Dkey=value
  * if (value == null) value = environmentResolver.get(key); // export key=value
  * </pre>
  * 
  * @see httl.Template#render(Object, Object)
- * @see httl.spi.translators.templates.WriterTemplate#render(Map, java.io.Writer)
- * @see httl.spi.translators.templates.OutputStreamTemplate#render(Map, java.io.OutputStream)
+ * @see httl.spi.translators.templates.AbstractTemplate#render(Object, Object)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

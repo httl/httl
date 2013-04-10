@@ -26,8 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * AdaptiveCache. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.engines.DefaultEngine#setTemplateCache(java.util.Map)
- * @see httl.spi.engines.DefaultEngine#setExpressionCache(java.util.Map)
+ * @see httl.spi.engines.DefaultEngine#setCache(java.util.Map)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

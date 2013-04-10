@@ -50,7 +50,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * CompiledTranslator
+ * CompiledTranslator. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

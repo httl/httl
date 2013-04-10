@@ -37,6 +37,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * MultiFormatter. (SPI, Prototype, ThreadSafe)
  * 
+ * @see httl.spi.translators.CompiledTranslator#setFormatter(Formatter)
+ * @see httl.spi.translators.InterpretedTranslator#setFormatter(Formatter)
+ * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiFormatter implements Formatter<Object> {

@@ -20,7 +20,8 @@ import httl.spi.Filter;
 /**
  * MultiValueFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setValueFilter(Filter)
+ * @see httl.spi.translators.CompiledTranslator#setValueFilter(Filter)
+ * @see httl.spi.translators.InterpretedTranslator#setValueFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

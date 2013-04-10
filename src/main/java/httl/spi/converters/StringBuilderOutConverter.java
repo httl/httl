@@ -26,7 +26,8 @@ import java.util.Map;
 /**
  * StringBuilderOutConverter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setOutConverter(Converter)
+ * @see httl.spi.translators.CompiledTranslator#setOutConverter(Converter)
+ * @see httl.spi.translators.InterpretedTranslator#setOutConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

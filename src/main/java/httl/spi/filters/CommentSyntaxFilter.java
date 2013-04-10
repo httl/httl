@@ -22,7 +22,8 @@ import httl.spi.Filter;
 /**
  * CommentSyntaxFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setTextFilter(Filter)
+ * @see httl.spi.translators.CompiledTranslator#setTextFilter(Filter)
+ * @see httl.spi.translators.InterpretedTranslator#setTextFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

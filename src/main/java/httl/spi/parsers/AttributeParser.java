@@ -22,9 +22,9 @@ import httl.spi.translators.CompiledTranslator;
 /**
  * AttributeParser. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.engines.DefaultEngine#setParser(httl.spi.Parser)
- *
- * @deprecated Replace to <code>httl.spi.filters.AttributeSyntaxFilter</code>
+ * @deprecated Replace to: template.filter=<code>httl.spi.filters.AttributeSyntaxFilter</code>
+ * @see httl.spi.filters.AttributeSyntaxFilter
+ * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 @Deprecated

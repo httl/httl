@@ -24,8 +24,10 @@ import httl.spi.Filter;
 /**
  * ScriptFilterSwitcher. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setTextFilterSwitcher(Switcher)
- * @see httl.spi.parsers.TemplateParser#setValueFilterSwitcher(Switcher)
+ * @see httl.spi.translators.CompiledTranslator#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.translators.CompiledTranslator#setValueFilterSwitcher(Switcher)
+ * @see httl.spi.translators.InterpretedTranslator#setTextFilterSwitcher(Switcher)
+ * @see httl.spi.translators.InterpretedTranslator#setValueFilterSwitcher(Switcher)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

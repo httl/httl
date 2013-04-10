@@ -40,7 +40,6 @@ import java.util.concurrent.ConcurrentMap;
  * @see httl.Context#getEngine()
  * @see httl.Template#getEngine()
  * @see httl.Resource#getEngine()
- * @see httl.ast.Expression#getEngine()
  * @see httl.spi.engines.DefaultEngine
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)

@@ -70,7 +70,7 @@ public class DefaultEngine extends Engine {
 	private Logger logger;
 
 	// httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
-	private Map<Object, Object> templateCache;
+	private Map<Object, Object> cache;
 
 	// httl.properties: template.directory=/META-INF/templates
 	private String templateDirectory;
@@ -172,7 +172,7 @@ public class DefaultEngine extends Engine {
 	public Template getTemplate(String name, Locale locale, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
 		name = UrlUtils.cleanName(name);
 		locale = cleanLocale(locale);
-		Map<Object, Object> cache = this.templateCache; // safe copy reference
+		Map<Object, Object> cache = this.cache; // safe copy reference
 		if (cache == null) {
 			return parseTemplate(null, name, locale, encoding, parameterTypes);
 		}
@@ -454,10 +454,10 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
+	 * httl.properties: cache=java.util.concurrent.ConcurrentHashMap
 	 */
-	public void setTemplateCache(Map<Object, Object> cache) {
-		this.templateCache = cache;
+	public void setCache(Map<Object, Object> cache) {
+		this.cache = cache;
 	}
 	
 	/**

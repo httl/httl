@@ -16,11 +16,13 @@
 package httl.spi.filters;
 
 import httl.internal.util.StringUtils;
+import httl.spi.Filter;
 
 /**
  * CompressBlankFilter. (SPI, Singleton, ThreadSafe)
  * 
- * httl.spi.parsers.DefaultParser#setTextFilter(Filter)
+ * @see httl.spi.translators.CompiledTranslator#setTextFilter(Filter)
+ * @see httl.spi.translators.InterpretedTranslator#setTextFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

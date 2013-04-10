@@ -21,7 +21,8 @@ import httl.internal.util.StringUtils;
 /**
  * TrimBlankLineFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.TemplateParser#setTemplateFilter(Filter)
+ * @see httl.spi.translators.CompiledTranslator#setTemplateFilter(Filter)
+ * @see httl.spi.translators.InterpretedTranslator#setTemplateFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

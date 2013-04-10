@@ -25,8 +25,8 @@ import java.util.Map;
 /**
  * ArrayMapConverter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.parsers.ExpressionParser#setMapConverter(Converter)
- * @see httl.spi.parsers.TemplateParser#setMapConverter(Converter)
+ * @see httl.spi.translators.CompiledTranslator#setMapConverter(Converter)
+ * @see httl.spi.translators.InterpretedTranslator#setMapConverter(Converter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

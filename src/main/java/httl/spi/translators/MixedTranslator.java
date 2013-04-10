@@ -25,7 +25,9 @@ import httl.spi.Translator;
 import httl.spi.translators.templates.MixedTemplate;
 
 /**
- * MixedTranslator
+ * MixedTranslator. (SPI, Singleton, ThreadSafe)
+ * 
+ * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
  * 
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
