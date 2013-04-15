@@ -16,7 +16,6 @@
 package httl.spi.filters;
 
 import httl.internal.util.Reqiured;
-import httl.internal.util.StringUtils;
 import httl.spi.Filter;
 
 /**
@@ -28,19 +27,10 @@ import httl.spi.Filter;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class CommentSyntaxFilter extends AbstractFilter {
-	
-	private boolean removeDirectiveBlankLine;
 
 	private String commentLeft;
 
 	private String commentRight;
-
-	/**
-	 * httl.properties: remove.directive.blank.line=true
-	 */
-	public void setRemoveDirectiveBlankLine(boolean removeDirectiveBlankLine) {
-		this.removeDirectiveBlankLine = removeDirectiveBlankLine;
-	}
 
 	/**
 	 * httl.properties: comment.left=&lt;!--
@@ -59,18 +49,11 @@ public class CommentSyntaxFilter extends AbstractFilter {
 	}
 
 	public String filter(String key, String value) {
-		boolean left = false;
 		if (value.startsWith(commentRight)) {
 			value = value.substring(commentRight.length());
-			left = true;
 		}
-		boolean right = false;
 		if (value.endsWith(commentLeft)) {
 			value = value.substring(0, value.length() - commentLeft.length());
-			right = true;
-		}
-		if (removeDirectiveBlankLine && (left || right)) {
-			value = StringUtils.trimBlankLine(value, left, right);
 		}
 		return value;
 	}

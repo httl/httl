@@ -21,15 +21,24 @@ import httl.internal.util.StringUtils;
 /**
  * TrimBlankLineFilter. (SPI, Singleton, ThreadSafe)
  * 
- * @see httl.spi.translators.CompiledTranslator#setTemplateFilter(Filter)
- * @see httl.spi.translators.InterpretedTranslator#setTemplateFilter(Filter)
+ * @see httl.spi.translators.CompiledTranslator#setTextFilter(Filter)
+ * @see httl.spi.translators.InterpretedTranslator#setTextFilter(Filter)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class TrimBlankLineFilter extends AbstractFilter {
-	
+
+	private boolean removeDirectiveBlankLine = true;
+
+	/**
+	 * httl.properties: remove.directive.blank.line=true
+	 */
+	public void setRemoveDirectiveBlankLine(boolean removeDirectiveBlankLine) {
+		this.removeDirectiveBlankLine = removeDirectiveBlankLine;
+	}
+
 	public String filter(String key, String text) {
-		return StringUtils.trimBlankLine(text);
+		return removeDirectiveBlankLine ? StringUtils.trimBlankLine(text) : text;
 	}
 
 }
