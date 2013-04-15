@@ -233,8 +233,9 @@ public class TemplateParser implements Parser {
 				}
 				int offset = nodes.get(i).getOffset();
 				StringBuilder buf = new StringBuilder();
-				while (i < nodes.size() && isNoLiteralText(nodes.get(i))) {
-					buf.append(((Text) nodes.get(i)).getContent());
+				buf.append(((Text) nodes.get(i)).getContent());
+				while (i + 1 < nodes.size() && isNoLiteralText(nodes.get(i + 1))) {
+					buf.append(((Text) nodes.get(i + 1)).getContent());
 					i ++;
 				}
 				result.add(new Text(buf.toString(), false, offset));
