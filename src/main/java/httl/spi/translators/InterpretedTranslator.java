@@ -19,7 +19,6 @@ import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.internal.util.ClassUtils;
 import httl.internal.util.StringSequence;
 import httl.spi.Converter;
 import httl.spi.Filter;
@@ -78,8 +77,6 @@ public class InterpretedTranslator implements Translator {
 
 	private final List<StringSequence> importSequences = new CopyOnWriteArrayList<StringSequence>();
 
-	private String[] importMethods;
-
 	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
 	private String[] importPackages;
@@ -119,21 +116,6 @@ public class InterpretedTranslator implements Translator {
 
 	public void setInterceptor(Interceptor interceptor) {
 		this.interceptor = interceptor;
-	}
-	
-	public void init() {
-		if (importMethods != null && importMethods.length > 0) {
-			for (String method : importMethods) {
-				Class<?> cls = ClassUtils.forName(importPackages, method);
-				Object ins;
-				try {
-					ins = cls.newInstance();
-				} catch (Exception e) {
-					ins = cls;
-				}
-				this.functions.put(cls, ins);
-			}
-		}
 	}
 
 	/**
@@ -194,7 +176,13 @@ public class InterpretedTranslator implements Translator {
 	 * httl.properties: import.methods=java.lang.Math
 	 */
 	public void setImportMethods(String[] importMethods) {
-		this.importMethods = importMethods;
+		for (Object function : importMethods) {
+			if (function instanceof Class) {
+				this.functions.put((Class<?>) function, function);
+			} else {
+				this.functions.put(function.getClass(), function);
+			}
+		}
 	}
 
 	/**

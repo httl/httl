@@ -515,8 +515,6 @@ public class TemplateParser implements Parser {
 
 	private Map<String, Class<?>> importTypes;
 
-	private String[] importMethods;
-
 	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
 	private Class<?> defaultVariableType;
@@ -616,7 +614,13 @@ public class TemplateParser implements Parser {
 	 * httl.properties: import.methods=java.lang.Math
 	 */
 	public void setImportMethods(String[] importMethods) {
-		this.importMethods = importMethods;
+		for (Object function : importMethods) {
+			if (function instanceof Class) {
+				this.functions.put((Class<?>) function, function);
+			} else {
+				this.functions.put(function.getClass(), function);
+			}
+		}
 	}
 	
 	/**
@@ -631,18 +635,6 @@ public class TemplateParser implements Parser {
 					throw new IllegalArgumentException("Illegal config import.setVariables");
 				}
 				this.importTypes.put(var.substring(i + 1), ClassUtils.forName(importPackages, var.substring(0, i)));
-			}
-		}
-		if (importMethods != null && importMethods.length > 0) {
-			for (String method : importMethods) {
-				Class<?> cls = ClassUtils.forName(importPackages, method);
-				Object ins;
-				try {
-					ins = cls.newInstance();
-				} catch (Exception e) {
-					ins = cls;
-				}
-				this.functions.put(cls, ins);
 			}
 		}
 	}

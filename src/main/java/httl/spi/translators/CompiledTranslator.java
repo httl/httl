@@ -112,8 +112,6 @@ public class CompiledTranslator implements Translator {
 
 	private Map<String, Class<?>> importTypes;
 
-	private String[] importMethods;
-
 	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
 	private final List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
@@ -354,8 +352,14 @@ public class CompiledTranslator implements Translator {
 	/**
 	 * httl.properties: import.methods=java.lang.Math
 	 */
-	public void setImportMethods(String[] importMethods) {
-		this.importMethods = importMethods;
+	public void setImportMethods(Object[] importMethods) {
+		for (Object function : importMethods) {
+			if (function instanceof Class) {
+				this.functions.put((Class<?>) function, function);
+			} else {
+				this.functions.put(function.getClass(), function);
+			}
+		}
 	}
 
 	/**
@@ -392,18 +396,6 @@ public class CompiledTranslator implements Translator {
 					throw new IllegalArgumentException("Illegal config import.setVariables");
 				}
 				this.importTypes.put(var.substring(i + 1), ClassUtils.forName(importPackages, var.substring(0, i)));
-			}
-		}
-		if (importMethods != null && importMethods.length > 0) {
-			for (String method : importMethods) {
-				Class<?> cls = ClassUtils.forName(importPackages, method);
-				Object ins;
-				try {
-					ins = cls.newInstance();
-				} catch (Exception e) {
-					ins = cls;
-				}
-				this.functions.put(cls, ins);
 			}
 		}
 	}
