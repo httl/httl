@@ -86,7 +86,7 @@ public abstract class AbstractLoader implements Loader {
 	 * httl.properties: message.basename=messages
 	 */
 	public void setMessageBasename(String messageBasename) {
-		this.messageBasename = messageBasename;
+		this.messageBasename = UrlUtils.cleanName(messageBasename);
 	}
 
 	/**
