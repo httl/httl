@@ -1645,8 +1645,7 @@ public class CompiledVisitor extends AstVisitor {
 		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
 		
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
+		if (node.getLeftParameter() instanceof Operator) {
 			leftCode = "(" + leftCode + ")";
 		}
 		
@@ -1675,8 +1674,7 @@ public class CompiledVisitor extends AstVisitor {
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
 		
 		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
+		if (node.getLeftParameter() instanceof Operator) {
 			leftCode = "(" + leftCode + ")";
 		}
 		
@@ -1704,23 +1702,14 @@ public class CompiledVisitor extends AstVisitor {
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
 		
 		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
+		if (node.getLeftParameter() instanceof Operator) {
 			leftCode = "(" + leftCode + ")";
 		}
 		
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			if (">".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") > 0");
-			} else if (">=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") >= 0");
-			} else if ("<".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") < 0");
-			} else if ("<=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") <= 0");
-			}
+			code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") > 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -1747,23 +1736,14 @@ public class CompiledVisitor extends AstVisitor {
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
 		
 		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
+		if (node.getLeftParameter() instanceof Operator) {
 			leftCode = "(" + leftCode + ")";
 		}
 		
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			if (">".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") > 0");
-			} else if (">=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") >= 0");
-			} else if ("<".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") < 0");
-			} else if ("<=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") <= 0");
-			}
+			code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") >= 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -1790,23 +1770,14 @@ public class CompiledVisitor extends AstVisitor {
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
 		
 		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
+		if (node.getLeftParameter() instanceof Operator) {
 			leftCode = "(" + leftCode + ")";
 		}
 		
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			if (">".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") > 0");
-			} else if (">=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") >= 0");
-			} else if ("<".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") < 0");
-			} else if ("<=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") <= 0");
-			}
+			code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") < 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -1833,23 +1804,14 @@ public class CompiledVisitor extends AstVisitor {
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
 		
 		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
+		if (node.getLeftParameter() instanceof Operator) {
 			leftCode = "(" + leftCode + ")";
 		}
 		
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			if (">".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") > 0");
-			} else if (">=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") >= 0");
-			} else if ("<".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") < 0");
-			} else if ("<=".equals(name)) {
-				code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") <= 0");
-			}
+			code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".compareTo(" + rightCode + ") <= 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -2177,8 +2139,7 @@ public class CompiledVisitor extends AstVisitor {
 
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
 		
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
+		if (node.getLeftParameter() instanceof Operator) {
 			leftCode = "(" + leftCode + ")";
 		}
 		

@@ -1,0 +1,29 @@
+#set(int a = 3)
+#set(int b = 2)
+#set(int c = 1)
+#if(a == (b + c))
+AAA
+#end
+#if((b + c) == a)
+BBB
+#end
+
+#set(String d = "ab")
+#set(String e = "a")
+#set(String f = "b")
+#if(d == (e + f))
+CCC
+#end
+#if((e + f) == d)
+DDD
+#end
+
+#set(String g = "nullnull")
+#set(String h = null)
+#set(String i = null)
+#if(g == (h + i))
+EEE
+#end
+#if((h + i) == g)
+FFF
+#end
