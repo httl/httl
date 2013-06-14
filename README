@@ -2,9 +2,11 @@ Hyper-Text Template Language and Engine.
 
 Homepage:
 
-http://httl.github.com
+http://httl.github.io
 
-Checkout:
+Download:
+
+https://github.com/httl/httl/tags
 
 git clone https://github.com/httl/httl.git
 
