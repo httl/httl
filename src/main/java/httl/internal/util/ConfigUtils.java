@@ -220,13 +220,11 @@ public final class ConfigUtils {
 	}
 	
 	private static String getRefValue(Properties result, String v) {
-		if (v != null) {
-			while (v.startsWith(REF)) {
-				String ref = v.substring(1);
-				v = result.getProperty(ref);
-				if (v == null) {
-					v = System.getProperty(ref);
-				}
+		while (v != null && v.startsWith(REF)) {
+			String ref = v.substring(1);
+			v = result.getProperty(ref);
+			if (v == null) {
+				v = System.getProperty(ref);
 			}
 		}
 		return v == null ? "" : v;
