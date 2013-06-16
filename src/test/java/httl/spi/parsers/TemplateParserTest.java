@@ -8,6 +8,100 @@ import org.junit.Test;
 public class TemplateParserTest {
 
 	@Test
+	public void testSplitDefine() throws Exception {
+		// without type
+		List<String> list = TemplateParser.splitDefine("book");
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("book", list.get(0));
+
+		list = TemplateParser.splitDefine("book1, book2");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("book1", list.get(0));
+		Assert.assertEquals(" book2", list.get(1));
+
+		list = TemplateParser.splitDefine("book1, book2, book3");
+		Assert.assertEquals(3, list.size());
+		Assert.assertEquals("book1", list.get(0));
+		Assert.assertEquals(" book2", list.get(1));
+		Assert.assertEquals(" book3", list.get(2));
+
+		// with simple type
+		list = TemplateParser.splitDefine("Book book");
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("Book book", list.get(0));
+
+		list = TemplateParser.splitDefine("Book book1, Book book2");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("Book book1", list.get(0));
+		Assert.assertEquals(" Book book2", list.get(1));
+
+		list = TemplateParser.splitDefine("Book book1, Book book2, Book book3");
+		Assert.assertEquals(3, list.size());
+		Assert.assertEquals("Book book1", list.get(0));
+		Assert.assertEquals(" Book book2", list.get(1));
+		Assert.assertEquals(" Book book3", list.get(2));
+
+		// with generic type
+		list = TemplateParser.splitDefine("Map<String, Book> books");
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("Map<String, Book> books", list.get(0));
+
+		list = TemplateParser.splitDefine("Map<String, Book> bookMap, Map<String, Book> bookMap2");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("Map<String, Book> bookMap", list.get(0));
+		Assert.assertEquals(" Map<String, Book> bookMap2", list.get(1));
+
+		list = TemplateParser.splitDefine("Map<String, Book> bookMap, Map<String, Book> bookMap2, Map<String, Book> bookMap3");
+		Assert.assertEquals(3, list.size());
+		Assert.assertEquals("Map<String, Book> bookMap", list.get(0));
+		Assert.assertEquals(" Map<String, Book> bookMap2", list.get(1));
+		Assert.assertEquals(" Map<String, Book> bookMap3", list.get(2));
+
+		// with multi type
+		list = TemplateParser.splitDefine("Book book1, book2");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("Book book1", list.get(0));
+		Assert.assertEquals(" book2", list.get(1));
+
+		list = TemplateParser.splitDefine("Map<String, Book> bookMap, book");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("Map<String, Book> bookMap", list.get(0));
+		Assert.assertEquals(" book", list.get(1));
+
+		list = TemplateParser.splitDefine("Map<String, Book> bookMap, Book book");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("Map<String, Book> bookMap", list.get(0));
+		Assert.assertEquals(" Book book", list.get(1));
+
+		list = TemplateParser.splitDefine("Map<String, Book> bookMap, Book book1, book2");
+		Assert.assertEquals(3, list.size());
+		Assert.assertEquals("Map<String, Book> bookMap", list.get(0));
+		Assert.assertEquals(" Book book1", list.get(1));
+		Assert.assertEquals(" book2", list.get(2));
+		
+		list = TemplateParser.splitDefine("book1, Book book2");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("book1", list.get(0));
+		Assert.assertEquals(" Book book2", list.get(1));
+
+		list = TemplateParser.splitDefine("book, Map<String, Book> bookMap");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("book", list.get(0));
+		Assert.assertEquals(" Map<String, Book> bookMap", list.get(1));
+
+		list = TemplateParser.splitDefine("Book book, Map<String, Book> bookMap");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("Book book", list.get(0));
+		Assert.assertEquals(" Map<String, Book> bookMap", list.get(1));
+
+		list = TemplateParser.splitDefine("book1, Book book2, Map<String, Book> bookMap");
+		Assert.assertEquals(3, list.size());
+		Assert.assertEquals("book1", list.get(0));
+		Assert.assertEquals(" Book book2", list.get(1));
+		Assert.assertEquals(" Map<String, Book> bookMap", list.get(2));
+	}
+
+	@Test
 	public void testSplitAssign() throws Exception {
 		// without type
 		List<String> list = TemplateParser.splitAssign("book = books.get(0)");

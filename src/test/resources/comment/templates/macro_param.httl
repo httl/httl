@@ -1,0 +1,10 @@
+<!--#macro(xxx(String aaa, String bbb))-->
+${aaa}, ${bbb}
+<!--#end-->
+
+<!--#macro(yyy(ccc, ddd))-->
+${ccc}, ${ddd}
+<!--#end-->
+
+${xxx("111","222")}
+${yyy("333","444")}

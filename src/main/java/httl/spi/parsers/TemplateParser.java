@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,20 +191,9 @@ public class TemplateParser implements Parser {
 	}
 	
 	private void defineVariableTypes(String value, int offset, List<Statement> directives) throws IOException, ParseException {
-		value = BLANK_PATTERN.matcher(value).replaceAll(" ");
-		List<String> vs = new ArrayList<String>();
-		List<Integer> os = new ArrayList<Integer>();
-		Matcher matcher = DEFINE_PATTERN.matcher(value);
-		while (matcher.find()) {
-			StringBuffer rep = new StringBuffer();
-			matcher.appendReplacement(rep, "$1");
-			String v = rep.toString();
-			vs.add(v);
-			os.add(offset + matcher.end(1) - v.length());
-		}
-		for (int n = 0; n < vs.size(); n ++) {
-			String v = vs.get(n).trim();
-			int o = os.get(n);
+		int o = offset;
+		for (String v : splitDefine(value)) {
+			v = v.trim().replaceAll("\\s", " ");
 			String var;
 			String type;
 			int i = v.lastIndexOf(' ');
@@ -215,6 +205,7 @@ public class TemplateParser implements Parser {
 				var = v.substring(i + 1).trim();
 			}
 			directives.add(new SetDirective(parseGenericType(type, o), var, null, false, false, offset));
+			o += v.length() + 1;
 		}
 	}
 	
@@ -486,12 +477,8 @@ public class TemplateParser implements Parser {
 
 	}
 	
-	private static final Pattern DEFINE_PATTERN = Pattern.compile("([\\w>\\]]\\s\\w+)\\s?[,]?\\s?");
-
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
-	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
-	
 	private String[] setDirective = new String[] { "var" };
 
 	private String[] ifDirective = new String[] { "if" };
@@ -894,6 +881,42 @@ public class TemplateParser implements Parser {
 		}
 		list.add(value);
 		return list;
+	}
+
+	private static final Pattern DEFINE_PATTERN = Pattern.compile("([\\w>\\]]\\s+\\w+)\\s*[,]?");
+
+	static List<String> splitDefine(String value) {
+		List<String> vs = new ArrayList<String>();
+		Matcher matcher = DEFINE_PATTERN.matcher(value);
+		while (matcher.find()) {
+			StringBuffer rep = new StringBuffer();
+			matcher.appendReplacement(rep, "$1");
+			String v = rep.toString();
+			if (v.contains(",")) {
+				if (! v.contains("<")) {
+					vs.addAll(Arrays.asList(v.split(",")));
+				} else if (v.indexOf(',') < v.indexOf('<')) {
+					int j = v.indexOf('<');
+					int i = v.substring(0, j).lastIndexOf(',');
+					vs.addAll(Arrays.asList(v.substring(0, i).split(",")));
+					vs.add(v.substring(i + 1));
+				} else {
+					vs.add(v);
+				}
+			} else {
+				vs.add(v);
+			}
+		}
+		if (vs.size() == 0) {
+			vs = Arrays.asList(value.split(","));
+		} else {
+			StringBuffer tail = new StringBuffer();
+			matcher.appendTail(tail);
+			if (tail.toString().trim().length() > 0) {
+				vs.add(tail.toString());
+			}
+		}
+		return vs;
 	}
 	
 }
