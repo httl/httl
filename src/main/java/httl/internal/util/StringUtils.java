@@ -615,75 +615,65 @@ public class StringUtils {
 			byte ch = src[i];
 			switch (ch) {
 				case 60:
-					if (i != 0) {
-						if (buf == null) {
-							buf = expand(src, off = i, 4);
-						} else if (buf.length < off + 4) {
-							buf = expand(buf, off, 4);
-						}
-						buf[off ++] = '&';
-						buf[off ++] = 'l';
-						buf[off ++] = 't';
-						buf[off ++] = ';';
-						break;
+					if (buf == null) {
+						buf = expand(src, off = i, 4);
+					} else if (buf.length < off + 4) {
+						buf = expand(buf, off, 4);
 					}
+					buf[off ++] = '&';
+					buf[off ++] = 'l';
+					buf[off ++] = 't';
+					buf[off ++] = ';';
+					break;
 				case 62:
-					if (i != 0) {
-						if (buf == null) {
-							buf = expand(src, off = i, 4);
-						} else if (buf.length < off + 4) {
-							buf = expand(buf, off, 4);
-						}
-						buf[off ++] = '&';
-						buf[off ++] = 'g';
-						buf[off ++] = 't';
-						buf[off ++] = ';';
-						break;
+					if (buf == null) {
+						buf = expand(src, off = i, 4);
+					} else if (buf.length < off + 4) {
+						buf = expand(buf, off, 4);
 					}
+					buf[off ++] = '&';
+					buf[off ++] = 'g';
+					buf[off ++] = 't';
+					buf[off ++] = ';';
+					break;
 				case 34:
-					if (i != 0) {
-						if (buf == null) {
-							buf = expand(src, off = i, 6);
-						} else if (buf.length < off + 6) {
-							buf = expand(buf, off, 6);
-						}
-						buf[off ++] = '&';
-						buf[off ++] = 'q';
-						buf[off ++] = 'u';
-						buf[off ++] = 'o';
-						buf[off ++] = 't';
-						buf[off ++] = ';';
-						break;
+					if (buf == null) {
+						buf = expand(src, off = i, 6);
+					} else if (buf.length < off + 6) {
+						buf = expand(buf, off, 6);
 					}
+					buf[off ++] = '&';
+					buf[off ++] = 'q';
+					buf[off ++] = 'u';
+					buf[off ++] = 'o';
+					buf[off ++] = 't';
+					buf[off ++] = ';';
+					break;
 				case 39:
-					if (i != 0) {
-						if (buf == null) {
-							buf = expand(src, off = i, 6);
-						} else if (buf.length < off + 6) {
-							buf = expand(buf, off, 6);
-						}
-						buf[off ++] = '&';
-						buf[off ++] = 'a';
-						buf[off ++] = 'p';
-						buf[off ++] = 'o';
-						buf[off ++] = 's';
-						buf[off ++] = ';';
-						break;
+					if (buf == null) {
+						buf = expand(src, off = i, 6);
+					} else if (buf.length < off + 6) {
+						buf = expand(buf, off, 6);
 					}
+					buf[off ++] = '&';
+					buf[off ++] = 'a';
+					buf[off ++] = 'p';
+					buf[off ++] = 'o';
+					buf[off ++] = 's';
+					buf[off ++] = ';';
+					break;
 				case 38:
-					if (i != 0) {
-						if (buf == null) {
-							buf = expand(src, off = i, 5);
-						} else if (buf.length < off + 5) {
-							buf = expand(buf, off, 5);
-						}
-						buf[off ++] = '&';
-						buf[off ++] = 'a';
-						buf[off ++] = 'm';
-						buf[off ++] = 'p';
-						buf[off ++] = ';';
-						break;
+					if (buf == null) {
+						buf = expand(src, off = i, 5);
+					} else if (buf.length < off + 5) {
+						buf = expand(buf, off, 5);
 					}
+					buf[off ++] = '&';
+					buf[off ++] = 'a';
+					buf[off ++] = 'm';
+					buf[off ++] = 'p';
+					buf[off ++] = ';';
+					break;
 				default:
 					if (buf != null) {
 						if (buf.length < off + 1) {

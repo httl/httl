@@ -37,9 +37,27 @@ public class MixedTranslator implements Translator {
 
 	private Translator interpretedTranslator;
 
+	private boolean compiled;
+
+	private boolean interpreted;
+
 	public Template translate(Resource resource, Map<String, Class<?>> types)
 			throws ParseException, IOException {
-		return new MixedTemplate(interpretedTranslator.translate(resource, types), compiledTranslator, resource, types);
+		if (interpreted && compiled) {
+			return new MixedTemplate(interpretedTranslator.translate(resource, types), compiledTranslator, resource, types);
+		} else if (interpreted) {
+			return interpretedTranslator.translate(resource, types);
+		} else {
+			return compiledTranslator.translate(resource, types);
+		}
+	}
+
+	public void setCompiled(boolean compiled) {
+		this.compiled = compiled;
+	}
+
+	public void setInterpreted(boolean interpreted) {
+		this.interpreted = interpreted;
 	}
 
 	public void setCompiledTranslator(Translator compiledTranslator) {
