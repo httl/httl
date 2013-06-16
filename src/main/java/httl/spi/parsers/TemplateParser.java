@@ -280,36 +280,40 @@ public class TemplateParser implements Parser {
 				}
 				if (StringUtils.inArray(name, setDirective)) {
 					if (value.contains("=")) {
-						int i = value.indexOf('=');
-						String var = value.substring(0, i).trim();
-						String expr = value.substring(i + 1);
-						int blank = 0;
-						while (blank < expr.length()) {
-							if (! Character.isWhitespace(expr.charAt(blank))) {
-								break;
+						int o = 0;
+						for (String v : splitAssign(value)) {
+							int i = v.indexOf('=');
+							String var = v.substring(0, i).trim();
+							String expr = v.substring(i + 1);
+							int blank = 0;
+							while (blank < expr.length()) {
+								if (! Character.isWhitespace(expr.charAt(blank))) {
+									break;
+								}
+								blank ++;
 							}
-							blank ++;
+							if (blank > 0) {
+								expr = expr.substring(blank);
+							}
+							Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + 1 + blank + o);
+							boolean export = false;
+							boolean hide = false;
+							if (var.endsWith(":")) {
+								export = true;
+								var = var.substring(0, var.length() - 1).trim();
+							} else if (var.endsWith(".")) {
+								hide = true;
+								var = var.substring(0, var.length() - 1).trim();
+							}
+							int j = var.lastIndexOf(' ');
+							String type = null;
+							if (j > 0) {
+								type = var.substring(0, j).trim();
+								var = var.substring(j + 1).trim();
+							}
+							directives.add(new SetDirective(parseGenericType(type, exprOffset), var, expression, export, hide, offset));
+							o += v.length() + 1;
 						}
-						if (blank > 0) {
-							expr = expr.substring(blank);
-						}
-						Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + 1 + blank);
-						boolean export = false;
-						boolean hide = false;
-						if (var.endsWith(":")) {
-							export = true;
-							var = var.substring(0, var.length() - 1).trim();
-						} else if (var.endsWith(".")) {
-							hide = true;
-							var = var.substring(0, var.length() - 1).trim();
-						}
-						int j = var.lastIndexOf(' ');
-						String type = null;
-						if (j > 0) {
-							type = var.substring(0, j).trim();
-							var = var.substring(j + 1).trim();
-						}
-						directives.add(new SetDirective(parseGenericType(type, exprOffset), var, expression, export, hide, offset));
 					} else {
 						defineVariableTypes(value, offset, directives);
 					}
@@ -486,7 +490,7 @@ public class TemplateParser implements Parser {
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
 	private static final Pattern BLANK_PATTERN = Pattern.compile("\\s+");
-
+	
 	private String[] setDirective = new String[] { "var" };
 
 	private String[] ifDirective = new String[] { "if" };
@@ -738,6 +742,47 @@ public class TemplateParser implements Parser {
 			offsets.add(offset + type.length() - token.length());
 			buf.setLength(0);
 		}
+	}
+	
+	static List<String> splitAssign(String value) {
+		List<String> list = new ArrayList<String>();
+		int i = value.indexOf('=');
+		while ((i = value.indexOf('=', i + 1)) > 0) {
+			if (i + 1 < value.length() && value.charAt(i + 1) == '=') {
+				i ++;
+			} else if (value.charAt(i - 1) != '>'
+					&& value.charAt(i - 1) != '<'
+					&& value.charAt(i - 1) != '!') {
+				String sub = value.substring(0, i);
+				int j = sub.lastIndexOf(',');
+				int k = sub.lastIndexOf('>');
+				if (j > 0 && j < k) {
+					int g = 0;
+					for (int n = k; n >= 0; n --) {
+						char c = sub.charAt(n);
+						if (c == '>') {
+							g ++;
+						} else if (c == '<') {
+							g --;
+						}
+						if (g == 0) {
+							sub = sub.substring(0, n);
+							j = sub.lastIndexOf(',');
+							break;
+						}
+					}
+				}
+				if (j > 0) {
+					list.add(value.substring(0, j));
+					value = value.substring(j + 1);
+					i = i - j - 1;
+				} else {
+					break;
+				}
+			}
+		}
+		list.add(value);
+		return list;
 	}
 	
 }
