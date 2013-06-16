@@ -72,7 +72,7 @@ public class SetDirective extends LineDirective {
 	@Override
 	public String toString() {
 		String typeName = type == null ? "" : (type instanceof Class ? ((Class<?>) type).getCanonicalName() : type.toString());
-		return "#var(" + typeName + " " + name + 
+		return "#set(" + typeName + " " + name + 
 				(expression == null ? "" : (export ? " := " : (hide ? " .= " : " = ")) + expression) + ")";
 	}
 
