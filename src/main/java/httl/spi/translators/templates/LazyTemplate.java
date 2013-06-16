@@ -46,6 +46,8 @@ public class LazyTemplate implements Template {
 	private final Map<String, Class<?>> parameterTypes;
 
 	private final Resource resource;
+	
+	private final Node root;
 
 	private final Translator translator;
 
@@ -53,9 +55,10 @@ public class LazyTemplate implements Template {
 
 	private volatile Template template;
 
-	public LazyTemplate(Translator translator, Resource resource, Map<String, Class<?>> parameterTypes, Converter<Object, Object> mapConverter) {
+	public LazyTemplate(Translator translator, Resource resource, Node root, Map<String, Class<?>> parameterTypes, Converter<Object, Object> mapConverter) {
 		this.translator = translator;
 		this.resource = resource;
+		this.root = root;
 		this.parameterTypes = parameterTypes;
 		this.mapConverter = mapConverter;
 	}
@@ -66,7 +69,7 @@ public class LazyTemplate implements Template {
 				if (template == null) {
 					Map<String, Class<?>> types = context == null ? null : new TypeMap(convertMap(context));
 					types = new DelegateMap<String, Class<?>>(types, parameterTypes);
-					template = translator.translate(resource, types);
+					template = translator.translate(resource, root, types);
 				}
 			}
 		}

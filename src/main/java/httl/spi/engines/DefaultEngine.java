@@ -16,6 +16,7 @@
 package httl.spi.engines;
 
 import httl.Engine;
+import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.internal.util.ConfigUtils;
@@ -27,6 +28,7 @@ import httl.internal.util.VolatileReference;
 import httl.spi.Converter;
 import httl.spi.Loader;
 import httl.spi.Logger;
+import httl.spi.Parser;
 import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
@@ -59,6 +61,9 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: loaders=httl.spi.loaders.ClasspathLoader
 	private Loader loader;
+
+	// httl.properties: template.parser=httl.spi.parsers.TemplateParser
+	private Parser templateParser;
 
 	// httl.properties: translator=httl.spi.translators.DefaultTranslator
 	private Translator translator;
@@ -236,12 +241,13 @@ public class DefaultEngine extends Engine {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
+		Node root = templateParser.parse(resource.getSource(), 0);
 		if (useRenderVariableType) {
-			return new LazyTemplate(translator, resource, parameterTypes, mapConverter);
+			return new LazyTemplate(translator, resource, root, parameterTypes, mapConverter);
 		}
-		return translator.translate(resource, parameterTypes);
+		return translator.translate(resource, root, parameterTypes);
 	}
-	
+
 	/**
 	 * Parse string template.
 	 * 
@@ -465,6 +471,13 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setLoader(Loader loader) {
 		this.loader = loader;
+	}
+
+	/**
+	 * httl.properties: template.parser=httl.spi.parsers.TemplateParser
+	 */
+	public void setTemplateParser(Parser templateParser) {
+		this.templateParser = templateParser;
 	}
 
 	/**

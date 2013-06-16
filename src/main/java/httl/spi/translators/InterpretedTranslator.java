@@ -25,7 +25,6 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Logger;
-import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
 import httl.spi.translators.templates.InterpretedTemplate;
@@ -46,8 +45,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class InterpretedTranslator implements Translator {
-
-	private Parser templateParser;
 
 	private Formatter<Object> formatter;
 
@@ -229,16 +226,12 @@ public class InterpretedTranslator implements Translator {
 		this.outputEncoding = outputEncoding;
 	}
 
-	public void setTemplateParser(Parser templateParser) {
-		this.templateParser = templateParser;
-	}
-
 	public void setDefaultVariableType(Class<?> defaultVariableType) {
 		this.defaultVariableType = defaultVariableType;
 	}
 
 	public Template translate(Resource resource,
-			Map<String, Class<?>> parameterTypes) throws ParseException,
+			Node root, Map<String, Class<?>> parameterTypes) throws ParseException,
 			IOException {
 		if (logger != null && logger.isDebugEnabled()) {
 			logger.debug("Interprete template " + resource.getName());
@@ -247,7 +240,6 @@ public class InterpretedTranslator implements Translator {
 		if (templateFilter != null) {
 			source = templateFilter.filter(resource.getName(), source);
 		}
-		Node root = templateParser.parse(source, 0);
 		InterpretedTemplate template = new InterpretedTemplate(resource, root, null);
 		template.setInterceptor(interceptor);
 		template.setMapConverter(mapConverter);

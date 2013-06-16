@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -231,6 +233,71 @@ public class CollectionMethod {
 		array = CollectionUtils.copyOf(array, array.length);
 		Arrays.sort(array);
 		return array;
+	}
+
+	public static <K, V> Map<K, V> recursive(Map<K, V> map) {
+		Map<K, V> result = new HashMap<K, V>();
+		_recursive(result, map);
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <K, V> void _recursive(Map<K, V> result, Map<K, V> map) {
+		if (map != null) {
+			for (Map.Entry<K, V> entry : map.entrySet()) {
+				V value = entry.getValue();
+				if (value instanceof Map) {
+					_recursive(result, (Map<K, V>) entry.getValue());
+				} else {
+					result.put(entry.getKey(), value);
+				}
+			}
+		}
+	}
+
+	public static <T> List<T> recursive(Collection<T> set) {
+		List<T> result = new ArrayList<T>();
+		_recursive(result, set);
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> void _recursive(Collection<T> result, Collection<T> set) {
+		if (set != null) {
+			for (T item : set) {
+				if (item instanceof Collection) {
+					_recursive(result, (Collection<T>) item);
+				} else {
+					result.add(item);
+				}
+			}
+		}
+	}
+
+	public static <T> List<T> recursive(T node, String children) {
+		List<T> result = new ArrayList<T>();
+		_recursive(result, node, children);
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> void _recursive(Collection<T> result, T node, String children) {
+		if (node != null) {
+			result.add(node);
+			Collection<T> set;
+			try {
+				set = (Collection<T>) node.getClass().getMethod(children, new Class<?>[0]).invoke(node, new Object[0]);
+			} catch (RuntimeException e) {
+				throw (RuntimeException) e;
+			} catch (Exception e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+			if (set != null) {
+				for (T item : set) {
+					_recursive(result, item, children);
+				}
+			}
+		}
 	}
 
 }

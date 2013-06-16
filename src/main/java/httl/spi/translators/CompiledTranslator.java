@@ -28,7 +28,6 @@ import httl.spi.Filter;
 import httl.spi.Formatter;
 import httl.spi.Interceptor;
 import httl.spi.Logger;
-import httl.spi.Parser;
 import httl.spi.Switcher;
 import httl.spi.Translator;
 import httl.spi.translators.templates.AdaptiveTemplate;
@@ -69,8 +68,6 @@ public class CompiledTranslator implements Translator {
 	private String defaultFormatterVariable;
 
 	private Engine engine;
-
-	private Parser templateParser;
 
 	private Compiler compiler;
 	
@@ -135,13 +132,6 @@ public class CompiledTranslator implements Translator {
 	private String[] importSizers;
 
 	private String[] importGetters;
-
-	/**
-	 * httl.properties: template.parser=httl.spi.parsers.TemplateParser
-	 */
-	public void setTemplateParser(Parser parser) {
-		this.templateParser = parser;
-	}
 
 	/**
 	 * httl.properties: import.sizers=size,length,getSize,getLength
@@ -416,7 +406,7 @@ public class CompiledTranslator implements Translator {
 		}
 	}
 
-	public Template translate(Resource resource, Map<String, Class<?>> defVariableTypes) throws IOException, ParseException {
+	public Template translate(Resource resource, Node root, Map<String, Class<?>> defVariableTypes) throws IOException, ParseException {
 		if (logger != null && logger.isDebugEnabled()) {
 			logger.debug("Compile template " + resource.getName());
 		}
@@ -427,7 +417,6 @@ public class CompiledTranslator implements Translator {
 			if (templateFilter != null) {
 				source = templateFilter.filter(resource.getName(), source);
 			}
-			Node root = templateParser.parse(source, 0);
 			if (isOutputWriter || ! isOutputStream) {
 				Class<?> clazz = parseClass(resource, root, defVariableTypes, false, 0);
 				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class, Resource.class, Template.class, Node.class)

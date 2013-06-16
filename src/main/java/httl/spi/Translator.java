@@ -15,6 +15,7 @@
  */
 package httl.spi;
 
+import httl.Node;
 import httl.Resource;
 import httl.Template;
 
@@ -35,9 +36,10 @@ public interface Translator {
 	 * Translate the resource to template.
 	 * 
 	 * @param resource - template resource
+	 * @param root TODO
 	 * @param types - template parameter types
 	 * @return template instance
 	 */
-	Template translate(Resource resource, Map<String, Class<?>> types) throws ParseException, IOException;
+	Template translate(Resource resource, Node root, Map<String, Class<?>> types) throws ParseException, IOException;
 
 }

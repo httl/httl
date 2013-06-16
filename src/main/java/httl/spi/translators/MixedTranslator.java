@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
 
+import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Translator;
@@ -41,14 +42,14 @@ public class MixedTranslator implements Translator {
 
 	private boolean interpreted;
 
-	public Template translate(Resource resource, Map<String, Class<?>> types)
+	public Template translate(Resource resource, Node root, Map<String, Class<?>> types)
 			throws ParseException, IOException {
 		if (interpreted && compiled) {
-			return new MixedTemplate(interpretedTranslator.translate(resource, types), compiledTranslator, resource, types);
+			return new MixedTemplate(interpretedTranslator.translate(resource, root, types), compiledTranslator, resource, root, types);
 		} else if (interpreted) {
-			return interpretedTranslator.translate(resource, types);
+			return interpretedTranslator.translate(resource, root, types);
 		} else {
-			return compiledTranslator.translate(resource, types);
+			return compiledTranslator.translate(resource, root, types);
 		}
 	}
 

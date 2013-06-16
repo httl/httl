@@ -15,6 +15,7 @@
  */
 package httl.spi.translators.templates;
 
+import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Translator;
@@ -39,15 +40,18 @@ public class MixedTemplate extends ProxyTemplate {
 	private final ReentrantLock lock = new ReentrantLock();
 
 	private final Resource resource;
+
+	private final Node root;
 	
 	private final Translator compiledTranslator;
 
 	private Template compiledTemplate;
 
-	public MixedTemplate(Template template, Translator translator, Resource resource, Map<String, Class<?>> types) {
+	public MixedTemplate(Template template, Translator translator, Resource resource, Node root, Map<String, Class<?>> types) {
 		super(template);
 		this.compiledTranslator = translator;
 		this.resource = resource;
+		this.root = root;
 		if (types != null) {
 			this.types.putAll(types);
 		}
@@ -84,7 +88,7 @@ public class MixedTemplate extends ProxyTemplate {
 					lock.lock();
 					try {
 						if (compiledTemplate == null) {
-							compiledTemplate = compiledTranslator.translate(resource, types);
+							compiledTemplate = compiledTranslator.translate(resource, root, types);
 						}
 					} finally {
 						lock.unlock();

@@ -31,7 +31,7 @@ import java.util.Map;
  * @see httl.Engine#getTemplate(String)
  * @see httl.Engine#getTemplate(String, String)
  * @see httl.Context#getTemplate()
- * @see httl.spi.Translator#translate(Resource, java.util.Map)
+ * @see httl.spi.Translator#translate(Resource, Node, java.util.Map)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */

@@ -718,7 +718,6 @@ public class CompiledVisitor extends AstVisitor {
 		CompiledVisitor visitor = new CompiledVisitor();
 		visitor.setResource(resource);
 		visitor.setNode(node);
-		// visitor.setTypes(types);
 		visitor.setStream(stream);
 		visitor.setOffset(offset);
 		visitor.setDefaultFilterVariable(defaultFilterVariable);
