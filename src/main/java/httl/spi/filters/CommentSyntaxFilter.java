@@ -49,11 +49,12 @@ public class CommentSyntaxFilter extends AbstractFilter {
 	}
 
 	public String filter(String key, String value) {
-		if (value.startsWith(commentRight)) {
-			value = value.substring(commentRight.length());
+		String trim = value.trim();
+		if (trim.startsWith(commentRight)) {
+			value = value.substring(value.indexOf(commentRight) + commentRight.length());
 		}
-		if (value.endsWith(commentLeft)) {
-			value = value.substring(0, value.length() - commentLeft.length());
+		if (trim.endsWith(commentLeft)) {
+			value = value.substring(0, value.lastIndexOf(commentLeft));
 		}
 		return value;
 	}

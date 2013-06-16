@@ -127,7 +127,7 @@ public class StringUtils {
 	public static boolean isNotBlank(String value) {
 		return ! isBlank(value);
 	}
-
+	
 	public static String toString(Object value) {
 		if (value == null)
 			return null;
