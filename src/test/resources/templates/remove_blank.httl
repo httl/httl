@@ -1,0 +1,23 @@
+#set(User user, Book[] books)
+
+line1:  ${user.name}
+line2:
+        ${user.name}     line3
+line4:  ${user.name}     ${user.role}, ${user.name}  aaa  ${user.role}
+line5:
+
+<html>
+<body>
+    #if(books)
+    <table>
+        #for(Book book in books)
+        <tr>
+            <td>${book.title}</td>
+        </tr>
+        #end
+    </table>
+    #end
+    </body>
+</html>
+
+----

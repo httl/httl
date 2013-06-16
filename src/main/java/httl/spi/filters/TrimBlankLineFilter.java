@@ -15,8 +15,8 @@
  */
 package httl.spi.filters;
 
-import httl.spi.Filter;
 import httl.internal.util.StringUtils;
+import httl.spi.Filter;
 
 /**
  * TrimBlankLineFilter. (SPI, Singleton, ThreadSafe)
@@ -28,17 +28,8 @@ import httl.internal.util.StringUtils;
  */
 public class TrimBlankLineFilter extends AbstractFilter {
 
-	private boolean removeDirectiveBlankLine = true;
-
-	/**
-	 * httl.properties: remove.directive.blank.line=true
-	 */
-	public void setRemoveDirectiveBlankLine(boolean removeDirectiveBlankLine) {
-		this.removeDirectiveBlankLine = removeDirectiveBlankLine;
-	}
-
 	public String filter(String key, String text) {
-		return removeDirectiveBlankLine ? StringUtils.trimBlankLine(text) : text;
+		return StringUtils.trimBlankLine(text);
 	}
 
 }

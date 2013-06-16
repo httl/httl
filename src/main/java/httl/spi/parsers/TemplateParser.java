@@ -21,6 +21,7 @@ import httl.Template;
 import httl.ast.BlockDirective;
 import httl.ast.BreakDirective;
 import httl.ast.Comment;
+import httl.ast.Directive;
 import httl.ast.ElseDirective;
 import httl.ast.EndDirective;
 import httl.ast.Expression;
@@ -523,6 +524,15 @@ public class TemplateParser implements Parser {
 
 	private Class<?> defaultVariableType;
 
+	private boolean removeDirectiveBlankLine = true;
+
+	/**
+	 * httl.properties: remove.directive.blank.line=true
+	 */
+	public void setRemoveDirectiveBlankLine(boolean removeDirectiveBlankLine) {
+		this.removeDirectiveBlankLine = removeDirectiveBlankLine;
+	}
+
 	/**
 	 * httl.properties: set.directive=set
 	 */
@@ -660,7 +670,108 @@ public class TemplateParser implements Parser {
 	}
 
 	public Node parse(String source, int offset) throws IOException, ParseException {
-		return reduce(clean(scan(source)));
+		return reduce(trim(clean(scan(source))));
+	}
+
+	/**
+	 * 如果指令所在的行没有其他内容，那么将两边的空白内容删除。
+	 * 
+	 * @author subchen@gmail.com
+	 */
+	private List<Statement> trim(List<Statement> nodes) throws ParseException, IOException {
+		if (! removeDirectiveBlankLine) {
+			return nodes;
+		}
+		
+		// 待移除的空的 Text Node (主要是 Text Node 不允许为空的内容，只能在循环外把它delete了)
+		List<Integer> empty_text_index_list = new ArrayList<Integer>();
+
+		for (int i = 0; i < nodes.size(); i++) {
+			Statement node = nodes.get(i);
+
+			if (isTrimableDirective(node)) {
+				if (i > 0) {
+					int prev_index = i - 1;
+					Statement prev = nodes.get(prev_index);
+
+					if (isNoLiteralText(prev)
+							&& !empty_text_index_list.contains(prev_index)) {
+						// 删除上一个文本节点最后一个\n之后的所有空白符
+						String text = ((Text) prev).getContent();
+						int pos = text.lastIndexOf('\n');
+						if (pos >= 0) {
+							String tail = text.substring(pos + 1);
+							if (tail.length() > 0 && tail.trim().length() == 0) {
+								text = text.substring(0, pos + 1);
+								if (text.length() == 0) {
+									empty_text_index_list.add(prev_index); // 将会是空节点，加入到待删除队列
+								} else {
+									nodes.set(prev_index, new Text(text, false,
+											prev.getOffset())); // 修改
+								}
+							}
+						}
+					}
+				} // prev text node
+
+				if (i + 1 < nodes.size()) {
+					int next_index = i + 1;
+					Statement next = nodes.get(next_index);
+
+					if (isNoLiteralText(next)) {
+						// 删除下一个文本节点地一个\n之前的所有空白符
+						String text = ((Text) next).getContent();
+						int pos = text.indexOf('\n');
+						if (pos >= 0) {
+							String head = text.substring(0, pos);
+							if (head.trim().length() == 0) {
+								text = text.substring(pos + 1);
+								boolean isEmptyNode = false;
+								if (text.length() == 0) {
+									empty_text_index_list.add(next_index); // 将会是空节点，加入到待删除队列
+									isEmptyNode = true;
+								} else if (text.indexOf('\n') == -1
+										&& text.trim().length() == 0) {
+									// 看看下面是不是还是个指令，是不是可以全部丢掉
+									if (next_index + 1 < nodes.size()) {
+										Statement next_next = nodes
+												.get(next_index + 1);
+										if (isTrimableDirective(next_next)) {
+											empty_text_index_list
+													.add(next_index); // 将会是空节点，加入到待删除队列
+											isEmptyNode = true;
+										}
+									}
+								}
+								if (!isEmptyNode) {
+									nodes.set(next_index, new Text(text, false,
+											next.getOffset())); // 修改
+								}
+							}
+						}
+						i++; // skip next
+					}
+				} // next text node
+			} // not Directive
+		}
+
+		// 删除需要删掉的空节点。
+		if (empty_text_index_list.size() > 0) {
+			// 必须先删除后面的node
+			for (int i = empty_text_index_list.size() - 1; i >= 0; i--) {
+				int index = empty_text_index_list.get(i); // 必须转成小 int,
+															// 否则就是删除对象，不是删除指定的index
+				nodes.remove(index);
+			}
+		}
+		return nodes;
+	}
+
+	private boolean isTrimableDirective(Statement node) {
+	    if (node instanceof Directive) {
+	        return !(node instanceof ValueDirective);
+	    }
+	    return false;
 	}
 
 	private String filterEscape(String source) {
