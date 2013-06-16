@@ -40,7 +40,7 @@ public class ClasspathResource extends InputStreamResource {
 		this.path = path;
 	}
 
-	public InputStream getInputStream() throws IOException {
+	public InputStream openStream() throws IOException {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
 	}
 

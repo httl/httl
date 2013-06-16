@@ -52,11 +52,11 @@ public class StringResource extends AbstractResource {
 		return source.length();
 	}
 	
-	public Reader getReader() throws IOException {
+	public Reader openReader() throws IOException {
 		return new StringReader(source);
 	}
 
-	public InputStream getInputStream() throws IOException {
+	public InputStream openStream() throws IOException {
 		return new ByteArrayInputStream(source.getBytes(getEncoding()));
 	}
 

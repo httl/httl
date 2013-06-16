@@ -402,7 +402,7 @@ public class MultiFormatter implements Formatter<Object> {
 
 	public String toString(String key, Resource value) {
 		try {
-			return IOUtils.readToString(value.getReader());
+			return IOUtils.readToString(value.openReader());
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -622,7 +622,7 @@ public class MultiFormatter implements Formatter<Object> {
 
 	public char[] toChars(String key, Resource value) {
 		try {
-			return IOUtils.readToChars(value.getReader());
+			return IOUtils.readToChars(value.openReader());
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -844,7 +844,7 @@ public class MultiFormatter implements Formatter<Object> {
 
 	public byte[] toBytes(String key, Resource value) {
 		try {
-			return IOUtils.readToBytes(value.getInputStream());
+			return IOUtils.readToBytes(value.openStream());
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}

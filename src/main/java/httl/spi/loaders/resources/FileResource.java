@@ -41,7 +41,7 @@ public class FileResource extends InputStreamResource {
 		this.file = new File(path);
 	}
 
-	public InputStream getInputStream() throws IOException {
+	public InputStream openStream() throws IOException {
 		return new FileInputStream(this.file);
 	}
 

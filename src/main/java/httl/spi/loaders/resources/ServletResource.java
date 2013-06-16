@@ -45,7 +45,7 @@ public class ServletResource extends InputStreamResource {
 		this.servletContext = servletContext;
 	}
 
-	public InputStream getInputStream() throws IOException {
+	public InputStream openStream() throws IOException {
 		return servletContext.getResourceAsStream(path);
 	}
 

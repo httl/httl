@@ -105,16 +105,16 @@ public class ProxyTemplate implements Template {
 		return template.getSource();
 	}
 
-	public Reader getReader() throws IOException {
-		return template.getReader();
+	public Reader openReader() throws IOException {
+		return template.openReader();
 	}
 
 	public Map<String, Class<?>> getVariables() {
 		return template.getVariables();
 	}
 
-	public InputStream getInputStream() throws IOException {
-		return template.getInputStream();
+	public InputStream openStream() throws IOException {
+		return template.openStream();
 	}
 
 	public int getOffset() {

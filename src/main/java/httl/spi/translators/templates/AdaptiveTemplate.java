@@ -86,12 +86,12 @@ public class AdaptiveTemplate implements Template, Serializable {
 		return writerTemplate.getSource();
 	}
 
-	public Reader getReader() throws IOException {
-		return writerTemplate.getReader();
+	public Reader openReader() throws IOException {
+		return writerTemplate.openReader();
 	}
 
-	public InputStream getInputStream() throws IOException {
-		return streamTemplate.getInputStream();
+	public InputStream openStream() throws IOException {
+		return streamTemplate.openStream();
 	}
 
 	public Engine getEngine() {

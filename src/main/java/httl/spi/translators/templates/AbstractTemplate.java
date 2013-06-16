@@ -216,12 +216,12 @@ public abstract class AbstractTemplate implements Template {
 		return resource.getSource();
 	}
 
-	public Reader getReader() throws IOException {
-		return resource.getReader();
+	public Reader openReader() throws IOException {
+		return resource.openReader();
 	}
 
-	public InputStream getInputStream() throws IOException {
-		return resource.getInputStream();
+	public InputStream openStream() throws IOException {
+		return resource.openStream();
 	}
 
 	public Engine getEngine() {

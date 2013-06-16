@@ -463,7 +463,7 @@ public class CompiledTranslator implements Translator {
 			}
 			String location = null;
 			try {
-				Reader reader = resource.getReader();
+				Reader reader = resource.openReader();
 				try {
 					location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
 				} finally {

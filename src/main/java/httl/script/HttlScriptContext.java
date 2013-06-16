@@ -93,7 +93,7 @@ public class HttlScriptContext implements ScriptContext {
 			Template template = Context.getContext().getTemplate();
 			if (template != null) {
 				try {
-					return template.getReader();
+					return template.openReader();
 				} catch (IOException e) {
 					return null;
 				}

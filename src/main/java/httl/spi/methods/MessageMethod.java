@@ -212,7 +212,7 @@ public class MessageMethod {
 				Resource resource = engine.getResource(file);
 				if (properties.getLastModified() < resource.getLastModified()) {
 					String encoding = (StringUtils.isEmpty(messageEncoding) ? "UTF-8" : messageEncoding);
-					properties.load(resource.getInputStream(), encoding, resource.getLastModified());
+					properties.load(resource.openStream(), encoding, resource.getLastModified());
 				}
 			} catch (IOException e) {
 				if (logger != null && logger.isErrorEnabled()) {

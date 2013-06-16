@@ -50,8 +50,8 @@ public abstract class InputStreamResource extends AbstractResource {
 		super(engine, name, locale, encoding);
 	}
 
-	public Reader getReader() throws IOException {
-		InputStream in = getInputStream();
+	public Reader openReader() throws IOException {
+		InputStream in = openStream();
 		if (in == null) {
 			throw new FileNotFoundException("Not found template " + getName() + " in " + getClass().getSimpleName());
 		}
@@ -94,7 +94,7 @@ public abstract class InputStreamResource extends AbstractResource {
 			return file.length();
 		}
 		try {
-			InputStream in = getInputStream();
+			InputStream in = openStream();
 			if (in != null) {
 				try {
 					return in.available();

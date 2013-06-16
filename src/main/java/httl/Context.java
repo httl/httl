@@ -39,8 +39,8 @@ import java.util.Set;
  * if (value == null) value = parent.get(key); // recursive above
  * 
  * default resovler:
- * if (value == null) value = servletResovler.get(key); // request, response, parameter, header, session, cookie, application
  * if (value == null) value = contextResovler.get(key); // parent, super, this, engine, out, level
+ * if (value == null) value = servletResovler.get(key); // request, response, parameter, header, session, cookie, application
  * if (value == null) value = globalResovler.get(key); // GlobalResovler.put(key, value)
  * 
  * non default resovler:

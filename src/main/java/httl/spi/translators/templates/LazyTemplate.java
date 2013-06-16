@@ -142,10 +142,10 @@ public class LazyTemplate implements Template {
 		return template.getSource();
 	}
 
-	public Reader getReader() throws IOException {
+	public Reader openReader() throws IOException {
 		if (template == null)
-			return resource.getReader();
-		return template.getReader();
+			return resource.openReader();
+		return template.openReader();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -155,10 +155,10 @@ public class LazyTemplate implements Template {
 		return template.getVariables();
 	}
 
-	public InputStream getInputStream() throws IOException {
+	public InputStream openStream() throws IOException {
 		if (template == null)
-			return resource.getInputStream();
-		return template.getInputStream();
+			return resource.openStream();
+		return template.openStream();
 	}
 
 	public int getOffset() {

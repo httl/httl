@@ -124,7 +124,7 @@ public class FileMethod {
 	}
 
 	public Template render(Resource resource) throws IOException, ParseException {
-		return render(IOUtils.readToString(resource.getReader()));
+		return render(IOUtils.readToString(resource.openReader()));
 	}
 
 	public Template render(byte[] source) throws IOException, ParseException {

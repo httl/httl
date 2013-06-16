@@ -40,7 +40,7 @@ public class UrlResource extends InputStreamResource {
 		this.url = new URL(path);
 	}
 
-	public InputStream getInputStream() throws IOException {
+	public InputStream openStream() throws IOException {
 		return url.openStream();
 	}
 

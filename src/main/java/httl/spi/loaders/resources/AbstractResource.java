@@ -82,7 +82,7 @@ public abstract class AbstractResource implements Resource, Serializable {
 
 	public String getSource() throws IOException {
 		try {
-			return IOUtils.readToString(getReader());
+			return IOUtils.readToString(openReader());
 		} catch (IOException e) {
 			throw new IllegalStateException(e.getMessage(), e);
 		}

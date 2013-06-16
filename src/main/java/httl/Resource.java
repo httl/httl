@@ -86,7 +86,7 @@ public interface Resource {
 	 * NOTE: Don't forget close the reader.
 	 * 
 	 * <pre>
-	 * Reader reader = resource.getReader();
+	 * Reader reader = resource.openReader();
 	 * try {
 	 *	 // do something ...
 	 * } finally {
@@ -97,7 +97,7 @@ public interface Resource {
 	 * @return source reader
 	 * @throws IOException - If an I/O error occurs
 	 */
-	Reader getReader() throws IOException;
+	Reader openReader() throws IOException;
 
 	/**
 	 * Get the template source input stream.
@@ -105,18 +105,18 @@ public interface Resource {
 	 * NOTE: Don't forget close the input stream.
 	 * 
 	 * <pre>
-	 * InputStream input = resource.getInputStream();
+	 * InputStream stream = resource.openStream();
 	 * try {
 	 *	 // do something ...
 	 * } finally {
-	 *	 input.close();
+	 *	 stream.close();
 	 * }
 	 * </pre>
 	 * 
 	 * @return source input stream
 	 * @throws IOException - If an I/O error occurs
 	 */
-	InputStream getInputStream() throws IOException;
+	InputStream openStream() throws IOException;
 
 	/**
 	 * Get the template engine.
