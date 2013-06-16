@@ -36,6 +36,11 @@ public class StringUtilsTest {
 	}
 
 	@Test
+	public void escapeXmlBytes() {
+	    assertEquals("中&lt;文&gt;字&quot;符", new String(StringUtils.escapeXml("中<文>字\"符".getBytes())));
+	}
+
+	@Test
 	public void testEscapeXmlPerformance() {
 		String html = "a<table border=\"0\" color=\'red\'>b&lt;c</table>d";
 		//char[] html = "a<table border=\"0\" color=\'red\'>b&lt;c</table>d".toCharArray();

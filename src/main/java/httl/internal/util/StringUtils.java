@@ -611,12 +611,11 @@ public class StringUtils {
 		int len = src.length;
 		int off = 0;
 		byte[] buf = null;
-		byte pre = 0;
 		for (int i = 0; i < len; i ++) {
 			byte ch = src[i];
 			switch (ch) {
 				case 60:
-					if (pre >= 0) {
+					if (i != 0) {
 						if (buf == null) {
 							buf = expand(src, off = i, 4);
 						} else if (buf.length < off + 4) {
@@ -629,7 +628,7 @@ public class StringUtils {
 						break;
 					}
 				case 62:
-					if (pre >= 0) {
+					if (i != 0) {
 						if (buf == null) {
 							buf = expand(src, off = i, 4);
 						} else if (buf.length < off + 4) {
@@ -642,7 +641,7 @@ public class StringUtils {
 						break;
 					}
 				case 34:
-					if (pre >= 0) {
+					if (i != 0) {
 						if (buf == null) {
 							buf = expand(src, off = i, 6);
 						} else if (buf.length < off + 6) {
@@ -657,7 +656,7 @@ public class StringUtils {
 						break;
 					}
 				case 39:
-					if (pre >= 0) {
+					if (i != 0) {
 						if (buf == null) {
 							buf = expand(src, off = i, 6);
 						} else if (buf.length < off + 6) {
@@ -672,7 +671,7 @@ public class StringUtils {
 						break;
 					}
 				case 38:
-					if (pre >= 0) {
+					if (i != 0) {
 						if (buf == null) {
 							buf = expand(src, off = i, 5);
 						} else if (buf.length < off + 5) {
@@ -694,7 +693,6 @@ public class StringUtils {
 					}
 					break;
 			}
-			pre = ch;
 		}
 		if (buf != null) {
 			if (buf.length > off) {
