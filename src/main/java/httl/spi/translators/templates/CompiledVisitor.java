@@ -430,9 +430,9 @@ public class CompiledVisitor extends AstVisitor {
 			builder.append(".copy(");
 			builder.append(code);
 			if (stream) {
-				builder.append(".getInputStream()");
+				builder.append(".openStream()");
 			} else {
-				builder.append(".getReader()");
+				builder.append(".openReader()");
 			}
 			builder.append(", $output);\n");
 		} else {
@@ -461,22 +461,22 @@ public class CompiledVisitor extends AstVisitor {
 					builder.append(")");
 					builder.append(code);
 					if (stream) {
-						builder.append(").getInputStream()");
+						builder.append(").openStream()");
 					} else {
-						builder.append(").getReader()");
+						builder.append(").openReader()");
 					}
 					builder.append(", $output);\n	}");
 				} else {
 					code = "(" + code + " instanceof " + Resource.class.getName() + " ? " 
 							+ IOUtils.class.getName() + ".readToString(((" + Resource.class.getName() + ")" 
-							+ code + ").getReader()) : " + code + ")";
+							+ code + ").openReader()) : " + code + ")";
 				}
 				builder.append(" else {\n");
 			} else if (Resource.class.isAssignableFrom(returnType)) {
 				if (! StringUtils.isNamed(code)) {
 					code = "(" + code + ")";
 				}
-				code = "(" + code + " == null ? null : " + IOUtils.class.getName() + ".readToString(" + code + ".getReader()))";
+				code = "(" + code + " == null ? null : " + IOUtils.class.getName() + ".readToString(" + code + ".openReader()))";
 			}
 			getVariables.add(formatterVariable);
 			String key = getTextPart(node.getExpression().toString(), null, true);
