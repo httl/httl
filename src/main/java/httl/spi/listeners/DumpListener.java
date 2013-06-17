@@ -16,7 +16,7 @@
 package httl.spi.listeners;
 
 import httl.Context;
-import httl.internal.bean.Reqiured;
+import httl.internal.util.Reqiured;
 import httl.internal.util.UrlUtils;
 import httl.spi.Codec;
 import httl.spi.Listener;

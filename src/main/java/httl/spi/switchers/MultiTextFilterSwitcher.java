@@ -17,7 +17,7 @@ package httl.spi.switchers;
 
 import httl.spi.Filter;
 import httl.spi.Switcher;
-import httl.internal.bean.Reqiured;
+import httl.internal.util.Reqiured;
 
 /**
  * MultiTextFilterSwitcher. (SPI, Singleton, ThreadSafe)

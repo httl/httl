@@ -56,11 +56,11 @@ import httl.ast.SubOperator;
 import httl.ast.UnaryOperator;
 import httl.ast.UnsignShiftOperator;
 import httl.ast.Variable;
-import httl.internal.scanner.DfaScanner;
-import httl.internal.scanner.Token;
 import httl.internal.util.ClassUtils;
+import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.StringUtils;
+import httl.internal.util.Token;
 import httl.spi.Filter;
 import httl.spi.Parser;
 

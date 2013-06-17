@@ -18,7 +18,7 @@ package httl.spi.interceptors;
 import httl.Context;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
-import httl.internal.bean.Reqiured;
+import httl.internal.util.Reqiured;
 
 import java.io.IOException;
 import java.text.ParseException;

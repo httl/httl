@@ -33,12 +33,12 @@ import httl.ast.SetDirective;
 import httl.ast.Statement;
 import httl.ast.Text;
 import httl.ast.ValueDirective;
-import httl.internal.scanner.DfaScanner;
-import httl.internal.scanner.Token;
 import httl.internal.util.ClassUtils;
+import httl.internal.util.DfaScanner;
 import httl.internal.util.LinkedStack;
 import httl.internal.util.ParameterizedTypeImpl;
 import httl.internal.util.StringUtils;
+import httl.internal.util.Token;
 import httl.spi.Parser;
 
 import java.io.IOException;

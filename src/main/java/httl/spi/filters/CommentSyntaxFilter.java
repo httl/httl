@@ -15,7 +15,7 @@
  */
 package httl.spi.filters;
 
-import httl.internal.bean.Reqiured;
+import httl.internal.util.Reqiured;
 import httl.spi.Filter;
 
 /**

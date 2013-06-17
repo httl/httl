@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.internal.bean;
+package httl.internal.util;
 
-import httl.internal.util.ClassUtils;
-import httl.internal.util.StringUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;

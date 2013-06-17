@@ -15,8 +15,8 @@
  */
 package httl.spi.filters;
 
-import httl.internal.scanner.DfaScanner;
-import httl.internal.scanner.Token;
+import httl.internal.util.DfaScanner;
+import httl.internal.util.Token;
 import httl.spi.Filter;
 
 import java.text.ParseException;

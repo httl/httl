@@ -22,7 +22,7 @@ import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.methods.FileMethod;
 import httl.spi.translators.templates.ListenerTemplate;
-import httl.internal.bean.Optional;
+import httl.internal.util.Optional;
 import httl.internal.util.StringUtils;
 import httl.internal.util.UrlUtils;
 

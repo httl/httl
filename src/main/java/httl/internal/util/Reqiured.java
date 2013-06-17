@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.internal.bean;
+package httl.internal.util;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -22,15 +22,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Optional. (SPI, Annotation, ThreadSafe)
+ * Reqiured. (SPI, Annotation, ThreadSafe)
  * 
- * @see httl.internal.bean.BeanFactory
- * @see httl.internal.bean.Reqiured
+ * @see httl.internal.util.BeanFactory
+ * @see httl.internal.util.Optional
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface Optional {
+public @interface Reqiured {
 }

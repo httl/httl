@@ -15,7 +15,7 @@
  */
 package httl;
 
-import httl.internal.bean.BeanFactory;
+import httl.internal.util.BeanFactory;
 import httl.internal.util.CollectionUtils;
 import httl.internal.util.ConfigUtils;
 import httl.internal.util.StringUtils;
