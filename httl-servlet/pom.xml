@@ -117,6 +117,7 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.5</source>
@@ -139,6 +140,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
 					<execution>
@@ -159,23 +161,10 @@
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<forkMode>once</forkMode>
 					<argLine>-server -Xms128m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=256m</argLine>
-					<systemProperties>
-						<property>
-							<name>profile</name>
-							<value>${profile}</value>
-						</property>
-						<property>
-							<name>includes</name>
-							<value>${includes}</value>
-						</property>
-						<property>
-							<name>excludes</name>
-							<value>${excludes}</value>
-						</property>
-					</systemProperties>
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
 					<execution>
