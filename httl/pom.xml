@@ -19,10 +19,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>httl</groupId>
-	<artifactId>httl-parent</artifactId>
+	<artifactId>httl</artifactId>
 	<version>1.0.10</version>
-	<packaging>pom</packaging>
-	<name>HTTL-Parent</name>
+	<packaging>jar</packaging>
+	<name>HTTL</name>
 	<description>Hyper Text Template Language and Engine.</description>
 	<url>http://httl.github.io</url>
 	<inceptionYear>2012</inceptionYear>
@@ -37,16 +37,74 @@
 	<properties>
 		<updateReleaseInfo>true</updateReleaseInfo>
 	</properties>
-	<modules>
-		<module>httl</module>
-		<module>httl-script</module>
-		<module>httl-servlet</module>
-		<module>httl-springmvc</module>
-		<module>httl-struts</module>
-		<module>httl-webx</module>
-		<module>httl-jfinal</module>
-		<module>httl-nutz</module>
-	</modules>
+	<dependencies>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.16.1-GA</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.sorcerer</groupId>
+			<artifactId>sorcerer-javac</artifactId>
+			<version>0.8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.htmlparser.jericho</groupId>
+			<artifactId>jericho-html</artifactId>
+			<version>3.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging-api</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.1.27</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<repositories>
 		<repository>
 			<id>httl-repository</id>
