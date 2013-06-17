@@ -273,6 +273,16 @@ public class CollectionMethod {
 		}
 	}
 
+	public static <T> List<T> recursive(Collection<T> set, String children) {
+		List<T> result = new ArrayList<T>();
+		if (set != null) {
+			for (T item : set) {
+				_recursive(result, item, children);
+			}
+		}
+		return result;
+	}
+
 	public static <T> List<T> recursive(T node, String children) {
 		List<T> result = new ArrayList<T>();
 		_recursive(result, node, children);
