@@ -77,7 +77,6 @@ public class JdkCompiler extends AbstractCompiler {
 
 	private boolean lintUnchecked;
 	
-	@SuppressWarnings("resource")
 	public JdkCompiler(){
 		compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {

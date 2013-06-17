@@ -41,7 +41,6 @@ public class JarResource extends InputStreamResource {
 		this.file = file;
 	}
 
-	@SuppressWarnings("resource")
 	public InputStream openStream() throws IOException {
 		// 注：JarFile与File的设计是不一样的，File相当于C#的FileInfo，只持有信息，
 		// 而JarFile构造时即打开流，所以每次读取数据时，重新new新的实例，而不作为属性字段持有。

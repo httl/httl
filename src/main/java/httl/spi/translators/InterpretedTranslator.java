@@ -172,7 +172,7 @@ public class InterpretedTranslator implements Translator {
 	/**
 	 * httl.properties: import.methods=java.lang.Math
 	 */
-	public void setImportMethods(String[] importMethods) {
+	public void setImportMethods(Object[] importMethods) {
 		for (Object function : importMethods) {
 			if (function instanceof Class) {
 				this.functions.put((Class<?>) function, function);
