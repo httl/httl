@@ -17,7 +17,7 @@ package httl.spi.switchers;
 
 import httl.spi.Formatter;
 import httl.spi.Switcher;
-import httl.internal.util.Reqiured;
+import httl.internal.bean.Reqiured;
 
 /**
  * MultiFormatterSwitcher. (SPI, Singleton, ThreadSafe)

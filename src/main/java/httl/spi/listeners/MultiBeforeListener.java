@@ -16,7 +16,7 @@
 package httl.spi.listeners;
 
 import httl.spi.Listener;
-import httl.internal.util.Reqiured;
+import httl.internal.bean.Reqiured;
 
 /**
  * MultiListener. (SPI, Singleton, ThreadSafe)

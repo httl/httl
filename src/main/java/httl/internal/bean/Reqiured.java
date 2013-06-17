@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.switchers;
+package httl.internal.bean;
 
-import httl.spi.Filter;
-import httl.spi.Switcher;
-import httl.internal.bean.Reqiured;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * MultiTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
+ * Reqiured. (SPI, Annotation, ThreadSafe)
  * 
- * @see httl.spi.translators.CompiledTranslator#setTextFilterSwitcher(Switcher)
- * @see httl.spi.translators.InterpretedTranslator#setTextFilterSwitcher(Switcher)
+ * @see httl.internal.bean.BeanFactory
+ * @see httl.internal.bean.Optional
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class MultiTextFilterSwitcher extends MultiSwitcher<Filter> {
-
-	/**
-	 * httl.properties: text.filter.switchers=httl.spi.switchers.JavascriptFilterSwitcher
-	 */
-	@Reqiured
-	public void setTextFilterSwitchers(Switcher<Filter>[] switchers) {
-		setSwitchers(switchers);
-	}
-
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface Reqiured {
 }

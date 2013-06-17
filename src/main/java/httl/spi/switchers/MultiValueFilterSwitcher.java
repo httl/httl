@@ -17,7 +17,7 @@ package httl.spi.switchers;
 
 import httl.spi.Filter;
 import httl.spi.Switcher;
-import httl.internal.util.Reqiured;
+import httl.internal.bean.Reqiured;
 
 /**
  * MultiValueFilterSwitcher. (SPI, Singleton, ThreadSafe)
