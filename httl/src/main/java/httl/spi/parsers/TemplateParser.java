@@ -366,6 +366,7 @@ public class TemplateParser implements Parser {
 							hide = true;
 							set = set.substring(0, set.length() - 1);
 						}
+						set = set.trim();
 						macroName = macroName.substring(i + 1);
 					}
 					boolean out = false;
@@ -373,12 +374,27 @@ public class TemplateParser implements Parser {
 						out = true;
 						macroName = macroName.substring(macroName.startsWith("$!") ? 2 : 1);
 					}
+					String filter = null;
+					int idx = macroName.indexOf("=>");
+					if (idx > 0) {
+						filter = macroName.substring(idx + 2).trim();
+						macroName = macroName.substring(0, idx);
+					}
+					String expr;
+					if (StringUtils.isNotEmpty(filter)) {
+						if (filter.contains("(")) {
+							expr = filter;
+						} else {
+							expr = filter + "(" + macroName + ")";
+						}
+					} else {
+						expr = macroName;
+					}
 					if (StringUtils.isNotEmpty(set)) {
-						String var = set.trim();
-						directives.add(new SetDirective(Template.class, var, (Expression) expressionParser.parse(macroName, exprOffset), parent, hide, offset));
+						directives.add(new SetDirective(Template.class, set, (Expression) expressionParser.parse(expr, exprOffset), parent, hide, offset));
 					}
 					if (out) {
-						directives.add(new ValueDirective((Expression) expressionParser.parse(macroName, exprOffset), true, offset));
+						directives.add(new ValueDirective((Expression) expressionParser.parse(expr, exprOffset), true, offset));
 					}
 					macroName = macroName.trim();
 					directives.add(new MacroDirective(macroName, offset));
