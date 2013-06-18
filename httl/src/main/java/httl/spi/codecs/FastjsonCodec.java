@@ -25,7 +25,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class FastjsonCodec extends JsonCodec {
+public class FastjsonCodec extends AbstractJsonCodec {
 
 	public String toString(String key, Object value) {
 		if (value == null) {

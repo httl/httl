@@ -15,22 +15,16 @@
  */
 package httl.spi.codecs;
 
-import httl.spi.Compiler;
-import httl.spi.codecs.json.JSON;
-import httl.spi.converters.BeanMapConverter;
 import httl.util.StringUtils;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Map;
 
 /**
  * Json Codec. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class JsonCodec extends AbstractCodec {
+public abstract class AbstractJsonCodec extends AbstractCodec {
 
 	private static final char[] NULL_CHARS = "null".toCharArray();
 
@@ -43,12 +37,6 @@ public class JsonCodec extends AbstractCodec {
 	private static final byte[] TRUE_BYTES = "true".getBytes();
 
 	private static final byte[] FALSE_BYTES = "false".getBytes();
-
-	private final BeanMapConverter converter = new BeanMapConverter();
-
-	public void setCompiler(Compiler compiler) {
-		this.converter.setCompiler(compiler);
-	}
 
 	private boolean jsonWithClass;
 
@@ -92,28 +80,6 @@ public class JsonCodec extends AbstractCodec {
 				|| (str.length > 1 && str[0] == '\'' && str[str.length - 1] == '\'')
 				|| StringUtils.isNumber(str) || Arrays.equals(NULL_BYTES, str) 
 				|| Arrays.equals(TRUE_BYTES, str) || Arrays.equals(FALSE_BYTES, str));
-	}
-
-	public String toString(String key, Object value) {
-		if (value == null) {
-			return null;
-		}
-		try {
-			return JSON.json(value, jsonWithClass, converter);
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T valueOf(String str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		if (type == null) {
-			return (T) JSON.parse(str, Map.class, converter);
-		}
-		return JSON.parse(str, type, converter);
 	}
 
 }

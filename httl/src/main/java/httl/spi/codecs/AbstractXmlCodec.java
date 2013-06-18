@@ -13,27 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package httl.spi.codecs.json;
+package httl.spi.codecs;
 
-import java.io.IOException;
+import httl.util.StringUtils;
 
 /**
- * JSONSerializable.
+ * Xml Codec. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-interface JSONNode {
+public abstract class AbstractXmlCodec extends AbstractCodec {
 
-	/**
-	 * write json string.
-	 * 
-	 * @param jc
-	 *            json converter.
-	 * @param jb
-	 *            json builder.
-	 * @throws IOException
-	 */
-	void writeJSON(JSONValue jc, JSONWriter jb, boolean writeClass)
-			throws IOException;
+	public String getFormat() {
+		return "xml";
+	}
+
+	public boolean isValueOf(String str) {
+		return StringUtils.isNotEmpty(str) && str.startsWith("<");
+	}
+
+	public boolean isValueOf(char[] str) {
+		return StringUtils.isNotEmpty(str) && str[0] == '<';
+	}
+
+	public boolean isValueOf(byte[] str) {
+		return StringUtils.isNotEmpty(str) && str[0] == '<';
+	}
 
 }

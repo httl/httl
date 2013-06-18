@@ -15,8 +15,6 @@
  */
 package httl.spi.codecs;
 
-import httl.util.StringUtils;
-
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.ByteArrayInputStream;
@@ -24,27 +22,11 @@ import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 
 /**
- * Xml Codec. (SPI, Singleton, ThreadSafe)
+ * Xbean Codec. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class XmlCodec extends AbstractCodec {
-
-	public String getFormat() {
-		return "xml";
-	}
-
-	public boolean isValueOf(String str) {
-		return StringUtils.isNotEmpty(str) && str.startsWith("<");
-	}
-
-	public boolean isValueOf(char[] str) {
-		return StringUtils.isNotEmpty(str) && str[0] == '<';
-	}
-
-	public boolean isValueOf(byte[] str) {
-		return StringUtils.isNotEmpty(str) && str[0] == '<';
-	}
+public class XbeanCodec extends AbstractXmlCodec {
 
 	public String toString(String key, Object value) {
 		return toString(toBytes(key, value));

@@ -16,17 +16,17 @@
 package httl.spi;
 
 /**
- * Property Resolver. (SPI, Singleton, ThreadSafe)
+ * Variable Resolver. (SPI, Singleton, ThreadSafe)
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Resolver {
 
 	/**
-	 * Get the property value.
+	 * Get the variable value.
 	 * 
-	 * @param key - property key
-	 * @return property value
+	 * @param key - variable key
+	 * @return variable value
 	 */
 	Object get(String key);
 

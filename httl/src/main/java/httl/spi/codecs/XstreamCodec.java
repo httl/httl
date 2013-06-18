@@ -29,7 +29,7 @@ import com.thoughtworks.xstream.io.xml.Xpp3Driver;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class XstreamCodec extends XmlCodec {
+public class XstreamCodec extends AbstractXmlCodec {
 
 	private static XStream XSTREAM = new XStream(new Xpp3Driver());
 
