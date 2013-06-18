@@ -36,7 +36,7 @@ public interface Translator {
 	 * Translate the resource to template.
 	 * 
 	 * @param resource - template resource
-	 * @param root TODO
+	 * @param root - template root node
 	 * @param types - template parameter types
 	 * @return template instance
 	 */

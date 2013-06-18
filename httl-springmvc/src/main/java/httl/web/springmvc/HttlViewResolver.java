@@ -38,7 +38,7 @@ public class HttlViewResolver extends AbstractTemplateViewResolver implements In
 
 	public void afterPropertiesSet() throws Exception {
 		WebEngine.setServletContext(getServletContext());
-		if (super.getSuffix() == null) {
+		if (super.getSuffix() == null || super.getSuffix().length() == 0) {
 			super.setSuffix(WebEngine.getTemplateSuffix());
 		}
 	}
