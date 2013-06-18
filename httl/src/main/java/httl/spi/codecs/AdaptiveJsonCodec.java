@@ -11,10 +11,10 @@ public class AdaptiveJsonCodec extends AbstractJsonCodec {
 	public AdaptiveJsonCodec() {
 		try {
 			codec = (Codec) Class.forName("httl.spi.codecs.FastjsonCodec").newInstance();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			try {
 				codec = (Codec) Class.forName("httl.spi.codecs.JacksonCodec").newInstance();
-			} catch (Exception e2) {
+			} catch (Throwable e2) {
 				codec = null;
 			}
 		}
