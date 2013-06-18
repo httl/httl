@@ -15,10 +15,16 @@
  */
 package httl.test.method;
 
+import httl.Template;
+
+import java.text.ParseException;
+
 /**
  * @author Jerry Lee (oldratlee AT gmail DOT com)
  */
 public class UserMethods {
+
+	private UserMethods() {}
 
 	public static String overloadMethod(A1 a1) {
 		return "A1";
@@ -28,9 +34,16 @@ public class UserMethods {
 		return "A1B1";
 	}
 
-	private UserMethods() {}
-
 	public static String overloadMethod(A1 a1, A2 a2) {
 		return "A1";
 	}
+
+	public static String appendHello(Template macro) throws ParseException {
+		Object result = macro.evaluate();
+		if (result instanceof byte[]) {
+			result = new String((byte[]) result);
+		}
+		return "Hello: " + result;
+	}
+
 }

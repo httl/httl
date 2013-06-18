@@ -350,6 +350,12 @@ public class TemplateParser implements Parser {
 				} else if (StringUtils.inArray(name, macroDirective)) {
 					String macroName = value;
 					String macroParams = null;
+					String filter = null;
+					int idx = macroName.indexOf("=>");
+					if (idx > 0) {
+						filter = macroName.substring(idx + 2).trim();
+						macroName = macroName.substring(0, idx);
+					}
 					int i = value.indexOf('(');
 					if (i > 0) {
 						if (! message.endsWith(")")) {
@@ -378,12 +384,6 @@ public class TemplateParser implements Parser {
 					if (macroName.startsWith("$")) {
 						out = true;
 						macroName = macroName.substring(macroName.startsWith("$!") ? 2 : 1);
-					}
-					String filter = null;
-					int idx = macroName.indexOf("=>");
-					if (idx > 0) {
-						filter = macroName.substring(idx + 2).trim();
-						macroName = macroName.substring(0, idx);
 					}
 					String expr;
 					if (StringUtils.isNotEmpty(filter)) {
