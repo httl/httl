@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -243,6 +244,7 @@ public class TemplateParser implements Parser {
 	private List<Statement> scan(String source) throws ParseException, IOException {
 		List<Statement> directives = new ArrayList<Statement>();
 		List<Token> tokens = scanner.scan(source);
+		AtomicInteger seq = new AtomicInteger();
 		for (int t = 0; t < tokens.size(); t ++) {
 			Token token = tokens.get(t);
 			String message = token.getMessage();
@@ -309,6 +311,9 @@ public class TemplateParser implements Parser {
 						defineVariableTypes(value, offset, directives);
 					}
 				} else if (StringUtils.inArray(name, forDirective)) {
+					if (StringUtils.isNumber(value.trim())) {
+						value = "__for" + seq.incrementAndGet() + " : 1 .. " + value.trim();
+					}
 					int i = value.indexOf(" in ");
 					int n = 4;
 					if (i < 0) {
