@@ -73,4 +73,18 @@ public abstract class AbstractFormatter<T> implements Formatter<T> {
 		}
 	}
 
+	protected String toString(byte[] str) {
+		if (str == null) {
+			return "";
+		}
+		if (outputEncoding == null) {
+			return new String(str);
+		}
+		try {
+			return new String(str, outputEncoding);
+		} catch (UnsupportedEncodingException e) {
+			return new String(str);
+		}
+	}
+
 }

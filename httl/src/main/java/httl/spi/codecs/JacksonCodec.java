@@ -77,7 +77,7 @@ public class JacksonCodec extends AbstractJsonCodec {
 			if (e instanceof JsonProcessingException) {
 				offset = (int) ((JsonProcessingException) e).getLocation().getCharOffset();
 			}
-			throw new ParseException("Failed to parse " + str + " using jackson, cause: " + e.getMessage(), offset);
+			throw new ParseException("Failed to parse " + toString(str) + " using jackson, cause: " + e.getMessage(), offset);
 		}
 	}
 
