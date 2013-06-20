@@ -380,6 +380,9 @@ public class ExpressionParser implements Parser {
 		for (int i = 0; i < tokens.size(); i ++) {
 			Token token = tokens.get(i);
 			String msg = token.getMessage().trim();
+			if (msg.length() == 0) {
+				continue;
+			}
 			if ("new".equals(msg)) {
 				StringBuilder buf = new StringBuilder();
 				while (i + 1 < tokens.size() && isPackageName(tokens.get(i + 1).getMessage().trim())) {
