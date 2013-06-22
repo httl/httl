@@ -2402,7 +2402,7 @@ public class CompiledVisitor extends AstVisitor {
 					} catch (NoSuchMethodException e) {
 						String def = "";
 						if (StringUtils.isNamed(leftCode) && leftClass.equals(defaultVariableType)) {
-							def = " Please add variable type definition #set(Xxx user) in your template.";
+							def = " Please add variable type definition #set(Xxx " + leftCode + ") in your template.";
 						}
 						if (rightTypes != null && rightTypes.length > 0) {
 							throw new ParseException("No such method " + ClassUtils.getMethodFullName(name, rightTypes) + " in class "

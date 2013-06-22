@@ -90,15 +90,6 @@ public class InterpretedTranslator implements Translator {
 
 	private Logger logger;
 
-	private Filter templateFilter;
-
-	/**
-	 * httl.properties: template.filter=httl.spi.filters.AttributeSyntaxFilter
-	 */
-	public void setTemplateFilter(Filter templateFilter) {
-		this.templateFilter = templateFilter;
-	}
-	
 	public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
@@ -235,10 +226,6 @@ public class InterpretedTranslator implements Translator {
 			IOException {
 		if (logger != null && logger.isDebugEnabled()) {
 			logger.debug("Interprete template " + resource.getName());
-		}
-		String source = resource.getSource();
-		if (templateFilter != null) {
-			source = templateFilter.filter(resource.getName(), source);
 		}
 		InterpretedTemplate template = new InterpretedTemplate(resource, root, null);
 		template.setInterceptor(interceptor);

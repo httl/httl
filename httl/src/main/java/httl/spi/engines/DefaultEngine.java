@@ -20,6 +20,7 @@ import httl.Node;
 import httl.Resource;
 import httl.Template;
 import httl.spi.Converter;
+import httl.spi.Filter;
 import httl.spi.Loader;
 import httl.spi.Logger;
 import httl.spi.Parser;
@@ -27,6 +28,7 @@ import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
 import httl.spi.translators.templates.LazyTemplate;
+import httl.util.ClassUtils;
 import httl.util.ConfigUtils;
 import httl.util.DelegateMap;
 import httl.util.Digest;
@@ -36,6 +38,7 @@ import httl.util.VolatileReference;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -73,6 +76,8 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: loggers=httl.spi.loggers.Log4jLogger
 	private Logger logger;
+
+	private Filter templateFilter;
 
 	// httl.properties: template.cache=java.util.concurrent.ConcurrentHashMap
 	private Map<Object, Object> cache;
@@ -241,7 +246,43 @@ public class DefaultEngine extends Engine {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
-		Node root = templateParser.parse(resource.getSource(), 0);
+		String source = resource.getSource();
+		if (templateFilter != null) {
+			source = templateFilter.filter(resource.getName(), source);
+		}
+		Node root;
+		try {
+			root = templateParser.parse(source, 0);
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			ParseException pe;
+			if (e instanceof ParseException)
+				pe = (ParseException) e;
+			else
+				pe = new ParseException("Failed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
+			if (e.getMessage() != null 
+					&& e.getMessage().contains("Occur to offset:")) {
+				throw pe;
+			}
+			int offset = pe.getErrorOffset();
+			if (offset <= 0) {
+				throw pe;
+			}
+			String location = null;
+			try {
+				Reader reader = resource.openReader();
+				try {
+					location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
+				} finally {
+					reader.close();
+				}
+			} catch (Throwable t) {
+			}
+			throw new ParseException(e.getMessage()  + "\nOccur to offset: " + offset + 
+									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
+									 + ", stack: " + ClassUtils.toString(e), offset);
+		}
 		if (useRenderVariableType) {
 			return new LazyTemplate(translator, resource, root, parameterTypes, mapConverter);
 		}
@@ -492,6 +533,13 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setResolver(Resolver resolver) {
 		this.resolver = resolver;
+	}
+
+	/**
+	 * httl.properties: template.filters=httl.spi.filters.CleanBlankLineFilter
+	 */
+	public void setTemplateFilter(Filter templateFilter) {
+		this.templateFilter = templateFilter;
 	}
 
 }

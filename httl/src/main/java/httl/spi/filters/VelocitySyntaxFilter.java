@@ -161,7 +161,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 	public String filter(String key, String value) {
 		try {
 			StringBuilder buf = new StringBuilder();
-			List<Token> tokens = scanner.scan(value);
+			List<Token> tokens = scanner.scan(value, 0);
 			for (Token token : tokens) {
 				String message = token.getMessage();
 				if (message.length() > 1) {

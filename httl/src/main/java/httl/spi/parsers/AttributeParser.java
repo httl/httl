@@ -15,9 +15,9 @@
  */
 package httl.spi.parsers;
 
-import httl.spi.Translator;
+import httl.Engine;
+import httl.spi.engines.DefaultEngine;
 import httl.spi.filters.AttributeSyntaxFilter;
-import httl.spi.translators.CompiledTranslator;
 
 /**
  * AttributeParser. (SPI, Singleton, ThreadSafe)
@@ -30,16 +30,16 @@ import httl.spi.translators.CompiledTranslator;
 @Deprecated
 public class AttributeParser extends TemplateParser {
 
-	private Translator translator;
+	private Engine engine;
 
-	public void setTranslator(Translator translator) {
-		this.translator = translator;
+	public void setEngine(Engine engine) {
+		this.engine = engine;
 	}
 
 	@Override
 	public void init() {
-		if (translator instanceof CompiledTranslator) {
-			((CompiledTranslator) translator).setTemplateFilter(new AttributeSyntaxFilter());
+		if (engine instanceof DefaultEngine) {
+			((DefaultEngine) engine).setTemplateFilter(new AttributeSyntaxFilter());
 		}
 		super.init();
 	}

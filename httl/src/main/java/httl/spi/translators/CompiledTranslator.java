@@ -35,7 +35,6 @@ import httl.util.StringSequence;
 import httl.util.StringUtils;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,8 +83,6 @@ public class CompiledTranslator implements Translator {
 	private Switcher<Filter> valueFilterSwitcher;
 
 	private Switcher<Formatter<Object>> formatterSwitcher;
-
-	private Filter templateFilter;
 
 	private Filter textFilter;
 
@@ -231,13 +228,6 @@ public class CompiledTranslator implements Translator {
 	 */
 	public void setFormatterSwitcher(Switcher<Formatter<Object>> formatterSwitcher) {
 		this.formatterSwitcher = formatterSwitcher;
-	}
-
-	/**
-	 * httl.properties: template.filters=httl.spi.filters.CleanBlankLineFilter
-	 */
-	public void setTemplateFilter(Filter templateFilter) {
-		this.templateFilter = templateFilter;
 	}
 
 	/**
@@ -413,10 +403,6 @@ public class CompiledTranslator implements Translator {
 		try {
 			Template writerTemplate = null;
 			Template streamTemplate = null;
-			String source = resource.getSource();
-			if (templateFilter != null) {
-				source = templateFilter.filter(resource.getName(), source);
-			}
 			if (isOutputWriter || ! isOutputStream) {
 				Class<?> clazz = parseClass(resource, root, defVariableTypes, false, 0);
 				writerTemplate = (Template) clazz.getConstructor(Engine.class, Interceptor.class, Compiler.class, Switcher.class, Switcher.class, Filter.class, Formatter.class, Converter.class, Converter.class, Map.class, Map.class, Resource.class, Template.class, Node.class)
@@ -436,33 +422,10 @@ public class CompiledTranslator implements Translator {
 			}
 		} catch (IOException e) {
 			throw e;
+		} catch (ParseException e) {
+			throw e;
 		} catch (Exception e) {
-			ParseException pe;
-			if (e instanceof ParseException)
-				pe = (ParseException) e;
-			else
-				pe = new ParseException("Failed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
-			if (e.getMessage() != null 
-					&& e.getMessage().contains("Occur to offset:")) {
-				throw pe;
-			}
-			int offset = pe.getErrorOffset();
-			if (offset <= 0) {
-				throw pe;
-			}
-			String location = null;
-			try {
-				Reader reader = resource.openReader();
-				try {
-					location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
-				} finally {
-					reader.close();
-				}
-			} catch (Throwable t) {
-			}
-			throw new ParseException(e.getMessage()  + "\nOccur to offset: " + offset + 
-									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
-									 + ", stack: " + ClassUtils.toString(e), offset);
+			throw new ParseException("Failed to translate template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
 		}
 	}
 	
@@ -525,7 +488,6 @@ public class CompiledTranslator implements Translator {
 			visitor.setImportSequences(sequences);
 			visitor.setOutputEncoding(outputEncoding);
 			visitor.setSourceInClass(sourceInClass);
-			visitor.setTemplateFilter(templateFilter);
 			visitor.setTextFilter(textFilter);
 			visitor.setTextFilterSwitcher(textFilterSwitcher);
 			visitor.setTextInClass(textInClass);

@@ -241,9 +241,9 @@ public class TemplateParser implements Parser {
 		return nodes;
 	}
 
-	private List<Statement> scan(String source) throws ParseException, IOException {
+	private List<Statement> scan(String source, int sourceOffset) throws ParseException, IOException {
 		List<Statement> directives = new ArrayList<Statement>();
-		List<Token> tokens = scanner.scan(source);
+		List<Token> tokens = scanner.scan(source, sourceOffset);
 		AtomicInteger seq = new AtomicInteger();
 		for (int t = 0; t < tokens.size(); t ++) {
 			Token token = tokens.get(t);
@@ -677,7 +677,7 @@ public class TemplateParser implements Parser {
 	}
 
 	public Node parse(String source, int offset) throws IOException, ParseException {
-		return reduce(trim(clean(scan(source))));
+		return reduce(trim(clean(scan(source, offset))));
 	}
 
 	/**

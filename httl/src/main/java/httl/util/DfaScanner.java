@@ -41,8 +41,12 @@ public abstract class DfaScanner {
 	// state = ERROR - 错误码
 	// state = ERROR - 1 // 出错，并返回错误码为1的异常信息。
 	public static final int ERROR = -100000000;
+	
+	public List<Token> scan(String charStream, int offset) throws ParseException {
+		return scan(charStream, offset, false);
+	}
 
-	public List<Token> scan(String charStream) throws ParseException {
+	public List<Token> scan(String charStream, int offset, boolean errorWithSource) throws ParseException {
 		List<Token> tokens = new ArrayList<Token>();
 		// 解析时状态 ----
 		StringBuilder buffer = new StringBuilder(); // 缓存字符
@@ -50,7 +54,6 @@ public abstract class DfaScanner {
 		int pre = 0; // 上一状态
 		int state = 0; // 当前状态
 		char ch; // 当前字符
-		int offset = 0;
 
 		// 逐字解析 ----
 		int i = 0;
@@ -70,13 +73,13 @@ public abstract class DfaScanner {
 			buffer.append(ch); // 将字符加入缓存
 			state = next(state, ch); // 从状态机图中取下一状态
 			if (state <= ERROR) {
-				throw new ParseException("DFAScanner.state.error, error code: " + (ERROR - state), offset - buffer.length());
+				throw new ParseException("DFAScanner.state.error, error code: " + (ERROR - state) + (errorWithSource ? ", source: " + charStream : ""), offset - buffer.length());
 			}
 			if (state <= POP) {
 				int n = - (state % POP);
 				int e = (state - n) / POP - 1;
 				if (p <= 0) {
-					throw new ParseException("DFAScanner.mismatch.stack", offset - buffer.length());
+					throw new ParseException("DFAScanner.mismatch.stack" + (errorWithSource ? ", source: " + charStream : ""), offset - buffer.length());
 				}
 				p --;
 				if (p == 0) {
@@ -96,7 +99,7 @@ public abstract class DfaScanner {
 			if (state <= BREAK) { // 负数表示接收状态
 				int acceptLength = buffer.length() + state - BREAK;
 				if (acceptLength < 0 || acceptLength > buffer.length())
-					throw new ParseException("DFAScanner.accepter.error", offset - buffer.length());
+					throw new ParseException("DFAScanner.accepter.error" + (errorWithSource ? ", source: " + charStream : ""), offset - buffer.length());
 				if (acceptLength != 0) {
 					String message = buffer.substring(0, acceptLength);
 					Token token = new Token(message, offset - buffer.length(), pre);

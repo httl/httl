@@ -375,7 +375,8 @@ public class ExpressionParser implements Parser {
 		LinkedStack<Expression> parameterStack = new LinkedStack<Expression>();
 		LinkedStack<Operator> operatorStack = new LinkedStack<Operator>();
 		Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
-		List<Token> tokens = scanner.scan(source);
+		List<Token> tokens;
+		tokens = scanner.scan(source, offset, true);
 		boolean beforeOperator = true;
 		for (int i = 0; i < tokens.size(); i ++) {
 			Token token = tokens.get(i);
