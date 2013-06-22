@@ -530,7 +530,7 @@ public class CompiledVisitor extends AstVisitor {
 			if (clazz == null) {
 				clazz = returnType;
 			}
-			appendVar(clazz, node.getName(), code, node.isExport(), node.isHide(), node.getOffset());
+			appendVar(clazz, node.getName(), code, node.isExport(), node.isHide(), node.getType() != null, node.getOffset());
 			getVariables.addAll(variableTypes.keySet());
 		} else {
 			clazz = checkVar(clazz, node.getName(), node.getOffset());
@@ -561,10 +561,12 @@ public class CompiledVisitor extends AstVisitor {
 		return clazz;
 	}
 
-	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, int offset) throws IOException, ParseException {
+	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, boolean def, int offset) throws IOException, ParseException {
 		clazz = checkVar(clazz, var, offset);
 		String type = clazz.getCanonicalName();
-		types.put(var, clazz);
+		if (def || types.get(var) == null) {
+			types.put(var, clazz);
+		}
 		setVariables.add(var);
 		builder.append("	" + var + " = (" + type + ")(" + code + ");\n");
 		String ctx = null;
@@ -674,7 +676,7 @@ public class CompiledVisitor extends AstVisitor {
 		} else {
 			varCode = name + ".next()";
 		}
-		appendVar(clazz, var, varCode, false, false, node.getOffset());
+		appendVar(clazz, var, varCode, false, false, node.getType() != null, node.getOffset());
 		getVariables.addAll(variableTypes.keySet());
 		for (String fv : forVariable) {
 			setVariables.add(fv);
