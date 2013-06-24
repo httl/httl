@@ -33,12 +33,20 @@ import java.text.ParseException;
 public abstract class AstVisitor implements Visitor {
 
 	public boolean visit(Node node) throws IOException, ParseException {
-		if (node instanceof Expression) {
-			visit((Expression) node);
-		} else if (node instanceof Statement) {
-			return visit((Statement) node);
-		} else if (node instanceof Template) {
-			return visit((Template) node);
+		try {
+			if (node instanceof Expression) {
+				visit((Expression) node);
+			} else if (node instanceof Statement) {
+				return visit((Statement) node);
+			} else if (node instanceof Template) {
+				return visit((Template) node);
+			}
+		} catch (IOException e) {
+			throw e;
+		} catch (ParseException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new ParseException(e.getMessage(), node.getOffset());
 		}
 		return true;
 	}

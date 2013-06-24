@@ -4,7 +4,7 @@ java.util.HashMap
 name space: bb
 name*operator: bb
 1: 1
-httl.internal.util.MapEntry
+httl.util.MapEntry
 java.lang.Integer
 java.lang.Integer
 liangfei: bb

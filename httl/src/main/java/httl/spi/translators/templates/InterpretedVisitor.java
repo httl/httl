@@ -645,7 +645,11 @@ public class InterpretedVisitor extends AstVisitor {
 		Object rightParameter = parameterStack.pop();
 		Object leftParameter = parameterStack.pop();
 		Object result = null;
-		if (leftParameter != null) {
+		if (leftParameter == null) {
+			result = rightParameter;
+		} else if (rightParameter == null) {
+			result = leftParameter;
+		} else {
 			if (leftParameter instanceof Integer && rightParameter instanceof Number) {
 				result = ((Number) leftParameter).intValue() + ((Number) rightParameter).intValue();
 			} else if (leftParameter instanceof Long && rightParameter instanceof Number) {
@@ -790,6 +794,8 @@ public class InterpretedVisitor extends AstVisitor {
 		Object result = null;
 		if (leftParameter != null) {
 			result = leftParameter.equals(rightParameter);
+		} else {
+			result = rightParameter == null;
 		}
 		parameterStack.push(result);
 	}
@@ -801,6 +807,8 @@ public class InterpretedVisitor extends AstVisitor {
 		Object result = null;
 		if (leftParameter != null) {
 			result = ! leftParameter.equals(rightParameter);
+		} else {
+			result = rightParameter != null;
 		}
 		parameterStack.push(result);
 	}

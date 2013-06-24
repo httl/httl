@@ -1412,15 +1412,19 @@ public class CompiledVisitor extends AstVisitor {
 		
 		Type type = null;
 		String code = null;
+		boolean nullable = true;
 		if ((Collection.class.isAssignableFrom(leftClass) || leftClass.isArray()) 
 						&& (Collection.class.isAssignableFrom(rightClass) || rightClass.isArray())
 				|| Map.class.isAssignableFrom(leftClass) && Map.class.isAssignableFrom(rightClass)) {
 			code = CollectionUtils.class.getName() + ".merge(" + leftCode+ ", " + rightCode + ")";
 			type = leftType;
+			nullable = false;
 		} else if (rightClass.isPrimitive() && rightType != boolean.class) {
 			type = rightClass;
+			nullable = false;
 		} else if (leftClass.isPrimitive() && leftClass != boolean.class) {
 			type = leftClass;
+			nullable = false;
 		} else {
 			type = String.class;
 		}
@@ -1430,9 +1434,11 @@ public class CompiledVisitor extends AstVisitor {
 			typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
 			if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
 				leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
+				nullable = false;
 			}
 			if (! (rightClass.isPrimitive() && leftClass != boolean.class)) {
 				rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
+				nullable = false;
 			}
 		}
 		if (node.getRightParameter() instanceof Operator
@@ -1441,6 +1447,9 @@ public class CompiledVisitor extends AstVisitor {
 		}
 		if (code == null) {
 			code = leftCode + " " + name + " " + rightCode;
+			if (nullable && ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
+				code = "(" + leftCode + " == null ? " + rightCode + " : (" + rightCode + " == null ? " + leftCode + " : " + code + "))";
+			}
 		}
 		
 		typeStack.push(type);
@@ -1654,7 +1663,7 @@ public class CompiledVisitor extends AstVisitor {
 		String code;
 		if(! "null".equals(leftCode) && ! "null".equals(rightCode)
 				&& ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
-			code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".equals(" + rightCode + ")");
+			code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".equals(" + rightCode + ")", "(" + rightCode + ") == null");
 		} else {
 			code = leftCode + " == " + rightCode;
 		}
@@ -2506,11 +2515,15 @@ public class CompiledVisitor extends AstVisitor {
 	}
 	
 	private String getNotNullCode(Node leftParameter, Type type, String leftCode, String code) throws IOException, ParseException {
+		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
+		return getNotNullCode(leftParameter, type, leftCode, code, ClassUtils.getInitCodeWithType(clazz));
+	}
+	
+	private String getNotNullCode(Node leftParameter, Type type, String leftCode, String code, String nullCode) throws IOException, ParseException {
 		if (leftParameter instanceof Constant) {
 			return code;
 		}
-		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
-		return "(" + leftCode + " == null ? (" + clazz.getCanonicalName() + ")" + ClassUtils.getInitCode(clazz) + " : " + code + ")";
+		return "(" + leftCode + " == null ? " + nullCode + " : " + code + ")";
 	}
 
 	private boolean hasMethod(Class<?> leftClass, String name, Class<?>[] rightTypes) {

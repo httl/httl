@@ -27,8 +27,8 @@ import httl.spi.Parser;
 import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
+import httl.spi.translators.templates.AbstractTemplate;
 import httl.spi.translators.templates.LazyTemplate;
-import httl.util.ClassUtils;
 import httl.util.ConfigUtils;
 import httl.util.DelegateMap;
 import httl.util.Digest;
@@ -38,7 +38,6 @@ import httl.util.VolatileReference;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -247,46 +246,18 @@ public class DefaultEngine extends Engine {
 			resource = loadResource(name, locale, encoding);
 		}
 		String source = resource.getSource();
-		if (templateFilter != null) {
-			source = templateFilter.filter(resource.getName(), source);
-		}
-		Node root;
 		try {
-			root = templateParser.parse(source, 0);
-		} catch (IOException e) {
-			throw e;
-		} catch (Exception e) {
-			ParseException pe;
-			if (e instanceof ParseException)
-				pe = (ParseException) e;
-			else
-				pe = new ParseException("Failed to parse template: " + resource.getName() + ", cause: " + ClassUtils.toString(e), 0);
-			if (e.getMessage() != null 
-					&& e.getMessage().contains("Occur to offset:")) {
-				throw pe;
+			if (templateFilter != null) {
+				source = templateFilter.filter(resource.getName(), source);
 			}
-			int offset = pe.getErrorOffset();
-			if (offset <= 0) {
-				throw pe;
+			Node root = templateParser.parse(source, 0);
+			if (useRenderVariableType) {
+				return new LazyTemplate(translator, resource, root, parameterTypes, mapConverter);
 			}
-			String location = null;
-			try {
-				Reader reader = resource.openReader();
-				try {
-					location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
-				} finally {
-					reader.close();
-				}
-			} catch (Throwable t) {
-			}
-			throw new ParseException(e.getMessage()  + "\nOccur to offset: " + offset + 
-									 (StringUtils.isEmpty(location) ? "" : ", " + location) 
-									 + ", stack: " + ClassUtils.toString(e), offset);
+			return translator.translate(resource, root, parameterTypes);
+		} catch (ParseException e) {
+			throw AbstractTemplate.toLocatedParseException(e, resource);
 		}
-		if (useRenderVariableType) {
-			return new LazyTemplate(translator, resource, root, parameterTypes, mapConverter);
-		}
-		return translator.translate(resource, root, parameterTypes);
 	}
 
 	/**

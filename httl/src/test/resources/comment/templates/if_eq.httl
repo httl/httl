@@ -18,7 +18,7 @@ CCC
 DDD
 #end
 
-#set(String g = "nullnull")
+#set(String g = null)
 #set(String h = null)
 #set(String i = null)
 #if(g == (h + i))

@@ -26,6 +26,8 @@ import httl.ast.MacroDirective;
 import httl.spi.Converter;
 import httl.spi.Interceptor;
 import httl.spi.Listener;
+import httl.util.ClassUtils;
+import httl.util.StringUtils;
 import httl.util.UnsafeStringWriter;
 
 import java.io.IOException;
@@ -139,6 +141,8 @@ public abstract class AbstractTemplate implements Template {
 			} else {
 				_render(context);
 			}
+		} catch (ParseException e) {
+			throw toLocatedParseException(e, this);
 		} finally {
 			Context.popContext();
 		}
@@ -269,6 +273,30 @@ public abstract class AbstractTemplate implements Template {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 		return writer.toString();
+	}
+	
+	public static ParseException toLocatedParseException(ParseException e, Resource resource) {
+		if (e.getMessage() != null 
+				&& e.getMessage().contains("Occur to offset:")) {
+			return e;
+		}
+		int offset = e.getErrorOffset();
+		if (offset <= 0) {
+			return e;
+		}
+		String location = null;
+		try {
+			Reader reader = resource.openReader();
+			try {
+				location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
+			} finally {
+				reader.close();
+			}
+		} catch (Throwable t) {
+		}
+		return new ParseException(e.getMessage()  + "\nOccur to offset: " + offset + 
+								 (StringUtils.isEmpty(location) ? "" : ", " + location) 
+								 + ", stack: " + ClassUtils.toString(e), offset);
 	}
 
 	@Override

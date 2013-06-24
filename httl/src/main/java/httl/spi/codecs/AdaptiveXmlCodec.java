@@ -12,7 +12,7 @@ public class AdaptiveXmlCodec extends AbstractXmlCodec {
 		try {
 			codec = (Codec) Class.forName("httl.spi.codecs.XstreamCodec").newInstance();
 		} catch (Throwable e) {
-			codec = new XbeanCodec();
+			codec = new XmlCodec();
 		}
 	}
 

@@ -375,8 +375,7 @@ public class ExpressionParser implements Parser {
 		LinkedStack<Expression> parameterStack = new LinkedStack<Expression>();
 		LinkedStack<Operator> operatorStack = new LinkedStack<Operator>();
 		Map<Operator, Token> operatorTokens = new HashMap<Operator, Token>();
-		List<Token> tokens;
-		tokens = scanner.scan(source, offset, true);
+		List<Token> tokens = scanner.scan(source, offset, true);
 		boolean beforeOperator = true;
 		for (int i = 0; i < tokens.size(); i ++) {
 			Token token = tokens.get(i);
@@ -434,7 +433,7 @@ public class ExpressionParser implements Parser {
 							if (left != Bracket.ROUND) {
 								throw new ParseException("Miss left parenthesis", token.getOffset());
 							}
-							UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
+							UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) );
 							operatorTokens.put(operator, token);
 							operatorStack.push(operator);
 							beforeOperator = true;
@@ -512,7 +511,7 @@ public class ExpressionParser implements Parser {
 				parameterStack.push(new Constant(ClassUtils.forName(importPackages, msg.substring(1).trim()), false, token.getOffset()));
 				beforeOperator = false;
 			} else if (StringUtils.isNamed(msg) && ! "instanceof".equals(msg)) {
-				parameterStack.push(new Variable(msg, getTokenOffset(token) + offset));
+				parameterStack.push(new Variable(msg, getTokenOffset(token) ));
 				beforeOperator = false;
 			} else if ("(".equals(msg)) {
 				operatorStack.push(Bracket.ROUND);
@@ -534,16 +533,16 @@ public class ExpressionParser implements Parser {
 				}
 				if (beforeOperator) {
 					if (! msg.startsWith("new ") && ! StringUtils.isFunction(msg) && ! UNARY_OPERATORS.contains(msg)) {
-						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
+						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) );
 					}
-					UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token) + offset);
+					UnaryOperator operator = createUnaryOperator(msg, getPriority(msg, true), getTokenOffset(token));
 					operatorTokens.put(operator, token);
 					operatorStack.push(operator);
 				} else {
 					if (! StringUtils.isFunction(msg) && ! BINARY_OPERATORS.contains(msg)) {
-						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) + offset);
+						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) );
 					}
-					BinaryOperator operator = createBinaryOperator(msg, getPriority(msg, false), getTokenOffset(token) + offset);
+					BinaryOperator operator = createBinaryOperator(msg, getPriority(msg, false), getTokenOffset(token));
 					operatorTokens.put(operator, token);
 					while (! operatorStack.isEmpty() && ! (operatorStack.peek() instanceof Bracket)
 							&& operatorStack.peek().getPriority() >= operator.getPriority()) {
@@ -591,17 +590,17 @@ public class ExpressionParser implements Parser {
 			Token token = operatorTokens.get(operator);
 			BinaryOperator binaryOperator = (BinaryOperator) operator;
 			if (parameterStack.isEmpty())
-				throw new ParseException("Binary operator " + binaryOperator.getName() + " miss parameter", token == null ? offset : getTokenOffset(token) + offset);
+				throw new ParseException("Binary operator " + binaryOperator.getName() + " miss parameter", token == null ? offset : getTokenOffset(token));
 			binaryOperator.setRightParameter(parameterStack.pop()); // right first
 			if (parameterStack.isEmpty())
-				throw new ParseException("Binary operator " + binaryOperator.getName() + " miss parameter", token == null ? offset : getTokenOffset(token) + offset);
+				throw new ParseException("Binary operator " + binaryOperator.getName() + " miss parameter", token == null ? offset : getTokenOffset(token));
 			binaryOperator.setLeftParameter(parameterStack.pop());
 			parameterStack.push(operator);
 		} else if (operator instanceof UnaryOperator) {
 			Token token = operatorTokens.get(operator);
 			UnaryOperator unaryOperator = (UnaryOperator) operator;
 			if (parameterStack.isEmpty())
-				throw new ParseException("Unary operator " + unaryOperator.getName() + "miss parameter", token == null ? offset : getTokenOffset(token) + offset);
+				throw new ParseException("Unary operator " + unaryOperator.getName() + "miss parameter", token == null ? offset : getTokenOffset(token));
 			unaryOperator.setParameter(parameterStack.pop());
 			parameterStack.push(operator);
 		}

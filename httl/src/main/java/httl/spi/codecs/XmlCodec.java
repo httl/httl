@@ -26,7 +26,7 @@ import java.text.ParseException;
  * 
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
-public class XbeanCodec extends AbstractXmlCodec {
+public class XmlCodec extends AbstractXmlCodec {
 
 	public String toString(String key, Object value) {
 		return toString(toBytes(key, value));

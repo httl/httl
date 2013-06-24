@@ -3,6 +3,7 @@ package httl.spi.codecs;
 import java.text.ParseException;
 
 import httl.spi.Codec;
+import httl.spi.Compiler;
 
 public class AdaptiveJsonCodec extends AbstractJsonCodec {
 
@@ -15,8 +16,14 @@ public class AdaptiveJsonCodec extends AbstractJsonCodec {
 			try {
 				codec = (Codec) Class.forName("httl.spi.codecs.JacksonCodec").newInstance();
 			} catch (Throwable e2) {
-				codec = null;
+				codec = new JsonCodec();
 			}
+		}
+	}
+
+	public void setCompiler(Compiler compiler) {
+		if (codec instanceof JsonCodec) {
+			((JsonCodec) codec).setCompiler(compiler);
 		}
 	}
 

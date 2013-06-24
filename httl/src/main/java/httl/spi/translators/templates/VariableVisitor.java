@@ -18,11 +18,13 @@ package httl.spi.translators.templates;
 import httl.ast.AstVisitor;
 import httl.ast.SetDirective;
 import httl.ast.Variable;
+import httl.util.OrderedMap;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,15 +38,19 @@ public class VariableVisitor extends AstVisitor {
 	
 	private boolean addDefault;
 
-	private final Map<String, Class<?>> variables = new HashMap<String, Class<?>>();
-	
+	private final List<String> variableNames = new ArrayList<String>();
+
+	private final List<Class<?>> variableTypes = new ArrayList<Class<?>>();
+
 	public VariableVisitor(Class<?> defaultVariableType, boolean addDefault) {
 		this.defaultVariableType = defaultVariableType;
 		this.addDefault = addDefault;
 	}
 
 	public Map<String, Class<?>> getVariables() {
-		return variables;
+		return new OrderedMap<String, Class<?>>(
+				variableNames.toArray(new String[variableNames.size()]), 
+				variableTypes.toArray(new Class<?>[variableTypes.size()]));
 	}
 
 	@Override
@@ -52,18 +58,33 @@ public class VariableVisitor extends AstVisitor {
 		if (node.getExpression() == null) {
 			Type type = node.getType();
 			Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
-			if (clazz != null) {
-				variables.put(node.getName(), clazz);
-			} else if (addDefault) {
-				variables.put(node.getName(), defaultVariableType);
+			if (clazz == null) {
+				if (addDefault) {
+					clazz = defaultVariableType;
+				} else {
+					return;
+				}
+			}
+			int i = variableNames.indexOf(node.getName());
+			if (i >= 0) {
+				Class<?> cls = variableTypes.get(i);
+				if(! cls.equals(clazz) 
+						&& ! cls.isAssignableFrom(clazz) 
+						&& ! clazz.isAssignableFrom(cls)) {
+					throw new ParseException("Defined different type variable " + node.getName() + ", conflict types: " + cls + ", " + clazz, node.getOffset());
+				}
+			} else {
+				variableNames.add(node.getName());
+				variableTypes.add(clazz);
 			}
 		}
 	}
 
 	@Override
 	public void visit(Variable node) throws ParseException {
-		if (addDefault && ! variables.containsKey(node.getName())) {
-			variables.put(node.getName(), defaultVariableType);
+		if (addDefault && ! variableNames.contains(node.getName())) {
+			variableNames.add(node.getName());
+			variableTypes.add(defaultVariableType);
 		}
 	}
 

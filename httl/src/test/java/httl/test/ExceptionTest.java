@@ -64,6 +64,7 @@ public class ExceptionTest {
 		File[] files = directory.listFiles();
 		for (int i = 0, n = files.length; i < n; i ++) {
 			File file = files[i];
+			// if (! "undefined_method.httl".equals(file.getName())) continue; // 指定模板测试
 			retTestData.add(new Object[]{file.getName()});
 		}
 
@@ -99,6 +100,7 @@ public class ExceptionTest {
 			engine.getTemplate("/templates/" + templateName);
 			fail(templateName);
 		} catch (ParseException e) {
+			e.printStackTrace();
 			if (! profile) {
 				String message = e.getMessage();
 				assertTrue(StringUtils.isNotEmpty(message));
