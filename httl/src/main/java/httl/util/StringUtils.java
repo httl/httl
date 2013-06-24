@@ -919,6 +919,7 @@ public class StringUtils {
 	                case ' ':
 	                case '\t':
 	                case '\b':
+	                case '\f':
 	                    break;
 	                case '\n':
 	                    start = i + 1;
@@ -945,6 +946,7 @@ public class StringUtils {
 	                case ' ':
 	                case '\t':
 	                case '\b':
+	                case '\f':
 	                    break;
 	                case '\n':
 	                    end = i + 1;
