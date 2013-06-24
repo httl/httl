@@ -1,0 +1,4 @@
+<!--#set(List list = new LinkedList())-->
+${list.class.name}
+<!--#set(list = new ArrayList())-->
+${list.class.name}
