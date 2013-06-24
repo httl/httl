@@ -15,12 +15,12 @@
  */
 package httl.test.util;
 
-import java.text.DecimalFormat;
-
+import static org.junit.Assert.assertEquals;
 import httl.util.StringUtils;
 
+import java.text.DecimalFormat;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class StringUtilsTest {
 	static boolean profile = "true".equals(System.getProperty("profile"));
@@ -77,14 +77,35 @@ public class StringUtilsTest {
 	public void testTrimBlankLine() {
 		assertEquals("12345678", StringUtils.trimBlankLine("12345678"));
 		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f ")));
-		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\n\t\r\b\f ")));
-		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n")));
-		assertEquals(StringUtils.escapeString("\t\n"), StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n\t\n")));
+		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\n\t\b\f ")));
+		assertEquals("", StringUtils.escapeString(StringUtils.trimBlankLine("\t\b\f \n")));
+		assertEquals(StringUtils.escapeString("\t\r"), StringUtils.escapeString(StringUtils.trimBlankLine("\n\t\r\b\f ")));
+		assertEquals(StringUtils.escapeString("\b\f \n"), StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n")));
+		assertEquals(StringUtils.escapeString("\b\f \n\t\n"), StringUtils.escapeString(StringUtils.trimBlankLine("\t\r\b\f \n\t\n")));
 		assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine("1\t2\n3\r4\b5\f6 \t7 \t\n\r\b\f8\n\t\r\b\f\n")));
-		assertEquals(StringUtils.escapeString("1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f ")));
+		assertEquals(StringUtils.escapeString("\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f ")));
 		assertEquals(StringUtils.escapeString("\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n"), StringUtils.escapeString(StringUtils.trimBlankLine(" \t\n\t\r\b\f\n1\t2\n3\r4\b5\f6 \t7 \t\n\t\n\r\b\f8\n\t\r\b\f\n\t ")));
-	}
+		
+		//LF
+		assertEquals("", StringUtils.trimBlankLine("\n"));
+		assertEquals("\n", StringUtils.trimBlankLine("\n\n"));
 
+		//CRLF
+		assertEquals("", StringUtils.trimBlankLine("\r\n"));
+		assertEquals("\r\n", StringUtils.trimBlankLine("\r\n\r\n"));
+
+		//CR
+		assertEquals("", StringUtils.trimBlankLine("\r"));
+		assertEquals("\r", StringUtils.trimBlankLine("\r\r"));
+
+		//Mix
+		assertEquals("\r\n", StringUtils.trimBlankLine("\r\r\n"));
+
+		//with blanks
+		assertEquals("", StringUtils.trimBlankLine(" \t  \n    \t      "));
+		assertEquals("\n", StringUtils.trimBlankLine("  \t  \n\n   \t  "));
+	}
+	
 	@Test
 	public void testClearBlankLine() {
 		assertEquals("12345678", StringUtils.clearBlankLine("12345678"));
