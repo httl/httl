@@ -1,0 +1,5 @@
+<!--#set(String seq = "a,b,c")-->
+<!--#set(String[] ts = seq.split(","))-->
+<!--#for(String t : ts)-->
+${t}
+<!--#end-->
