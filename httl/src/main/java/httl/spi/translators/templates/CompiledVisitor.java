@@ -1446,9 +1446,10 @@ public class CompiledVisitor extends AstVisitor {
 			rightCode = "(" + rightCode + ")";
 		}
 		if (code == null) {
-			code = leftCode + " " + name + " " + rightCode;
-			if (nullable && ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
-				code = "(" + leftCode + " == null ? " + rightCode + " : (" + rightCode + " == null ? " + leftCode + " : " + code + "))";
+			if (nullable && type == String.class && ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
+				code = StringUtils.class.getName() + ".concat(" + leftCode + ", " + rightCode + ")";
+			} else {
+				code = leftCode + " " + name + " " + rightCode;
 			}
 		}
 		

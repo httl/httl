@@ -1226,4 +1226,17 @@ public class StringUtils {
 		return false;
 	}
 
+	public static String concat(Object v1, Object v2) {
+		if (v1 == null && v2 == null) {
+			return "";
+		}
+		if (v1 == null) {
+			return String.valueOf(v2);
+		}
+		if (v2 == null) {
+			return String.valueOf(v1);
+		}
+		return String.valueOf(v1) + String.valueOf(v2);
+	}
+
 }
