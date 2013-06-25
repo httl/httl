@@ -1,0 +1,5 @@
+<!--#set(Object author)-->
+<!--#set(String[] ns = ["a", "@author " + author])-->
+<!--#for(String n : ns)-->
+${n}
+<!--#end-->
