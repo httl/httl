@@ -645,44 +645,38 @@ public class InterpretedVisitor extends AstVisitor {
 		Object rightParameter = parameterStack.pop();
 		Object leftParameter = parameterStack.pop();
 		Object result = null;
-		if (leftParameter == null) {
-			result = rightParameter;
-		} else if (rightParameter == null) {
-			result = leftParameter;
-		} else {
-			if (leftParameter instanceof Integer && rightParameter instanceof Number) {
-				result = ((Number) leftParameter).intValue() + ((Number) rightParameter).intValue();
-			} else if (leftParameter instanceof Long && rightParameter instanceof Number) {
-				result = ((Number) leftParameter).longValue() + ((Number) rightParameter).longValue();
-			} else if (leftParameter instanceof Float && rightParameter instanceof Number) {
-				result = ((Number) leftParameter).floatValue() + ((Number) rightParameter).floatValue();
-			} else if (leftParameter instanceof Double && rightParameter instanceof Number) {
-				result = ((Number) leftParameter).doubleValue() + ((Number) rightParameter).doubleValue();
-			} else if (leftParameter instanceof Short && rightParameter instanceof Number) {
-				result = ((Number) leftParameter).shortValue() + ((Number) rightParameter).shortValue();
-			} else if (leftParameter instanceof Byte && rightParameter instanceof Number) {
-				result = ((Number) leftParameter).byteValue() + ((Number) rightParameter).byteValue();
-			} else if (leftParameter instanceof Map && rightParameter instanceof Map) {
-				result = CollectionUtils.merge((Map<Object, Object>) leftParameter, (Map<Object, Object>) rightParameter);
-			} else if (leftParameter instanceof Collection) {
-				if (rightParameter instanceof Collection) {
-					result = CollectionUtils.merge((Collection<Object>) leftParameter, (Collection<Object>) rightParameter);
-				} else if (rightParameter instanceof Object[]) {
-					result = CollectionUtils.merge((Collection<Object>) leftParameter, (Object[]) rightParameter);
-				} else {
-					result = CollectionUtils.merge((Collection<Object>) leftParameter, Arrays.asList(rightParameter));
-				}
-			} else if (leftParameter instanceof Object[]) {
-				if (rightParameter instanceof Collection) {
-					result = CollectionUtils.merge((Object[]) leftParameter, (Collection<Object>) rightParameter);
-				} else if (rightParameter instanceof Object[]) {
-					result = CollectionUtils.merge((Object[]) leftParameter, (Object[]) rightParameter);
-				} else {
-					result = CollectionUtils.merge((Object[]) leftParameter, Arrays.asList(rightParameter));
-				}
+		if (leftParameter instanceof Integer && rightParameter instanceof Number) {
+			result = ((Number) leftParameter).intValue() + ((Number) rightParameter).intValue();
+		} else if (leftParameter instanceof Long && rightParameter instanceof Number) {
+			result = ((Number) leftParameter).longValue() + ((Number) rightParameter).longValue();
+		} else if (leftParameter instanceof Float && rightParameter instanceof Number) {
+			result = ((Number) leftParameter).floatValue() + ((Number) rightParameter).floatValue();
+		} else if (leftParameter instanceof Double && rightParameter instanceof Number) {
+			result = ((Number) leftParameter).doubleValue() + ((Number) rightParameter).doubleValue();
+		} else if (leftParameter instanceof Short && rightParameter instanceof Number) {
+			result = ((Number) leftParameter).shortValue() + ((Number) rightParameter).shortValue();
+		} else if (leftParameter instanceof Byte && rightParameter instanceof Number) {
+			result = ((Number) leftParameter).byteValue() + ((Number) rightParameter).byteValue();
+		} else if (leftParameter instanceof Map && rightParameter instanceof Map) {
+			result = CollectionUtils.merge((Map<Object, Object>) leftParameter, (Map<Object, Object>) rightParameter);
+		} else if (leftParameter instanceof Collection) {
+			if (rightParameter instanceof Collection) {
+				result = CollectionUtils.merge((Collection<Object>) leftParameter, (Collection<Object>) rightParameter);
+			} else if (rightParameter instanceof Object[]) {
+				result = CollectionUtils.merge((Collection<Object>) leftParameter, (Object[]) rightParameter);
 			} else {
-				result = String.valueOf(leftParameter) + String.valueOf(rightParameter);
+				result = CollectionUtils.merge((Collection<Object>) leftParameter, Arrays.asList(rightParameter));
 			}
+		} else if (leftParameter instanceof Object[]) {
+			if (rightParameter instanceof Collection) {
+				result = CollectionUtils.merge((Object[]) leftParameter, (Collection<Object>) rightParameter);
+			} else if (rightParameter instanceof Object[]) {
+				result = CollectionUtils.merge((Object[]) leftParameter, (Object[]) rightParameter);
+			} else {
+				result = CollectionUtils.merge((Object[]) leftParameter, Arrays.asList(rightParameter));
+			}
+		} else {
+			result = StringUtils.concat(leftParameter, rightParameter);
 		}
 		parameterStack.push(result);
 	}
