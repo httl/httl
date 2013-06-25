@@ -1228,7 +1228,7 @@ public class StringUtils {
 
 	public static String concat(Object v1, Object v2) {
 		if (v1 == null && v2 == null) {
-			return "";
+			return null;
 		}
 		if (v1 == null) {
 			return String.valueOf(v2);
