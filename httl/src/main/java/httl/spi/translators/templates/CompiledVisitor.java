@@ -1692,7 +1692,7 @@ public class CompiledVisitor extends AstVisitor {
 		String code;
 		if(! "null".equals(leftCode) && ! "null".equals(rightCode)
 				&& ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
-			code = getNotNullCode(node.getLeftParameter(), type, leftCode, "(! " + leftCode + ".equals(" + rightCode + "))");
+			code = getNotNullCode(node.getLeftParameter(), type, leftCode, "(! " + leftCode + ".equals(" + rightCode + "))", "(" + rightCode + ") != null");
 		} else {
 			code = leftCode + " " + name + " " + rightCode;
 		}
