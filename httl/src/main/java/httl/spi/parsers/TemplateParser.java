@@ -862,6 +862,33 @@ public class TemplateParser implements Parser {
 		}
 	}
 	
+	private static boolean isEndString(String value) {
+		int sc = 0;
+		int dc = 0;
+		for (int i = 0; i < value.length(); i ++) {
+			char ch = value.charAt(i);
+			if (ch == '\'' && dc % 2 == 0 
+					|| ch == '\"' && sc % 2 == 0) {
+				int c = 0;
+				for (int j = i - 1; j >= 0; j--) {
+					if (value.charAt(j) == '\\') {
+						c++;
+					} else {
+						break;
+					}
+				}
+				if (c % 2 == 0) {
+					if (ch == '\'') {
+						sc ++;
+					} else {
+						dc ++;
+					}
+				}
+			}
+		}
+		return sc % 2 == 0 && dc % 2 == 0;
+	}
+
 	static List<String> splitAssign(String value) {
 		List<String> list = new ArrayList<String>();
 		int i = value.indexOf('=');
@@ -870,7 +897,8 @@ public class TemplateParser implements Parser {
 				i ++;
 			} else if (value.charAt(i - 1) != '>'
 					&& value.charAt(i - 1) != '<'
-					&& value.charAt(i - 1) != '!') {
+					&& value.charAt(i - 1) != '!'
+					&& isEndString(value.substring(0, i - 1))) {
 				String sub = value.substring(0, i);
 				int j = sub.lastIndexOf(',');
 				int k = sub.lastIndexOf('>');

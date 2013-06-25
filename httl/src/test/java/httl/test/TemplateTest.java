@@ -111,6 +111,10 @@ public class TemplateTest {
 		for (Book book : books2) {
 			bookmap2.put(book.getTitle().replaceAll("\\s+", ""), book);
 		}
+		Map<Integer, Integer> intmap = new HashMap<Integer, Integer>();
+		for (int i = 0; i < 5; i ++) {
+			intmap.put(i, i + 10);
+		}
 		Map<String, Object> context = new HashMap<String, Object>();
 		context.put("chinese", "中文");
 		context.put("impvar", "abcxyz");
@@ -126,6 +130,7 @@ public class TemplateTest {
 		context.put("books2", books2);
 		context.put("booklist2", Arrays.asList(books2));
 		context.put("bookmap2", bookmap2);
+		context.put("intmap", intmap);
 		context.put("begin", 3);
 		context.put("end", 7);
 
@@ -144,6 +149,7 @@ public class TemplateTest {
 		model.setBooks2(books2);
 		model.setBooklist2(Arrays.asList(books2));
 		model.setBookmap2(bookmap2);
+		model.setIntmap(intmap);
 		model.setBegin(3);
 		model.setEnd(7);
 
@@ -174,7 +180,7 @@ public class TemplateTest {
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
 					String templateName = file.getName();
-					//if (! "boxed_method.httl".equals(templateName)) continue; // 指定模板测试
+					//if (! "set_multi_equals.httl".equals(templateName)) continue; // 指定模板测试
 					//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
 					if ("httl-comment-interpret.properties".equals(config) // FIXME
 							&& ("include_hide.httl".equals(templateName)

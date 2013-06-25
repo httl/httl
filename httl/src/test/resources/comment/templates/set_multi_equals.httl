@@ -1,0 +1,4 @@
+<!--#set(xxx = "a = b", yyy = "a" == "b", zzz = "a" != "b")-->
+${xxx}
+${yyy}
+${zzz}

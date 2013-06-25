@@ -1,0 +1,2 @@
+<!--#set(Map<Integer, Integer> intmap)-->
+${intmap.get(0)}

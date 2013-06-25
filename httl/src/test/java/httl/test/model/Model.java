@@ -50,6 +50,8 @@ public class Model {
 	
 	private Map<String, Book> bookmap2;
 
+	private Map<Integer, Integer> intmap;
+
 	private int begin;
 
 	private int end;
@@ -172,6 +174,14 @@ public class Model {
 
 	public void setBookmap2(Map<String, Book> bookmap2) {
 		this.bookmap2 = bookmap2;
+	}
+
+	public Map<Integer, Integer> getIntmap() {
+		return intmap;
+	}
+
+	public void setIntmap(Map<Integer, Integer> intmap) {
+		this.intmap = intmap;
 	}
 
 	public int getBegin() {

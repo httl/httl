@@ -2312,24 +2312,29 @@ public class CompiledVisitor extends AstVisitor {
 				}
 			}
 		} else if (Map.class.isAssignableFrom(leftClass)
-				&& "get".equals(name)
-				&& String.class.equals(rightType)) {
+				&& "get".equals(name)) {
 			String var = getGenericVariableName(node.getLeftParameter());
 			if (var != null) {
 				Class<?> varType = types.get(var + ":1"); // Map<K,V>第二个泛型 
 				if (varType != null) {
 					type = varType;
+					if (rightClass.isPrimitive()) {
+						rightCode = ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
+					}
 					code = getNotNullCode(node.getLeftParameter(), type, leftCode, "((" + varType.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
 				}
 			}
 		} else if (List.class.isAssignableFrom(leftClass)
 				&& "get".equals(name)
-				&& int.class.equals(rightType)) {
+				&& (int.class.equals(rightType) || Integer.class.equals(rightType))) {
 			String var = getGenericVariableName(node.getLeftParameter());
 			if (var != null) {
 				Class<?> varType = types.get(var + ":0"); // List<T>第一个泛型
 				if (varType != null) {
 					type = varType;
+					if (! rightClass.isPrimitive()) {
+						rightCode = ClassUtils.class.getName() + ".unboxed(" + rightCode + ")";
+					}
 					code = getNotNullCode(node.getLeftParameter(), type, leftCode, "((" + varType.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
 				}
 			}

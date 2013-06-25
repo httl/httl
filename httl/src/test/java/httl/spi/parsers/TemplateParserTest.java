@@ -162,6 +162,16 @@ public class TemplateParserTest {
 		Assert.assertEquals("Map<String, Book> bookMap = books.toMap()", list.get(0));
 		Assert.assertEquals(" Book book1 = books.get(0)", list.get(1));
 		Assert.assertEquals(" book2 = books.get(1)", list.get(2));
+
+		// without equals string
+		list = TemplateParser.splitAssign("pair = \"a = b\"");
+		Assert.assertEquals(1, list.size());
+		Assert.assertEquals("pair = \"a = b\"", list.get(0));
+		
+		list = TemplateParser.splitAssign("pair1 = \"a \\\" = b\\\", pair2 = \"a = b\"");
+		Assert.assertEquals(2, list.size());
+		Assert.assertEquals("pair1 = \"a \\\" = b\\\"", list.get(0));
+		Assert.assertEquals(" pair2 = \"a = b\"", list.get(1));
 		
 		// without equals type
 		list = TemplateParser.splitAssign("enable = user.role == 'member'");
