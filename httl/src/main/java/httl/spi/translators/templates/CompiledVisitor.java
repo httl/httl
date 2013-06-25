@@ -1350,13 +1350,18 @@ public class CompiledVisitor extends AstVisitor {
 			if (functions != null && functions.size() > 0) {
 				for (Class<?> function : functions.keySet()) {
 					try {
-						Method method = ClassUtils.searchMethod(function, name, parameterTypes);
+						Method method = ClassUtils.searchMethod(function, name, parameterTypes, parameterTypes.length == 1);
 						if (Object.class.equals(method.getDeclaringClass())) {
 							break;
 						}
 						type = method.getReturnType();
 						if (type == void.class) {
 							throw new ParseException("Can not call void method " + method.getName() + " in class " + function.getName(), node.getOffset());
+						}
+						Class<?>[] pts = method.getParameterTypes();
+						if (parameterTypes.length == 1 && parameterTypes[0].isPrimitive() 
+								&& pts[0].isAssignableFrom(ClassUtils.getBoxedClass(parameterTypes[0]))) {
+							parameterCode = ClassUtils.class.getName() + ".boxed(" + parameterCode + ")";
 						}
 						if (Modifier.isStatic(method.getModifiers())) {
 							code = function.getName() + "." + method.getName() + "(" + parameterCode + ")";
@@ -2382,11 +2387,15 @@ public class CompiledVisitor extends AstVisitor {
 				}
 				for (Class<?> function : functions.keySet()) {
 					try {
-						Method method = ClassUtils.searchMethod(function, name, allTypes);
+						Method method = ClassUtils.searchMethod(function, name, allTypes, allTypes.length == 2);
 						if (! Object.class.equals(method.getDeclaringClass())) {
 							type = method.getReturnType();
 							if (type == void.class) {
 								throw new ParseException("Can not call void method " + method.getName() + " in class " + function.getName(), node.getOffset());
+							}
+							Class<?>[] pts = method.getParameterTypes();
+							if (allTypes.length == 2 && allTypes[1].isPrimitive() && pts[1].isAssignableFrom(ClassUtils.getBoxedClass(allTypes[1]))) {
+								allCode = leftCode + ", " + ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
 							}
 							if (Modifier.isStatic(method.getModifiers())) {
 								code = getNotNullCode(node.getLeftParameter(), type, leftCode, function.getName() + "." + method.getName() + "(" + allCode + ")");
@@ -2535,7 +2544,7 @@ public class CompiledVisitor extends AstVisitor {
 			return true;
 		}
 		try {
-			Method method = ClassUtils.searchMethod(leftClass, name, rightTypes);
+			Method method = ClassUtils.searchMethod(leftClass, name, rightTypes, false);
 			return method != null;
 		} catch (NoSuchMethodException e) {
 			if (rightTypes != null && rightTypes.length > 0) {

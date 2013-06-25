@@ -46,4 +46,16 @@ public class UserMethods {
 		return "Hello: " + result;
 	}
 
+	public static String overrideMethod(int i) throws ParseException {
+		return "i:" + i;
+	}
+
+	public static String overrideMethod(Object i) throws ParseException {
+		return "o:" + i;
+	}
+
+	public static String boxedMethod(Object i) throws ParseException {
+		return "boxed:" + i;
+	}
+
 }

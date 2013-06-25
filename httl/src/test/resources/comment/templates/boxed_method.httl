@@ -1,0 +1,2 @@
+${boxedMethod(1)}
+${boxedMethod("a")}

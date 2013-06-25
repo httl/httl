@@ -1,0 +1,2 @@
+${overrideMethod(1)}
+${overrideMethod("a")}
