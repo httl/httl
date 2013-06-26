@@ -14,11 +14,15 @@
  - See the License for the specific language governing permissions and
  - limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>httl</groupId>
+	<parent>
+		<groupId>com.github.httl</groupId>
+		<artifactId>httl-parent</artifactId>
+		<version>1.0.10</version>
+	</parent>
+	<groupId>com.github.httl</groupId>
 	<artifactId>httl-springmvc</artifactId>
 	<version>1.0.10</version>
 	<packaging>jar</packaging>
@@ -30,16 +34,51 @@
 		<license>
 			<name>Apache 2</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>httl-repository</distribution>
+			<distribution>repo</distribution>
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
 	<properties>
 		<updateReleaseInfo>true</updateReleaseInfo>
 	</properties>
+	<repositories>
+		<repository>
+			<id>httl-repository</id>
+			<name>Httl Repository</name>
+			<url>http://httl.github.io/maven</url>
+		</repository>
+	</repositories>
+	<scm>
+		<url>http://httl.github.io</url>
+		<connection>scm:git:https://github.com/httl/httl.git</connection>
+		<developerConnection>scm:git:git@github.com:httl/httl.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>github</system>
+		<url>https://github.com/httl/httl/issues</url>
+	</issueManagement>
+	<mailingLists>
+		<mailingList>
+			<name>HTTL User Mailling List</name>
+			<subscribe>httl-user-subscribe AT googlegroups DOT com</subscribe>
+			<unsubscribe>httl-user-unsubscribe AT googlegroups DOT com</unsubscribe>
+			<post>httl-user AT googlegroups DOT com</post>
+			<archive>https://groups.google.com/forum/#!forum/httl-user</archive>
+		</mailingList>
+	</mailingLists>
+	<developers>
+		<developer>
+			<name>Liang Fei</name>
+			<email>liangfei0201 A gmail D com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+	</developers>
 	<dependencies>
 		<dependency>
-			<groupId>httl</groupId>
+			<groupId>com.github.httl</groupId>
 			<artifactId>httl</artifactId>
 			<version>1.0.10</version>
 		</dependency>
@@ -85,67 +124,9 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<repositories>
-		<repository>
-			<id>httl-repository</id>
-			<name>Httl Repository</name>
-			<url>http://httl.github.io/maven</url>
-		</repository>
-	</repositories>
-	<scm>
-		<url>http://httl.github.io</url>
-		<connection>scm:git:https://github.com/httl/httl.git</connection>
-		<developerConnection>scm:git:git@github.com:httl/httl.git</developerConnection>
-	</scm>
-	<issueManagement>
-		<system>github</system>
-		<url>https://github.com/httl/httl/issues</url>
-	</issueManagement>
-	<developers>
-		<developer>
-			<name>Liang Fei</name>
-			<email>liangfei0201 A gmail D com</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>+8</timezone>
-		</developer>
-		<developer>
-			<name>Li Ding</name>
-			<email>oldratlee A gmail D com</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>+8</timezone>
-		</developer>
-	</developers>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<addMavenDescriptor>true</addMavenDescriptor>
-						<index>true</index>
-						<manifest>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
 					<execution>
@@ -160,30 +141,67 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<forkMode>once</forkMode>
-					<argLine>-server -Xms128m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=256m</argLine>
+					<argLine>-server -Xms128m -Xmx512m -XX:PermSize=64m
+						-XX:MaxPermSize=256m</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>true</addMavenDescriptor>
+						<index>true</index>
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>attach-javadocs</id>
+						<id>attach-javadoc</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
 				<configuration>
-					<attach>true</attach>
+					<show>public</show>
 					<charset>UTF-8</charset>
 					<encoding>UTF-8</encoding>
+					<docencoding>UTF-8</docencoding>
+					<excludePackageNames>com.alibaba.com.*</excludePackageNames>
+					<links>
+						<link>http://docs.oracle.com/javase/6/docs/api</link>
+					</links>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

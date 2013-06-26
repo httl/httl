@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- - Copyright 2011-2013 HTTL Team.
- -  
- - Licensed under the Apache License, Version 2.0 (the "License");
- - you may not use this file except in compliance with the License.
- - You may obtain a copy of the License at
- -  
- -      http://www.apache.org/licenses/LICENSE-2.0
- -  
- - Unless required by applicable law or agreed to in writing, software
- - distributed under the License is distributed on an "AS IS" BASIS,
- - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- - See the License for the specific language governing permissions and
- - limitations under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- - Copyright 2011-2013 HTTL Team. - - Licensed under the Apache License, 
+	Version 2.0 (the "License"); - you may not use this file except in compliance 
+	with the License. - You may obtain a copy of the License at - - http://www.apache.org/licenses/LICENSE-2.0 
+	- - Unless required by applicable law or agreed to in writing, software - 
+	distributed under the License is distributed on an "AS IS" BASIS, - WITHOUT 
+	WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. - See the 
+	License for the specific language governing permissions and - limitations 
+	under the License. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>httl</groupId>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+	<groupId>com.github.httl</groupId>
 	<artifactId>httl-parent</artifactId>
 	<version>1.0.10</version>
 	<packaging>pom</packaging>
@@ -30,23 +27,17 @@
 		<license>
 			<name>Apache 2</name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>httl-repository</distribution>
+			<distribution>repo</distribution>
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
+	<organization>
+		<name>HTTL</name>
+		<url>http://httl.github.io</url>
+	</organization>
 	<properties>
 		<updateReleaseInfo>true</updateReleaseInfo>
 	</properties>
-	<modules>
-		<module>httl</module>
-		<module>httl-script</module>
-		<module>httl-servlet</module>
-		<module>httl-springmvc</module>
-		<module>httl-struts</module>
-		<module>httl-webx</module>
-		<module>httl-jfinal</module>
-		<module>httl-nutz</module>
-	</modules>
 	<repositories>
 		<repository>
 			<id>httl-repository</id>
@@ -63,6 +54,15 @@
 		<system>github</system>
 		<url>https://github.com/httl/httl/issues</url>
 	</issueManagement>
+	<mailingLists>
+		<mailingList>
+			<name>HTTL User Mailling List</name>
+			<subscribe>httl-user-subscribe AT googlegroups DOT com</subscribe>
+			<unsubscribe>httl-user-unsubscribe AT googlegroups DOT com</unsubscribe>
+			<post>httl-user AT googlegroups DOT com</post>
+			<archive>https://groups.google.com/forum/#!forum/httl-user</archive>
+		</mailingList>
+	</mailingLists>
 	<developers>
 		<developer>
 			<name>Liang Fei</name>
@@ -72,13 +72,31 @@
 			</roles>
 			<timezone>+8</timezone>
 		</developer>
-		<developer>
-			<name>Li Ding</name>
-			<email>oldratlee A gmail D com</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>+8</timezone>
-		</developer>
 	</developers>
+	<modules>
+		<module>httl</module>
+		<module>httl-script</module>
+		<module>httl-servlet</module>
+		<module>httl-springmvc</module>
+		<module>httl-struts</module>
+		<module>httl-webx</module>
+		<module>httl-jfinal</module>
+		<module>httl-nutz</module>
+	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
