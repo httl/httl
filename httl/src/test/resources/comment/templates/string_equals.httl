@@ -1,0 +1,9 @@
+<!--#set(String aaa = "aaa")-->
+<!--#macro(bbb)-->${aaa}<!--#end-->
+<!--#set(String ccc = bbb().toString())-->
+<!--#set(boolean ddd = (aaa == ccc))-->
+aaa.length=${aaa.length}
+ccc.length=${ccc.length}
+aaa=${aaa}
+ccc=${ccc}
+ddd=${ddd}
