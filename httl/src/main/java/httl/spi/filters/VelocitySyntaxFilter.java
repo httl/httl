@@ -21,6 +21,7 @@ import httl.util.Token;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 /**
@@ -157,6 +158,8 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 	};
 
 	private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$(\\w+)");
+	
+	private final AtomicInteger seq = new AtomicInteger();
 
 	public String filter(String key, String value) {
 		try {
@@ -196,7 +199,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 								message = "${render(" + expression + ")}";
 							} else if ("foreach".equals(name)) {
 								// 将#foreach(item in list) 转成 #for(item : list)
-								message = "#for(" + expression + ")";
+								message = "#for(" + expression + ")#set(int velocityCount = for.count)";
 							} else if ("macro".equals(name)) {
 								String[] args = expression.split("\\s+");
 								StringBuilder sb = new StringBuilder();
@@ -215,8 +218,20 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 								// 将 #define(name) 转成 #macro(name := _macro_name)
 								message = "#macro(" + expression + " := _macro_" + expression + ")";
 							} else if ("stop".equals(name)) {
-								// 删除 #stop
-								message = "";
+								// 将 #stop 转成 #break
+								message = "#break";
+							} else if (name.startsWith("@")) {
+								// 将 #@blockmacroname 转成 ${macroname(arg1, arg2)}
+								name = name.substring(1);
+								String tmp = name + "_" + seq.incrementAndGet();
+								message = "#set(String bodyContent = " + tmp + ".evaluate())${" + name + "(" + expression + ")}#macro(" + tmp + ")";
+							} else if (! "set".equals(name)
+									&& ! "if".equals(name)
+									&& ! "elseif".equals(name)
+									&& ! "else".equals(name)
+									&& ! "break".equals(name)) {
+								// 将 #macroname(arg1, arg2) 转成 ${macroname(arg1, arg2)}
+								message = "${" + name + "(" + expression + ")}";
 							}
 						}
 					} else if (message.charAt(0) == '$') { // 插值
