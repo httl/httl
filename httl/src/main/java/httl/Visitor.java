@@ -34,7 +34,7 @@ public interface Visitor {
 	 * @param node - visited node
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the expression cannot be parsed on runtime
-	 * @return true - need visit the children node.
+	 * @return true - Need visit the children nodes.
 	 */
 	boolean visit(Node node) throws IOException, ParseException;
 
