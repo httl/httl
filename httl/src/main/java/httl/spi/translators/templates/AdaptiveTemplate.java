@@ -116,6 +116,10 @@ public class AdaptiveTemplate implements Template, Serializable {
 		}
 	}
 
+	public void render() throws IOException, ParseException {
+		render(Context.getContext().getOut());
+	}
+
 	public void render(Object out) throws IOException, ParseException {
 		if (out instanceof OutputStream) {
 			streamTemplate.render(out);

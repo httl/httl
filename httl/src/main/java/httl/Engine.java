@@ -173,7 +173,7 @@ public abstract class Engine {
 	 * @return engine version
 	 */
 	public String getVersion() {
-		return Version.getVersion();
+		return Version.getVersion(getClass());
 	}
 
 	/**

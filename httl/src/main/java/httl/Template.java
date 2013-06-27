@@ -42,19 +42,19 @@ public interface Template extends Node, Resource {
 	 * 
 	 * <pre>
 	 * Writer/OutputStream out = ...;
-	 * Map&lt;String, Object&gt; context = new HashMap&lt;String, Object&gt;();
-	 * context.put("foo", foo);
-	 * template.render(context, out);
+	 * Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+	 * map.put("foo", foo);
+	 * template.render(map, out);
 	 * </pre>
 	 * 
-	 * @see httl.Context#getContext()
-	 * @see httl.Context#getOut()
-	 * @param context - render context
-	 * @param out - output
+	 * @see httl.Context
+	 * @see httl.spi.Converter
+	 * @param map - render variables map
+	 * @param out - render output
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
-	void render(Object context, Object out) throws IOException, ParseException;
+	void render(Object map, Object out) throws IOException, ParseException;
 
 	/**
 	 * Render the template to output stream.
@@ -66,28 +66,47 @@ public interface Template extends Node, Resource {
 	 * template.render(out);
 	 * </pre>
 	 * 
-	 * @see httl.Context#getContext()
-	 * @see httl.Context#getOut()
-	 * @param out - output
+	 * @see httl.Context
+	 * @see httl.spi.Converter
+	 * @param out - render output
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed on runtime
 	 */
 	void render(Object out) throws IOException, ParseException;
 
 	/**
+	 * Render the template to output stream.
+	 * 
+	 * <pre>
+	 * Writer/OutputStream out = ...;
+	 * Context context = Context.getContext();
+	 * context.put("foo", foo);
+	 * context.setOut(out);
+	 * template.render();
+	 * </pre>
+	 * 
+	 * @see httl.Context
+	 * @throws IOException - If an I/O error occurs
+	 * @throws ParseException - If the template cannot be parsed on runtime
+	 */
+	void render() throws IOException, ParseException;
+
+	/**
 	 * Evaluate the template.
 	 * 
 	 * <pre>
-	 * Map&lt;String, Object&gt; context = new HashMap&lt;String, Object&gt;();
-	 * context.put("foo", foo);
-	 * Object result = template.evaluate(context);
+	 * Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+	 * map.put("foo", foo);
+	 * Object result = template.evaluate(map);
 	 * </pre>
 	 * 
-	 * @param context - evaluate context
-	 * @return evaluate result
+	 * @see httl.Context
+	 * @see httl.spi.Converter
+	 * @param map - evaluate variables map
+	 * @return evaluate result (string or byte[])
 	 * @throws ParseException - If the expression cannot be parsed on runtime
 	 */
-	Object evaluate(Object context) throws ParseException;
+	Object evaluate(Object map) throws ParseException;
 
 	/**
 	 * Evaluate the template.
@@ -98,7 +117,8 @@ public interface Template extends Node, Resource {
 	 * Object result = template.evaluate();
 	 * </pre>
 	 * 
-	 * @return evaluate result
+	 * @see httl.Context
+	 * @return evaluate result (string or byte[])
 	 * @throws ParseException - If the expression cannot be parsed on runtime
 	 */
 	Object evaluate() throws ParseException;

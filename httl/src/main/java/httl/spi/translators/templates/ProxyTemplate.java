@@ -72,6 +72,10 @@ public class ProxyTemplate implements Template {
 		}
 	}
 
+	public void render() throws IOException, ParseException {
+		render(null, Context.getContext().getOut());
+	}
+
 	public void render(Object stream) throws IOException, ParseException {
 		render(null, stream);
 	}

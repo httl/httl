@@ -15,6 +15,7 @@
  */
 package httl.spi.translators.templates;
 
+import httl.Context;
 import httl.Engine;
 import httl.Node;
 import httl.Resource;
@@ -98,6 +99,10 @@ public class LazyTemplate implements Template {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 		return template.evaluate(context);
+	}
+
+	public void render() throws IOException, ParseException {
+		render(null, Context.getContext().getOut());
 	}
 
 	public void render(Object out) throws IOException, ParseException {

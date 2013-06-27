@@ -28,8 +28,12 @@ public final class Version {
 
 	private static final String VERSION = getVersion(Version.class, "1.0.0");
 
-	public static String getVersion(){
+	public static String getVersion() {
 		return VERSION;
+	}
+
+	public static String getVersion(Class<?> cls) {
+		return getVersion(cls, getVersion());
 	}
 
 	public static String getVersion(Class<?> cls, String defaultVersion) {

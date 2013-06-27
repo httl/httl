@@ -265,6 +265,10 @@ public abstract class AbstractTemplate implements Template {
 		render(null, out);
 	}
 
+	public void render() throws IOException, ParseException {
+		render(null, Context.getContext().getOut());
+	}
+
 	public Object evaluate(Object context) throws ParseException {
 		UnsafeStringWriter writer = new UnsafeStringWriter();
 		try {
