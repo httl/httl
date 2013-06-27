@@ -393,10 +393,11 @@ public class StringUtils {
 			return value;
 		}
 		StringBuilder buf = null;
-		int len = value.length() - 1;
+		int len = value.length();
+		int len1 = len - 1;
 		for (int i = 0; i < len; i ++) {
 			char ch = value.charAt(i);
-			if (ch == '\\') {
+			if (ch == '\\' && i < len1) {
 				int j = i;
 				i ++;
 				ch = value.charAt(i);
@@ -440,7 +441,6 @@ public class StringUtils {
 			}
 		}
 		if (buf != null) {
-			buf.append(value.charAt(len));
 			return buf.toString();
 		}
 		return value;

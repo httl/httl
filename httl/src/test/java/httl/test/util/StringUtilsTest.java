@@ -32,6 +32,7 @@ public class StringUtilsTest {
 
 	@Test
 	public void testUnescapeString() {
+		assertEquals("''\"", StringUtils.unescapeString("'\\'\\\""));
 		assertEquals("a\"b\"c\'d\'e\\1\t2\n3\r4\b5\f6", StringUtils.unescapeString("a\\\"b\\\"c\\\'d\\\'e\\\\1\\t2\\n3\\r4\\b5\\f6"));
 	}
 
