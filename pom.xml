@@ -17,12 +17,25 @@
 	</parent>
 	<groupId>com.github.httl</groupId>
 	<artifactId>httl-parent</artifactId>
-	<version>1.0.11</version>
+	<version>1.0.10</version>
 	<packaging>pom</packaging>
 	<name>HTTL-Parent</name>
 	<description>Hyper Text Template Language and Engine.</description>
 	<url>http://httl.github.io</url>
 	<inceptionYear>2012</inceptionYear>
+	<properties>
+		<updateReleaseInfo>true</updateReleaseInfo>
+	</properties>
+	<modules>
+		<module>httl</module>
+		<module>httl-script</module>
+		<module>httl-servlet</module>
+		<module>httl-springmvc</module>
+		<module>httl-struts</module>
+		<module>httl-webx</module>
+		<module>httl-jfinal</module>
+		<module>httl-nutz</module>
+	</modules>
 	<licenses>
 		<license>
 			<name>Apache 2</name>
@@ -35,9 +48,6 @@
 		<name>HTTL</name>
 		<url>http://httl.github.io</url>
 	</organization>
-	<properties>
-		<updateReleaseInfo>true</updateReleaseInfo>
-	</properties>
 	<repositories>
 		<repository>
 			<id>httl-repository</id>
@@ -73,16 +83,6 @@
 			<timezone>+8</timezone>
 		</developer>
 	</developers>
-	<modules>
-		<module>httl</module>
-		<module>httl-script</module>
-		<module>httl-servlet</module>
-		<module>httl-springmvc</module>
-		<module>httl-struts</module>
-		<module>httl-webx</module>
-		<module>httl-jfinal</module>
-		<module>httl-nutz</module>
-	</modules>
 	<profiles>
 		<profile>
 			<id>gpg</id>

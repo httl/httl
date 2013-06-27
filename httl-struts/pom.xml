@@ -20,11 +20,9 @@
 	<parent>
 		<groupId>com.github.httl</groupId>
 		<artifactId>httl-parent</artifactId>
-		<version>1.0.11</version>
+		<version>1.0.10</version>
 	</parent>
-	<groupId>com.github.httl</groupId>
 	<artifactId>httl-struts</artifactId>
-	<version>1.0.11</version>
 	<packaging>jar</packaging>
 	<name>HTTL-Struts</name>
 	<description>HTTL Struts Integration.</description>
@@ -80,7 +78,7 @@
 		<dependency>
 			<groupId>com.github.httl</groupId>
 			<artifactId>httl</artifactId>
-			<version>1.0.11</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.struts.xwork</groupId>
