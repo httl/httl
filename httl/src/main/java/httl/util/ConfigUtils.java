@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public final class ConfigUtils {
-	
+
 	// Windows file path prefix pattern
 	private static final Pattern WINDOWS_FILE_PATTERN = Pattern.compile("^[A-Za-z]+:");
 	
@@ -67,7 +67,7 @@ public final class ConfigUtils {
 		Properties properties = new Properties();
 		return loadProperties(properties, path, required);
 	}
-	
+
 	public static Properties loadProperties(Properties properties, String path, boolean required) {
 		if (StringUtils.isEmpty(path)) {
 			throw new IllegalArgumentException("path == null");
@@ -103,12 +103,12 @@ public final class ConfigUtils {
 			}
 		}
 	}
-	
+
 	public static boolean isFilePath(String path) {
 		return path != null && (path.startsWith("/") || path.startsWith("./") || path.startsWith("../") 
 				|| WINDOWS_FILE_PATTERN.matcher(path).matches());
 	}
-	
+
 	public static String getRealPath(String path) {
 		if (StringUtils.isEmpty(path)) {
 			return null;
@@ -218,7 +218,7 @@ public final class ConfigUtils {
 		}
 		return result;
 	}
-	
+
 	private static String getRefValue(Properties result, String v) {
 		while (v != null && v.startsWith(REF)) {
 			String ref = v.substring(1);

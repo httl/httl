@@ -119,9 +119,10 @@ public class WebEngine {
 				if (ENGINE == null) { // double check
 					Properties properties = new Properties();
 					String config = servletContext.getInitParameter(CONFIG_KEY);
-					if (StringUtils.isEmpty(config)) {
+					if (StringUtils.isBlank(config)) {
 						config = WEBINF_CONFIG;
 					}
+					config = config.trim();
 					if (config.startsWith("/")) {
 						InputStream in = servletContext.getResourceAsStream(config);
 						if (in != null) {
@@ -130,15 +131,20 @@ public class WebEngine {
 							} catch (IOException e) {
 								throw new IllegalStateException("Failed to load httl config " + config + " in wepapp. cause: " + e.getMessage(), e);
 							}
-						} else if (servletContext.getInitParameter(CONFIG_KEY) != null) { // 用户主动配置错误提醒
+						} else if (StringUtils.isNotBlank(servletContext.getInitParameter(CONFIG_KEY))) { // 用户主动配置错误提醒
 							throw new IllegalStateException("Not found httl config " + config + " in wepapp.");
 						} else {
 							config = null;
 						}
 					} else if (config.startsWith("classpath:")) {
 						config = config.substring("classpath:".length());
+						config.replaceFirst("^/+", "");
 					} else if (config.startsWith("file:")) {
 						config = config.substring("file:".length());
+						config.replaceFirst("^/+", "/");
+						if (! config.startsWith("/") && ! config.startsWith(".")) {
+							config = "/" + config;
+						}
 					}
 					ENGINE = Engine.getEngine(config, addProperties(properties));
 					logConfigPath(ENGINE, servletContext, config);

@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
+ * BeanFactory. (Tool, Static, ThreadSafe)
+ * 
  * 该BeanFactory是一个仿Spring的轻量级“IoC+AOP”容器。
  * 
  * IoC: 基于Setter递归注入属性，如：
@@ -108,7 +110,7 @@ import java.util.Properties;
  * }
  * </pre>
  * 
- * @author liangfei
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class BeanFactory {
 

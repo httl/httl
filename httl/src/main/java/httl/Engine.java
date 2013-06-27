@@ -133,12 +133,16 @@ public abstract class Engine {
 		return engine;
 	}
 
+	/*
+	 * Mode and System Configuration
+	 * 
+	 * @author Li Ding (oldratlee AT gmail DOT com)
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static Properties initProperties(String configPath, Properties configProperties) {
 		Map<String, String> systemProperties = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, (Map) System.getProperties(), false);
 		Map<String, String> systemEnv = ConfigUtils.filterWithPrefix(HTTL_KEY_PREFIX, System.getenv(), true);
-		Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath,
-				configProperties, systemProperties, systemEnv);
+		Properties properties = ConfigUtils.mergeProperties(HTTL_DEFAULT_PROPERTIES, configPath, configProperties, systemProperties, systemEnv);
 		String[] modes = StringUtils.splitByComma(properties.getProperty(MODES_KEY));
 		if(CollectionUtils.isNotEmpty(modes)) {
 			Object[] configs = new Object[modes.length + 5];
