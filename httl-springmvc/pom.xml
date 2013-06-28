@@ -60,8 +60,8 @@
 	<mailingLists>
 		<mailingList>
 			<name>HTTL User Mailling List</name>
-			<subscribe>httl-user-subscribe AT googlegroups DOT com</subscribe>
-			<unsubscribe>httl-user-unsubscribe AT googlegroups DOT com</unsubscribe>
+			<subscribe>httl-user+subscribe AT googlegroups DOT com</subscribe>
+			<unsubscribe>httl-user+unsubscribe AT googlegroups DOT com</unsubscribe>
 			<post>httl-user AT googlegroups DOT com</post>
 			<archive>https://groups.google.com/forum/#!forum/httl-user</archive>
 		</mailingList>
