@@ -80,7 +80,7 @@ public class JdkCompiler extends AbstractCompiler {
 	public JdkCompiler(){
 		compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
-			throw new IllegalStateException("Can not get system java compiler. Please add jdk tools.jar to your classpath.");
+			throw new IllegalStateException("Can not get system java compiler. Please run with JDK (NOT JVM), or configure the httl.properties: compiler=httl.spi.compilers.JavassistCompiler, and add javassist.jar.");
 		}
 		diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
 		standardJavaFileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
