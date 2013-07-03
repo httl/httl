@@ -1,0 +1,2 @@
+<!--#set(List<Book> booklist)-->
+<!--#for(book : booklist)--> ${book.title} ${for.index} <!--#end-->

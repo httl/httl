@@ -1,0 +1,2 @@
+
+ Practical API Design 0  Effective Java 1  Java Concurrency in Practice 2  Java Programming Language 3  Domain-Driven Design 4  Agile Project Management with Scrum 5  J2EE Development without EJB 6  Design Patterns 7  Agile Software Development, Principles, Patterns, and Practices 8  Design by Contract, by Example 9 
