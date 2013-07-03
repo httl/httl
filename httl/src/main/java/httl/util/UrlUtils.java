@@ -181,6 +181,9 @@ public class UrlUtils {
 	public static final String FILE_URL_PREFIX = "file:";
 	
 	public static List<String> listUrl(URL rootDirUrl, String suffix) throws IOException {
+		if (rootDirUrl == null) {
+			return new ArrayList<String>(0);
+		}
 		if ("file".equals(rootDirUrl.getProtocol())) {
 			return listFile(new File(rootDirUrl.getFile()), suffix);
 		} else {
