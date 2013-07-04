@@ -30,7 +30,8 @@ public class ContextResolver implements Resolver {
 		if ("parent".equals(key)) {
 			return Context.getContext().getParent();
 		} else if ("super".equals(key)) {
-			return Context.getContext().getSuper();
+			Context parent = Context.getContext().getParent();
+			return parent == null ? null : parent.getTemplate();
 		} else if ("this".equals(key)) {
 			return Context.getContext().getTemplate();
 		} else if ("engine".equals(key)) {

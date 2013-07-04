@@ -173,17 +173,6 @@ public final class Context implements Map<String, Object> {
 	}
 
 	/**
-	 * Get the super template.
-	 * 
-	 * @see #getContext()
-	 * @return super template
-	 */
-	public Template getSuper() {
-		checkThread();
-		return parent == null ? null : parent.getTemplate();
-	}
-
-	/**
 	 * Get the current template.
 	 * 
 	 * @see #getContext()
