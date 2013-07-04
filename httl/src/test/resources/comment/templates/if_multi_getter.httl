@@ -1,0 +1,3 @@
+<!--#set(User user, User user_not_exist)-->
+<!--#if(75==user.book.price)-->aaa<!--#end-->
+<!--#if(75==user_not_exist.book.price)-->bbb<!--#end-->

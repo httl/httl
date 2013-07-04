@@ -83,7 +83,7 @@ public class TemplateTest {
     public static Collection<Object[]> prepareData() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		format.setTimeZone(TimeZone.getTimeZone("+0"));
-		User user = new User("liangfei", "admin", "Y");
+		User user = new User(1, "liangfei", "admin", "Y");
 		Book[] books = new Book[10];
 		books[0] = new Book("Practical API Design", "Jaroslav Tulach", "Apress", format.parse("2008-07-29"), 75, 85);
 		books[1] = new Book("Effective Java", "Joshua Bloch", "Addison-Wesley Professional", format.parse("2008-05-28"), 55, 70);
@@ -95,6 +95,7 @@ public class TemplateTest {
 		books[7] = new Book("Design Patterns", "Erich Gamma", "Addison-Wesley Professional", format.parse("1994-11-10"), 60, 80);
 		books[8] = new Book("Agile Software Development, Principles, Patterns, and Practices", " Robert C. Martin", "Prentice Hall", format.parse("2002-10-25"), 80, 75);
 		books[9] = new Book("Design by Contract, by Example", "Richard Mitchell", "Addison-Wesley Publishing Company", format.parse("2001-10-22"), 50, 85);
+		user.setBook(books[0]);
 		Book[] books2 = new Book[2];
 		books2[0] = new Book("Practical API Design2", "Jaroslav Tulach", "Apress", format.parse("2010-07-29"), 75, 85);
 		books2[1] = new Book("Effective Java2", "Joshua Bloch", "Addison-Wesley Professional", format.parse("2010-05-28"), 55, 70);
@@ -180,7 +181,7 @@ public class TemplateTest {
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
 					String templateName = file.getName();
-					//if (! "string_quote.httl".equals(templateName)) continue; // 指定模板测试
+					//if (! "if_multi_getter.httl".equals(templateName)) continue; // 指定模板测试
 					//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
 					if ("httl-comment-interpret.properties".equals(config) // FIXME
 							&& ("include_hide.httl".equals(templateName)

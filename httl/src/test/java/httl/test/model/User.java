@@ -26,19 +26,32 @@ public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private int id;
+
 	private String name;
 
 	private String role;
 	
 	private String isLogin;
 
+	private Book book;
+
 	public User() {
 	}
 	
-	public User(String name, String role, String isLogin) {
+	public User(int id, String name, String role, String isLogin) {
+		this.id = id;
 		this.name = name;
 		this.role = role;
 		this.isLogin = isLogin;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -68,5 +81,13 @@ public class User implements Serializable {
 	public void setIsLogin(String isLogin) {
 		this.isLogin = isLogin;
 	}
-	
+
+	public Book getBook() {
+		return book;
+	}
+
+	public void setBook(Book book) {
+		this.book = book;
+	}
+
 }
