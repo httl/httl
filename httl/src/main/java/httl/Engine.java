@@ -385,8 +385,8 @@ public abstract class Engine {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public Template getTemplate(String name, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
-		return getTemplate(name, null, null, parameterTypes);
+	public Template getTemplate(String name, Map<String, Object> args) throws IOException, ParseException {
+		return getTemplate(name, null, null, args);
 	}
 
 	/**
@@ -399,8 +399,8 @@ public abstract class Engine {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public Template getTemplate(String name, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
-		return getTemplate(name, null, encoding, parameterTypes);
+	public Template getTemplate(String name, String encoding, Map<String, Object> args) throws IOException, ParseException {
+		return getTemplate(name, null, encoding, args);
 	}
 
 	/**
@@ -413,8 +413,8 @@ public abstract class Engine {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public Template getTemplate(String name, Locale locale, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
-		return getTemplate(name, locale, null, parameterTypes);
+	public Template getTemplate(String name, Locale locale, Map<String, Object> args) throws IOException, ParseException {
+		return getTemplate(name, locale, null, args);
 	}
 
 	/**
@@ -428,7 +428,7 @@ public abstract class Engine {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public abstract Template getTemplate(String name, Locale locale, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException;
+	public abstract Template getTemplate(String name, Locale locale, String encoding, Map<String, Object> args) throws IOException, ParseException;
 
 	/**
 	 * Parse string template.

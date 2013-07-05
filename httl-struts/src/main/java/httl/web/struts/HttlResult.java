@@ -44,7 +44,7 @@ public class HttlResult extends StrutsResultSupport {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		WebEngine.setRequestAndResponse(request, response);
-		WebEngine.getEngine().getTemplate(location, request.getLocale()).render(map, response);
+		WebEngine.getEngine().getTemplate(location, request.getLocale(), map).render(map, response);
 	}
 
 }

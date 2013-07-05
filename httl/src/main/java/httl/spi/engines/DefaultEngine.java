@@ -33,6 +33,7 @@ import httl.util.ConfigUtils;
 import httl.util.DelegateMap;
 import httl.util.Digest;
 import httl.util.StringUtils;
+import httl.util.TypeMap;
 import httl.util.UrlUtils;
 import httl.util.VolatileReference;
 
@@ -178,9 +179,10 @@ public class DefaultEngine extends Engine {
 	 * @throws ParseException - If the template cannot be parsed
 	 */
 	@SuppressWarnings("unchecked")
-	public Template getTemplate(String name, Locale locale, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
+	public Template getTemplate(String name, Locale locale, String encoding, Map<String, Object> args) throws IOException, ParseException {
 		name = UrlUtils.cleanName(name);
 		locale = cleanLocale(locale);
+		Map<String, Class<?>> parameterTypes = args == null ? null : new TypeMap(args);
 		Map<Object, Object> cache = this.cache; // safe copy reference
 		if (cache == null) {
 			return parseTemplate(null, name, locale, encoding, parameterTypes);

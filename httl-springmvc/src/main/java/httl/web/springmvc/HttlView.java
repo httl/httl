@@ -37,7 +37,7 @@ public class HttlView extends AbstractTemplateView {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		WebEngine.setRequestAndResponse(request, response);
-		WebEngine.getEngine().getTemplate(getUrl(), request.getLocale()).render(model, response);
+		WebEngine.getEngine().getTemplate(getUrl(), request.getLocale(), model).render(model, response);
 	}
 
 	@Override

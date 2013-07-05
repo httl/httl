@@ -97,17 +97,19 @@ public class HttlEngine implements TemplateEngine {
 
 	private void doWriteTo(String templateName, TemplateContext templateContext, Object out) throws TemplateException, IOException {
 		try {
+			String path = getTemplatePath(templateName);
+			ContextMap map = new ContextMap(templateContext);
 			TurbineRunData rundata = (TurbineRunData) templateContext.get("rundata");
 			if (rundata != null) {
 				HttpServletRequest request = rundata.getRequest();
 				HttpServletResponse response = rundata.getResponse();
 				if (rundata.getRequest() != null && rundata.getResponse() != null) {
 					WebEngine.setRequestAndResponse(request, response);
-					WebEngine.getEngine().getTemplate(getTemplatePath(templateName), request.getLocale(), templateEncoding).render(new ContextMap(templateContext), out);
+					WebEngine.getEngine().getTemplate(path, request.getLocale(), templateEncoding, map).render(map, out);
 					return;
 				}
 			}
-			WebEngine.getEngine().getTemplate(getTemplatePath(templateName), templateEncoding).render(new ContextMap(templateContext), out);
+			WebEngine.getEngine().getTemplate(path, templateEncoding).render(map, out);
 		} catch (ParseException e) {
 			throw new TemplateException(e.getMessage(), e);
 		}
