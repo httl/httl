@@ -229,7 +229,8 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 									&& ! "if".equals(name)
 									&& ! "elseif".equals(name)
 									&& ! "else".equals(name)
-									&& ! "break".equals(name)) {
+									&& ! "break".equals(name)
+									&& ! "end".equals(name)) {
 								// 将 #macroname(arg1, arg2) 转成 ${macroname(arg1, arg2)}
 								message = "${" + name + "(" + expression + ")}";
 							}
