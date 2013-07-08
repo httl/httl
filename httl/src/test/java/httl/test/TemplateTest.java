@@ -134,6 +134,7 @@ public class TemplateTest {
 		context.put("intmap", intmap);
 		context.put("begin", 3);
 		context.put("end", 7);
+		context.put("logined", true);
 
 		Model model = new Model();
 		model.setChinese("中文");
@@ -153,6 +154,7 @@ public class TemplateTest {
 		model.setIntmap(intmap);
 		model.setBegin(3);
 		model.setEnd(7);
+		model.setLogined(true);
 
 	    final List<Object[]> retTestData = new ArrayList<Object[]>();
 		String[] configs = new String[] { "httl.properties", "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-comment-compile.properties", "httl-comment-interpret.properties", "httl-attribute.properties", "httl-velocity.properties" };
@@ -181,7 +183,7 @@ public class TemplateTest {
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
 					String templateName = file.getName();
-					//if (! "if_multi_getter.httl".equals(templateName)) continue; // 指定模板测试
+					//if (! "if_boolean.httl".equals(templateName)) continue; // 指定模板测试
 					//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
 					if ("httl-comment-interpret.properties".equals(config) // FIXME
 							&& ("include_hide.httl".equals(templateName)

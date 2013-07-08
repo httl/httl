@@ -158,7 +158,7 @@ public abstract class AbstractTemplate implements Template {
 		} catch (ParseException e) {
 			throw (ParseException) e;
 		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
+			throw new RuntimeException(ClassUtils.toString(e), e);
 		}
 	}
 

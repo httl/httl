@@ -1310,7 +1310,7 @@ public class InterpretedVisitor extends AstVisitor {
 					} catch (ParseException e) {
 						throw e;
 					} catch (Exception e) {
-						throw new ParseException(e.getMessage(), node.getOffset());
+						throw new ParseException(ClassUtils.toString(e), node.getOffset());
 					}
 				}
 			}

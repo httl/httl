@@ -18,6 +18,7 @@ package httl.ast;
 import httl.Node;
 import httl.Template;
 import httl.Visitor;
+import httl.util.ClassUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -46,7 +47,7 @@ public abstract class AstVisitor implements Visitor {
 		} catch (ParseException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new ParseException(e.getMessage(), node.getOffset());
+			throw new ParseException(ClassUtils.toString(e), node.getOffset());
 		}
 		return true;
 	}

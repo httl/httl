@@ -55,6 +55,16 @@ public class Model {
 	private int begin;
 
 	private int end;
+	
+	private boolean logined;
+
+	public boolean isLogined() {
+		return logined;
+	}
+
+	public void setLogined(boolean logined) {
+		this.logined = logined;
+	}
 
 	public String getExtends() {
 		return _extends;
