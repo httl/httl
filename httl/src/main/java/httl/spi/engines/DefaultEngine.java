@@ -91,8 +91,8 @@ public class DefaultEngine extends Engine {
 	// httl.properties: reloadable=true
 	private boolean reloadable;
 	
-	// httl.properties: precompiled=true
-	private boolean precompiled;
+	// httl.properties: preload=true
+	private boolean preload;
 	
 	// httl.properties: localized=true
 	private boolean localized;
@@ -367,7 +367,7 @@ public class DefaultEngine extends Engine {
 	 * On all inited.
 	 */
 	public void inited() {
-		if (precompiled) {
+		if (preload) {
 			try {
 				int count = 0;
 				if (templateSuffix == null) {
@@ -382,7 +382,7 @@ public class DefaultEngine extends Engine {
 					for (String name : list) {
 						try {
 							if (logger != null && logger.isDebugEnabled()) {
-								logger.debug("Precompiled the template: " + name);
+								logger.debug("Preload the template: " + name);
 							}
 							getTemplate(name);
 						} catch (Exception e) {
@@ -393,7 +393,7 @@ public class DefaultEngine extends Engine {
 					}
 				}
 				if (logger != null && logger.isInfoEnabled()) {
-					logger.info("Precompiled " + count + " templates from directory " + (templateDirectory == null ? "/" : templateDirectory) + " with suffix " + Arrays.toString(templateSuffix));
+					logger.info("Preload " + count + " templates from directory " + (templateDirectory == null ? "/" : templateDirectory) + " with suffix " + Arrays.toString(templateSuffix));
 				}
 			} catch (Exception e) {
 				if (logger != null && logger.isErrorEnabled()) {
@@ -439,10 +439,10 @@ public class DefaultEngine extends Engine {
 	}
 
 	/**
-	 * httl.properties: precompiled=true
+	 * httl.properties: preload=true
 	 */
-	public void setPrecompiled(boolean precompiled) {
-		this.precompiled = precompiled;
+	public void setPreload(boolean preload) {
+		this.preload = preload;
 	}
 
 	/**
