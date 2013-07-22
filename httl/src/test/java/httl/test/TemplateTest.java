@@ -83,7 +83,7 @@ public class TemplateTest {
     public static Collection<Object[]> prepareData() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		format.setTimeZone(TimeZone.getTimeZone("+0"));
-		User user = new User(1, "liangfei", "admin", "Y");
+		User user = new User(1, "liangfei", "admin", 3, "Y");
 		Book[] books = new Book[10];
 		books[0] = new Book("Practical API Design", "Jaroslav Tulach", "Apress", format.parse("2008-07-29"), 75, 85);
 		books[1] = new Book("Effective Java", "Joshua Bloch", "Addison-Wesley Professional", format.parse("2008-05-28"), 55, 70);
@@ -183,7 +183,7 @@ public class TemplateTest {
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
 					String templateName = file.getName();
-					//if (! "if_boolean.httl".equals(templateName)) continue; // 指定模板测试
+					//if (! "integer_equals.httl".equals(templateName)) continue; // 指定模板测试
 					//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
 					if ("httl-comment-interpret.properties".equals(config) // FIXME
 							&& ("include_hide.httl".equals(templateName)

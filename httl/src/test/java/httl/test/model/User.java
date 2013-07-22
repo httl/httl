@@ -26,12 +26,14 @@ public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int id;
+	private Integer id;
 
 	private String name;
 
 	private String role;
-	
+
+	private int level;
+
 	private String isLogin;
 
 	private Book book;
@@ -39,18 +41,19 @@ public class User implements Serializable {
 	public User() {
 	}
 	
-	public User(int id, String name, String role, String isLogin) {
+	public User(Integer id, String name, String role, int level, String isLogin) {
 		this.id = id;
 		this.name = name;
 		this.role = role;
+		this.level = level;
 		this.isLogin = isLogin;
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -70,8 +73,12 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public boolean isOwned(Book book) {
-		return true;
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 	public String getIsLogin() {
@@ -88,6 +95,10 @@ public class User implements Serializable {
 
 	public void setBook(Book book) {
 		this.book = book;
+	}
+
+	public boolean isOwned(Book book) {
+		return true;
 	}
 
 }

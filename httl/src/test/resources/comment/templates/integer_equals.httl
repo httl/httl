@@ -1,0 +1,25 @@
+#set(User user)
+#if(user.id == 1)
+AAA
+#end
+#if(user.id == 2)
+BBB
+#end
+#if(user.id != 1)
+CCC
+#end
+#if(user.id != 2)
+DDD
+#end
+#if(user.level == 3)
+EEE
+#end
+#if(user.level == 4)
+FFF
+#end
+#if(user.level != 3)
+GGG
+#end
+#if(user.level != 4)
+HHH
+#end
