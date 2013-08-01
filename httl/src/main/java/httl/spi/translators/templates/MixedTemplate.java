@@ -42,7 +42,7 @@ public class MixedTemplate extends ProxyTemplate {
 	private final Resource resource;
 
 	private final Node root;
-	
+
 	private final Translator compiledTranslator;
 
 	private Template compiledTemplate;

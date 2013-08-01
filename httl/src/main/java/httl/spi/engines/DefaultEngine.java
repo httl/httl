@@ -247,6 +247,7 @@ public class DefaultEngine extends Engine {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
+		long start = logger != null && logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 		String source = resource.getSource();
 		try {
 			if (templateFilter != null) {
@@ -256,7 +257,11 @@ public class DefaultEngine extends Engine {
 			if (useRenderVariableType) {
 				return new LazyTemplate(translator, resource, root, parameterTypes, mapConverter);
 			}
-			return translator.translate(resource, root, parameterTypes);
+			Template template = translator.translate(resource, root, parameterTypes);
+			if (logger != null && logger.isDebugEnabled()) {
+				logger.debug("Parsed the template " + name + ", eslapsed: " + (System.currentTimeMillis() - start) + "ms.");
+			}
+			return template;
 		} catch (ParseException e) {
 			throw AbstractTemplate.toLocatedParseException(e, resource);
 		}

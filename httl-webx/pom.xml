@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>com.github.httl</groupId>
 		<artifactId>httl-parent</artifactId>
-		<version>1.0.10</version>
+		<version>1.0.11</version>
 	</parent>
 	<artifactId>httl-webx</artifactId>
 	<packaging>jar</packaging>
