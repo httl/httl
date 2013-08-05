@@ -1668,7 +1668,12 @@ public class CompiledVisitor extends AstVisitor {
 		Type type = boolean.class;
 		String code;
 		if(! "null".equals(leftCode) && ! "null".equals(rightCode)
-				&& ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
+				&& (! leftClass.isPrimitive() || ! rightClass.isPrimitive())) {
+			if (leftClass.isPrimitive()) {
+				leftCode = ClassUtils.class.getName() + ".boxed(" + leftCode + ")";
+			} else if (rightClass.isPrimitive()) {
+				rightCode = ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
+			}
 			code = getNotNullCode(node.getLeftParameter(), type, leftCode, leftCode + ".equals(" + rightCode + ")", "(" + rightCode + ") == null");
 		} else {
 			code = leftCode + " == " + rightCode;
@@ -1697,7 +1702,12 @@ public class CompiledVisitor extends AstVisitor {
 		Type type = boolean.class;
 		String code;
 		if(! "null".equals(leftCode) && ! "null".equals(rightCode)
-				&& ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
+				&& (! leftClass.isPrimitive() || ! rightClass.isPrimitive())) {
+			if (leftClass.isPrimitive()) {
+				leftCode = ClassUtils.class.getName() + ".boxed(" + leftCode + ")";
+			} else if (rightClass.isPrimitive()) {
+				rightCode = ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
+			}
 			code = getNotNullCode(node.getLeftParameter(), type, leftCode, "(! " + leftCode + ".equals(" + rightCode + "))", "(" + rightCode + ") != null");
 		} else {
 			code = leftCode + " " + name + " " + rightCode;
