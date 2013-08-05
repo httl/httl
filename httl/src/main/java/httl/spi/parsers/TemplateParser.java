@@ -320,6 +320,9 @@ public class TemplateParser implements Parser {
 						i = value.indexOf(':');
 						n = 1;
 					}
+					if (i < 0) {
+						throw new ParseException("Miss colon \":\" in invalid directive #for(" + value + ")", offset);
+					}
 					String var = value.substring(0, i).trim();
 					String expr = value.substring(i + n);
 					int blank = 0;
