@@ -18,6 +18,7 @@ package httl.spi.codecs.json;
 import httl.spi.Converter;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -101,7 +102,7 @@ public class JSONValue {
 					writeValue(item, jb, writeClass);
 			}
 			jb.arrayEnd();
-		} else {
+		} else if (obj instanceof Serializable) {
 			jb.objectBegin();
 
 			Map<String, Object> w;
