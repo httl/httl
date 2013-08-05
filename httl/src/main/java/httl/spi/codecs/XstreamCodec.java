@@ -33,6 +33,10 @@ public class XstreamCodec extends AbstractXmlCodec {
 
 	private static XStream XSTREAM = new XStream(new Xpp3Driver());
 
+	public static XStream getXStream() {
+		return XSTREAM;
+	}
+
 	public static void setDriver(HierarchicalStreamDriver driver) {
 		XSTREAM = new XStream(driver);
 	}

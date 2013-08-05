@@ -27,8 +27,16 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class JacksonCodec extends AbstractJsonCodec {
 
-	private final ObjectMapper mapper = new ObjectMapper();
-	
+	private static ObjectMapper mapper = new ObjectMapper();
+
+	public static ObjectMapper getMapper() {
+		return mapper;
+	}
+
+	public static void setMapper(ObjectMapper mapper) {
+		JacksonCodec.mapper = mapper;
+	}
+
 	public String toString(String key, Object value) {
 		if (value == null) {
 			return null;

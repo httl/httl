@@ -27,14 +27,18 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  */
 public class FastjsonCodec extends AbstractJsonCodec {
 
+	private static final SerializerFeature[] FEATURES = new SerializerFeature[] {SerializerFeature.SortField};
+
+	private static final SerializerFeature[] FEATURES_WITH_CLASS = new SerializerFeature[] {SerializerFeature.SortField, SerializerFeature.WriteClassName};
+
 	public String toString(String key, Object value) {
 		if (value == null) {
 			return null;
 		}
 		if (isJsonWithClass()) {
-			return JSON.toJSONString(value, SerializerFeature.SortField, SerializerFeature.WriteClassName);
+			return JSON.toJSONString(value, FEATURES_WITH_CLASS);
 		}
-		return JSON.toJSONString(value, SerializerFeature.SortField);
+		return JSON.toJSONString(value, FEATURES);
 	}
 
 	public byte[] toBytes(String key, Object value) {
@@ -42,9 +46,9 @@ public class FastjsonCodec extends AbstractJsonCodec {
 			return null;
 		}
 		if (isJsonWithClass()) {
-			return JSON.toJSONBytes(value, SerializerFeature.SortField, SerializerFeature.WriteClassName);
+			return JSON.toJSONBytes(value, FEATURES_WITH_CLASS);
 		}
-		return JSON.toJSONBytes(value, SerializerFeature.SortField);
+		return JSON.toJSONBytes(value, FEATURES);
 	}
 
 	@SuppressWarnings("unchecked")
