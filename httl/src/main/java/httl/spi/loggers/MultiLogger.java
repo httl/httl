@@ -40,15 +40,19 @@ public class MultiLogger implements Logger {
 		if (loggers == null) {
 			try {
 				setLoggers(new Logger[] { new Slf4jLogger() });
+				info("Using slf4j logger for httl.");
 			} catch (Throwable e1) {
 				try {
 					setLoggers(new Logger[] { new JclLogger() });
+					info("Using jcl logger for httl.");
 				} catch (Throwable e2) {
 					try {
 						setLoggers(new Logger[] { new Log4jLogger() });
+						info("Using log4j logger for httl.");
 					} catch (Throwable e3) {
 						try {
 							setLoggers(new Logger[] { new JdkLogger() });
+							info("Using jdk logger for httl.");
 						} catch (Throwable e4) {
 							setLoggers(new Logger[] { new SimpleLogger() });
 						}
