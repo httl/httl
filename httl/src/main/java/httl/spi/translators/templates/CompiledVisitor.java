@@ -945,7 +945,9 @@ public class CompiledVisitor extends AstVisitor {
 				+ macroInits
 				+ "}\n"
 				+ "\n"
-				+ "protected void doRender(" + Context.class.getName() + " $context, " 
+				+ "protected void doRender" 
+				+ (stream ? "Stream" : "Writer")
+				+ "(" + Context.class.getName() + " $context, " 
 				+ (stream ? OutputStream.class.getName() : Writer.class.getName())
 				+ " $output) throws " + Exception.class.getName() + " {\n" 
 				+ methodCode

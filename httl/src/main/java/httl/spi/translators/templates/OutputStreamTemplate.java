@@ -64,9 +64,10 @@ public abstract class OutputStreamTemplate extends CompiledTemplate {
 		return output.toByteArray();
 	}
 
-	protected void doRender(Context context, Writer writer) throws Exception {
+	@Override
+	protected void doRenderWriter(Context context, Writer writer) throws Exception {
 		throw new UnsupportedOperationException("Unsupported out type " + OutputStream.class.getName() 
-				+ " in compiled " + Writer.class.getName() + " template.");
+				+ " in compiled " + Writer.class.getName() + " template. Please config output.writer=true");
 	}
 
 }

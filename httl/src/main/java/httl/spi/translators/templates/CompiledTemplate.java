@@ -144,15 +144,15 @@ public abstract class CompiledTemplate extends AbstractTemplate {
 	@Override
 	protected void doRender(Context context) throws Exception {
 		if (context.getOut() instanceof OutputStream) {
-			doRender(context, (OutputStream) context.getOut());
+			doRenderStream(context, (OutputStream) context.getOut());
 		} else {
-			doRender(context, (Writer) context.getOut());
+			doRenderWriter(context, (Writer) context.getOut());
 		}
 	}
 
-	protected abstract void doRender(Context context, OutputStream stream) throws Exception;
+	protected abstract void doRenderStream(Context context, OutputStream stream) throws Exception;
 
-	protected abstract void doRender(Context context, Writer writer) throws Exception;
+	protected abstract void doRenderWriter(Context context, Writer writer) throws Exception;
 
 	protected Map<String, Template> getImportMacros() {
 		return importMacros;

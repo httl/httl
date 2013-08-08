@@ -50,9 +50,10 @@ public abstract class WriterTemplate extends CompiledTemplate {
 				mapConverter, outConverter, functions, importMacros, resource, template, root);
 	}
 
-	protected void doRender(Context context, OutputStream stream) throws Exception {
+	@Override
+	protected void doRenderStream(Context context, OutputStream stream) throws Exception {
 		throw new UnsupportedOperationException("Unsupported out type " + Writer.class.getName() 
-				+ " in compiled " + OutputStream.class.getName() + " template.");
+				+ " in compiled " + OutputStream.class.getName() + " template. Please config output.stream=true");
 	}
 
 }
