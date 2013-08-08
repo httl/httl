@@ -39,6 +39,10 @@ public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 
 	private Map<K, V> writable;
 
+	public DelegateMap(Map<K, V> current) {
+		this(null, current);
+	}
+
 	public DelegateMap(Map<K, V> parent, Map<K, V> current) {
 		this.parent = parent;
 		this.current = current;
