@@ -20,6 +20,7 @@ import httl.spi.Loader;
 import httl.spi.loaders.resources.ServletResource;
 import httl.util.UrlUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -64,7 +65,11 @@ public class ServletLoader extends AbstractLoader implements ServletContextListe
 	}
 
 	public List<String> doList(String directory, String suffix) throws IOException {
-		return UrlUtils.listUrl(getAndCheckServletContext().getResource(directory), suffix);
+		String path = getAndCheckServletContext().getRealPath(directory);
+		if (path == null || path.length() == 0) {
+			return null;
+		}
+		return UrlUtils.listFile(new File(path), suffix);
 	}
 
 	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
