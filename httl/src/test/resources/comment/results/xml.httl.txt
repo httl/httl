@@ -1,7 +1,17 @@
 
 <httl.test.model.User>
+  <id>1</id>
   <name>liangfei</name>
   <role>admin</role>
+  <level>3</level>
   <isLogin>Y</isLogin>
+  <book>
+    <title>Practical API Design</title>
+    <author>Jaroslav Tulach</author>
+    <publisher>Apress</publisher>
+    <publication>2008-07-29 00:00:00.0 UTC</publication>
+    <price>75</price>
+    <discount>85</discount>
+  </book>
 </httl.test.model.User>
 liangfei

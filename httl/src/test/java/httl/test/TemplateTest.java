@@ -83,7 +83,7 @@ public class TemplateTest {
     public static Collection<Object[]> prepareData() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		format.setTimeZone(TimeZone.getTimeZone("+0"));
-		User user = new User(1, "liangfei", "admin", 3, "Y");
+		User user = new User("liangfei", "admin", "Y", 1, 3);
 		Book[] books = new Book[10];
 		books[0] = new Book("Practical API Design", "Jaroslav Tulach", "Apress", format.parse("2008-07-29"), 75, 85);
 		books[1] = new Book("Effective Java", "Joshua Bloch", "Addison-Wesley Professional", format.parse("2008-05-28"), 55, 70);
@@ -159,7 +159,7 @@ public class TemplateTest {
 	    final List<Object[]> retTestData = new ArrayList<Object[]>();
 		String[] configs = new String[] { "httl.properties", "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-comment-compile.properties", "httl-comment-interpret.properties", "httl-attribute.properties", "httl-velocity.properties" };
 		for (String config : configs) {
-			//if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
+			if (! "httl-comment-javassist.properties".equals(config)) continue; // 指定配置测试
 			Engine engine = Engine.getEngine(config);
 			
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);

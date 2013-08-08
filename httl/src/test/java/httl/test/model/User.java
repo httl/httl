@@ -40,13 +40,19 @@ public class User implements Serializable {
 
 	public User() {
 	}
-	
-	public User(Integer id, String name, String role, int level, String isLogin) {
-		this.id = id;
+
+	public User(String name, String role, String isLogin) {
 		this.name = name;
 		this.role = role;
-		this.level = level;
 		this.isLogin = isLogin;
+	}
+
+	public User(String name, String role, String isLogin, Integer id, int level) {
+		this.name = name;
+		this.role = role;
+		this.isLogin = isLogin;
+		this.id = id;
+		this.level = level;
 	}
 
 	public Integer getId() {

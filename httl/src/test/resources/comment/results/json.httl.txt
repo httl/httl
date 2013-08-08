@@ -1,4 +1,4 @@
 
-{"isLogin":"Y","name":"liangfei","role":"admin","class":"httl.test.model.User"}
+{"isLogin":"Y","id":1,"level":3,"name":"liangfei","book":{"author":"Jaroslav Tulach","title":"Practical API Design","price":75,"discount":85,"publication":"2008-07-29 08:00:00","publisher":"Apress","class":"httl.test.model.Book"},"role":"admin","class":"httl.test.model.User"}
 liangfei
 liangfei
