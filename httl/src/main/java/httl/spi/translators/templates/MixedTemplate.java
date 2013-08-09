@@ -18,6 +18,8 @@ package httl.spi.translators.templates;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
+import httl.spi.Converter;
+import httl.spi.Logger;
 import httl.spi.Translator;
 
 import java.io.IOException;
@@ -45,11 +47,20 @@ public class MixedTemplate extends ProxyTemplate {
 
 	private final Translator compiledTranslator;
 
-	private Template compiledTemplate;
+	private final Converter<Object, Object> mapConverter;
 
-	public MixedTemplate(Template template, Translator translator, Resource resource, Node root, Map<String, Class<?>> types) {
+	private final Logger logger;
+
+	private volatile Template compiledTemplate;
+	
+	private volatile boolean firstWarn = true;
+
+	public MixedTemplate(Template template, Resource resource, Node root, Map<String, Class<?>> types, 
+			Translator translator, Converter<Object, Object> mapConverter, Logger logger) {
 		super(template);
 		this.compiledTranslator = translator;
+		this.mapConverter = mapConverter;
+		this.logger = logger;
 		this.resource = resource;
 		this.root = root;
 		if (types != null) {
@@ -64,13 +75,24 @@ public class MixedTemplate extends ProxyTemplate {
 	}
 
 	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertMap(Object parameters) throws IOException, ParseException {
+		if (mapConverter != null && parameters != null && ! (parameters instanceof Map)) {
+			parameters = mapConverter.convert(parameters, null);
+		}
+		if (parameters == null || parameters instanceof Map) {
+			return (Map<String, Object>) parameters;
+		} else {
+			throw new IllegalArgumentException("No such Converter to convert the " + parameters.getClass().getName() + " to Map.");
+		}
+	}
+
 	public void render(Object parameters, Object stream)
 			throws IOException, ParseException {
 		if (compiledTemplate != null) {
 			compiledTemplate.render(parameters, stream);
 			return;
 		}
-		Map<String, Object> map = (Map<String, Object>) parameters;
+		Map<String, Object> map = convertMap(parameters);
 		if (map != null) {
 			boolean compilable = true;
 			for (String key : getVariables().keySet()) {
@@ -88,12 +110,21 @@ public class MixedTemplate extends ProxyTemplate {
 					lock.lock();
 					try {
 						if (compiledTemplate == null) {
-							compiledTemplate = compiledTranslator.translate(resource, root, types);
+							try {
+								compiledTemplate = compiledTranslator.translate(resource, root, types);
+							} catch (ParseException e) {
+								if (firstWarn && logger != null && logger.isWarnEnabled()) {
+									firstWarn = false;
+									logger.warn(e.getMessage(), e);
+								}
+							}
 						}
 					} finally {
 						lock.unlock();
 					}
-					compiledTemplate.render(parameters, stream);
+					if (compiledTemplate != null) {
+						compiledTemplate.render(parameters, stream);
+					}
 					return;
 				}
 			}

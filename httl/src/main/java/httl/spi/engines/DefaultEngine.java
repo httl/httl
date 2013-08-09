@@ -19,7 +19,6 @@ import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Loader;
 import httl.spi.Logger;
@@ -28,7 +27,6 @@ import httl.spi.Resolver;
 import httl.spi.Translator;
 import httl.spi.loaders.StringLoader;
 import httl.spi.translators.templates.AbstractTemplate;
-import httl.spi.translators.templates.LazyTemplate;
 import httl.util.ConfigUtils;
 import httl.util.DelegateMap;
 import httl.util.Digest;
@@ -99,9 +97,6 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: use.render.variable.type=false
 	private boolean useRenderVariableType;
-
-	// httl.properties: map.converters=httl.spi.converters.BeanMapConverter
-	private Converter<Object, Object> mapConverter;
 
 	// httl.properties: name
 	private String name;
@@ -182,7 +177,7 @@ public class DefaultEngine extends Engine {
 	public Template getTemplate(String name, Locale locale, String encoding, Map<String, Object> args) throws IOException, ParseException {
 		name = UrlUtils.cleanName(name);
 		locale = cleanLocale(locale);
-		Map<String, Class<?>> parameterTypes = args == null ? null : new DelegateMap<String, Class<?>>(new TypeMap(args));
+		Map<String, Class<?>> parameterTypes = useRenderVariableType && args != null ? new DelegateMap<String, Class<?>>(new TypeMap(args)) : null;
 		Map<Object, Object> cache = this.cache; // safe copy reference
 		if (cache == null) {
 			return parseTemplate(null, name, locale, encoding, parameterTypes);
@@ -254,9 +249,6 @@ public class DefaultEngine extends Engine {
 				source = templateFilter.filter(resource.getName(), source);
 			}
 			Node root = templateParser.parse(source, 0);
-			if (useRenderVariableType) {
-				return new LazyTemplate(translator, resource, root, parameterTypes, mapConverter);
-			}
 			Template template = translator.translate(resource, root, parameterTypes);
 			if (logger != null && logger.isDebugEnabled()) {
 				logger.debug("Parsed the template " + name + ", eslapsed: " + (System.currentTimeMillis() - start) + "ms.");
@@ -462,13 +454,6 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setUseRenderVariableType(boolean useRenderVariableType) {
 		this.useRenderVariableType = useRenderVariableType;
-	}
-
-	/**
-	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
-	 */
-	public void setMapConverter(Converter<Object, Object> mapConverter) {
-		this.mapConverter = mapConverter;
 	}
 
 	/**

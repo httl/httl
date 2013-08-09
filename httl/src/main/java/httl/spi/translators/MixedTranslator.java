@@ -22,6 +22,8 @@ import java.util.Map;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
+import httl.spi.Converter;
+import httl.spi.Logger;
 import httl.spi.Translator;
 import httl.spi.translators.templates.MixedTemplate;
 
@@ -38,6 +40,10 @@ public class MixedTranslator implements Translator {
 
 	private Translator interpretedTranslator;
 
+	private Converter<Object, Object> mapConverter;
+
+	private Logger logger;
+
 	private boolean compiled;
 
 	private boolean interpreted;
@@ -45,7 +51,8 @@ public class MixedTranslator implements Translator {
 	public Template translate(Resource resource, Node root, Map<String, Class<?>> types)
 			throws ParseException, IOException {
 		if (interpreted && compiled) {
-			return new MixedTemplate(interpretedTranslator.translate(resource, root, types), compiledTranslator, resource, root, types);
+			return new MixedTemplate(interpretedTranslator.translate(resource, root, types), 
+					resource, root, types, compiledTranslator, mapConverter, logger);
 		} else if (interpreted) {
 			return interpretedTranslator.translate(resource, root, types);
 		} else {
@@ -67,6 +74,14 @@ public class MixedTranslator implements Translator {
 
 	public void setInterpretedTranslator(Translator interpretedTranslator) {
 		this.interpretedTranslator = interpretedTranslator;
+	}
+
+	public void setMapConverter(Converter<Object, Object> mapConverter) {
+		this.mapConverter = mapConverter;
+	}
+
+	public void setLogger(Logger logger) {
+		this.logger = logger;
 	}
 
 }
