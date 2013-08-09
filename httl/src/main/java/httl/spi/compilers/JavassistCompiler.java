@@ -55,7 +55,13 @@ public class JavassistCompiler extends AbstractCompiler {
 	private final ClassPool pool = ClassPool.getDefault();
 	
 	public JavassistCompiler() {
-		pool.appendClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
+		ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+		try {
+			contextLoader.loadClass(JdkCompiler.class.getName());
+        } catch (ClassNotFoundException e) { // 如果线程上下文的ClassLoader不能加载当前httl.jar包中的类，则切换回httl.jar所在的ClassLoader
+        	contextLoader = JdkCompiler.class.getClassLoader();
+        }
+		pool.appendClassPath(new LoaderClassPath(contextLoader));
 	}
 
 	@Override
@@ -127,7 +133,7 @@ public class JavassistCompiler extends AbstractCompiler {
 					}
 				}
 			}
-			saveBytecode(name, cls.toBytecode());
+				saveBytecode(name, cls.toBytecode());
 			return cls.toClass();
 		}
 	}
