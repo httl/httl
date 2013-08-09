@@ -786,6 +786,11 @@ public class InterpretedVisitor extends AstVisitor {
 		Object rightParameter = parameterStack.pop();
 		Object leftParameter = parameterStack.pop();
 		Object result = null;
+		if (leftParameter instanceof String && ! (rightParameter instanceof String)) {
+			rightParameter = StringUtils.toString(rightParameter);
+		} else if (! (leftParameter instanceof String) && rightParameter instanceof String) {
+			leftParameter = StringUtils.toString(leftParameter);
+		}
 		if (leftParameter != null) {
 			result = leftParameter.equals(rightParameter);
 		} else {
@@ -799,6 +804,11 @@ public class InterpretedVisitor extends AstVisitor {
 		Object rightParameter = parameterStack.pop();
 		Object leftParameter = parameterStack.pop();
 		Object result = null;
+		if (leftParameter instanceof String && ! (rightParameter instanceof String)) {
+			rightParameter = StringUtils.toString(rightParameter);
+		} else if (! (leftParameter instanceof String) && rightParameter instanceof String) {
+			leftParameter = StringUtils.toString(leftParameter);
+		}
 		if (leftParameter != null) {
 			result = ! leftParameter.equals(rightParameter);
 		} else {
