@@ -46,9 +46,9 @@ public abstract class AbstractCompiler implements Compiler {
 
 	private static final ConcurrentMap<String, VolatileReference<Class<?>>> CLASS_CACHE = new ConcurrentHashMap<String, VolatileReference<Class<?>>>();
 
-	private File codeDirectory;
+	protected File codeDirectory;
 
-	private File compileDirectory;
+	protected File compileDirectory;
 	
 	protected Logger logger;
 	
