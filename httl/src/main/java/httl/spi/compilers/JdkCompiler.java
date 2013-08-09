@@ -84,7 +84,12 @@ public class JdkCompiler extends AbstractCompiler {
 		}
 		diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
 		standardJavaFileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
-		final ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+		try {
+			contextLoader.loadClass(JdkCompiler.class.getName());
+        } catch (ClassNotFoundException e) { // 如果线程上下文的ClassLoader不能加载当前httl.jar包中的类，则切换回httl.jar所在的ClassLoader
+        	contextLoader = JdkCompiler.class.getClassLoader();
+        }
 		ClassLoader loader = contextLoader;
 		Set<File> files = new HashSet<File>();
 		while (loader instanceof URLClassLoader 
@@ -106,9 +111,10 @@ public class JdkCompiler extends AbstractCompiler {
 				throw new IllegalStateException(e.getMessage(), e);
 			}
 		}
+		final ClassLoader parentLoader = contextLoader;
 		classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
 			public ClassLoaderImpl run() {
-				return new ClassLoaderImpl(contextLoader);
+				return new ClassLoaderImpl(parentLoader);
 			}
 		});
 		javaFileManager = new JavaFileManagerImpl(standardJavaFileManager, classLoader);
