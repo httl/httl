@@ -909,7 +909,6 @@ public class StringUtils {
 	        return value;
 	    }
 	    int len = value.length();
-	    int len1 = len - 1;
 	    int start = 0;
 	    if (left) {
 	        loop_left:
@@ -939,8 +938,10 @@ public class StringUtils {
 	    }
 	    int end = len;
 	    if (right) {
+	    	int len1 = len - 1;
+		    int start1 = start > 0 ? start - 1 : 0;
 	        loop_right:
-	        for (int i = len1; i >= start - 1; i--) {
+	        for (int i = len1; i >= start1; i--) {
 	            char ch = value.charAt(i);
 	            switch (ch) {
 	                case ' ':
