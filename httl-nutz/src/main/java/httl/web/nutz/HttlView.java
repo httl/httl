@@ -17,8 +17,6 @@ package httl.web.nutz;
 
 import httl.web.WebEngine;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,15 +36,10 @@ public class HttlView extends AbstractPathView {
 		super(dest);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void render(HttpServletRequest req, HttpServletResponse resp, Object obj) throws Throwable {
 		String path = getTemplatePath(evalPath(req, obj), req);
 		WebEngine.setRequestAndResponse(req, resp);
-		if (obj instanceof Map) {
-			WebEngine.getEngine().getTemplate(path, req.getLocale(), (Map<String, Object>) obj).render(obj, resp);
-		} else {
-			WebEngine.getEngine().getTemplate(path, req.getLocale()).render(obj, resp);
-		}
+		WebEngine.getEngine().getTemplate(path, req.getLocale(), obj).render(obj, resp);
 	}
 
 	protected String getTemplatePath(String path, HttpServletRequest request) {
