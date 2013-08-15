@@ -110,17 +110,17 @@ public class InterpretedVisitor extends AstVisitor {
 
 	private Switcher<Formatter<Object>> formatterSwitcher;
 
-	private String filterVariable = "filter";
+	private String filterVariable;
 
-	private String formatterVariable = "formatter";
+	private String formatterVariable;
 
-	private String[] forVariable = new String[] { "for" };
+	private String[] forVariable;
 
-	private String ifVariable = "if";
+	private String ifVariable;
 
-	private String breakVariable = "break";
+	private String breakVariable;
 
-	private String outputEncoding = "UTF-8";
+	private String outputEncoding;
 
 	private Map<Class<?>, Object> importMethods;
 

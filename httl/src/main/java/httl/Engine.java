@@ -366,6 +366,37 @@ public abstract class Engine {
 	 * 
 	 * @see #getEngine()
 	 * @param name - template name
+	 * @return template instance
+	 * @throws IOException - If an I/O error occurs
+	 * @throws ParseException - If the template cannot be parsed
+	 */
+	public Template getTemplate(String name, Object args) throws IOException, ParseException {
+		if (args instanceof String)
+			return getTemplate(name, (String) args);
+		if (args instanceof Locale)
+			return getTemplate(name, (Locale) args);
+		return getTemplate(name, null, null, args);
+	}
+
+	/**
+	 * Get template.
+	 * 
+	 * @see #getEngine()
+	 * @param name - template name
+	 * @param encoding - template encoding
+	 * @return template instance
+	 * @throws IOException - If an I/O error occurs
+	 * @throws ParseException - If the template cannot be parsed
+	 */
+	public Template getTemplate(String name, String encoding, Object args) throws IOException, ParseException {
+		return getTemplate(name, null, encoding, args);
+	}
+
+	/**
+	 * Get template.
+	 * 
+	 * @see #getEngine()
+	 * @param name - template name
 	 * @param locale - template locale
 	 * @param encoding - template encoding
 	 * @return template instance
@@ -381,39 +412,14 @@ public abstract class Engine {
 	 * 
 	 * @see #getEngine()
 	 * @param name - template name
-	 * @return template instance
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed
-	 */
-	public Template getTemplate(String name, Map<String, Object> args) throws IOException, ParseException {
-		return getTemplate(name, null, null, args);
-	}
-
-	/**
-	 * Get template.
-	 * 
-	 * @see #getEngine()
-	 * @param name - template name
-	 * @param encoding - template encoding
-	 * @return template instance
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed
-	 */
-	public Template getTemplate(String name, String encoding, Map<String, Object> args) throws IOException, ParseException {
-		return getTemplate(name, null, encoding, args);
-	}
-
-	/**
-	 * Get template.
-	 * 
-	 * @see #getEngine()
-	 * @param name - template name
 	 * @param locale - template locale
 	 * @return template instance
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public Template getTemplate(String name, Locale locale, Map<String, Object> args) throws IOException, ParseException {
+	public Template getTemplate(String name, Locale locale, Object args) throws IOException, ParseException {
+		if (args instanceof String)
+			return getTemplate(name, locale, (String) args);
 		return getTemplate(name, locale, null, args);
 	}
 
@@ -428,7 +434,7 @@ public abstract class Engine {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public abstract Template getTemplate(String name, Locale locale, String encoding, Map<String, Object> args) throws IOException, ParseException;
+	public abstract Template getTemplate(String name, Locale locale, String encoding, Object args) throws IOException, ParseException;
 
 	/**
 	 * Parse string template.
@@ -447,10 +453,11 @@ public abstract class Engine {
 	 * 
 	 * @see #getEngine()
 	 * @param source - template source
+	 * @param args - template render args
 	 * @return template instance
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public abstract Template parseTemplate(String source, Map<String, Class<?>> parameterTypes) throws ParseException;
+	public abstract Template parseTemplate(String source, Object args) throws ParseException;
 
 	/**
 	 * Create context map.

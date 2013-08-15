@@ -19,6 +19,7 @@ import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
+import httl.spi.Converter;
 import httl.spi.Filter;
 import httl.spi.Loader;
 import httl.spi.Logger;
@@ -103,6 +104,8 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: instantiated content
 	private Map<String, Object> properties;
+	
+	private Converter<Object, Map<String, Object>> mapConverter;
 
 	public DefaultEngine() {
 		this.stringLoader = new StringLoader(this);
@@ -174,13 +177,12 @@ public class DefaultEngine extends Engine {
 	 * @throws ParseException - If the template cannot be parsed
 	 */
 	@SuppressWarnings("unchecked")
-	public Template getTemplate(String name, Locale locale, String encoding, Map<String, Object> args) throws IOException, ParseException {
+	public Template getTemplate(String name, Locale locale, String encoding, Object args) throws IOException, ParseException {
 		name = UrlUtils.cleanName(name);
 		locale = cleanLocale(locale);
-		Map<String, Class<?>> parameterTypes = useRenderVariableType && args != null ? new DelegateMap<String, Class<?>>(new TypeMap(args)) : null;
 		Map<Object, Object> cache = this.cache; // safe copy reference
 		if (cache == null) {
-			return parseTemplate(null, name, locale, encoding, parameterTypes);
+			return parseTemplate(null, name, locale, encoding, args);
 		}
 		Resource resource = null;
 		long lastModified;
@@ -228,7 +230,7 @@ public class DefaultEngine extends Engine {
 			synchronized (reference) { // reference lock
 				template = (Template) reference.get();
 				if (template == null || template.getLastModified() < lastModified) { // double check
-					template = parseTemplate(resource, name, locale, encoding, parameterTypes); // slowly
+					template = parseTemplate(resource, name, locale, encoding, args); // slowly
 					reference.set(template);
 				}
 			}
@@ -238,7 +240,7 @@ public class DefaultEngine extends Engine {
 	}
 
 	// Parse the template. (No cache)
-	private Template parseTemplate(Resource resource, String name, Locale locale, String encoding, Map<String, Class<?>> parameterTypes) throws IOException, ParseException {
+	private Template parseTemplate(Resource resource, String name, Locale locale, String encoding, Object args) throws IOException, ParseException {
 		if (resource == null) {
 			resource = loadResource(name, locale, encoding);
 		}
@@ -249,6 +251,7 @@ public class DefaultEngine extends Engine {
 				source = templateFilter.filter(resource.getName(), source);
 			}
 			Node root = templateParser.parse(source, 0);
+			Map<String, Class<?>> parameterTypes = useRenderVariableType && args != null ? new DelegateMap<String, Class<?>>(new TypeMap(convertMap(args))) : null;
 			Template template = translator.translate(resource, root, parameterTypes);
 			if (logger != null && logger.isDebugEnabled()) {
 				logger.debug("Parsed the template " + name + ", eslapsed: " + (System.currentTimeMillis() - start) + "ms.");
@@ -256,6 +259,18 @@ public class DefaultEngine extends Engine {
 			return template;
 		} catch (ParseException e) {
 			throw AbstractTemplate.toLocatedParseException(e, resource);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> convertMap(Object parameters) throws IOException, ParseException {
+		if (mapConverter != null && parameters != null && ! (parameters instanceof Map)) {
+			parameters = mapConverter.convert(parameters, null);
+		}
+		if (parameters == null || parameters instanceof Map) {
+			return (Map<String, Object>) parameters;
+		} else {
+			throw new IllegalArgumentException("No such " + Converter.class.getName() + " to convert the " + parameters.getClass().getName() + " to Map. Please check engine.getTemplate() args or implement a converter and add config in httl.properties: map.converter+=com.your." + parameters.getClass().getSimpleName() + Converter.class.getName() + ".");
 		}
 	}
 
@@ -268,13 +283,13 @@ public class DefaultEngine extends Engine {
 	 * @throws IOException - If an I/O error occurs
 	 * @throws ParseException - If the template cannot be parsed
 	 */
-	public Template parseTemplate(String source, Map<String, Class<?>> parameterTypes) throws ParseException {
+	public Template parseTemplate(String source, Object parameterTypes) throws ParseException {
 		String name = "/$" + Digest.getMD5(source);
 		if (! hasResource(name)) {
 			stringLoader.add(name, source);
 		}
 		try {
-			return getTemplate(name);
+			return getTemplate(name, parameterTypes);
 		} catch (IOException e) {
 			throw new IllegalStateException(e.getMessage(), e);
 		}
@@ -503,6 +518,13 @@ public class DefaultEngine extends Engine {
 	 */
 	public void setTemplateFilter(Filter templateFilter) {
 		this.templateFilter = templateFilter;
+	}
+
+	/**
+	 * httl.properties: map.converter=httl.spi.converters.BeanMapConverter
+	 */
+	public void setMapConverter(Converter<Object, Map<String, Object>> mapConverter) {
+		this.mapConverter = mapConverter;
 	}
 
 }

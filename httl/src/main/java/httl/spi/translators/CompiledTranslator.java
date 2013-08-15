@@ -56,11 +56,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class CompiledTranslator implements Translator {
 
-	private String[] forVariable = new String[] { "for" };
+	private String[] forVariable;
 
-	private String filterVariable = "filter";
+	private String filterVariable;
 
-	private String formatterVariable = "formatter";
+	private String formatterVariable;
 
 	private String defaultFilterVariable;
 	

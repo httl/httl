@@ -160,15 +160,15 @@ public class CompiledVisitor extends AstVisitor {
 
 	private String engineName;
 
-	private String[] forVariable = new String[] { "for" };
+	private String[] forVariable;
 
-	private String[] importGetters = new String[] { "get" };
+	private String[] importGetters;
 
-	private String[] importSizers = new String[] { "size", "length" };
+	private String[] importSizers;
 
-	private String filterVariable = "filter";
+	private String filterVariable;
 
-	private String formatterVariable = "formatter";
+	private String formatterVariable;
 
 	private String defaultFilterVariable;
 	
@@ -329,7 +329,6 @@ public class CompiledVisitor extends AstVisitor {
 
 	public CompiledVisitor() {
 	}
-	
 
 	@Override
 	public boolean visit(Statement node) throws IOException, ParseException {
@@ -638,10 +637,11 @@ public class CompiledVisitor extends AstVisitor {
 				clazz = Map.Entry.class;
 			} else if (Collection.class.isAssignableFrom(returnType)) {
 				clazz = types.get(exprName + ":0"); // Collection<T>泛型 
-				if (clazz == null) {
-					clazz = defaultVariableType;
+			}
+			if (clazz == null) {
+				if (defaultVariableType == null) {
+					throw new ParseException("Can not resolve the variable " + node.getName() + " type in the #for directive. Please explicit define the variable type #for(Xxx " + node.getName() + " : " + node.getExpression() + ") in your template.", node.getOffset());
 				}
-			} else {
 				clazz = defaultVariableType;
 			}
 		}
@@ -822,8 +822,12 @@ public class CompiledVisitor extends AstVisitor {
 		}
 		for (String var : defVariables) {
 			if (getVariables.contains(var) && ! defined.contains(var)) {
+				Class<?> type = types.get(var);
+				if (type == null) {
+					type = defaultVariableType;
+				}
 				defined.add(var);
-				declare.append(getTypeCode(types.get(var), var));
+				declare.append(getTypeCode(type, var));
 			}
 		}
 		Set<String> macroKeySet = macros.keySet();
@@ -1211,10 +1215,10 @@ public class CompiledVisitor extends AstVisitor {
 		String name = node.getName();
 		Class<?> type = types.get(name);
 		if (type == null) {
-			type = defaultVariableType;
-			if (type == null) {
-				type = Object.class;
+			if (defaultVariableType == null) {
+				throw new ParseException("Can not resolve the " + node.getName() + " variable type. Please explicit define the variable type #set(Xxx " + node.getName() + ") in your template.", node.getOffset());
 			}
+			type = defaultVariableType;
 		}
 		String code = ClassUtils.filterJavaKeyword(name);
 		typeStack.push(type);
@@ -2450,7 +2454,7 @@ public class CompiledVisitor extends AstVisitor {
 					} catch (NoSuchMethodException e) {
 						String def = "";
 						if (StringUtils.isNamed(leftCode) && leftClass.equals(defaultVariableType)) {
-							def = " Please add variable type definition #set(Xxx " + leftCode + ") in your template.";
+							def = "Can not resolve the " + leftCode + " variable type. Please explicit define the variable type #set(Xxx " + leftCode + ") in your template.";
 						}
 						if (rightTypes != null && rightTypes.length > 0) {
 							throw new ParseException("No such method " + ClassUtils.getMethodFullName(name, rightTypes) + " in class "
