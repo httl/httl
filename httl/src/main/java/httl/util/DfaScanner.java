@@ -21,13 +21,15 @@ import java.util.List;
 
 public abstract class DfaScanner {
 
-	// BREAK，结束片段，并回到起始状态，最多可回退98个字符，退回的字符将重新读取
+	// BREAK，结束片段，并回到起始状态，最多可回退50个字符，退回的字符将重新读取
 	// state = BREAK - 退回字符数
 	// state = BREAK - 1 // 结束并退回1个字符，即不包含当前字符
 	public static final int BREAK = -1;
 	
 	// BACKSPACE，结束片段，并回到起始状态，回退所有空白符，退回的字符将重新读取
-	public static final int BACKSPACE = -99;
+	// state = BACKSPACE - 回退所有空白符
+	// state = BACKSPACE - 1 // 结束并退回1个字符，并回退之前所有空白符
+	public static final int BACKSPACE = -50;
 
 	// PUSH，压栈，并回到指定状态，最多900个状态
 	// state = PUSH - 压栈后回到状态数
@@ -101,16 +103,19 @@ public abstract class DfaScanner {
 			}
 			if (state <= BREAK) { // 负数表示接收状态
 				int acceptLength;
-				if (state == BACKSPACE) {
-					int space = 0;
-					for (int s = buffer.length() - 1; s >= 0; s --) {
-						if (Character.isSpaceChar(buffer.charAt(s))) {
-							space ++;
-						} else {
-							break;
+				if (state <= BACKSPACE) {
+					acceptLength = buffer.length() + state - BACKSPACE;
+					if (acceptLength > 0) {
+						int space = 0;
+						for (int s = acceptLength - 1; s >= 0; s --) {
+							if (Character.isSpaceChar(buffer.charAt(s))) {
+								space ++;
+							} else {
+								break;
+							}
 						}
+						acceptLength = acceptLength - space;
 					}
-					acceptLength = buffer.length() - space;
 				} else {
 					acceptLength = buffer.length() + state - BREAK;
 				}

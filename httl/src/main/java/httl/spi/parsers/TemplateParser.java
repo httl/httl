@@ -71,8 +71,8 @@ public class TemplateParser implements Parser {
 	// BREAK，结束片段，并退回一个字符，即不包含当前字符
 	private static final int B = DfaScanner.BREAK - 1;
 
-	// END，结束片段，退回所有空白
-	private static final int S = DfaScanner.BACKSPACE;
+	// BACKSPACE，结束片段，退回当前字符，以及之前的所有空白
+	private static final int S = DfaScanner.BACKSPACE - 1;
 
 	// PUSH，压栈1，即指令小括号栈，并回到状态4，即指令参数
 	private static final int P = DfaScanner.PUSH - 4;
