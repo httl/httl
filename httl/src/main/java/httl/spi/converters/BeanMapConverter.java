@@ -23,6 +23,7 @@ import httl.util.MapSupport;
 import httl.util.StringUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.ParseException;
@@ -116,10 +117,43 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 	}
 
 	public static Class<?> getMapClass(Class<?> beanClass, Compiler compiler) throws ParseException {
+		Set<String> fields = new HashSet<String>();
 		StringBuilder keys = new StringBuilder();
 		StringBuilder gets = new StringBuilder();
 		StringBuilder clss = new StringBuilder();
 		StringBuilder puts = new StringBuilder();
+		for (Field field : beanClass.getFields()) {
+			String key = field.getName();
+			if (Modifier.isPublic(field.getModifiers())
+					&& ! Modifier.isStatic(field.getModifiers())) {
+				fields.add(key);
+				if (keys.length() > 0) {
+					keys.append(", ");
+				}
+				keys.append("\"" + key + "\"");
+				if (gets.length() > 0) {
+					gets.append("else ");
+				}
+				String call = "bean." + key;
+				if (field.getType().isPrimitive()) {
+					call = ClassUtils.class.getName() + ".boxed(" + call + ")";
+				}
+				gets.append("if (\"" + key + "\".equals(key)) return " + call + ";\n");
+				clss.append("else if (\"" + key + ".class\".equals(key)) return " + field.getType().getCanonicalName() + ".class;\n");
+				if (! Modifier.isFinal(field.getModifiers())) {
+					if (puts.length() > 0) {
+						puts.append("else ");
+					}
+					String var;
+					if (field.getType().isPrimitive()) {
+						var = ClassUtils.class.getName() + ".unboxed((" + ClassUtils.getBoxedClass(field.getType()).getCanonicalName() + ") value)";
+					} else {
+						var = "(" + field.getType().getCanonicalName() + ") value";
+					}
+					puts.append("if (\"" + key + "\".equals(key)) bean." + key + " = " + var + ";\n");
+				}
+			}
+		}
 		for (Method method : beanClass.getMethods()) {
 			String name = method.getName();
 			if ((name.length() > 3 && name.startsWith("get") 
@@ -130,6 +164,9 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 					&& method.getDeclaringClass() != Object.class) {
 				int i = name.startsWith("get") ? 3 : 2;
 				String key = name.substring(i, i + 1).toLowerCase() + name.substring(i + 1);
+				if (fields.contains(key)) {
+					continue;
+				}
 				if (keys.length() > 0) {
 					keys.append(", ");
 				}
@@ -148,6 +185,9 @@ public class BeanMapConverter implements Converter<Object, Map<String, Object>> 
 					&& method.getParameterTypes().length == 1
 					&& method.getDeclaringClass() != Object.class) {
 				String key = name.substring(3, 3 + 1).toLowerCase() + name.substring(3 + 1);
+				if (fields.contains(key)) {
+					continue;
+				}
 				if (puts.length() > 0) {
 					puts.append("else ");
 				}
