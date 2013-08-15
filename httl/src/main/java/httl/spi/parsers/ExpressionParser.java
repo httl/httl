@@ -65,6 +65,7 @@ import httl.util.StringUtils;
 import httl.util.Token;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,7 +87,11 @@ public class ExpressionParser implements Parser {
 
 	private Filter expressionFilter;
 
-	private String[] forbidMethods;
+	private List<String> forbidEqualsMethods;
+
+	private List<String> forbidStartsMethods;
+
+	private List<String> forbidEndsMethods;
 
 	private String[] importPackages;
 
@@ -105,7 +110,24 @@ public class ExpressionParser implements Parser {
 	 * httl.properties: import.getters=forbid.methods=add,put,save,insert,modify,update,delete,remove,clear
 	 */
 	public void setForbidMethods(String[] forbidMethods) {
-		this.forbidMethods = forbidMethods;
+		for (String method : forbidMethods) {
+			if (method.startsWith("*")) {
+				if (forbidEndsMethods == null) {
+					forbidEndsMethods = new ArrayList<String>();
+				}
+				forbidEndsMethods.add(method.substring(1));
+			} else if (method.endsWith("*")) {
+				if (forbidStartsMethods == null) {
+					forbidStartsMethods = new ArrayList<String>();
+				}
+				forbidStartsMethods.add(method.substring(0, method.length() - 1));
+			} else {
+				if (forbidEqualsMethods == null) {
+					forbidEqualsMethods = new ArrayList<String>();
+				}
+				forbidEqualsMethods.add(method);
+			}
+		}
 	}
 
 	//单字母命名, 保证状态机图简洁
@@ -523,14 +545,31 @@ public class ExpressionParser implements Parser {
 				while (popOperator(parameterStack, operatorStack, operatorTokens, offset) != Bracket.SQUARE);
 				beforeOperator = false;
 			} else {
-				if (forbidMethods != null && StringUtils.isFunction(msg)) {
+				if (StringUtils.isFunction(msg)) {
 					String method = msg.substring(1);
-					for (String forbid : forbidMethods) {
-						if (method.startsWith(forbid)) {
-							throw new ParseException("Forbid call method " + method + " by forbid.method=" + forbid + " config.", offset);
+					if (forbidEqualsMethods != null ) {
+						for (String forbid : forbidEqualsMethods) {
+							if (method.equals(forbid)) {
+								throw new ParseException("Forbid call method " + method + " by forbid.method=" + forbid + " config.", offset);
+							}
+						}
+					}
+					if (forbidStartsMethods != null ) {
+						for (String forbid : forbidStartsMethods) {
+							if (method.startsWith(forbid)) {
+								throw new ParseException("Forbid call method " + method + " by forbid.method=" + forbid + "* config.", offset);
+							}
+						}
+					}
+					if (forbidEndsMethods != null ) {
+						for (String forbid : forbidEndsMethods) {
+							if (method.endsWith(forbid)) {
+								throw new ParseException("Forbid call method " + method + " by forbid.method=*" + forbid + " config.", offset);
+							}
 						}
 					}
 				}
+				
 				if (beforeOperator) {
 					if (! msg.startsWith("new ") && ! StringUtils.isFunction(msg) && ! UNARY_OPERATORS.contains(msg)) {
 						throw new ParseException("Unsupported binary operator " + msg, getTokenOffset(token) );
