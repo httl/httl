@@ -20,6 +20,7 @@ import httl.spi.Codec;
 import httl.spi.Listener;
 import httl.util.DateUtils;
 import httl.util.Reqiured;
+import httl.util.StringUtils;
 import httl.util.UrlUtils;
 
 import java.io.File;
@@ -103,12 +104,15 @@ public class DumpListener implements Listener {
 				}
 			}
 		}
-		FileWriter out = new FileWriter(file);
-		try {
-			out.write(dumpCodec.toString("context", context));
-			out.flush();
-		} finally {
-			out.close();
+		String dump = dumpCodec.toString("context", context);
+		if (StringUtils.isNotEmpty(dump)) {
+			FileWriter out = new FileWriter(file);
+			try {
+				out.write(dump);
+				out.flush();
+			} finally {
+				out.close();
+			}
 		}
 	}
 
