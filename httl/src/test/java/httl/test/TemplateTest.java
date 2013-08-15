@@ -141,7 +141,7 @@ public class TemplateTest {
 		model.setImpvar("abcxyz");
 		model.setDefvar("mnnm");
 		model.setHtml("<a href=\"foo.html\">foo</a>");
-		model.setUser(user);
+		model.user = user; // public field test
 		model.setBooks(books);
 		model.setBooklist(Arrays.asList(books));
 		model.setBookmap(bookmap);

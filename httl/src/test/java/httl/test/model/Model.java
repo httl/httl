@@ -30,7 +30,7 @@ public class Model {
 	
 	private String html;
 	
-	private User user;
+	public User user; // public field test
 	
 	private Book[] books;
 	
@@ -106,13 +106,14 @@ public class Model {
 		this.html = html;
 	}
 
-	public User getUser() {
+	// public field test
+	/*public User getUser() {
 		return user;
 	}
 
 	public void setUser(User user) {
 		this.user = user;
-	}
+	}*/
 
 	public Book[] getBooks() {
 		return books;
