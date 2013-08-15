@@ -183,7 +183,7 @@ public class TemplateTest {
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
 					String templateName = file.getName();
-					//if (! "int_equals_string.httl".equals(templateName)) continue; // 指定模板测试
+					//if (! "if_boolean.httl".equals(templateName)) continue; // 指定模板测试
 					//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
 					if ("httl-comment-interpret.properties".equals(config) // FIXME
 							&& ("include_hide.httl".equals(templateName)
@@ -242,7 +242,7 @@ public class TemplateTest {
 		if ("extends_default.httl".equals(templateName)) {
 			_engine = Engine.getEngine("httl-comment-extends.properties");
 		}
-		Template template = _engine.getTemplate("/templates/" + templateName, Locale.CHINA, encoding);
+		Template template = _engine.getTemplate("/templates/" + templateName, Locale.CHINA, encoding, data);
 		UnsafeByteArrayOutputStream actualStream = new UnsafeByteArrayOutputStream();
 		StringWriter actualWriter = new StringWriter();
 		if ("extends_var.httl".equals(templateName)) {
