@@ -71,6 +71,9 @@ public class TemplateParser implements Parser {
 	// BREAK，结束片段，并退回一个字符，即不包含当前字符
 	private static final int B = DfaScanner.BREAK - 1;
 
+	// END，结束片段，退回所有空白
+	private static final int S = DfaScanner.BACKSPACE;
+
 	// PUSH，压栈1，即指令小括号栈，并回到状态4，即指令参数
 	private static final int P = DfaScanner.PUSH - 4;
 
@@ -93,7 +96,7 @@ public class TemplateParser implements Parser {
 		/* 1.文本 */ { 1, 1, B, B, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, }, // 非指令文本内容
 		
 		/* 2.指令 */ { 1, 3, 9, B, 6, 10, 1, 1, 12, 1, P2, 1, 1, 1, 1, 1, 1, 1, }, // 指令提示符
-		/* 3.指名 */ { B, 3, B, B, B, B, P, B, B, B, B, B, B, B, B, B, B, B, }, // 指令名
+		/* 3.指名 */ { 26, 3, B, B, B, B, P, B, B, B, B, B, B, B, B, B, B, B, }, // 指令名
 		/* 4.指参 */ { 4, 4, 4, 4, 4, 4, P, O, 4, 4, 4, 4, 14, 16, 18, 4, 4, 4, }, // 指令参数
 		
 		/* 5.插值 */ { 1, 1, B, B, 6, 1, 1, 1, 1, 1, P2, 1, 1, 1, 1, 1, 1, 1, }, // 插值提示符
@@ -120,6 +123,8 @@ public class TemplateParser implements Parser {
 		/* 23.转字 */ { 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, }, // 插值参数单引号字符串转义
 		/* 24.字串 */ { 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 7, 25, 24, 24, }, // 插值参数反单引号字符串
 		/* 25.转字 */ { 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, }, // 插值参数反单引号字符串转义
+		
+		/* 26.指间空白 */ { 26, S, S, S, S, S, P, S, S, S, S, S, S, S, S, S, S, S, }, // 指令名和括号间的空白
 	};
 
 	static int getCharType(char ch) {

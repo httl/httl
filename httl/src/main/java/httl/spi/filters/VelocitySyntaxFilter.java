@@ -42,6 +42,9 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 	// BREAK，结束片段，并退回一个字符，即不包含当前字符
 	private static final int B = DfaScanner.BREAK - 1;
 
+	// END，结束片段，退回所有空白
+	private static final int S = DfaScanner.BACKSPACE;
+
 	// PUSH，压栈1，即指令小括号栈，并回到状态4，即指令参数
 	private static final int P = DfaScanner.PUSH - 4;
 
@@ -70,7 +73,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 		/* 1.文本 */ { 1, 1, B, B, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, }, // 非指令文本内容
 		
 		/* 2.指令 */ { 1, 3, 9, B, 6, 10, 1, 1, 12, 1, 26, 1, 1, 1, 1, 1, 1, 1, 1, }, // 指令提示符
-		/* 3.指名 */ { B, 3, B, B, B, B, P, B, B, B, B, B, B, B, B, B, B, B, B, }, // 指令名
+		/* 3.指名 */ { 30, 3, B, B, B, B, P, B, B, B, B, B, B, B, B, B, B, B, B, }, // 指令名
 		/* 4.指参 */ { 4, 4, 4, 4, 4, 4, P, O, 4, 4, 4, 4, 14, 16, 18, 4, 4, 4, 4, }, // 指令参数
 		
 		/* 5.插值 */ { 1, 27, B, B, 6, 1, 1, 1, 1, 1, P2, 1, 1, 1, 1, 1, 1, 1, 1, }, // 插值提示符
@@ -102,6 +105,8 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 		/* 27.插参 */ { B, 27, B, B, B, B, P3, B, B, B, B, B, B, B, B, B, B, 27, B, }, // 无大括号插值参数，如：$aaa.bbb
 		/* 28.函数 */ { 28, 28, 28, 28, 28, 28, P3, O3, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, }, // 小括号插值参数，如：$aaa.bbb((1 + 2) * (3 + 4))
 		/* 29.连点 */ { B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, 28, B, }, // 点号连接插值参数，如：$aaa(arg1, arg2).bbb(arg1, arg2)
+		
+		/* 30.指间空白 */ { 30, S, S, S, S, S, P, S, S, S, S, S, S, S, S, S, S, S, S, }, // 指令名和括号间的空白
 	};
 
 	static int getCharType(char ch) {
@@ -162,7 +167,7 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 		}
 	};
 
-	private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$(\\w+)");
+	private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\$\\{?(\\w+)\\}?");
 	
 	private final AtomicInteger seq = new AtomicInteger();
 
@@ -244,17 +249,22 @@ public class VelocitySyntaxFilter extends AbstractFilter  {
 						if (message.charAt(1) >= 'a' && message.charAt(1) <= 'z'
 								|| message.charAt(1) >= 'A' && message.charAt(1) <= 'Z') {
 							// 将 $user.name 转成 ${user.name}
-							message = "${" + message.substring(1) + "}";
+							message = message.substring(1);
 						} else if (message.length() > 2 && message.charAt(1) == '!'
 								&& (message.charAt(2) >= 'a' && message.charAt(2) <= 'z'
 								|| message.charAt(2) >= 'A' && message.charAt(2) <= 'Z')) {
 							// 将 $!user.name 转成 ${user.name}
-							message = "${" + message.substring(1) + "}";
+							message = message.substring(2);
 						} else if (message.length() > 3 && message.charAt(0) == '$' && message.charAt(1) == '!'
 								&& message.charAt(2) == '{' && message.charAt(message.length() - 1) == '}') {
+							// 将 ${user.name} 转成 ${user.name}
+							message = message.substring(2, message.length() - 1);
+						} else if (message.length() > 4 && message.charAt(0) == '$' && message.charAt(1) == '!'
+								&& message.charAt(2) == '{' && message.charAt(message.length() - 1) == '}') {
 							// 将 $!{user.name} 转成 ${user.name}
-							message = "$" + message.substring(2);
+							message = message.substring(3, message.length() - 1);
 						}
+						message = "${" + REFERENCE_PATTERN.matcher(message).replaceAll("$1") + "}";
 					}
 				}
 				buf.append(message);
