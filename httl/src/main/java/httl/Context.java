@@ -144,7 +144,8 @@ public final class Context implements Map<String, Object> {
 	private void checkThread() {
 		if (Thread.currentThread() != thread) {
 			throw new IllegalStateException("Don't cross-thread using " 
-					+ Context.class.getName() + " object, it's thread-local only.");
+					+ Context.class.getName() + " object, it's thread-local only. context thread: " 
+					+ thread.getName() + ", current thread: " + Thread.currentThread().getName());
 		}
 	}
 
@@ -152,7 +153,8 @@ public final class Context implements Map<String, Object> {
 	private void setCurrent(Map<String, Object> current) {
 		if (current instanceof Context) {
 			throw new IllegalArgumentException("Don't use the " + Context.class.getName() 
-					+ " type as render() parameters, it implicitly delivery by thread-local.");
+					+ " type as render() parameters, it implicitly delivery by thread-local. parameter context: "
+					+ ((Context) current).thread.getName() + ", current context: " + thread.getName());
 		}
 		this.current = current;
 	}
@@ -224,7 +226,9 @@ public final class Context implements Map<String, Object> {
 		checkThread();
 		if (engine != null) {
 			if (template != null && template.getEngine() != engine) {
-				throw new IllegalStateException("context.engine != template.engine");
+				throw new IllegalStateException("Failed to set the context engine, because is not the same to template engine. template engine: " 
+						+ template.getEngine().getName() + ", context engine: " + engine.getName() 
+						+ ", template: "+ template.getName() + ", context: " + thread.getName());
 			}
 			if (parent != null && parent.getEngine() != engine) {
 				parent.setEngine(engine);
