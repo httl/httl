@@ -153,7 +153,7 @@ public final class Context implements Map<String, Object> {
 	private void setCurrent(Map<String, Object> current) {
 		if (current instanceof Context) {
 			throw new IllegalArgumentException("Don't using the " + Context.class.getName() 
-					+ " object as a parameters, it implicitly delivery by thread-local. parameter context: "
+					+ " object as a parameters, it's implicitly delivery by thread-local. parameter context: "
 					+ ((Context) current).thread.getName() + ", current context: " + thread.getName());
 		}
 		this.current = current;
