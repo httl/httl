@@ -190,10 +190,10 @@ public final class Context implements Map<String, Object> {
 	 */
 	public Context setTemplate(Template template) {
 		checkThread();
-		this.template = template;
 		if (template != null) {
 			setEngine(template.getEngine());
 		}
+		this.template = template;
 		return this;
 	}
 
@@ -215,12 +215,16 @@ public final class Context implements Map<String, Object> {
 	 */
 	public Context setEngine(Engine engine) {
 		checkThread();
-		if (engine != null && engine != this.engine) {
+		if (engine != null) {
 			if (template != null && template.getEngine() != engine) {
 				throw new IllegalStateException("template.engine != context.engine");
 			}
-			if (parent != null && parent.getEngine() == null) {
-				parent.setEngine(engine);
+			if (parent != null) {
+				if (parent.getEngine() == null) {
+					parent.setEngine(engine);
+				} else if (parent.getEngine() != engine) {
+					throw new IllegalStateException("parent.engine != context.engine");
+				}
 			}
 			if (this.engine == null) {
 				current = engine.createContext(parent, current);
