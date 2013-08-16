@@ -143,7 +143,7 @@ public final class Context implements Map<String, Object> {
 	// Check the cross-thread use.
 	private void checkThread() {
 		if (Thread.currentThread() != thread) {
-			throw new IllegalStateException("Don't cross-thread using " 
+			throw new IllegalStateException("Don't cross-thread using the " 
 					+ Context.class.getName() + " object, it's thread-local only. context thread: " 
 					+ thread.getName() + ", current thread: " + Thread.currentThread().getName());
 		}
@@ -152,8 +152,8 @@ public final class Context implements Map<String, Object> {
 	// Set the current context
 	private void setCurrent(Map<String, Object> current) {
 		if (current instanceof Context) {
-			throw new IllegalArgumentException("Don't use the " + Context.class.getName() 
-					+ " type as render() parameters, it implicitly delivery by thread-local. parameter context: "
+			throw new IllegalArgumentException("Don't using the " + Context.class.getName() 
+					+ " object as a parameters, it implicitly delivery by thread-local. parameter context: "
 					+ ((Context) current).thread.getName() + ", current context: " + thread.getName());
 		}
 		this.current = current;
