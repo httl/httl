@@ -1,4 +1,4 @@
 No such property name in class java.lang.Object, because no such method getName() or method isName() or method name() or filed name.
-Please add variable type definition #set(Xxx user) in your template.
+Please explicit define the variable type #set(Xxx user) in your template.
 line: 2, column: 7, char: .,
 /templates/undefined_variable.httl
