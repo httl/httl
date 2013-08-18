@@ -85,51 +85,6 @@ import java.util.regex.Pattern;
  */
 public class ExpressionParser implements Parser {
 
-	private Filter expressionFilter;
-
-	private List<String> forbidEqualsMethods;
-
-	private List<String> forbidStartsMethods;
-
-	private List<String> forbidEndsMethods;
-
-	private String[] importPackages;
-
-	public void setImportPackages(String[] importPackages) {
-		this.importPackages = importPackages;
-	}
-
-	/**
-	 * httl.properties: expression.filters=httl.spi.filters.UnescapeXmlFilter
-	 */
-	public void setExpressionFilter(Filter expressionFilter) {
-		this.expressionFilter = expressionFilter;
-	}
-
-	/**
-	 * httl.properties: import.getters=forbid.methods=add,put,save,insert,modify,update,delete,remove,clear
-	 */
-	public void setForbidMethods(String[] forbidMethods) {
-		for (String method : forbidMethods) {
-			if (method.startsWith("*")) {
-				if (forbidEndsMethods == null) {
-					forbidEndsMethods = new ArrayList<String>();
-				}
-				forbidEndsMethods.add(method.substring(1));
-			} else if (method.endsWith("*")) {
-				if (forbidStartsMethods == null) {
-					forbidStartsMethods = new ArrayList<String>();
-				}
-				forbidStartsMethods.add(method.substring(0, method.length() - 1));
-			} else {
-				if (forbidEqualsMethods == null) {
-					forbidEqualsMethods = new ArrayList<String>();
-				}
-				forbidEqualsMethods.add(method);
-			}
-		}
-	}
-
 	//单字母命名, 保证状态机图简洁
 	
 	// BREAK，结束片段，包含当前字符
@@ -148,7 +103,7 @@ public class ExpressionParser implements Parser {
 	// 行表示状态
 	// 行列交点表示, 在该状态时, 遇到某类型的字符时, 切换到的下一状态(数组行号)
 	// E/B/T表示接收前面经过的字符为一个片断, R表示错误状态(这些状态均为负数)
-	static final int states[][] = {
+	static final int[][] states = {
 				  // 0.空格, 1.字母, 2.数字, 3.点号, 4.双引号, 5.单引号, 6.反单引号, 7.反斜线, 8.括号, 9.其它
 		/* 0.起始  */ { 0, 1, 2, 5, 7, 9, 11, 4, 6, 4}, // 初始状态或上一片断刚接收完成状态
 		/* 1.变量  */{ B1, 1, 1, B1, E, E, E, B1, B1, B1}, // 变量名识别
@@ -214,6 +169,51 @@ public class ExpressionParser implements Parser {
 
 	private static final Pattern BLANK_PATTERN = Pattern.compile("^(\\s+)");
 	
+	private Filter expressionFilter;
+
+	private List<String> forbidEqualsMethods;
+
+	private List<String> forbidStartsMethods;
+
+	private List<String> forbidEndsMethods;
+
+	private String[] importPackages;
+
+	public void setImportPackages(String[] importPackages) {
+		this.importPackages = importPackages;
+	}
+
+	/**
+	 * httl.properties: expression.filters=httl.spi.filters.UnescapeXmlFilter
+	 */
+	public void setExpressionFilter(Filter expressionFilter) {
+		this.expressionFilter = expressionFilter;
+	}
+
+	/**
+	 * httl.properties: import.getters=forbid.methods=add,put,save,insert,modify,update,delete,remove,clear
+	 */
+	public void setForbidMethods(String[] forbidMethods) {
+		for (String method : forbidMethods) {
+			if (method.startsWith("*")) {
+				if (forbidEndsMethods == null) {
+					forbidEndsMethods = new ArrayList<String>();
+				}
+				forbidEndsMethods.add(method.substring(1));
+			} else if (method.endsWith("*")) {
+				if (forbidStartsMethods == null) {
+					forbidStartsMethods = new ArrayList<String>();
+				}
+				forbidStartsMethods.add(method.substring(0, method.length() - 1));
+			} else {
+				if (forbidEqualsMethods == null) {
+					forbidEqualsMethods = new ArrayList<String>();
+				}
+				forbidEqualsMethods.add(method);
+			}
+		}
+	}
+
 	private int getTokenOffset(Token token) {
 		int offset = token.getOffset();
 		String msg = token.getMessage();

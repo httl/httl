@@ -178,6 +178,42 @@ public class TemplateParser implements Parser {
 		}
 	};
 
+	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
+
+	private String[] setDirective = new String[] { "var" };
+
+	private String[] ifDirective = new String[] { "if" };
+
+	private String[] elseDirective = new String[] { "else" };
+
+	private String[] forDirective = new String[] { "for" };
+
+	private String[] breakDirective = new String[] { "break" };
+
+	private String[] macroDirective = new String[] { "macro" };
+
+	private String[] endDirective = new String[] { "end" };
+
+	private Engine engine;
+	
+	private Parser expressionParser;
+	
+	private String[] importMacros;
+   
+	private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
+
+	private String[] importPackages;
+
+	private String[] importVariables;
+
+	private Map<String, Class<?>> importTypes;
+
+	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
+
+	private Class<?> defaultVariableType;
+
+	private boolean removeDirectiveBlankLine = true;
+
 	private boolean isDirective(String message) {
 		if (message.length() > 1 && message.charAt(0) == '#'
 				&& message.charAt(1) >= 'a' && message.charAt(1) <= 'z') {
@@ -505,42 +541,6 @@ public class TemplateParser implements Parser {
 
 	}
 	
-	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
-
-	private String[] setDirective = new String[] { "var" };
-
-	private String[] ifDirective = new String[] { "if" };
-
-	private String[] elseDirective = new String[] { "else" };
-
-	private String[] forDirective = new String[] { "for" };
-
-	private String[] breakDirective = new String[] { "break" };
-
-	private String[] macroDirective = new String[] { "macro" };
-
-	private String[] endDirective = new String[] { "end" };
-
-	private Engine engine;
-	
-	private Parser expressionParser;
-	
-	private String[] importMacros;
-   
-	private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
-
-	private String[] importPackages;
-
-	private String[] importVariables;
-
-	private Map<String, Class<?>> importTypes;
-
-	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
-
-	private Class<?> defaultVariableType;
-
-	private boolean removeDirectiveBlankLine = true;
-
 	/**
 	 * httl.properties: remove.directive.blank.line=true
 	 */

@@ -19,6 +19,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Deterministic Finite-state Automaton (DFA) Scanner
+ * 
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ */
 public abstract class DfaScanner {
 
 	// BREAK，结束片段，并回到起始状态，最多可回退50个字符，退回的字符将重新读取
