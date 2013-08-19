@@ -3,3 +3,4 @@ ${message("user")}
 ${"book".message}
 ${"welcome".message(user.name)}
 ${"onlyen".message}
+${user.name.message}
