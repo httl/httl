@@ -187,12 +187,15 @@ public class JdkCompiler extends AbstractCompiler {
 			if (result == null || ! result.booleanValue()) {
 				throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector.getDiagnostics());
 			}
+			if (compileDirectory != null) {
+				saveBytecode(name, javaFileObject.getByteCode());
+			}
 			return classLoader.loadClass(name);
 		}
 	}
 	
 	private final class ClassLoaderImpl extends ClassLoader {
-		
+
 		private final Map<String, JavaFileObject> classes = new HashMap<String, JavaFileObject>();
 
 		ClassLoaderImpl(final ClassLoader parentClassLoader) {
@@ -211,11 +214,6 @@ public class JdkCompiler extends AbstractCompiler {
 				JavaFileObject file = classes.get(qualifiedClassName);
 				if (file != null) {
 					byte[] bytes = ((JavaFileObjectImpl) file).getByteCode();
-					try {
-						saveBytecode(qualifiedClassName, bytes);
-					} catch (IOException e2) {
-						throw new IllegalStateException(e2.getMessage(), e2);
-					}
 					return defineClass(qualifiedClassName, bytes, 0, bytes.length);
 				}
 				throw e;

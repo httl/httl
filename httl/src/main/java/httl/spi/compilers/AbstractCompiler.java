@@ -85,21 +85,25 @@ public abstract class AbstractCompiler implements Compiler {
 		}
 	}
 	
-	protected void saveBytecode(String name, byte[] bytecode) throws IOException {
+	protected void saveBytecode(String name, byte[] bytecode) {
 		if (compileDirectory != null) {
-			File file = new File(compileDirectory, name.replace('.', '/') + ".class");
-			FileOutputStream out = new FileOutputStream(file);
 			try {
-				out.write(bytecode);
-				out.flush();
-			} finally {
-				out.close();
-			}
-			if (first) {
-				first = false;
-				if (logger != null && logger.isInfoEnabled()) {
-					logger.info("Compile httl template classes to directory " + compileDirectory.getAbsolutePath());
+				File file = new File(compileDirectory, name.replace('.', '/') + ".class");
+				FileOutputStream out = new FileOutputStream(file);
+				try {
+					out.write(bytecode);
+					out.flush();
+				} finally {
+					out.close();
 				}
+				if (first) {
+					first = false;
+					if (logger != null && logger.isInfoEnabled()) {
+						logger.info("Compile httl template classes to directory " + compileDirectory.getAbsolutePath());
+					}
+				}
+			} catch (IOException e) {
+				logger.warn(e.getMessage(), e);
 			}
 		}
 	}
