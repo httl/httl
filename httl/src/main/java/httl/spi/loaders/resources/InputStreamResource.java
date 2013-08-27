@@ -36,24 +36,27 @@ public abstract class InputStreamResource extends AbstractResource {
 
 	private static final long serialVersionUID = -5150738383353330217L;
 
-	private static final String FILE_PROTOCOL = "file";
+	protected static final String FILE_PROTOCOL = "file";
 
-	private static final String FILE_PROTOCOL_PREFIX = "file:";
+	protected static final String FILE_PROTOCOL_PREFIX = "file:";
 
-	private static final String JAR_PROTOCOL = "jar";
+	protected static final String JAR_PROTOCOL = "jar";
 
-	private static final String JAR_PROTOCOL_PREFIX = "jar:";
+	protected static final String JAR_PROTOCOL_PREFIX = "jar:";
 
-	private static final String JAR_FILE_SEPARATOR = "!/";
+	protected static final String JAR_FILE_SEPARATOR = "!/";
 	
-	public InputStreamResource(Engine engine, String name, Locale locale, String encoding){
+	private final String path;
+	
+	public InputStreamResource(Engine engine, String name, Locale locale, String encoding, String path){
 		super(engine, name, locale, encoding);
+		this.path = path;
 	}
 
 	public Reader openReader() throws IOException {
 		InputStream in = openStream();
 		if (in == null) {
-			throw new FileNotFoundException("Not found template " + getName() + " in " + getClass().getSimpleName());
+			throw new FileNotFoundException("Not found template " + getName() + " in " + getClass().getSimpleName() + ": " + getPath());
 		}
 		String encoding = getEncoding();
 		return StringUtils.isEmpty(encoding) 
@@ -127,5 +130,9 @@ public abstract class InputStreamResource extends AbstractResource {
 	protected URL getUrl() {
 		return null;
 	}
-	
+
+	protected String getPath() {
+		return path;
+	}
+
 }

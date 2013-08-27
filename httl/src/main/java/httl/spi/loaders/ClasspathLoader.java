@@ -38,7 +38,7 @@ public class ClasspathLoader extends AbstractLoader {
 	}
 	
 	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
-		return new ClasspathResource(getEngine(), name, encoding, cleanPath(path), locale);
+		return new ClasspathResource(getEngine(), name, locale, encoding, cleanPath(path));
 	}
 
 	public boolean doExists(String name, Locale locale, String path) throws IOException {

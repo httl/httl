@@ -33,20 +33,17 @@ public class ClasspathResource extends InputStreamResource {
 
 	private static final long serialVersionUID = 2499229996487593996L;
 	
-	private final String path;
-	
-	public ClasspathResource(Engine engine, String name, String encoding, String path, Locale locale) {
-		super(engine, name, locale, encoding);
-		this.path = path;
+	public ClasspathResource(Engine engine, String name, Locale locale, String encoding, String path) {
+		super(engine, name, locale, encoding, path);
 	}
 
 	public InputStream openStream() throws IOException {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream(getPath());
 	}
 
 	@Override
 	protected URL getUrl() {
-		return Thread.currentThread().getContextClassLoader().getResource(path);
+		return Thread.currentThread().getContextClassLoader().getResource(getPath());
 	}
 
 }

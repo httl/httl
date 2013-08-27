@@ -37,7 +37,7 @@ public class FileResource extends InputStreamResource {
 	private final File file;
 	
 	public FileResource(Engine engine, String name, Locale locale, String encoding, String path) {
-		super(engine, name, locale, encoding);
+		super(engine, name, locale, encoding, path);
 		this.file = new File(path);
 	}
 

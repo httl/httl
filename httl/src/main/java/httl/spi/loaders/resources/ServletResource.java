@@ -35,23 +35,20 @@ public class ServletResource extends InputStreamResource {
 
 	private static final long serialVersionUID = 2499229996487593996L;
 	
-	private final String path;
-	
 	private final transient ServletContext servletContext;
 
 	public ServletResource(Engine engine, String name, Locale locale, String encoding, String path, ServletContext servletContext) {
-		super(engine, name, locale, encoding);
-		this.path = path;
+		super(engine, name, locale, encoding, path);
 		this.servletContext = servletContext;
 	}
 
 	public InputStream openStream() throws IOException {
-		return servletContext.getResourceAsStream(path);
+		return servletContext.getResourceAsStream(getPath());
 	}
 
 	@Override
 	public File getFile() {
-		return new File(servletContext.getRealPath(path));
+		return new File(servletContext.getRealPath(getPath()));
 	}
 
 }

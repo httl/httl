@@ -37,7 +37,7 @@ public class JarResource extends InputStreamResource {
 	private final File file;
 
 	public JarResource(Engine engine, String name, Locale locale, String encoding, File file) {
-		super(engine, name, locale, encoding);
+		super(engine, name, locale, encoding, file.getPath() + JAR_FILE_SEPARATOR + name);
 		this.file = file;
 	}
 

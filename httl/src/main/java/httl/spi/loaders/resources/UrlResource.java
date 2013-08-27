@@ -36,7 +36,7 @@ public class UrlResource extends InputStreamResource {
 	private final URL url;
 	
 	public UrlResource(Engine engine, String name, Locale locale, String encoding, String path) throws IOException {
-		super(engine, name, locale, encoding);
+		super(engine, name, locale, encoding, path);
 		this.url = new URL(path);
 	}
 
