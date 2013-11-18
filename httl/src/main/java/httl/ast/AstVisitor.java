@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 /**
- * AstVisitor. (API, Prototype, Callback, NonThreadSafe)
+ * Abstract Syntax Tree (AST) Visitor. (API, Prototype, Callback, NonThreadSafe)
  * 
  * @see httl.Node#accept(Visitor)
  * @see httl.Template#accept(Visitor)
@@ -116,195 +116,15 @@ public abstract class AstVisitor implements Visitor {
 	}
 	
 	public void visit(UnaryOperator node) throws IOException, ParseException {
-		if (node instanceof PositiveOperator) {
-			visit((PositiveOperator) node);
-		} else if (node instanceof NegativeOperator) {
-			visit((NegativeOperator) node);
-		} else if (node instanceof NotOperator) {
-			visit((NotOperator) node);
-		} else if (node instanceof BitNotOperator) {
-			visit((BitNotOperator) node);
-		} else if (node instanceof ListOperator) {
-			visit((ListOperator) node);
-		} else if (node instanceof NewOperator) {
-			visit((NewOperator) node);
-		} else if (node instanceof StaticMethodOperator) {
-			visit((StaticMethodOperator) node);
-		} else if (node instanceof CastOperator) {
-			visit((CastOperator) node);
-		}
 	}
 
 	public void visit(BinaryOperator node) throws IOException, ParseException {
-		if (node instanceof AddOperator) {
-			visit((AddOperator) node);
-		} else if (node instanceof SubOperator) {
-			visit((SubOperator) node);
-		} else if (node instanceof MulOperator) {
-			visit((MulOperator) node);
-		} else if (node instanceof DivOperator) {
-			visit((DivOperator) node);
-		} else if (node instanceof ModOperator) {
-			visit((ModOperator) node);
-		} else if (node instanceof EqualsOperator) {
-			visit((EqualsOperator) node);
-		} else if (node instanceof NotEqualsOperator) {
-			visit((NotEqualsOperator) node);
-		} else if (node instanceof GreaterOperator) {
-			visit((GreaterOperator) node);
-		} else if (node instanceof GreaterEqualsOperator) {
-			visit((GreaterEqualsOperator) node);
-		} else if (node instanceof LessOperator) {
-			visit((LessOperator) node);
-		} else if (node instanceof LessEqualsOperator) {
-			visit((LessEqualsOperator) node);
-		} else if (node instanceof AndOperator) {
-			visit((AndOperator) node);
-		} else if (node instanceof OrOperator) {
-			visit((OrOperator) node);
-		} else if (node instanceof BitAndOperator) {
-			visit((BitAndOperator) node);
-		} else if (node instanceof BitOrOperator) {
-			visit((BitOrOperator) node);
-		} else if (node instanceof BitXorOperator) {
-			visit((BitXorOperator) node);
-		} else if (node instanceof RightShiftOperator) {
-			visit((RightShiftOperator) node);
-		} else if (node instanceof LeftShiftOperator) {
-			visit((LeftShiftOperator) node);
-		} else if (node instanceof UnsignShiftOperator) {
-			visit((UnsignShiftOperator) node);
-		} else if (node instanceof ArrayOperator) {
-			visit((ArrayOperator) node);
-		} else if (node instanceof ConditionOperator) {
-			visit((ConditionOperator) node);
-		} else if (node instanceof EntryOperator) {
-			visit((EntryOperator) node);
-		} else if (node instanceof InstanceofOperator) {
-			visit((InstanceofOperator) node);
-		} else if (node instanceof IndexOperator) {
-			visit((IndexOperator) node);
-		} else if (node instanceof SequenceOperator) {
-			visit((SequenceOperator) node);
-		} else if (node instanceof MethodOperator) {
-			visit((MethodOperator) node);
-		}
 	}
 
 	public void visit(Constant node) throws IOException, ParseException {
 	}
 
 	public void visit(Variable node) throws IOException, ParseException {
-	}
-
-	public void visit(PositiveOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(NegativeOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(NotOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(BitNotOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(ListOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(NewOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(StaticMethodOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(CastOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(AddOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(SubOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(MulOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(DivOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(ModOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(EqualsOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(NotEqualsOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(GreaterOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(GreaterEqualsOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(LessOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(LessEqualsOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(AndOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(OrOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(BitAndOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(BitOrOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(BitXorOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(RightShiftOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(LeftShiftOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(UnsignShiftOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(ArrayOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(ConditionOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(EntryOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(InstanceofOperator node) throws IOException,
-			ParseException {
-	}
-
-	public void visit(IndexOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(SequenceOperator node) throws IOException, ParseException {
-	}
-
-	public void visit(MethodOperator node) throws IOException, ParseException {
 	}
 
 	public void visit(Text node) throws IOException, ParseException {

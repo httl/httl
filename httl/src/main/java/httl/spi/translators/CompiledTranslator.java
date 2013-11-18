@@ -485,7 +485,6 @@ public class CompiledTranslator implements Translator {
 			visitor.setImportGetters(importGetters);
 			visitor.setImportTypes(importTypes);
 			visitor.setImportMethods(functions);
-			visitor.setImportSequences(sequences);
 			visitor.setOutputEncoding(outputEncoding);
 			visitor.setSourceInClass(sourceInClass);
 			visitor.setTextFilter(textFilter);

@@ -20,53 +20,20 @@ import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.ast.AddOperator;
-import httl.ast.AndOperator;
-import httl.ast.ArrayOperator;
 import httl.ast.AstVisitor;
 import httl.ast.BinaryOperator;
-import httl.ast.BitAndOperator;
-import httl.ast.BitNotOperator;
-import httl.ast.BitOrOperator;
-import httl.ast.BitXorOperator;
 import httl.ast.BreakDirective;
-import httl.ast.CastOperator;
-import httl.ast.ConditionOperator;
 import httl.ast.Constant;
-import httl.ast.DivOperator;
 import httl.ast.ElseDirective;
-import httl.ast.EntryOperator;
-import httl.ast.EqualsOperator;
 import httl.ast.Expression;
 import httl.ast.ForDirective;
-import httl.ast.GreaterEqualsOperator;
-import httl.ast.GreaterOperator;
 import httl.ast.IfDirective;
-import httl.ast.IndexOperator;
-import httl.ast.InstanceofOperator;
-import httl.ast.LeftShiftOperator;
-import httl.ast.LessEqualsOperator;
-import httl.ast.LessOperator;
-import httl.ast.ListOperator;
 import httl.ast.MacroDirective;
-import httl.ast.MethodOperator;
-import httl.ast.ModOperator;
-import httl.ast.MulOperator;
-import httl.ast.NegativeOperator;
-import httl.ast.NewOperator;
-import httl.ast.NotEqualsOperator;
-import httl.ast.NotOperator;
 import httl.ast.Operator;
-import httl.ast.OrOperator;
-import httl.ast.PositiveOperator;
-import httl.ast.RightShiftOperator;
-import httl.ast.SequenceOperator;
 import httl.ast.SetDirective;
 import httl.ast.Statement;
-import httl.ast.StaticMethodOperator;
-import httl.ast.SubOperator;
 import httl.ast.Text;
-import httl.ast.UnsignShiftOperator;
+import httl.ast.UnaryOperator;
 import httl.ast.ValueDirective;
 import httl.ast.Variable;
 import httl.spi.Compiler;
@@ -82,19 +49,16 @@ import httl.util.ClassUtils;
 import httl.util.CollectionUtils;
 import httl.util.IOUtils;
 import httl.util.LinkedStack;
-import httl.util.MapEntry;
 import httl.util.OrderedMap;
 import httl.util.ParameterizedTypeImpl;
 import httl.util.Status;
 import httl.util.StringCache;
-import httl.util.StringSequence;
 import httl.util.StringUtils;
 import httl.util.VolatileReference;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -112,7 +76,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -134,21 +97,23 @@ public class CompiledVisitor extends AstVisitor {
 	
 	private String filterKey = null;
 	
-	private VolatileReference<Filter> filterReference = new VolatileReference<Filter>();
+	private final VolatileReference<Filter> filterReference = new VolatileReference<Filter>();
 	
-	private Set<String> setVariables = new HashSet<String>();
+	private final Set<String> setVariables = new HashSet<String>();
 
-	private Set<String> getVariables = new HashSet<String>();
+	private final Set<String> getVariables = new HashSet<String>();
 
-	private List<String> defVariables = new ArrayList<String>();
+	private final List<String> defVariables = new ArrayList<String>();
 	
-	private List<Class<?>> defVariableTypes = new ArrayList<Class<?>>();
+	private final List<Class<?>> defVariableTypes = new ArrayList<Class<?>>();
 	
-	private Map<String, Class<?>> types = new HashMap<String, Class<?>>();
+	private final Map<String, Type> types = new HashMap<String, Type>();
 
-	private Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
+	private Map<String, Class<?>> parameterTypes;
 	
-	private Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
+	private final Map<String, Class<?>> returnTypes = new HashMap<String, Class<?>>();
+	
+	private final Map<String, Class<?>> macros = new HashMap<String, Class<?>>();
 	
 	private Resource resource;
 
@@ -194,8 +159,6 @@ public class CompiledVisitor extends AstVisitor {
 
 	private Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
 
-	private List<StringSequence> sequences = new CopyOnWriteArrayList<StringSequence>();
-
 	private static final String TEMPLATE_CLASS_PREFIX = CompiledTemplate.class.getPackage().getName() + ".Template_";
 	
 	private final AtomicInteger seq = new AtomicInteger();
@@ -223,7 +186,7 @@ public class CompiledVisitor extends AstVisitor {
 	}
 
 	public void setTypes(Map<String, Class<?>> types) {
-		this.types = types;
+		this.parameterTypes = types;
 	}
 
 	public void setResource(Resource resource) {
@@ -301,10 +264,6 @@ public class CompiledVisitor extends AstVisitor {
 
 	public void setImportMethods(Map<Class<?>, Object> functions) {
 		this.functions = functions;
-	}
-
-	public void setImportSequences(List<StringSequence> sequences) {
-		this.sequences = sequences;
 	}
 
 	public void setImportGetters(String[] importGetters) {
@@ -408,7 +367,7 @@ public class CompiledVisitor extends AstVisitor {
 	public void visit(ValueDirective node) throws IOException, ParseException {
 		boolean nofilter = node.isNoFilter();
 		String code = popExpressionCode();
-		Class<?> returnType = popExpressionReturnType();
+		Class<?> returnType = popExpressionReturnClass();
 		Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
 		getVariables.addAll(variableTypes.keySet());
 		if (Template.class.isAssignableFrom(returnType)) {
@@ -524,7 +483,7 @@ public class CompiledVisitor extends AstVisitor {
 		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
 		if (node.getExpression() != null) {
 			String code = popExpressionCode();
-			Class<?> returnType = popExpressionReturnType();
+			Class<?> returnType = popExpressionReturnClass();
 			Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
 			if (clazz == null) {
 				clazz = returnType;
@@ -533,21 +492,15 @@ public class CompiledVisitor extends AstVisitor {
 			getVariables.addAll(variableTypes.keySet());
 		} else {
 			clazz = checkVar(clazz, node.getName(), node.getOffset());
-			types.put(node.getName(), clazz);
-			if (type instanceof ParameterizedType) {
-				Type[] args = ((ParameterizedType) type).getActualTypeArguments();
-				for (int i = 0; i < args.length; i ++) {
-					Class<?> arg = (Class<?>) (args[i] instanceof ParameterizedType ? ((ParameterizedType) args[i]).getRawType() : args[i]);
-					types.put(node.getName() + ":" + i, arg);
-				}
-			}
+			types.put(node.getName(), type);
 			defVariables.add(node.getName());
 			defVariableTypes.add(clazz);
 		}
 	}
 	
 	private Class<?> checkVar(Class<?> clazz, String var, int offset) throws IOException, ParseException {
-		Class<?> cls = types.get(var);
+		Type type = types.get(var);
+		Class<?> cls = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
 		if (cls != null && ! cls.equals(clazz) 
 				&& ! cls.isAssignableFrom(clazz) 
 				&& ! clazz.isAssignableFrom(cls)) {
@@ -560,14 +513,15 @@ public class CompiledVisitor extends AstVisitor {
 		return clazz;
 	}
 
-	private void appendVar(Class<?> clazz, String var, String code, boolean parent, boolean hide, boolean def, int offset) throws IOException, ParseException {
+	private void appendVar(Type type, String var, String code, boolean parent, boolean hide, boolean def, int offset) throws IOException, ParseException {
+		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
 		clazz = checkVar(clazz, var, offset);
-		String type = clazz.getCanonicalName();
+		String typeName = clazz.getCanonicalName();
 		if (def || types.get(var) == null) {
-			types.put(var, clazz);
+			types.put(var, type);
 		}
 		setVariables.add(var);
-		builder.append("	" + var + " = (" + type + ")(" + code + ");\n");
+		builder.append("	" + var + " = (" + typeName + ")(" + code + ");\n");
 		String ctx = null;
 		if (parent) {
 			ctx = "($context.getParent() != null ? $context.getParent() : $context)";
@@ -587,7 +541,7 @@ public class CompiledVisitor extends AstVisitor {
 	@Override
 	public boolean visit(IfDirective node) throws IOException, ParseException {
 		String code = popExpressionCode();
-		Class<?> returnType = popExpressionReturnType();
+		Class<?> returnType = popExpressionReturnClass();
 		Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
 		builder.append("	if(");
 		builder.append(StringUtils.getConditionCode(returnType, code, importSizers));
@@ -607,7 +561,7 @@ public class CompiledVisitor extends AstVisitor {
 			builder.append("	else {\n");
 		} else {
 			String code = popExpressionCode();
-			Class<?> returnType = popExpressionReturnType();
+			Class<?> returnType = popExpressionReturnClass();
 			Map<String, Class<?>> variableTypes = popExpressionVariableTypes();builder.append("	else if (");
 			builder.append(StringUtils.getConditionCode(returnType, code, importSizers));
 			builder.append(") {\n");
@@ -621,39 +575,55 @@ public class CompiledVisitor extends AstVisitor {
 		builder.append("	}\n");
 	}
 
+	private Class<?> findGenericTypeByName(String name, int index) {
+		return findGenericType(types.get(name), index);
+	}
+
+	private Class<?> findGenericType(Type type, int index) {
+		if (type instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) type;
+			Type[] ts = pt.getActualTypeArguments();
+			if (index < ts.length) {
+				Type t = ts[index];
+				return (Class<?>) (t instanceof ParameterizedType ? ((ParameterizedType) t).getRawType() : t);
+			}
+		}
+		return null;
+	}
+
+	@SuppressWarnings("null")
 	@Override
 	public boolean visit(ForDirective node) throws IOException, ParseException {
 		String var = node.getName();
 		Type type  = node.getType();
 		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
 		String code = popExpressionCode();
-		Class<?> returnType = popExpressionReturnType();
+		Type returnType = popExpressionReturnType();
+		Class<?> returnClass = (Class<?>) (returnType instanceof ParameterizedType ? ((ParameterizedType)returnType).getRawType() : returnType);
 		Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
-		String exprName = getGenericVariableName(node.getExpression());
-		if (clazz == null) {
-			if (returnType.isArray()) {
-				clazz = returnType.getComponentType();
-			} else if (Map.class.isAssignableFrom(returnType)) {
-				clazz = Map.Entry.class;
-			} else if (Collection.class.isAssignableFrom(returnType)) {
-				clazz = types.get(exprName + ":0"); // Collection<T>泛型 
+		if (type == null) {
+			if (returnClass != null) {
+				if (returnClass.isArray()) {
+					type = returnClass.getComponentType();
+				} else if (Map.class.isAssignableFrom(returnClass)) {
+					if (returnType instanceof ParameterizedType) {
+						type = new ParameterizedTypeImpl(Map.Entry.class, ((ParameterizedType)type).getActualTypeArguments());
+					} else {
+						type = Map.Entry.class;
+					}
+				} else if (Collection.class.isAssignableFrom(returnClass)) {
+					type = findGenericType(returnType, 0); // Collection<T>泛型 
+				}
 			}
-			if (clazz == null) {
+			if (type == null) {
 				if (defaultVariableType == null) {
 					throw new ParseException("Can not resolve the variable " + node.getName() + " type in the #for directive. Please explicit define the variable type #for(Xxx " + node.getName() + " : " + node.getExpression() + ") in your template.", node.getOffset());
 				}
-				clazz = defaultVariableType;
+				type = defaultVariableType;
 			}
 		}
-		if (Map.class.isAssignableFrom(returnType)) {
-			Class<?> keyType = types.get(exprName + ":0");
-			if (keyType != null) {
-				types.put(var + ":0", keyType);
-			}
-			Class<?> valueType = types.get(exprName + ":1");
-			if (valueType != null) {
-				types.put(var + ":1", valueType);
-			}
+		clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
+		if (Map.class.isAssignableFrom(returnClass)) {
 			code = ClassUtils.class.getName() + ".entrySet(" + code + ")";
 		}
 		int i = seq.incrementAndGet();
@@ -676,7 +646,7 @@ public class CompiledVisitor extends AstVisitor {
 		} else {
 			varCode = name + ".next()";
 		}
-		appendVar(clazz, var, varCode, false, false, node.getType() != null, node.getOffset());
+		appendVar(type, var, varCode, false, false, node.getType() != null, node.getOffset());
 		getVariables.addAll(variableTypes.keySet());
 		for (String fv : forVariable) {
 			setVariables.add(fv);
@@ -705,7 +675,7 @@ public class CompiledVisitor extends AstVisitor {
 			builder.append("	" + b + ";\n");
 		} else {
 			String code = popExpressionCode();
-			Class<?> returnType = popExpressionReturnType();
+			Class<?> returnType = popExpressionReturnClass();
 			Map<String, Class<?>> variableTypes = popExpressionVariableTypes();
 			builder.append("	if(");
 			builder.append(StringUtils.getConditionCode(returnType, code, importSizers));
@@ -755,11 +725,11 @@ public class CompiledVisitor extends AstVisitor {
 	}
 
 	public void init() {
-		if (types == null) {
-			types = new HashMap<String, Class<?>>();
-		}
 		if (importTypes != null && importTypes.size() > 0) {
 			types.putAll(importTypes);
+		}
+		if (parameterTypes != null && parameterTypes.size() > 0) {
+			types.putAll(parameterTypes);
 		}
 		types.put("this", Template.class);
 		types.put("super", Template.class);
@@ -822,12 +792,13 @@ public class CompiledVisitor extends AstVisitor {
 		}
 		for (String var : defVariables) {
 			if (getVariables.contains(var) && ! defined.contains(var)) {
-				Class<?> type = types.get(var);
+				Type type = types.get(var);
 				if (type == null) {
 					type = defaultVariableType;
 				}
+				Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
 				defined.add(var);
-				declare.append(getTypeCode(type, var));
+				declare.append(getTypeCode(clazz, var));
 			}
 		}
 		Set<String> macroKeySet = macros.keySet();
@@ -860,21 +831,23 @@ public class CompiledVisitor extends AstVisitor {
 		for (String var : setVariables) {
 			if (! defined.contains(var)) {
 				defined.add(var);
-				Class<?> type = types.get(var);
-				String typeName = getTypeName(type);
-				declare.append("	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = " + ClassUtils.getInitCode(type) + ";\n");
+				Type type = types.get(var);
+				Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
+				String typeName = getTypeName(clazz);
+				declare.append("	" + typeName + " " + ClassUtils.filterJavaKeyword(var) + " = " + ClassUtils.getInitCode(clazz) + ";\n");
 			}
 		}
 		for (String var : getVariables) {
 			if (! defined.contains(var)) {
-				Class<?> type = types.get(var);
+				Type type = types.get(var);
 				if (type == null) {
 					type = defaultVariableType;
 				}
+				Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType() : type);
 				defined.add(var);
-				declare.append(getTypeCode(type, var));
+				declare.append(getTypeCode(clazz, var));
 				defVariables.add(var);
-				defVariableTypes.add(type);
+				defVariableTypes.add(clazz);
 			}
 		}
 		StringBuilder funtionFileds = new StringBuilder();
@@ -1149,11 +1122,16 @@ public class CompiledVisitor extends AstVisitor {
 		return code;
 	}
 
-	private Class<?> popExpressionReturnType() {
+	private Type popExpressionReturnType() {
 		Type type = typeStack.pop();
 		if (! typeStack.isEmpty()) {
 			throw new IllegalStateException("Illegal expression.");
 		}
+		return type;
+	}
+	
+	private Class<?> popExpressionReturnClass() {
+		Type type = popExpressionReturnType();
 		return (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
 	}
 
@@ -1210,125 +1188,25 @@ public class CompiledVisitor extends AstVisitor {
 		typeStack.push(type);
 		codeStack.push(code);
 	}
-
+	
 	public void visit(Variable node) throws IOException, ParseException {
 		String name = node.getName();
-		Class<?> type = types.get(name);
+		Type type = types.get(name);
 		if (type == null) {
 			if (defaultVariableType == null) {
 				throw new ParseException("Can not resolve the " + node.getName() + " variable type. Please explicit define the variable type #set(Xxx " + node.getName() + ") in your template.", node.getOffset());
 			}
 			type = defaultVariableType;
 		}
+		Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
 		String code = ClassUtils.filterJavaKeyword(name);
 		typeStack.push(type);
 		codeStack.push(code);
-		variableTypes.put(name, type);
+		variableTypes.put(name, clazz);
 	}
 
 	@Override
-	public void visit(PositiveOperator node) throws IOException, ParseException {
-		Type parameterType = typeStack.pop();
-		String parameterCode = codeStack.pop();
-		
-		Type type = parameterType;
-		String code = parameterCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(NegativeOperator node) throws IOException, ParseException {
-		Type parameterType = typeStack.pop();
-		String parameterCode = codeStack.pop();
-		Class<?> parameterClass = (Class<?>) (parameterType instanceof ParameterizedType ? ((ParameterizedType)parameterType).getRawType() : parameterType);
-		String name = node.getName();
-		
-		Type type = parameterClass;
-		String code;
-		if (node.getParameter() instanceof Operator
-				&& ((Operator) node.getParameter()).getPriority() < node.getPriority()) {
-			code = name + " (" + parameterCode + ")";
-		} else {
-			code = name + " " + parameterCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(NotOperator node) throws IOException, ParseException {
-		Type parameterType = typeStack.pop();
-		String parameterCode = codeStack.pop();
-		Class<?> parameterClass = (Class<?>) (parameterType instanceof ParameterizedType ? ((ParameterizedType)parameterType).getRawType() : parameterType);
-		
-		Type type = boolean.class;
-		String code = "! (" + StringUtils.getConditionCode(parameterClass, parameterCode, importSizers) + ")";
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(BitNotOperator node) throws IOException, ParseException {
-		Type parameterType = typeStack.pop();
-		String parameterCode = codeStack.pop();
-		Class<?> parameterClass = (Class<?>) (parameterType instanceof ParameterizedType ? ((ParameterizedType)parameterType).getRawType() : parameterType);
-		String name = node.getName();
-		
-		Type type = parameterClass;
-		String code;
-		if (node.getParameter() instanceof Operator
-				&& ((Operator) node.getParameter()).getPriority() < node.getPriority()) {
-			code = name + " (" + parameterCode + ")";
-		} else {
-			code = name + " " + parameterCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(ListOperator node) throws IOException, ParseException {
-		Type parameterType = typeStack.pop();
-		String parameterCode = codeStack.pop();
-		Class<?> parameterClass = (Class<?>) (parameterType instanceof ParameterizedType ? ((ParameterizedType)parameterType).getRawType() : parameterType);
-		
-		Type type = null;
-		String code = null;
-		if (parameterType instanceof ParameterizedType) {
-			parameterClass = (Class<?>)((ParameterizedType) parameterType).getActualTypeArguments()[0];
-		}
-		if (Map.Entry.class.isAssignableFrom(parameterClass)) {
-			type = Map.class;
-			code = CollectionUtils.class.getName() + ".toMap(new " + Map.Entry.class.getCanonicalName() + "[] {" + parameterCode + "})";
-		} else {
-			type = Array.newInstance(parameterClass, 0).getClass();
-			code = "new " + parameterClass.getCanonicalName() + "[] {" + parameterCode + "}";
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(NewOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String parameterCode = codeStack.pop();
-		String name = node.getName();
-		
-		Type type = ClassUtils.forName(importPackages, name);
-		String code = "new " + name + "(" + parameterCode + ")";
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(StaticMethodOperator node) throws IOException, ParseException {
+	public void visit(UnaryOperator node) throws IOException, ParseException {
 		Type parameterType = typeStack.pop();
 		String parameterCode = codeStack.pop();
 		Class<?> parameterClass = (Class<?>) (parameterType instanceof ParameterizedType ? ((ParameterizedType)parameterType).getRawType() : parameterType);
@@ -1344,7 +1222,8 @@ public class CompiledVisitor extends AstVisitor {
 		} else {
 			parameterTypes = new Class<?>[] { parameterClass };
 		}
-		Class<?> t = types.get(name);
+		Type macroType = types.get(name);
+		Class<?> t = (Class<?>) (macroType instanceof ParameterizedType ? ((ParameterizedType) macroType).getRawType() : macroType);
 		if (t != null && Template.class.isAssignableFrom(t)) {
 			variableTypes.put(name, Template.class);
 			type = Object.class;
@@ -1389,909 +1268,7 @@ public class CompiledVisitor extends AstVisitor {
 	}
 
 	@Override
-	public void visit(CastOperator node) throws IOException, ParseException {
-		Type parameterType = typeStack.pop();
-		String parameterCode = codeStack.pop();
-		String name = node.getName();
-		
-		Type type = ClassUtils.forName(importPackages, name);
-		String code = parameterCode;
-		if (! type.equals(parameterType)) {
-			code = "(" + name + ")(" + parameterCode + ")";
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(AddOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = null;
-		String code = null;
-		boolean nullable = true;
-		if ((Collection.class.isAssignableFrom(leftClass) || leftClass.isArray()) 
-						&& (Collection.class.isAssignableFrom(rightClass) || rightClass.isArray())
-				|| Map.class.isAssignableFrom(leftClass) && Map.class.isAssignableFrom(rightClass)) {
-			code = CollectionUtils.class.getName() + ".merge(" + leftCode+ ", " + rightCode + ")";
-			type = leftType;
-			nullable = false;
-		} else if (rightClass.isPrimitive() && rightType != boolean.class) {
-			type = rightClass;
-			nullable = false;
-		} else if (leftClass.isPrimitive() && leftClass != boolean.class) {
-			type = leftClass;
-			nullable = false;
-		} else {
-			type = String.class;
-		}
-		if (type != String.class) {
-			Class<?> clazz = (Class<?>) (type instanceof ParameterizedType ? ((ParameterizedType)type).getRawType() : type);
-			String typeName = clazz.getCanonicalName();
-			typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
-			if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
-				leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
-				nullable = false;
-			}
-			if (! (rightClass.isPrimitive() && leftClass != boolean.class)) {
-				rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
-				nullable = false;
-			}
-		}
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		if (code == null) {
-			if (nullable && type == String.class && ! leftClass.isPrimitive() && ! rightClass.isPrimitive()) {
-				code = StringUtils.class.getName() + ".concat(" + leftCode + ", " + rightCode + ")";
-			} else {
-				code = leftCode + " " + name + " " + rightCode;
-			}
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(SubOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type;
-		if (rightClass.isPrimitive() && rightType != boolean.class) {
-			type = rightClass;
-		} else if (leftClass.isPrimitive() && leftClass != boolean.class) {
-			type = leftClass;
-		} else {
-			type = int.class;
-		}
-		
-		Class<?> clazz = (Class<?>) type;
-		String typeName = clazz.getCanonicalName();
-		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
-		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
-			leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
-		}
-		if (! (rightClass.isPrimitive() && leftClass != boolean.class)) {
-			rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(MulOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type;
-		if (rightClass.isPrimitive() && rightType != boolean.class) {
-			type = rightClass;
-		} else if (leftClass.isPrimitive() && leftClass != boolean.class) {
-			type = leftClass;
-		} else {
-			type = int.class;
-		}
-		
-		Class<?> clazz = (Class<?>) type;
-		String typeName = clazz.getCanonicalName();
-		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
-		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
-			leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
-		}
-		if (! (rightClass.isPrimitive() && leftClass != boolean.class)) {
-			rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(DivOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type;
-		if (rightClass.isPrimitive() && rightType != boolean.class) {
-			type = rightClass;
-		} else if (leftClass.isPrimitive() && leftClass != boolean.class) {
-			type = leftClass;
-		} else {
-			type = int.class;
-		}
-		
-		Class<?> clazz = (Class<?>) type;
-		String typeName = clazz.getCanonicalName();
-		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
-		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
-			leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
-		}
-		if (! (rightClass.isPrimitive() && leftClass != boolean.class)) {
-			rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(ModOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type;
-		if (rightClass.isPrimitive() && rightType != boolean.class) {
-			type = rightClass;
-		} else if (leftClass.isPrimitive() && leftClass != boolean.class) {
-			type = leftClass;
-		} else {
-			type = int.class;
-		}
-		
-		Class<?> clazz = (Class<?>) type;
-		String typeName = clazz.getCanonicalName();
-		typeName = typeName.substring(0, 1).toUpperCase() + typeName.substring(1);
-		if (! (leftClass.isPrimitive() && leftClass != boolean.class)) {
-			leftCode = ClassUtils.class.getName() + ".to" + typeName + "(" + leftCode + ")";
-		}
-		if (! (rightClass.isPrimitive() && leftClass != boolean.class)) {
-			rightCode = ClassUtils.class.getName() + ".to" + typeName + "(" + rightCode + ")";
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(EqualsOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		if (node.getLeftParameter() instanceof Operator) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = boolean.class;
-		String code;
-		if(! "null".equals(leftCode) && ! "null".equals(rightCode)
-				&& (! leftClass.isPrimitive() || ! rightClass.isPrimitive())) {
-			if (leftClass.isPrimitive()) {
-				leftCode = ClassUtils.class.getName() + ".boxed(" + leftCode + ")";
-			} else if (rightClass.isPrimitive()) {
-				rightCode = ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
-			}
-			if (String.class.equals(leftClass) && ! String.class.equals(rightClass)) {
-				rightCode = StringUtils.class.getName() + ".toString(" + rightCode + ")";
-			} else if (! String.class.equals(leftClass) && String.class.equals(rightClass)) {
-				leftCode = StringUtils.class.getName() + ".toString(" + leftCode + ")";
-			}
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".equals(" + rightCode + ")", "(" + rightCode + ") == null");
-		} else {
-			code = leftCode + " == " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(NotEqualsOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = boolean.class;
-		String code;
-		if(! "null".equals(leftCode) && ! "null".equals(rightCode)
-				&& (! leftClass.isPrimitive() || ! rightClass.isPrimitive())) {
-			if (leftClass.isPrimitive()) {
-				leftCode = ClassUtils.class.getName() + ".boxed(" + leftCode + ")";
-			} else if (rightClass.isPrimitive()) {
-				rightCode = ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
-			}
-			if (String.class.equals(leftClass) && ! String.class.equals(rightClass)) {
-				rightCode = StringUtils.class.getName() + ".toString(" + rightCode + ")";
-			} else if (! String.class.equals(leftClass) && String.class.equals(rightClass)) {
-				leftCode = StringUtils.class.getName() + ".toString(" + leftCode + ")";
-			}
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, "(! " + leftCode + ".equals(" + rightCode + "))", "(" + rightCode + ") != null");
-		} else {
-			code = leftCode + " " + name + " " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(GreaterOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = boolean.class;
-		String code = null;
-		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") > 0");
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		if (code == null) {
-			code = leftCode + " " + name + " " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(GreaterEqualsOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = boolean.class;
-		String code = null;
-		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") >= 0");
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		if (code == null) {
-			code = leftCode + " " + name + " " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(LessOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = boolean.class;
-		String code = null;
-		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") < 0");
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		if (code == null) {
-			code = leftCode + " " + name + " " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(LessEqualsOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = boolean.class;
-		String code = null;
-		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") <= 0");
-		}
-		
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		
-		if (code == null) {
-			code = leftCode + " " + name + " " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(AndOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = boolean.class;
-		if(! boolean.class.equals(leftClass)) {
-			if (node.getRightParameter() instanceof Operator
-					&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-				rightCode = "(" + rightCode + ")";
-			}
-			leftCode = StringUtils.getConditionCode(leftClass, leftCode, importSizers);
-			rightCode = StringUtils.getConditionCode(rightClass, rightCode, importSizers);
-		}
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(OrOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = leftClass;
-		String code = null;
-		if(! boolean.class.equals(leftClass)) {
-			code = "(" + StringUtils.getConditionCode(leftClass, leftCode, importSizers) + " ? (" + leftCode + ") : (" + rightCode + "))";
-		} else {
-			code = leftCode + " " + name + " " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(BitAndOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type = leftType;
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(BitOrOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type = leftType;
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(BitXorOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = leftType;
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(RightShiftOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type = leftType;
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(LeftShiftOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type = leftType;
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(UnsignShiftOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type = leftType;
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(ArrayOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = null;
-		String code = null;
-		List<Class<?>> ts = new ArrayList<Class<?>>();
-		if (leftType instanceof ParameterizedType) {
-			for (Type t : ((ParameterizedType) leftType).getActualTypeArguments()) {
-				ts.add((Class<?>) t);
-			}
-		} else if (leftType != void.class) {
-			ts.add((Class<?>) leftType);
-		}
-		if (rightType instanceof ParameterizedType) {
-			for (Type t : ((ParameterizedType) rightType).getActualTypeArguments()) {
-				ts.add((Class<?>) t);
-			}
-		} else if (rightType != void.class)  {
-			ts.add((Class<?>) rightType);
-		}
-		type = new ParameterizedTypeImpl(Object[].class, ts.toArray(new Class<?>[ts.size()]));
-		code = leftCode + ", " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(ConditionOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = rightClass;
-		if (node.getRightParameter() instanceof Operator
-				&& ((Operator) node.getRightParameter()).getPriority() < node.getPriority()) {
-			rightCode = "(" + rightCode + ")";
-		}
-		leftCode = StringUtils.getConditionCode(leftClass, leftCode, importSizers);
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(EntryOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = null;
-		String code = null;
-		if(! (node.getLeftParameter() instanceof BinaryOperator 
-				&& "?".equals(((BinaryOperator)node.getLeftParameter()).getName()))) {
-			type = Map.Entry.class;
-			code = "new " + MapEntry.class.getName() + "(" + leftCode + ", " + rightCode + ")";
-		} else {
-			type = leftType;
-			code = leftCode + " " + name + " " + rightCode;
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(InstanceofOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-
-		Type type = boolean.class;
-		String code = leftCode + " " + name + " " + rightCode;
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(IndexOperator node) throws IOException, ParseException {
-		Type rightType = typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		if (node.getLeftParameter() instanceof Operator) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = null;
-		String code = null;
-		if (Map.class.isAssignableFrom(leftClass)) {
-			String var = getGenericVariableName(node.getLeftParameter());
-			if (var != null && types.containsKey(var + ":1")) {
-				Class<?> varType = types.get(var + ":1"); // Map<K,V>第二个泛型 
-				type = varType;
-				code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, "((" + varType.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
-			} else {
-				type = Object.class;
-				code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".get(" + rightCode + ")");
-			}
-		} else if (List.class.isAssignableFrom(leftClass)) {
-			if (int[].class == rightType) {
-				type = List.class;;
-				code = CollectionUtils.class.getName() + ".subList(" + leftCode + ", " + rightCode + ")";
-			} else if (rightType instanceof ParameterizedType
-					&& ((ParameterizedType) rightType).getActualTypeArguments()[0] == int.class) {
-				type = List.class;;
-				code = CollectionUtils.class.getName() + ".subList(" + leftCode + ", new int[] {" + rightCode + "})";
-			} else if (int.class.equals(rightType)) {
-				type = Object.class;
-				code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".get(" + rightCode + ")");
-				if (node.getLeftParameter() instanceof Variable) {
-					String var = ((Variable)node.getLeftParameter()).getName();
-					Class<?> varType = types.get(var + ":0"); // List<T>第一个泛型
-					if (varType != null) {
-						type = varType;
-						code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, "((" + varType.getCanonicalName() + ")" + leftCode + ".get(" + rightCode + "))");
-					}
-				}
-			} else {
-				throw new ParseException("The \"[]\" index type: " + rightType + " must be int!", node.getOffset());
-			}
-		} else if (leftClass.isArray()) {
-			if (int[].class == rightType) {
-				type = leftClass;
-				code = CollectionUtils.class.getName() + ".subArray(" + leftCode + ", " + rightCode + ")";
-			} else if (rightType instanceof ParameterizedType
-					&& ((ParameterizedType) rightType).getActualTypeArguments()[0] == int.class) {
-				type = leftClass;
-				code = CollectionUtils.class.getName() + ".subArray(" + leftCode + ", new int[] {" + rightCode + "})";
-			} else if (int.class.equals(rightType)) {
-				type = leftClass.getComponentType();
-				code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + "[" + rightCode + "]");
-			} else {
-				throw new ParseException("The \"[]\" index type: " + rightType + " must be int!", node.getOffset());
-			}
-		} else {
-			throw new ParseException("Unsuptorted \"[]\" for non-array type: " + leftClass, node.getOffset());
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(SequenceOperator node) throws IOException, ParseException {
-		typeStack.pop();
-		String rightCode = codeStack.pop();
-
-		Type leftType = typeStack.pop();
-		String leftCode = codeStack.pop();
-
-		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
-		
-		if (node.getLeftParameter() instanceof Operator
-				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
-			leftCode = "(" + leftCode + ")";
-		}
-		
-		Type type = null;
-		String code = null;
-		if (leftClass == int.class || leftClass == Integer.class 
-				|| leftClass == short.class  || leftClass == Short.class
-				|| leftClass == long.class || leftClass == Long.class
-				|| leftClass == char.class || leftClass == Character.class) {
-			type = Array.newInstance(leftClass, 0).getClass();
-			code = CollectionUtils.class.getName() + ".createSequence(" + leftCode + ", " + rightCode + ")";
-		} else if (leftClass == String.class 
-					&& leftCode.length() >= 2 && rightCode.length() >= 2 
-					&& (leftCode.startsWith("\"") || leftCode.startsWith("\'"))
-					&& (leftCode.endsWith("\"") || leftCode.endsWith("\'"))
-					&& (rightCode.startsWith("\"") || rightCode.startsWith("\'"))
-					&& (rightCode.endsWith("\"") || rightCode.endsWith("\'"))) {
-			type = String[].class;
-			StringBuilder buf = new StringBuilder();
-			for (String s : getSequence(leftCode.substring(1, leftCode.length() - 1), 
-					rightCode.substring(1, rightCode.length() - 1))) {
-				if (buf.length() > 0) {
-					buf.append(",");
-				}
-				buf.append("\"");
-				buf.append(s);
-				buf.append("\"");
-			}
-			code = "new String[] {" + buf.toString() + "}";
-		} else {
-			throw new ParseException("The operator \"..\" unsupported parameter type " + leftClass, node.getOffset());
-		}
-		
-		typeStack.push(type);
-		codeStack.push(code);
-	}
-
-	@Override
-	public void visit(MethodOperator node) throws IOException, ParseException {
+	public void visit(BinaryOperator node) throws IOException, ParseException {
 		Type rightType = typeStack.pop();
 		String rightCode = codeStack.pop();
 		
@@ -2327,8 +1304,8 @@ public class CompiledVisitor extends AstVisitor {
 				&& ("key".equals(name) || "value".equals(name))) {
 			String var = getGenericVariableName(node.getLeftParameter());
 			if (var != null) {
-				Class<?> keyType = types.get(var + ":0"); // Map<K,V>第一个泛型
-				Class<?> valueType = types.get(var + ":1"); // Map<K,V>第二个泛型
+				Class<?> keyType = findGenericTypeByName(var, 0); // Map<K,V>第一个泛型
+				Class<?> valueType = findGenericTypeByName(var, 1); // Map<K,V>第二个泛型
 				if ("key".equals(name) && keyType != null) {
 					type = keyType;
 					code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, "((" + keyType.getCanonicalName() + ")" + leftCode + ".getKey(" + rightCode + "))");
@@ -2341,7 +1318,7 @@ public class CompiledVisitor extends AstVisitor {
 				&& "get".equals(name)) {
 			String var = getGenericVariableName(node.getLeftParameter());
 			if (var != null) {
-				Class<?> varType = types.get(var + ":1"); // Map<K,V>第二个泛型 
+				Class<?> varType = findGenericTypeByName(var, 1); // Map<K,V>第二个泛型 
 				if (varType != null) {
 					type = varType;
 					if (rightClass.isPrimitive()) {
@@ -2355,7 +1332,7 @@ public class CompiledVisitor extends AstVisitor {
 				&& (int.class.equals(rightType) || Integer.class.equals(rightType))) {
 			String var = getGenericVariableName(node.getLeftParameter());
 			if (var != null) {
-				Class<?> varType = types.get(var + ":0"); // List<T>第一个泛型
+				Class<?> varType = findGenericTypeByName(var, 0); // List<T>第一个泛型
 				if (varType != null) {
 					type = varType;
 					if (! rightClass.isPrimitive()) {
@@ -2368,7 +1345,12 @@ public class CompiledVisitor extends AstVisitor {
 		if (code == null) {
 			Class<?>[] rightTypes;
 			if (rightType instanceof ParameterizedType) {
-				rightTypes = (Class<?>[]) ((ParameterizedType) rightType).getActualTypeArguments();
+				Type[] ts = ((ParameterizedType) rightType).getActualTypeArguments();
+				rightTypes = new Class<?>[ts.length];
+				for (int i = 0; i < ts.length; i ++) {
+					Type t = ts[i];
+					rightTypes[i] = (Class<?>) (t instanceof ParameterizedType ? ((ParameterizedType)t).getRawType() : t);
+				}
 			} else if (rightClass == void.class) {
 				rightTypes = new Class<?>[0];
 			} else {
@@ -2385,7 +1367,7 @@ public class CompiledVisitor extends AstVisitor {
 				code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".get(\"" + name + "\")");
 				String var = getGenericVariableName(node.getLeftParameter());
 				if (var != null) {
-					Class<?> t = types.get(var + ":1"); // Map<K,V>第二个泛型 
+					Class<?> t = findGenericTypeByName(var, 1); // Map<K,V>第二个泛型 
 					if (t != null) {
 						type = t;
 						code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, "((" + t.getCanonicalName() + ")" + leftCode + ".get(\"" + name + "\"))");
@@ -2424,6 +1406,25 @@ public class CompiledVisitor extends AstVisitor {
 							if (type == void.class) {
 								throw new ParseException("Can not call void method " + method.getName() + " in class " + function.getName(), node.getOffset());
 							}
+							Type grt = method.getGenericReturnType();
+							if (! (grt instanceof Class)) {
+								Class<?>[] pts = method.getParameterTypes();
+								Type[] gpts = method.getGenericParameterTypes();
+								if (pts.length == allTypes.length && pts.length == gpts.length) {
+									for (int i = 0; i < gpts.length; i ++) {
+										Type pt = pts[i];
+										Type gpt = gpts[i];
+										if (pt.equals(type) && gpt.equals(grt)) {
+											if (i == 0) {
+												type = leftType;
+											} else {
+												type = allTypes[i];
+											}
+											break;
+										}
+									}
+								}
+							}
 							Class<?>[] pts = method.getParameterTypes();
 							if (allTypes.length == 2 && allTypes[1].isPrimitive() && pts[1].isAssignableFrom(ClassUtils.getBoxedClass(allTypes[1]))) {
 								allCode = leftCode + ", " + ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
@@ -2457,8 +1458,8 @@ public class CompiledVisitor extends AstVisitor {
 							def = "Can not resolve the " + leftCode + " variable type. Please explicit define the variable type #set(Xxx " + leftCode + ") in your template.";
 						}
 						if (rightTypes != null && rightTypes.length > 0) {
-							throw new ParseException("No such method " + ClassUtils.getMethodFullName(name, rightTypes) + " in class "
-									+ leftClass.getName() + "." + def, node.getOffset());
+							throw new ParseException(def + " No such method " + ClassUtils.getMethodFullName(name, rightTypes) + " in class "
+									+ leftClass.getName() + ".", node.getOffset());
 						} else { // search property
 							try {
 								String getter = "get" + name.substring(0, 1).toUpperCase()
@@ -2489,7 +1490,7 @@ public class CompiledVisitor extends AstVisitor {
 										code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + "." + field.getName());
 									} catch (NoSuchFieldException e4) {
 										throw new ParseException(
-												"No such property "
+												def + " No such property "
 														+ name
 														+ " in class "
 														+ leftClass.getName()
@@ -2502,7 +1503,7 @@ public class CompiledVisitor extends AstVisitor {
 																.toUpperCase()
 														+ name.substring(1)
 														+ "() or method " + name
-														+ "() or filed " + name + "." + def, node.getOffset());
+														+ "() or filed " + name + ".", node.getOffset());
 									}
 								}
 							}
@@ -2536,17 +1537,6 @@ public class CompiledVisitor extends AstVisitor {
 		return null;
 	}
 
-	private List<String> getSequence(String begin, String end) {
-		if (sequences != null) {
-			for (StringSequence sequence : sequences) {
-				if (sequence.containSequence(begin, end)) {
-					return sequence.getSequence(begin, end);
-				}
-			}
-		}
-		throw new IllegalStateException("No such sequence from \"" + begin + "\" to \"" + end + "\".");
-	}
-	
 	public static Template getMacro(Template template, String name) {
 		Template macro = template.getMacros().get(name);
 		if (macro == null) {

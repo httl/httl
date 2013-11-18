@@ -159,13 +159,13 @@ public class TemplateTest {
 	    final List<Object[]> retTestData = new ArrayList<Object[]>();
 		String[] configs = new String[] { "httl.properties", "httl-comment.properties", "httl-comment-text.properties", "httl-comment-javassist.properties", "httl-comment-compile.properties", "httl-comment-interpret.properties", "httl-attribute.properties", "httl-velocity.properties" };
 		for (String config : configs) {
-			//if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
+			if (! "httl-comment.properties".equals(config)) continue; // 指定配置测试
 			Engine engine = Engine.getEngine(config);
 			
 			Codec[] codecs = engine.getProperty("codecs", Codec[].class);
 			String json = codecs[0].toString("context", model);
 
-			Object[] maps = new Object[] {context, model, json, null};
+			Object[] maps = new Object[] {context/*, model, json, null*/};
 			for (Object map : maps) {
 				if ("httl-velocity.properties".equals(config) 
 						&& (map == null || map instanceof String)) continue;
@@ -183,7 +183,7 @@ public class TemplateTest {
 				for (int i = 0, n = files.length; i < n; i ++) {
 					File file = files[i];
 					String templateName = file.getName();
-					//if (! "if_boolean.httl".equals(templateName)) continue; // 指定模板测试
+					//if (! "test.httl".equals(templateName)) continue; // 指定模板测试
 					//if ("extends_default.httl".equals(templateName)) continue; // 跳过模板测试
 					if ("httl-comment-interpret.properties".equals(config) // FIXME
 							&& ("include_hide.httl".equals(templateName)

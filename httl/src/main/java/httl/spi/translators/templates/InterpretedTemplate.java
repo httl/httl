@@ -128,10 +128,8 @@ public class InterpretedTemplate extends AbstractTemplate {
 		visitor.setForVariable(forVariable);
 		visitor.setIfVariable(ifVariable);
 		visitor.setOutputEncoding(outputEncoding);
-		visitor.setImportSequences(importSequences);
 		visitor.setImportMethods(importMethods);
 		visitor.setImportMacros(importMacros);
-		visitor.setImportPackages(importPackages);
 		visitor.setTextFilterSwitcher(textFilterSwitcher);
 		visitor.setValueFilterSwitcher(valueFilterSwitcher);
 		visitor.setFormatterSwitcher(formatterSwitcher);

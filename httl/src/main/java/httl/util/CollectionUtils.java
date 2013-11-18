@@ -277,11 +277,42 @@ public class CollectionUtils {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T[] merge(T[] c1, Collection<T> c2) {
-		return merge(c1, c2 == null ? null : (T[]) c2.toArray(new Object[0]));
+		if (c2 == null || c2.size() == 0) {
+			return c1;
+		}
+		Class<?> t;
+		if (c1 != null && c1.length > 0) {
+			t = c1.getClass().getComponentType();
+		} else {
+			t = Object.class;
+			for (T i : c2) {
+				if (i != null) {
+					t = i.getClass();
+					break;
+				}
+			}
+		}
+		return merge(c1, c2.toArray((T[]) Array.newInstance(t, c2.size())));
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> T[] merge(Collection<T> c1, T[] c2) {
-		return merge(c2, c2 == null ? null : Arrays.asList(c2));
+		if (c1 == null || c1.size() == 0) {
+			return c2;
+		}
+		Class<?> t;
+		if (c2 != null && c2.length > 0) {
+			t = c2.getClass().getComponentType();
+		} else {
+			t = Object.class;
+			for (T i : c1) {
+				if (i != null) {
+					t = i.getClass();
+					break;
+				}
+			}
+		}
+		return merge(c1.toArray((T[]) Array.newInstance(t, c1.size())), c2);
 	}
 
 	public static boolean[] merge(boolean[] c1, boolean[] c2) {
