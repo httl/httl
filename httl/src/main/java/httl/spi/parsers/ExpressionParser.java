@@ -204,6 +204,7 @@ public class ExpressionParser implements Parser {
 		unary.put("!", "not");
 		unary.put("~", "bitnot");
 		unary.put("[", "list");
+		unary.put("{", "map");
 		unary.put("new ", "new");
 		unary.put("(", "cast");
 		UNARY_OPERATOR_NAMES = Collections.unmodifiableMap(unary);
@@ -225,14 +226,14 @@ public class ExpressionParser implements Parser {
 		binary.put("&", "bitand");
 		binary.put("|", "bitor");
 		binary.put("^", "xor");
-		binary.put(">>", "rightshift");
-		binary.put("<<", "leftshift");
-		binary.put(">>>", "unsignshift");
+		binary.put(">>", "rs");
+		binary.put("<<", "ls");
+		binary.put(">>>", "us");
 		binary.put(",", "array");
 		binary.put("?", "select");
-		binary.put(":", "entry");
+		binary.put(":", "kv");
 		binary.put("instanceof", "is");
-		binary.put("[", "index");
+		binary.put("[", "get");
 		binary.put("..", "seq");
 		BINARY_OPERATOR_NAMES = Collections.unmodifiableMap(binary);
 	}

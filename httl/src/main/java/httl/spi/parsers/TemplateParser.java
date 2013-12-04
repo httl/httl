@@ -41,7 +41,6 @@ import httl.util.ParameterizedTypeImpl;
 import httl.util.StringUtils;
 import httl.util.Token;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -231,7 +230,7 @@ public class TemplateParser implements Parser {
 				|| StringUtils.inArray(name, macroDirective) || StringUtils.inArray(name, endDirective);
 	}
 	
-	private void defineVariableTypes(String value, int offset, List<Statement> directives) throws IOException, ParseException {
+	private void defineVariableTypes(String value, int offset, List<Statement> directives) throws ParseException {
 		int o = offset;
 		for (String v : splitDefine(value)) {
 			v = v.trim().replaceAll("\\s", " ");
@@ -254,7 +253,7 @@ public class TemplateParser implements Parser {
 		return node instanceof Text && ! ((Text) node).isLiteral();
 	}
 
-	private List<Statement> clean(List<Statement> nodes) throws ParseException, IOException {
+	private List<Statement> clean(List<Statement> nodes) throws ParseException {
 		List<Statement> result = null;
 		for (int i = 0; i < nodes.size(); i ++) {
 			if (i + 1 < nodes.size() && isNoLiteralText(nodes.get(i)) && isNoLiteralText(nodes.get(i + 1))) {
@@ -282,7 +281,7 @@ public class TemplateParser implements Parser {
 		return nodes;
 	}
 
-	private List<Statement> scan(String source, int sourceOffset) throws ParseException, IOException {
+	private List<Statement> scan(String source, int sourceOffset) throws ParseException {
 		List<Statement> directives = new ArrayList<Statement>();
 		List<Token> tokens = scanner.scan(source, sourceOffset);
 		AtomicInteger seq = new AtomicInteger();
@@ -516,7 +515,7 @@ public class TemplateParser implements Parser {
 		if (! directiveStack.isEmpty()) { // 后验条件
 			throw new ParseException("Miss #end directive." + root.getClass().getSimpleName(), root.getOffset());
 		}
-		return (BlockDirective) root;
+		return root;
 	}
 
 	// 指令归约辅助封装类
@@ -684,7 +683,7 @@ public class TemplateParser implements Parser {
 		}
 	}
 
-	public Node parse(String source, int offset) throws IOException, ParseException {
+	public Node parse(String source, int offset) throws ParseException {
 		return reduce(trim(clean(scan(source, offset))));
 	}
 
@@ -693,7 +692,7 @@ public class TemplateParser implements Parser {
 	 * 
 	 * @author subchen@gmail.com
 	 */
-	private List<Statement> trim(List<Statement> nodes) throws ParseException, IOException {
+	private List<Statement> trim(List<Statement> nodes) throws ParseException {
 		if (! removeDirectiveBlankLine) {
 			return nodes;
 		}
@@ -804,7 +803,7 @@ public class TemplateParser implements Parser {
 		return buf.toString().substring(0, buf.length() - 1); // 减掉预加的#号
 	}
 
-	private Type parseGenericType(String type, int offset) throws IOException, ParseException {
+	private Type parseGenericType(String type, int offset) throws ParseException {
 		if (StringUtils.isBlank(type)) {
 			return null;
 		}
@@ -840,7 +839,7 @@ public class TemplateParser implements Parser {
 		return raw;
 	}
 
-	private void parseGenericTypeString(String type, int offset, List<String> types, List<Integer> offsets) throws IOException, ParseException {
+	private void parseGenericTypeString(String type, int offset, List<String> types, List<Integer> offsets) throws ParseException {
 		StringBuilder buf = new StringBuilder();
 		int begin = 0;
 		for (int j = 0; j < type.length(); j ++) {

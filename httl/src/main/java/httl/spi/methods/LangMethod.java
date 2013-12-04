@@ -651,51 +651,51 @@ public class LangMethod {
 		return left ^ right;
 	}
 
-	public static int leftshift(byte left, byte right) {
+	public static int ls(byte left, byte right) {
 		return left << right;
 	}
 
-	public static int leftshift(short left, short right) {
+	public static int ls(short left, short right) {
 		return left << right;
 	}
 
-	public static int leftshift(int left, int right) {
+	public static int ls(int left, int right) {
 		return left << right;
 	}
 
-	public static long leftshift(long left, long right) {
+	public static long ls(long left, long right) {
 		return left << right;
 	}
 
-	public static int rightshift(byte left, byte right) {
+	public static int rs(byte left, byte right) {
 		return left >> right;
 	}
 
-	public static int rightshift(short left, short right) {
+	public static int rs(short left, short right) {
 		return left >> right;
 	}
 
-	public static int rightshift(int left, int right) {
+	public static int rs(int left, int right) {
 		return left >> right;
 	}
 
-	public static long rightshift(long left, long right) {
+	public static long rs(long left, long right) {
 		return left >> right;
 	}
 
-	public static int unsignshift(byte left, byte right) {
+	public static int us(byte left, byte right) {
 		return left >>> right;
 	}
 
-	public static int unsignshift(short left, short right) {
+	public static int us(short left, short right) {
 		return left >>> right;
 	}
 
-	public static int unsignshift(int left, int right) {
+	public static int us(int left, int right) {
 		return left >>> right;
 	}
 
-	public static long unsignshift(long left, long right) {
+	public static long us(long left, long right) {
 		return left >>> right;
 	}
 	
@@ -785,51 +785,51 @@ public class LangMethod {
 		return CollectionUtils.createSequence(left, right);
 	}
 
-	public static boolean index(boolean[] left, int right) {
+	public static boolean get(boolean[] left, int right) {
 		return left[right];
 	}
 
-	public static char index(char[] left, int right) {
+	public static char get(char[] left, int right) {
 		return left[right];
 	}
 
-	public static byte index(byte[] left, int right) {
+	public static byte get(byte[] left, int right) {
 		return left[right];
 	}
 
-	public static short index(short[] left, int right) {
+	public static short get(short[] left, int right) {
 		return left[right];
 	}
 
-	public static int index(int[] left, int right) {
+	public static int get(int[] left, int right) {
 		return left[right];
 	}
 
-	public static long index(long[] left, int right) {
+	public static long get(long[] left, int right) {
 		return left[right];
 	}
 
-	public static float index(float[] left, int right) {
+	public static float get(float[] left, int right) {
 		return left[right];
 	}
 
-	public static double index(double[] left, int right) {
+	public static double get(double[] left, int right) {
 		return left[right];
 	}
 
-	public static <T> T index(T[] left, int right) {
+	public static <T> T get(T[] left, int right) {
 		return left[right];
 	}
 
-	public static <T> T index(List<T> left, int right) {
+	public static <T> T get(List<T> left, int right) {
 		return left.get(right);
 	}
 
-	public static <K, V> V index(Map<K, V> left, K right) {
+	public static <K, V> V get(Map<K, V> left, K right) {
 		return left.get(right);
 	}
 
-	public static <K, V> Entry<K, V> entry(K left, V right) {
+	public static <K, V> Entry<K, V> kv(K left, V right) {
 		return new MapEntry<K, V>(left, right);
 	}
 
