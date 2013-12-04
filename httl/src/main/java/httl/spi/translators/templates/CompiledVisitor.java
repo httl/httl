@@ -1216,7 +1216,14 @@ public class CompiledVisitor extends AstVisitor {
 		String code = null;
 		Class<?>[] parameterTypes;
 		if (parameterType instanceof ParameterizedType) {
-			parameterTypes = (Class<?>[]) ((ParameterizedType) parameterType).getActualTypeArguments();
+			Type raw = ((ParameterizedType) parameterType).getRawType();
+			if (raw == Object[].class) {
+				parameterTypes = (Class<?>[]) ((ParameterizedType) parameterType).getActualTypeArguments();
+			} else if (raw == void.class) {
+				parameterTypes = new Class<?>[0];
+			} else {
+				parameterTypes = new Class<?>[] { (Class<?>) raw };
+			}
 		} else if (parameterClass == void.class) {
 			parameterTypes = new Class<?>[0];
 		} else {
@@ -1345,11 +1352,18 @@ public class CompiledVisitor extends AstVisitor {
 		if (code == null) {
 			Class<?>[] rightTypes;
 			if (rightType instanceof ParameterizedType) {
-				Type[] ts = ((ParameterizedType) rightType).getActualTypeArguments();
-				rightTypes = new Class<?>[ts.length];
-				for (int i = 0; i < ts.length; i ++) {
-					Type t = ts[i];
-					rightTypes[i] = (Class<?>) (t instanceof ParameterizedType ? ((ParameterizedType)t).getRawType() : t);
+				Type raw = ((ParameterizedType) rightType).getRawType();
+				if (raw == Object[].class) {
+					Type[] ts = ((ParameterizedType) rightType).getActualTypeArguments();
+					rightTypes = new Class<?>[ts.length];
+					for (int i = 0; i < ts.length; i ++) {
+						Type t = ts[i];
+						rightTypes[i] = (Class<?>) (t instanceof ParameterizedType ? ((ParameterizedType)t).getRawType() : t);
+					}
+				} else if (raw == void.class) {
+					rightTypes = new Class<?>[0];
+				} else {
+					rightTypes = new Class<?>[] { (Class<?>) raw };
 				}
 			} else if (rightClass == void.class) {
 				rightTypes = new Class<?>[0];

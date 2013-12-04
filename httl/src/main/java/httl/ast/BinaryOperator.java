@@ -48,9 +48,9 @@ public class BinaryOperator extends Operator {
 		return leftParameter;
 	}
 
-	public void setLeftParameter(Expression leftParameter) {
+	public void setLeftParameter(Expression leftParameter) throws ParseException {
 		if (this.leftParameter != null)
-			throw new IllegalStateException("Can not modify left parameter.");
+			throw new ParseException("Can not modify left parameter.", getOffset());
 		this.leftParameter = leftParameter;
 	}
 
@@ -58,9 +58,9 @@ public class BinaryOperator extends Operator {
 		return rightParameter;
 	}
 
-	public void setRightParameter(Expression rightParameter) {
+	public void setRightParameter(Expression rightParameter) throws ParseException {
 		if (this.rightParameter != null)
-			throw new IllegalStateException("Can not modify right parameter.");
+			throw new ParseException("Can not modify right parameter.", getOffset());
 		this.rightParameter = rightParameter;
 	}
 

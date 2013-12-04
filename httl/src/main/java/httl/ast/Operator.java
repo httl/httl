@@ -15,9 +15,6 @@
  */
 package httl.ast;
 
-import httl.Node;
-
-import java.util.List;
 
 /**
  * Operator. (SPI, Prototype, ThreadSafe)
@@ -27,7 +24,7 @@ import java.util.List;
 public abstract class Operator extends Expression {
 
 	private final String name;
-	
+
 	private final int priority;
 
 	public Operator(String name, int priority, int offset){
@@ -43,8 +40,6 @@ public abstract class Operator extends Expression {
 	public int getPriority() {
 		return priority;
 	}
-
-	public abstract List<Node> getChildren();
 
 	@Override
 	public String toString() {

@@ -15,6 +15,8 @@
  */
 package httl.ast;
 
+import java.text.ParseException;
+
 /**
  * EndDirective. (SPI, Prototype, ThreadSafe)
  * 
@@ -32,9 +34,9 @@ public class EndDirective extends Directive {
 		return start;
 	}
 
-	public void setStart(BlockDirective start) {
+	public void setStart(BlockDirective start) throws ParseException {
 		if (this.start != null)
-			throw new IllegalStateException("Can not modify start.");
+			throw new ParseException("Can not modify start.", getOffset());
 		this.start = start;
 	}
 

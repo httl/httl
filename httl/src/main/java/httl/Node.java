@@ -17,6 +17,7 @@ package httl;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 
 /**
  * Node. (API, Prototype, Immutable, ThreadSafe)
@@ -49,5 +50,12 @@ public interface Node {
 	 * @return parent
 	 */
 	Node getParent();
+
+	/**
+	 * Get the template children nodes.
+	 * 
+	 * @return children nodes
+	 */
+	List<Node> getChildren();
 
 }
