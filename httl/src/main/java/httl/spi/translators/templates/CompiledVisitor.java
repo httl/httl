@@ -591,7 +591,6 @@ public class CompiledVisitor extends AstVisitor {
 		return null;
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public boolean visit(ForDirective node) throws IOException, ParseException {
 		String var = node.getName();
@@ -607,7 +606,7 @@ public class CompiledVisitor extends AstVisitor {
 					type = returnClass.getComponentType();
 				} else if (Map.class.isAssignableFrom(returnClass)) {
 					if (returnType instanceof ParameterizedType) {
-						type = new ParameterizedTypeImpl(Map.Entry.class, ((ParameterizedType)type).getActualTypeArguments());
+						type = new ParameterizedTypeImpl(Map.Entry.class, ((ParameterizedType) returnType).getActualTypeArguments());
 					} else {
 						type = Map.Entry.class;
 					}
@@ -1284,9 +1283,14 @@ public class CompiledVisitor extends AstVisitor {
 		
 		Class<?> rightClass = (Class<?>) (rightType instanceof ParameterizedType ? ((ParameterizedType)rightType).getRawType() : rightType);
 		Class<?> leftClass = (Class<?>) (leftType instanceof ParameterizedType ? ((ParameterizedType)leftType).getRawType() : leftType);
+
+		if (leftClass == null)
+			leftClass = Object.class;
 		
 		String name = node.getName();
-		if (node.getLeftParameter() instanceof Operator
+		if ("null".equals(leftCode)) {
+			leftCode = "((" + (leftClass == null ? Object.class.getSimpleName() : leftClass.getClass().getCanonicalName()) + ") " + leftCode + ")";
+		} else if (node.getLeftParameter() instanceof Operator
 				&& ((Operator) node.getLeftParameter()).getPriority() < node.getPriority()) {
 			leftCode = "(" + leftCode + ")";
 		}
@@ -1440,11 +1444,16 @@ public class CompiledVisitor extends AstVisitor {
 								}
 							}
 							Class<?>[] pts = method.getParameterTypes();
-							if (allTypes.length == 2 && allTypes[1].isPrimitive() && pts[1].isAssignableFrom(ClassUtils.getBoxedClass(allTypes[1]))) {
-								allCode = leftCode + ", " + ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
+							if (allTypes.length == 2) {
+								if (allTypes[1] == null) {
+									allCode = leftCode + ", " + "((" + (rightClass == null ? Object.class.getSimpleName() : rightClass.getClass().getCanonicalName()) + ") " + rightCode + ")";
+								} else if (allTypes[1].isPrimitive() && pts[1].isAssignableFrom(ClassUtils.getBoxedClass(allTypes[1]))) {
+									allCode = leftCode + ", " + ClassUtils.class.getName() + ".boxed(" + rightCode + ")";
+								}
 							}
+							
 							if (Modifier.isStatic(method.getModifiers())) {
-								code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, function.getName() + "." + method.getName() + "(" + allCode + ")");
+								code = function.getName() + "." + method.getName() + "(" + allCode + ")";
 							} else {
 								code = "$" + function.getName().replace('.', '_') + "." + method.getName() + "(" + allCode + ")";
 							}

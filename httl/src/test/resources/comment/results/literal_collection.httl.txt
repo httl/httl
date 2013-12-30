@@ -1,4 +1,9 @@
 [a]
 {x=a}
 [a, b, c]
-{z=c, y=b, x=a}
+{x=a, y=b, z=c}
+----
+{a=a}
+[x=a]
+{a=a, b=b, c=c}
+[x=a, y=b, z=c]

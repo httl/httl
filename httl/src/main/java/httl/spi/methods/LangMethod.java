@@ -4,12 +4,14 @@ import httl.util.ClassUtils;
 import httl.util.CollectionUtils;
 import httl.util.MapEntry;
 import httl.util.StringSequence;
+import httl.util.StringUtils;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,27 +79,678 @@ public class LangMethod {
 		return left + right;
 	}
 
+	public static int add(Number left, byte right) {
+		if (left == null)
+			return right;
+		return left.byteValue() + right;
+	}
+
+	public static int add(byte left, Number right) {
+		if (right == null)
+			return left;
+		return left + right.byteValue();
+	}
+
+	public static Object add(String left, byte right) {
+		if (left == null) {
+			if (! StringUtils.isNumber(left))
+				return left + right;
+			else
+				return right;
+		}
+		return Byte.parseByte(left) + right;
+	}
+
+	public static Object add(byte left, String right) {
+		if (right == null) {
+			if (! StringUtils.isNumber(right))
+				return left + right;
+			else
+				return left;
+		}
+		return left + Byte.parseByte(right);
+	}
+
+	public static Object add(Object left, byte right) {
+		if (left == null)
+			return right;
+		if (left instanceof Number)
+			return add((Number) left, right);
+		if (left instanceof String)
+			return add((String) left, right);
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(byte left, Object right) {
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return add(left, (Number) right);
+		if (right instanceof String)
+			return add(left, (String) right);
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
+	public static Integer add(Byte left, Byte right) {
+		if (left == null && right == null) {
+			return null;
+		}
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left + right;
+	}
+
+	public static Integer add(Number left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left.byteValue() + right;
+	}
+
+	public static Integer add(Byte left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left + right.byteValue();
+	}
+
+	public static Object add(Object left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (left instanceof Number)
+			return ((Number) left).byteValue() + right;
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(Byte left, Object right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return left + ((Number) right).byteValue();
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
 	public static int add(short left, short right) {
 		return left + right;
+	}
+
+	public static int add(Number left, short right) {
+		if (left == null)
+			return right;
+		return left.shortValue() + right;
+	}
+
+	public static int add(short left, Number right) {
+		if (right == null)
+			return left;
+		return left + right.shortValue();
+	}
+
+	public static Object add(String left, short right) {
+		if (left == null) {
+			if (! StringUtils.isNumber(left))
+				return left + right;
+			else
+				return right;
+		}
+		return Short.parseShort(left) + right;
+	}
+
+	public static Object add(short left, String right) {
+		if (right == null) {
+			if (! StringUtils.isNumber(right))
+				return left + right;
+			else
+				return left;
+		}
+		return left + Short.parseShort(right);
+	}
+
+	public static Object add(Object left, short right) {
+		if (left == null)
+			return right;
+		if (left instanceof Number)
+			return add((Number) left, right);
+		if (left instanceof String)
+			return add((String) left, right);
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(short left, Object right) {
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return add(left, (Number) right);
+		if (right instanceof String)
+			return add(left, (String) right);
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
+	public static Integer add(Short left, Short right) {
+		if (left == null && right == null) {
+			return null;
+		}
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left + right;
+	}
+
+	public static Integer add(Number left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left.shortValue() + right;
+	}
+
+	public static Integer add(Short left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left + right.shortValue();
+	}
+
+	public static Object add(Object left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (left instanceof Number)
+			return ((Number) left).shortValue() + right;
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(Short left, Object right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return left + ((Number) right).shortValue();
+		return String.valueOf(left) + StringUtils.valueOf(right);
 	}
 
 	public static int add(int left, int right) {
 		return left + right;
 	}
 
+	public static int add(Number left, int right) {
+		if (left == null)
+			return right;
+		return left.intValue() + right;
+	}
+
+	public static int add(int left, Number right) {
+		if (right == null)
+			return left;
+		return left + right.intValue();
+	}
+
+	public static Object add(String left, int right) {
+		if (left == null) {
+			if (! StringUtils.isNumber(left))
+				return left + right;
+			else
+				return right;
+		}
+		return Integer.parseInt(left) + right;
+	}
+
+	public static Object add(int left, String right) {
+		if (right == null) {
+			if (! StringUtils.isNumber(right))
+				return left + right;
+			else
+				return left;
+		}
+		return left + Integer.parseInt(right);
+	}
+
+	public static Object add(Object left, int right) {
+		if (left == null)
+			return right;
+		if (left instanceof Number)
+			return add((Number) left, right);
+		if (left instanceof String)
+			return add((String) left, right);
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(int left, Object right) {
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return add(left, (Number) right);
+		if (right instanceof String)
+			return add(left, (String) right);
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
+	public static Integer add(Integer left, Integer right) {
+		if (left == null && right == null) {
+			return null;
+		}
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left + right;
+	}
+
+	public static Integer add(Number left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.intValue();
+		return left.intValue() + right;
+	}
+
+	public static Integer add(Integer left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left;
+		return left + right.intValue();
+	}
+
+	public static Object add(Object left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (left instanceof Number)
+			return ((Number) left).intValue() + right;
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(Integer left, Object right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return left + ((Number) right).intValue();
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
 	public static long add(long left, long right) {
 		return left + right;
+	}
+
+	public static long add(Number left, long right) {
+		if (left == null)
+			return right;
+		return left.longValue() + right;
+	}
+
+	public static long add(long left, Number right) {
+		if (right == null)
+			return left;
+		return left + right.longValue();
+	}
+
+	public static Object add(String left, long right) {
+		if (left == null) {
+			if (! StringUtils.isNumber(left))
+				return left + right;
+			else
+				return right;
+		}
+		return Long.parseLong(left) + right;
+	}
+
+	public static Object add(long left, String right) {
+		if (right == null) {
+			if (! StringUtils.isNumber(right))
+				return left + right;
+			else
+				return left;
+		}
+		return left + Long.parseLong(right);
+	}
+
+	public static Object add(Object left, long right) {
+		if (left == null)
+			return right;
+		if (left instanceof Number)
+			return add((Number) left, right);
+		if (left instanceof String)
+			return add((String) left, right);
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(long left, Object right) {
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return add(left, (Number) right);
+		if (right instanceof String)
+			return add(left, (String) right);
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
+	public static Long add(Long left, Long right) {
+		if (left == null && right == null) {
+			return null;
+		}
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left + right;
+	}
+
+	public static Long add(Number left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.longValue();
+		return left.longValue() + right;
+	}
+
+	public static Long add(Long left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.longValue();
+		if (right == null)
+			return left;
+		return left + right.longValue();
+	}
+
+	public static Object add(Object left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (left instanceof Number)
+			return ((Number) left).longValue() + right;
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(Long left, Object right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return left + ((Number) right).longValue();
+		return String.valueOf(left) + StringUtils.valueOf(right);
 	}
 
 	public static float add(float left, float right) {
 		return left + right;
 	}
 
+	public static float add(Number left, float right) {
+		if (left == null)
+			return right;
+		return left.floatValue() + right;
+	}
+
+	public static float add(float left, Number right) {
+		if (right == null)
+			return left;
+		return left + right.floatValue();
+	}
+
+	public static Object add(String left, float right) {
+		if (left == null) {
+			if (! StringUtils.isNumber(left))
+				return left + right;
+			else
+				return right;
+		}
+		return Float.parseFloat(left) + right;
+	}
+
+	public static Object add(float left, String right) {
+		if (right == null) {
+			if (! StringUtils.isNumber(right))
+				return left + right;
+			else
+				return left;
+		}
+		return left + Float.parseFloat(right);
+	}
+
+	public static Object add(Object left, float right) {
+		if (left == null)
+			return right;
+		if (left instanceof Number)
+			return add((Number) left, right);
+		if (left instanceof String)
+			return add((String) left, right);
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(float left, Object right) {
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return add(left, (Number) right);
+		if (right instanceof String)
+			return add(left, (String) right);
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
+	public static Float add(Float left, Float right) {
+		if (left == null && right == null) {
+			return null;
+		}
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left + right;
+	}
+
+	public static Float add(Number left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.floatValue();
+		return left.floatValue() + right;
+	}
+
+	public static Float add(Float left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.floatValue();
+		if (right == null)
+			return left;
+		return left + right.floatValue();
+	}
+
+	public static Object add(Object left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (left instanceof Number)
+			return ((Number) left).floatValue() + right;
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(Float left, Object right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return left + ((Number) right).floatValue();
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
 	public static double add(double left, double right) {
 		return left + right;
 	}
 
+	public static double add(Number left, double right) {
+		if (left == null)
+			return right;
+		return left.doubleValue() + right;
+	}
+
+	public static double add(double left, Number right) {
+		if (right == null)
+			return left;
+		return left + right.doubleValue();
+	}
+
+	public static Object add(String left, double right) {
+		if (left == null) {
+			if (! StringUtils.isNumber(left))
+				return left + right;
+			else
+				return right;
+		}
+		return Double.parseDouble(left) + right;
+	}
+
+	public static Object add(double left, String right) {
+		if (right == null) {
+			if (! StringUtils.isNumber(right))
+				return left + right;
+			else
+				return left;
+		}
+		return left + Double.parseDouble(right);
+	}
+
+	public static Object add(Object left, double right) {
+		if (left == null)
+			return right;
+		if (left instanceof Number)
+			return add((Number) left, right);
+		if (left instanceof String)
+			return add((String) left, right);
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(double left, Object right) {
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return add(left, (Number) right);
+		if (right instanceof String)
+			return add(left, (String) right);
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
+	public static Double add(Double left, Double right) {
+		if (left == null && right == null) {
+			return null;
+		}
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left + right;
+	}
+
+	public static Double add(Number left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.doubleValue();
+		return left.doubleValue() + right;
+	}
+
+	public static Double add(Double left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.doubleValue();
+		if (right == null)
+			return left;
+		return left + right.doubleValue();
+	}
+
+	public static Object add(Object left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (left instanceof Number)
+			return ((Number) left).doubleValue() + right;
+		return StringUtils.valueOf(left) + String.valueOf(right);
+	}
+
+	public static Object add(Double left, Object right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		if (right instanceof Number)
+			return left + ((Number) right).doubleValue();
+		return String.valueOf(left) + StringUtils.valueOf(right);
+	}
+
 	public static String add(String left, String right) {
+		if (left == null && right == null) {
+			return null;
+		}
+		if (left == null) {
+			return right;
+		}
+		if (right == null) {
+			return left;
+		}
 		return left + right;
 	}
 
@@ -106,12 +759,12 @@ public class LangMethod {
 			return null;
 		}
 		if (left == null) {
-			return String.valueOf(right);
+			return StringUtils.valueOf(right);
 		}
 		if (right == null) {
-			return String.valueOf(left);
+			return StringUtils.valueOf(left);
 		}
-		return String.valueOf(left) + String.valueOf(right);
+		return StringUtils.valueOf(left) + StringUtils.valueOf(right);
 	}
 
 	public static boolean[] add(boolean[] left, boolean[] right) {
@@ -165,6 +818,7 @@ public class LangMethod {
 		return all;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> List<T> add(List<T> left, T right) {
 		if (right instanceof List) {
 			return _add(left, (List<T>) right);
@@ -186,6 +840,7 @@ public class LangMethod {
 		return all;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> Set<T> add(Set<T> left, T right) {
 		if (right instanceof Set) {
 			return _add(left, (Set<T>) right);
@@ -246,48 +901,1176 @@ public class LangMethod {
 		return left - right;
 	}
 
+	public static int sub(Number left, byte right) {
+		if (left == null)
+			return - right;
+		return left.byteValue() - right;
+	}
+
+	public static int sub(byte left, Number right) {
+		if (right == null)
+			return left;
+		return left - right.byteValue();
+	}
+
+	public static int sub(String left, byte right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		return Byte.parseByte(left) - right;
+	}
+
+	public static int sub(byte left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left - Byte.parseByte(right);
+	}
+
+	public static int sub(Object left, byte right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return - right;
+	}
+
+	public static int sub(byte left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
+	public static Integer sub(Byte left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.intValue();
+		return left - right;
+	}
+
+	public static Integer sub(Number left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.intValue();
+		return left.byteValue() - right;
+	}
+
+	public static Integer sub(Byte left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right.byteValue();
+		if (right == null)
+			return left.intValue();
+		return left - right.byteValue();
+	}
+
+	public static Integer sub(String left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		if (right == null)
+			return Integer.parseInt(left);
+		return Byte.parseByte(left) - right;
+	}
+
+	public static Integer sub(Byte left, String right) {
+		if (left == null && right == null)
+			return null;
+		if (right == null || ! StringUtils.isNumber(right))
+			return left.intValue();
+		if (left == null)
+			return Integer.parseInt(right);
+		return left - Byte.parseByte(right);
+	}
+
+	public static Integer sub(Object left, Byte right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return right == null ? null : - right;
+	}
+
+	public static Integer sub(Byte left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left == null ? null : left.intValue();
+	}
+
 	public static int sub(short left, short right) {
 		return left - right;
+	}
+
+	public static int sub(Number left, short right) {
+		if (left == null)
+			return - right;
+		return left.shortValue() - right;
+	}
+
+	public static int sub(short left, Number right) {
+		if (right == null)
+			return left;
+		return left - right.shortValue();
+	}
+
+	public static int sub(String left, short right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		return Short.parseShort(left) - right;
+	}
+
+	public static int sub(short left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left - Short.parseShort(right);
+	}
+
+	public static int sub(Object left, short right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return - right;
+	}
+
+	public static int sub(short left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
+	public static Integer sub(Short left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.intValue();
+		return left - right;
+	}
+
+	public static Integer sub(Number left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.intValue();
+		return left.shortValue() - right;
+	}
+
+	public static Integer sub(Short left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left - right.shortValue();
+	}
+
+	public static Integer sub(String left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		if (right == null)
+			return Integer.parseInt(left);
+		return Short.parseShort(left) - right;
+	}
+
+	public static Integer sub(Short left, String right) {
+		if (left == null && right == null)
+			return null;
+		if (right == null || ! StringUtils.isNumber(right))
+			return left.intValue();
+		if (left == null)
+			return Integer.parseInt(right);
+		return left - Short.parseShort(right);
+	}
+
+	public static Integer sub(Object left, Short right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return right == null ? null : - right;
+	}
+
+	public static Integer sub(Short left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left == null ? null : left.intValue();
 	}
 
 	public static int sub(int left, int right) {
 		return left - right;
 	}
 
+	public static int sub(Number left, int right) {
+		if (left == null)
+			return - right;
+		return left.intValue() - right;
+	}
+
+	public static int sub(int left, Number right) {
+		if (right == null)
+			return left;
+		return left - right.intValue();
+	}
+
+	public static int sub(String left, int right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		return Integer.parseInt(left) - right;
+	}
+
+	public static int sub(int left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left - Integer.parseInt(right);
+	}
+
+	public static int sub(Object left, int right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return - right;
+	}
+
+	public static int sub(int left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
+	public static Integer sub(Integer left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left;
+		return left - right;
+	}
+
+	public static Integer sub(Number left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.intValue();
+		return left.intValue() - right;
+	}
+
+	public static Integer sub(Integer left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right.intValue();
+		if (right == null)
+			return left;
+		return left - right.intValue();
+	}
+
+	public static Integer sub(String left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		if (right == null)
+			return Integer.parseInt(left);
+		return Integer.parseInt(left) - right;
+	}
+
+	public static Integer sub(Integer left, String right) {
+		if (left == null && right == null)
+			return null;
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		if (left == null)
+			return Integer.parseInt(right);
+		return left - Integer.parseInt(right);
+	}
+
+	public static Integer sub(Object left, Integer right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return right == null ? null : - right;
+	}
+
+	public static Integer sub(Integer left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
 	public static long sub(long left, long right) {
 		return left - right;
+	}
+
+	public static long sub(Number left, long right) {
+		if (left == null)
+			return - right;
+		return left.longValue() - right;
+	}
+
+	public static long sub(long left, Number right) {
+		if (right == null)
+			return left;
+		return left - right.longValue();
+	}
+
+	public static long sub(String left, long right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		return Long.parseLong(left) - right;
+	}
+
+	public static long sub(long left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left - Long.parseLong(right);
+	}
+
+	public static long sub(Object left, long right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return - right;
+	}
+
+	public static long sub(long left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
+	public static Long sub(Long left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left;
+		return left - right;
+	}
+
+	public static Long sub(Number left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.longValue();
+		return left.longValue() - right;
+	}
+
+	public static Long sub(Long left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right.longValue();
+		if (right == null)
+			return left;
+		return left - right.longValue();
+	}
+
+	public static Long sub(String left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		if (right == null)
+			return Long.parseLong(left);
+		return Long.parseLong(left) - right;
+	}
+
+	public static Long sub(Long left, String right) {
+		if (left == null && right == null)
+			return null;
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		if (left == null)
+			return Long.parseLong(right);
+		return left - Long.parseLong(right);
+	}
+
+	public static Long sub(Object left, Long right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return right == null ? null : - right;
+	}
+
+	public static Long sub(Long left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
 	}
 
 	public static float sub(float left, float right) {
 		return left - right;
 	}
 
+	public static float sub(Number left, float right) {
+		if (left == null)
+			return - right;
+		return left.floatValue() - right;
+	}
+
+	public static float sub(float left, Number right) {
+		if (right == null)
+			return left;
+		return left - right.floatValue();
+	}
+
+	public static float sub(String left, float right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		return Float.parseFloat(left) - right;
+	}
+
+	public static float sub(float left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left - Float.parseFloat(right);
+	}
+
+	public static float sub(Object left, float right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return - right;
+	}
+
+	public static float sub(float left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
+	public static Float sub(Float left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left;
+		return left - right;
+	}
+
+	public static Float sub(Number left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.floatValue();
+		return left.floatValue() - right;
+	}
+
+	public static Float sub(Float left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right.floatValue();
+		if (right == null)
+			return left;
+		return left - right.floatValue();
+	}
+
+	public static Float sub(String left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		if (right == null)
+			return Float.parseFloat(left);
+		return Float.parseFloat(left) - right;
+	}
+
+	public static Float sub(Float left, String right) {
+		if (left == null && right == null)
+			return null;
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		if (left == null)
+			return Float.parseFloat(right);
+		return left - Float.parseFloat(right);
+	}
+
+	public static Float sub(Object left, Float right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return right == null ? null : - right;
+	}
+
+	public static Float sub(Float left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
 	public static double sub(double left, double right) {
 		return left - right;
+	}
+
+	public static double sub(Number left, double right) {
+		if (left == null)
+			return - right;
+		return left.doubleValue() - right;
+	}
+
+	public static double sub(double left, Number right) {
+		if (right == null)
+			return left;
+		return left - right.doubleValue();
+	}
+
+	public static double sub(String left, double right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		return Double.parseDouble(left) - right;
+	}
+
+	public static double sub(double left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left - Double.parseDouble(right);
+	}
+
+	public static double sub(Object left, double right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return - right;
+	}
+
+	public static double sub(double left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
+	}
+
+	public static Double sub(Double left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left;
+		return left - right;
+	}
+
+	public static Double sub(Number left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right;
+		if (right == null)
+			return left.doubleValue();
+		return left.doubleValue() - right;
+	}
+
+	public static Double sub(Double left, Number right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return - right.doubleValue();
+		if (right == null)
+			return left;
+		return left - right.doubleValue();
+	}
+
+	public static Double sub(String left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return - right;
+		if (right == null)
+			return Double.parseDouble(left);
+		return Double.parseDouble(left) - right;
+	}
+
+	public static Double sub(Double left, String right) {
+		if (left == null && right == null)
+			return null;
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		if (left == null)
+			return Double.parseDouble(right);
+		return left - Double.parseDouble(right);
+	}
+
+	public static Double sub(Object left, Double right) {
+		if (left instanceof Number)
+			return sub((Number) left, right);
+		if (left instanceof String)
+			return sub((String) left, right);
+		return right == null ? null : - right;
+	}
+
+	public static Double sub(Double left, Object right) {
+		if (right instanceof Number)
+			return sub(left, (Number) right);
+		if (right instanceof String)
+			return sub(left, (String) right);
+		return left;
 	}
 
 	public static int mul(byte left, byte right) {
 		return left * right;
 	}
 
+	public static int mul(Number left, byte right) {
+		if (left == null)
+			return right;
+		return left.byteValue() * right;
+	}
+
+	public static int mul(byte left, Number right) {
+		return mul(right, left);
+	}
+
+	public static int mul(String left, byte right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		return Integer.parseInt(left) * right;
+	}
+
+	public static int mul(byte left, String right) {
+		return mul(right, left);
+	}
+
+	public static int mul(Object left, byte right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static int mul(byte left, Object right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(Byte left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left * right;
+	}
+
+	public static Integer mul(Number left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left.byteValue() * right;
+	}
+
+	public static Integer mul(Byte left, Number right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(String left, Byte right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return right.intValue();
+		if (right == null)
+			return Integer.parseInt(left);
+		return Integer.parseInt(left) * right;
+	}
+
+	public static Integer mul(Byte left, String right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(Object left, Byte right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right == null ? null : right.intValue();
+	}
+
+	public static Integer mul(Byte left, Object right) {
+		return mul(right, left);
+	}
+
 	public static int mul(short left, short right) {
 		return left * right;
+	}
+
+	public static int mul(Number left, short right) {
+		if (left == null)
+			return right;
+		return left.shortValue() * right;
+	}
+
+	public static int mul(short left, Number right) {
+		return mul(right, left);
+	}
+
+	public static int mul(String left, short right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		return Integer.parseInt(left) * right;
+	}
+
+	public static int mul(short left, String right) {
+		return mul(right, left);
+	}
+
+	public static int mul(Object left, short right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static int mul(short left, Object right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(Short left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left * right;
+	}
+
+	public static Integer mul(Number left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right.intValue();
+		if (right == null)
+			return left.intValue();
+		return left.shortValue() * right;
+	}
+
+	public static Integer mul(Short left, Number right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(String left, Short right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return right.intValue();
+		if (right == null)
+			return Integer.parseInt(left);
+		return Integer.parseInt(left) * right;
+	}
+
+	public static Integer mul(Short left, String right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(Object left, Short right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right == null ? null : right.intValue();
+	}
+
+	public static Integer mul(Short left, Object right) {
+		return mul(right, left);
 	}
 
 	public static int mul(int left, int right) {
 		return left * right;
 	}
 
+	public static int mul(Number left, int right) {
+		if (left == null)
+			return right;
+		return left.intValue() * right;
+	}
+
+	public static int mul(int left, Number right) {
+		return mul(right, left);
+	}
+
+	public static int mul(String left, int right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		return Integer.parseInt(left) * right;
+	}
+
+	public static int mul(int left, String right) {
+		return mul(right, left);
+	}
+
+	public static int mul(Object left, int right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static int mul(int left, Object right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(Integer left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left * right;
+	}
+
+	public static Integer mul(Number left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.intValue();
+		return left.intValue() * right;
+	}
+
+	public static Integer mul(Integer left, Number right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(String left, Integer right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		if (right == null)
+			return Integer.parseInt(left);
+		return Integer.parseInt(left) * right;
+	}
+
+	public static Integer mul(Integer left, String right) {
+		return mul(right, left);
+	}
+
+	public static Integer mul(Object left, Integer right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static Integer mul(Integer left, Object right) {
+		return mul(right, left);
+	}
+
 	public static long mul(long left, long right) {
 		return left * right;
+	}
+
+	public static long mul(Number left, long right) {
+		if (left == null)
+			return right;
+		return left.longValue() * right;
+	}
+
+	public static long mul(long left, Number right) {
+		return mul(right, left);
+	}
+
+	public static long mul(String left, long right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		return Long.parseLong(left) * right;
+	}
+
+	public static long mul(long left, String right) {
+		return mul(right, left);
+	}
+
+	public static long mul(Object left, long right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static long mul(long left, Object right) {
+		return mul(right, left);
+	}
+
+	public static Long mul(Long left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left * right;
+	}
+
+	public static Long mul(Number left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.longValue();
+		return left.longValue() * right;
+	}
+
+	public static Long mul(Long left, Number right) {
+		return mul(right, left);
+	}
+
+	public static Long mul(String left, Long right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		if (right == null)
+			return Long.parseLong(left);
+		return Long.parseLong(left) * right;
+	}
+
+	public static Long mul(Long left, String right) {
+		return mul(right, left);
+	}
+
+	public static Long mul(Object left, Long right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static Long mul(Long left, Object right) {
+		return mul(right, left);
 	}
 
 	public static float mul(float left, float right) {
 		return left * right;
 	}
 
+	public static float mul(Number left, float right) {
+		if (left == null)
+			return right;
+		return left.floatValue() * right;
+	}
+
+	public static float mul(float left, Number right) {
+		return mul(right, left);
+	}
+
+	public static float mul(String left, float right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		return Float.parseFloat(left) * right;
+	}
+
+	public static float mul(float left, String right) {
+		return mul(right, left);
+	}
+
+	public static float mul(Object left, float right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static float mul(float left, Object right) {
+		return mul(right, left);
+	}
+
+	public static Float mul(Float left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left * right;
+	}
+
+	public static Float mul(Number left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.floatValue();
+		return left.floatValue() * right;
+	}
+
+	public static Float mul(Float left, Number right) {
+		return mul(right, left);
+	}
+
+	public static Float mul(String left, Float right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		if (right == null)
+			return Float.parseFloat(left);
+		return Float.parseFloat(left) * right;
+	}
+
+	public static Float mul(Float left, String right) {
+		return mul(right, left);
+	}
+
+	public static Float mul(Object left, Float right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static Float mul(Float left, Object right) {
+		return mul(right, left);
+	}
+
 	public static double mul(double left, double right) {
 		return left * right;
+	}
+
+	public static double mul(Number left, double right) {
+		if (left == null)
+			return right;
+		return left.doubleValue() * right;
+	}
+
+	public static double mul(double left, Number right) {
+		return mul(right, left);
+	}
+
+	public static double mul(String left, double right) {
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		return Double.parseDouble(left) * right;
+	}
+
+	public static double mul(double left, String right) {
+		return mul(right, left);
+	}
+
+	public static double mul(Object left, double right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static double mul(double left, Object right) {
+		return mul(right, left);
+	}
+
+	public static Double mul(Double left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left;
+		return left * right;
+	}
+
+	public static Double mul(Number left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null)
+			return right;
+		if (right == null)
+			return left.doubleValue();
+		return left.doubleValue() * right;
+	}
+
+	public static Double mul(Double left, Number right) {
+		return mul(right, left);
+	}
+
+	public static Double mul(String left, Double right) {
+		if (left == null && right == null)
+			return null;
+		if (left == null || ! StringUtils.isNumber(left))
+			return right;
+		if (right == null)
+			return Double.parseDouble(left);
+		return Double.parseDouble(left) * right;
+	}
+
+	public static Double mul(Double left, String right) {
+		return mul(right, left);
+	}
+
+	public static Double mul(Object left, Double right) {
+		if (left instanceof Number)
+			return mul((Number) left, right);
+		if (left instanceof String)
+			return mul((String) left, right);
+		return right;
+	}
+
+	public static Double mul(Double left, Object right) {
+		return mul(right, left);
 	}
 
 	public static int div(byte left, byte right) {
@@ -346,28 +2129,500 @@ public class LangMethod {
 		return left == right;
 	}
 
+	public static boolean eq(char left, Character right) {
+		return right != null && left == right.charValue();
+	}
+
+	public static boolean eq(Character left, char right) {
+		return left != null && left.charValue() == right;
+	}
+
+	public static boolean eq(char left, String right) {
+		return right != null && right.length() == 1 && left == right.charAt(0);
+	}
+
+	public static boolean eq(String left, char right) {
+		return left != null && left.length() == 1 && left.charAt(0) == right;
+	}
+
+	public static boolean eq(char left, Object right) {
+		if (right instanceof Character)
+			return eq(left, (Character) right);
+		if (right instanceof String)
+			return eq(left, (String) right);
+		return false;
+	}
+
+	public static boolean eq(Object left, char right) {
+		if (left instanceof Character)
+			return eq((Character) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
 	public static boolean eq(byte left, byte right) {
 		return left == right;
+	}
+
+	public static boolean eq(Number left, byte right) {
+		return left != null && left.byteValue() == right;
+	}
+
+	public static boolean eq(byte left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(String left, byte right) {
+		return StringUtils.isNumber(left) && eq(Byte.parseByte(left), right);
+	}
+
+	public static boolean eq(byte left, String right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, byte right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(byte left, Object right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Byte left, Byte right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.equals(right);
+	}
+
+	public static boolean eq(Number left, Byte right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.byteValue() == right.byteValue();
+	}
+
+	public static boolean eq(Byte left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Byte left, String right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return StringUtils.isNumber(right) && eq(left.byteValue(), Byte.parseByte(right));
+	}
+
+	public static boolean eq(String left, Byte right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, Byte right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(Byte left, Object right) {
+		return eq(right, left);
 	}
 
 	public static boolean eq(short left, short right) {
 		return left == right;
 	}
 
+	public static boolean eq(Number left, short right) {
+		return left != null && left.shortValue() == right;
+	}
+
+	public static boolean eq(short left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(String left, short right) {
+		return StringUtils.isNumber(left) && eq(Short.parseShort(left), right);
+	}
+
+	public static boolean eq(short left, String right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, short right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(short left, Object right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Short left, Short right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.equals(right);
+	}
+
+	public static boolean eq(Number left, Short right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.shortValue() == right.shortValue();
+	}
+
+	public static boolean eq(Short left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Short left, String right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return StringUtils.isNumber(right) && eq(left.shortValue(), Short.parseShort(right));
+	}
+
+	public static boolean eq(String left, Short right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, Short right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(Short left, Object right) {
+		return eq(right, left);
+	}
+
 	public static boolean eq(int left, int right) {
 		return left == right;
+	}
+
+	public static boolean eq(Number left, int right) {
+		return left != null && left.intValue() == right;
+	}
+
+	public static boolean eq(int left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(String left, int right) {
+		return StringUtils.isNumber(left) && eq(Integer.parseInt(left), right);
+	}
+
+	public static boolean eq(int left, String right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, int right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(int left, Object right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Integer left, Integer right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.equals(right);
+	}
+
+	public static boolean eq(Number left, Integer right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.intValue() == right.intValue();
+	}
+
+	public static boolean eq(Integer left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Integer left, String right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return StringUtils.isNumber(right) && eq(left.intValue(), Integer.parseInt(right));
+	}
+
+	public static boolean eq(String left, Integer right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, Integer right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(Integer left, Object right) {
+		return eq(right, left);
 	}
 
 	public static boolean eq(long left, long right) {
 		return left == right;
 	}
 
+	public static boolean eq(Number left, long right) {
+		return left != null && left.longValue() == right;
+	}
+
+	public static boolean eq(long left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(String left, long right) {
+		return StringUtils.isNumber(left) && eq(Long.parseLong(left), right);
+	}
+
+	public static boolean eq(long left, String right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, long right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(long left, Object right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Long left, Long right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.equals(right);
+	}
+
+	public static boolean eq(Number left, Long right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.longValue() == right.longValue();
+	}
+
+	public static boolean eq(Long left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Long left, String right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null)
+			return false;
+		if (right == null)
+			return false;
+		return StringUtils.isNumber(right) && eq(left.longValue(), Long.parseLong(right));
+	}
+
+	public static boolean eq(String left, Long right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, Long right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(Long left, Object right) {
+		return eq(right, left);
+	}
+
 	public static boolean eq(float left, float right) {
 		return left == right;
 	}
 
+	public static boolean eq(Number left, float right) {
+		return left != null && left.floatValue() == right;
+	}
+
+	public static boolean eq(float left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(String left, float right) {
+		return StringUtils.isNumber(left) && eq(Float.parseFloat(left), right);
+	}
+
+	public static boolean eq(float left, String right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, float right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(float left, Object right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Float left, Float right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.equals(right);
+	}
+
+	public static boolean eq(Number left, Float right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.floatValue() == right.floatValue();
+	}
+
+	public static boolean eq(Float left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Float left, String right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null)
+			return false;
+		if (right == null)
+			return false;
+		return StringUtils.isNumber(right) && eq(left.floatValue(), Float.parseFloat(right));
+	}
+
+	public static boolean eq(String left, Float right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, Float right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(Float left, Object right) {
+		return eq(right, left);
+	}
+
 	public static boolean eq(double left, double right) {
 		return left == right;
+	}
+
+	public static boolean eq(Number left, double right) {
+		return left != null && left.doubleValue() == right;
+	}
+
+	public static boolean eq(double left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(String left, double right) {
+		return StringUtils.isNumber(left) && eq(Double.parseDouble(left), right);
+	}
+
+	public static boolean eq(double left, String right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, double right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(double left, Object right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Double left, Double right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null || right == null)
+			return false;
+		return left.equals(right);
+	}
+
+	public static boolean eq(Number left, Double right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null)
+			return false;
+		if (right == null)
+			return false;
+		return left.doubleValue() == right.doubleValue();
+	}
+
+	public static boolean eq(Double left, Number right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Double left, String right) {
+		if (left == null && right == null)
+			return true;
+		if (left == null)
+			return false;
+		if (right == null)
+			return false;
+		return StringUtils.isNumber(right) && eq(left.doubleValue(), Double.parseDouble(right));
+	}
+
+	public static boolean eq(String left, Double right) {
+		return eq(right, left);
+	}
+
+	public static boolean eq(Object left, Double right) {
+		if (left instanceof Number)
+			return eq((Number) left, right);
+		if (left instanceof String)
+			return eq((String) left, right);
+		return false;
+	}
+
+	public static boolean eq(Double left, Object right) {
+		return eq(right, left);
 	}
 
 	public static boolean eq(Object left, Object right) {
@@ -376,11 +2631,6 @@ public class LangMethod {
 		}
 		if (left == null || right == null) {
 			return false;
-		}
-		if (left instanceof String) {
-			right = right.toString();
-		} else if (right instanceof String) {
-			left = left.toString();
 		}
 		return left.equals(right);
 	}
@@ -394,31 +2644,343 @@ public class LangMethod {
 	}
 
 	public static boolean ne(byte left, byte right) {
-		return left != right;
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, byte right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(byte left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, byte right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(byte left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, byte right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(byte left, Object right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Byte left, Byte right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, Byte right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Byte left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Byte left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, Byte right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, Byte right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Byte left, Object right) {
+		return ! eq(left, right);
 	}
 
 	public static boolean ne(short left, short right) {
-		return left != right;
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, short right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(short left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, short right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(short left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, short right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(short left, Object right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Short left, Short right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, Short right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Short left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Short left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, Short right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, Short right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Short left, Object right) {
+		return ! eq(left, right);
 	}
 
 	public static boolean ne(int left, int right) {
-		return left != right;
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, int right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(int left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, int right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(int left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, int right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(int left, Object right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Integer left, Integer right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, Integer right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Integer left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Integer left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, Integer right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, Integer right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Integer left, Object right) {
+		return ! eq(left, right);
 	}
 
 	public static boolean ne(long left, long right) {
-		return left != right;
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, long right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(long left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, long right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(long left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, long right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(long left, Object right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Long left, Long right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, Long right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Long left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Long left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, Long right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, Long right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Long left, Object right) {
+		return ! eq(left, right);
 	}
 
 	public static boolean ne(float left, float right) {
-		return left != right;
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, float right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(float left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, float right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(float left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, float right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(float left, Object right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Float left, Float right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, Float right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Float left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Float left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, Float right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, Float right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Float left, Object right) {
+		return ! eq(left, right);
 	}
 
 	public static boolean ne(double left, double right) {
-		return left != right;
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, double right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(double left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, double right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(double left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, double right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(double left, Object right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Double left, Double right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Number left, Double right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Double left, Number right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Double left, String right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(String left, Double right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Object left, Double right) {
+		return ! eq(left, right);
+	}
+
+	public static boolean ne(Double left, Object right) {
+		return ! eq(left, right);
 	}
 
 	public static boolean ne(Object left, Object right) {
-		return left == null ? right != null : ! left.equals(right);
+		return ! eq(left, right);
 	}
 
 	public static boolean gt(char left, char right) {
@@ -731,17 +3293,53 @@ public class LangMethod {
 		array[1] = right;
 		return array;
 	}
-
-	public static Object[] list(Object left) {
+	
+	public static List<Object> list(Object[] left) {
 		if (left == null)
 			return null;
-		return new Object[] { left };
+		return Arrays.asList((Object[]) left);
 	}
 
-	public static <K, V> Map<K, V> list(Entry<K, V> left) {
+	public static List<Object> list(Object left) {
 		if (left == null)
 			return null;
-		Map<K, V> map = new HashMap<K, V>();
+		if (left instanceof Object[]) {
+			return list(left);
+		}
+		return Arrays.asList(new Object[] { left });
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<Object, Object> map(Object[] left) {
+		if (left == null)
+			return null;
+		Map<Object, Object> map = new LinkedHashMap<Object, Object>();
+		for (Object item : (Object[]) left) {
+			if (item instanceof Entry) {
+				Entry<Object, Object> entry = (Entry<Object, Object>) item;
+				map.put(entry.getKey(), entry.getValue());
+			} else {
+				map.put(item, item);
+			}
+		}
+		return map;
+	}
+
+	public static Map<Object, Object> map(Object left) {
+		if (left == null)
+			return null;
+		if (left instanceof Object[]) {
+			return map(left);
+		}
+		Map<Object, Object> map = new LinkedHashMap<Object, Object>();
+		map.put(left, left);
+		return map;
+	}
+
+	public static <K, V> Map<K, V> map(Entry<K, V> left) {
+		if (left == null)
+			return null;
+		Map<K, V> map = new LinkedHashMap<K, V>();
 		map.put(left.getKey(), left.getValue());
 		return map;
 	}

@@ -131,7 +131,7 @@ public class ExpressionParser implements Parser {
 	
 	private static final Set<String> BINARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "*", "/", "%", "==", "!=", ">", ">=", "<", "<=", "gt", "ge", "lt", "le", "&&", "||", "&", "|", "^", ">>", "<<", ">>>", ",", "?", ":", "instanceof", "is", "[", ".."}));
 	
-	private static final Set<String> UNARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "!", "~", "new", "["}));
+	private static final Set<String> UNARY_OPERATORS = new HashSet<String>(Arrays.asList(new String[]{"+", "-", "!", "~", "new", "[", "{"}));
 
 	private static final Pattern BLANK_PATTERN = Pattern.compile("^(\\s+)");
 	
@@ -500,6 +500,9 @@ public class ExpressionParser implements Parser {
 			} else if ("]".equals(msg)) {
 				while (popOperator(parameterStack, operatorStack, operatorTokens, offset) != Bracket.SQUARE);
 				beforeOperator = false;
+			} else if ("}".equals(msg)) {
+				while (popOperator(parameterStack, operatorStack, operatorTokens, offset) != Bracket.BRACE);
+				beforeOperator = false;
 			} else {
 				if (StringUtils.isFunction(msg)) {
 					String method = msg.substring(1);
@@ -547,6 +550,8 @@ public class ExpressionParser implements Parser {
 				}
 				if ("[".equals(msg)) {
 					operatorStack.push(Bracket.SQUARE);
+				} else if ("{".equals(msg)) {
+					operatorStack.push(Bracket.BRACE);
 				}
 				beforeOperator = true;
 				// 给无参函数自动补上null参数
@@ -607,6 +612,8 @@ public class ExpressionParser implements Parser {
 		public static final Bracket ROUND = new Bracket("(");
 		
 		public static final Bracket SQUARE = new Bracket("[");
+
+		public static final Bracket BRACE = new Bracket("{");
 
 		private Bracket(String name) {
 			super(name, Integer.MAX_VALUE, 0);

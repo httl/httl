@@ -27,3 +27,9 @@ EEE
 #if((h + i) == g)
 FFF
 #end
+#if(g == null)
+GGG
+#end
+#if(null == g)
+HHH
+#end

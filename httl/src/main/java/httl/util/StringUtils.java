@@ -1064,7 +1064,7 @@ public class StringUtils {
 				if (StringUtils.isNotEmpty(method)) {
 					code = "(" + code + ") != null && (" + code + ")." + method + " > 0";
 				} else {
-					code = "(" + code + ") != null";
+					code = ClassUtils.class.getCanonicalName() + ".isTrue(" + code + ")";
 				}
 			}
 		}
