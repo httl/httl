@@ -2074,51 +2074,1143 @@ public class LangMethod {
 	}
 
 	public static int div(byte left, byte right) {
+		if (right == 0)
+			return 0;
 		return left / right;
+	}
+
+	public static int div(Number left, byte right) {
+		if (left == null || right == 0)
+			return right;
+		return left.byteValue() / right;
+	}
+
+	public static int div(byte left, Number right) {
+		if (right == null || right.byteValue() == 0)
+			return left;
+		return left / right.byteValue();
+	}
+
+	public static int div(String left, byte right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0)
+			return 0;
+		return Integer.parseInt(left) / right;
+	}
+
+	public static int div(byte left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left / Integer.parseInt(right);
+	}
+
+	public static int div(Object left, byte right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0;
+	}
+
+	public static int div(byte left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0;
+	}
+
+	public static Integer div(Byte left, Byte right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return left / right;
+	}
+
+	public static Integer div(Number left, Byte right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return left.byteValue() / right;
+	}
+
+	public static Integer div(Byte left, Number right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return left / right.byteValue();
+	}
+
+	public static Integer div(String left, Byte right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return Integer.parseInt(left) / right;
+	}
+
+	public static Integer div(Byte left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0;
+		int value = Integer.parseInt(right);
+		if (value == 0)
+			return 0;
+		return left / value;
+	}
+
+	public static Integer div(Object left, Byte right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0;
+	}
+
+	public static Integer div(Byte left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0;
 	}
 
 	public static int div(short left, short right) {
+		if (right == 0)
+			return 0;
 		return left / right;
+	}
+
+	public static int div(Number left, short right) {
+		if (left == null || right == 0)
+			return right;
+		return left.shortValue() / right;
+	}
+
+	public static int div(short left, Number right) {
+		if (right == null || right.shortValue() == 0)
+			return left;
+		return left / right.shortValue();
+	}
+
+	public static int div(String left, short right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0)
+			return 0;
+		return Integer.parseInt(left) / right;
+	}
+
+	public static int div(short left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left / Integer.parseInt(right);
+	}
+
+	public static int div(Object left, short right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0;
+	}
+
+	public static int div(short left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0;
+	}
+
+	public static Integer div(Short left, Short right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return left / right;
+	}
+
+	public static Integer div(Number left, Short right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return left.shortValue() / right;
+	}
+
+	public static Integer div(Short left, Number right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return left / right.shortValue();
+	}
+
+	public static Integer div(String left, Short right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return Integer.parseInt(left) / right;
+	}
+
+	public static Integer div(Short left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0;
+		int value = Integer.parseInt(right);
+		if (value == 0)
+			return 0;
+		return left / value;
+	}
+
+	public static Integer div(Object left, Short right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0;
+	}
+
+	public static Integer div(Short left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0;
 	}
 
 	public static int div(int left, int right) {
+		if (right == 0)
+			return 0;
 		return left / right;
+	}
+
+	public static int div(Number left, int right) {
+		if (left == null || right == 0)
+			return right;
+		return left.intValue() / right;
+	}
+
+	public static int div(int left, Number right) {
+		if (right == null || right.intValue() == 0)
+			return left;
+		return left / right.intValue();
+	}
+
+	public static int div(String left, int right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0)
+			return 0;
+		return Integer.parseInt(left) / right;
+	}
+
+	public static int div(int left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left / Integer.parseInt(right);
+	}
+
+	public static int div(Object left, int right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0;
+	}
+
+	public static int div(int left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0;
+	}
+
+	public static Integer div(Integer left, Integer right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return left / right;
+	}
+
+	public static Integer div(Number left, Integer right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return left.intValue() / right;
+	}
+
+	public static Integer div(Integer left, Number right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return left / right.intValue();
+	}
+
+	public static Integer div(String left, Integer right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return Integer.parseInt(left) / right;
+	}
+
+	public static Integer div(Integer left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0;
+		int value = Integer.parseInt(right);
+		if (value == 0)
+			return 0;
+		return left / value;
+	}
+
+	public static Integer div(Object left, Integer right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0;
+	}
+
+	public static Integer div(Integer left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0;
 	}
 
 	public static long div(long left, long right) {
+		if (right == 0L)
+			return 0L;
 		return left / right;
+	}
+
+	public static long div(Number left, long right) {
+		if (left == null || right == 0L)
+			return right;
+		return left.longValue() / right;
+	}
+
+	public static long div(long left, Number right) {
+		if (right == null || right.longValue() == 0L)
+			return left;
+		return left / right.longValue();
+	}
+
+	public static long div(String left, long right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0L)
+			return 0L;
+		return Long.parseLong(left) / right;
+	}
+
+	public static long div(long left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left / Long.parseLong(right);
+	}
+
+	public static long div(Object left, long right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0L;
+	}
+
+	public static long div(long left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0L;
+	}
+
+	public static Long div(Long left, Long right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return left / right;
+	}
+
+	public static Long div(Number left, Long right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return left.longValue() / right;
+	}
+
+	public static Long div(Long left, Number right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return left / right.longValue();
+	}
+
+	public static Long div(String left, Long right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return Long.parseLong(left) / right;
+	}
+
+	public static Long div(Long left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0L;
+		long value = Long.parseLong(right);
+		if (value == 0L)
+			return 0L;
+		return left / value;
+	}
+
+	public static Long div(Object left, Long right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0L;
+	}
+
+	public static Long div(Long left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0L;
 	}
 
 	public static float div(float left, float right) {
+		if (right == 0F)
+			return 0F;
 		return left / right;
+	}
+
+	public static float div(Number left, float right) {
+		if (left == null || right == 0F)
+			return right;
+		return left.floatValue() / right;
+	}
+
+	public static float div(float left, Number right) {
+		if (right == null || right.floatValue() == 0F)
+			return left;
+		return left / right.floatValue();
+	}
+
+	public static float div(String left, float right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0F)
+			return 0F;
+		return Float.parseFloat(left) / right;
+	}
+
+	public static float div(float left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left / Float.parseFloat(right);
+	}
+
+	public static float div(Object left, float right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0F;
+	}
+
+	public static float div(float left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0F;
+	}
+
+	public static Float div(Float left, Float right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
+		return left / right;
+	}
+
+	public static Float div(Number left, Float right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
+		return left.floatValue() / right;
+	}
+
+	public static Float div(Float left, Number right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
+		return left / right.floatValue();
+	}
+
+	public static Float div(String left, Float right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
+		return Float.parseFloat(left) / right;
+	}
+
+	public static Float div(Float left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0F;
+		float value = Float.parseFloat(right);
+		if (value == 0F)
+			return 0F;
+		return left / value;
+	}
+
+	public static Float div(Object left, Float right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0F;
+	}
+
+	public static Float div(Float left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0F;
 	}
 
 	public static double div(double left, double right) {
+		if (right == 0D)
+			return 0D;
 		return left / right;
 	}
 
+	public static double div(Number left, double right) {
+		if (left == null || right == 0D)
+			return right;
+		return left.doubleValue() / right;
+	}
+
+	public static double div(double left, Number right) {
+		if (right == null || right.doubleValue() == 0D)
+			return left;
+		return left / right.doubleValue();
+	}
+
+	public static double div(String left, double right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0D)
+			return 0D;
+		return Double.parseDouble(left) / right;
+	}
+
+	public static double div(double left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left / Double.parseDouble(right);
+	}
+
+	public static double div(Object left, double right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0D;
+	}
+
+	public static double div(double left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0D;
+	}
+
+	public static Double div(Double left, Double right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return left / right;
+	}
+
+	public static Double div(Number left, Double right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return left.doubleValue() / right;
+	}
+
+	public static Double div(Double left, Number right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return left / right.doubleValue();
+	}
+
+	public static Double div(String left, Double right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return Double.parseDouble(left) / right;
+	}
+
+	public static Double div(Double left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0D;
+		double value = Double.parseDouble(right);
+		if (value == 0D)
+			return 0D;
+		return left / value;
+	}
+
+	public static Double div(Object left, Double right) {
+		if (left instanceof Number)
+			return div((Number) left, right);
+		if (left instanceof String)
+			return div((String) left, right);
+		return 0D;
+	}
+
+	public static Double div(Double left, Object right) {
+		if (right instanceof Number)
+			return div(left, (Number) right);
+		if (right instanceof String)
+			return div(left, (String) right);
+		return 0D;
+	}
+
 	public static int mod(byte left, byte right) {
+		if (right == 0)
+			return 0;
 		return left % right;
+	}
+
+	public static int mod(Number left, byte right) {
+		if (left == null || right == 0)
+			return right;
+		return left.byteValue() % right;
+	}
+
+	public static int mod(byte left, Number right) {
+		if (right == null || right.byteValue() == 0)
+			return left;
+		return left % right.byteValue();
+	}
+
+	public static int mod(String left, byte right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0)
+			return 0;
+		return Integer.parseInt(left) % right;
+	}
+
+	public static int mod(byte left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left % Integer.parseInt(right);
+	}
+
+	public static int mod(Object left, byte right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0;
+	}
+
+	public static int mod(byte left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0;
+	}
+
+	public static Integer mod(Byte left, Byte right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return left % right;
+	}
+
+	public static Integer mod(Number left, Byte right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return left.byteValue() % right;
+	}
+
+	public static Integer mod(Byte left, Number right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return left % right.byteValue();
+	}
+
+	public static Integer mod(String left, Byte right) {
+		if (left == null || right == null || right.byteValue() == 0)
+			return 0;
+		return Integer.parseInt(left) % right;
+	}
+
+	public static Integer mod(Byte left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0;
+		int value = Integer.parseInt(right);
+		if (value == 0)
+			return 0;
+		return left % value;
+	}
+
+	public static Integer mod(Object left, Byte right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0;
+	}
+
+	public static Integer mod(Byte left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0;
 	}
 
 	public static int mod(short left, short right) {
+		if (right == 0)
+			return 0;
 		return left % right;
+	}
+
+	public static int mod(Number left, short right) {
+		if (left == null || right == 0)
+			return right;
+		return left.shortValue() % right;
+	}
+
+	public static int mod(short left, Number right) {
+		if (right == null || right.shortValue() == 0)
+			return left;
+		return left % right.shortValue();
+	}
+
+	public static int mod(String left, short right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0)
+			return 0;
+		return Integer.parseInt(left) % right;
+	}
+
+	public static int mod(short left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left % Integer.parseInt(right);
+	}
+
+	public static int mod(Object left, short right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0;
+	}
+
+	public static int mod(short left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0;
+	}
+
+	public static Integer mod(Short left, Short right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return left % right;
+	}
+
+	public static Integer mod(Number left, Short right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return left.shortValue() % right;
+	}
+
+	public static Integer mod(Short left, Number right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return left % right.shortValue();
+	}
+
+	public static Integer mod(String left, Short right) {
+		if (left == null || right == null || right.shortValue() == 0)
+			return 0;
+		return Integer.parseInt(left) % right;
+	}
+
+	public static Integer mod(Short left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0;
+		int value = Integer.parseInt(right);
+		if (value == 0)
+			return 0;
+		return left % value;
+	}
+
+	public static Integer mod(Object left, Short right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0;
+	}
+
+	public static Integer mod(Short left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0;
 	}
 
 	public static int mod(int left, int right) {
+		if (right == 0)
+			return 0;
 		return left % right;
+	}
+
+	public static int mod(Number left, int right) {
+		if (left == null || right == 0)
+			return right;
+		return left.intValue() % right;
+	}
+
+	public static int mod(int left, Number right) {
+		if (right == null || right.intValue() == 0)
+			return left;
+		return left % right.intValue();
+	}
+
+	public static int mod(String left, int right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0)
+			return 0;
+		return Integer.parseInt(left) % right;
+	}
+
+	public static int mod(int left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left % Integer.parseInt(right);
+	}
+
+	public static int mod(Object left, int right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0;
+	}
+
+	public static int mod(int left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0;
+	}
+
+	public static Integer mod(Integer left, Integer right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return left % right;
+	}
+
+	public static Integer mod(Number left, Integer right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return left.intValue() % right;
+	}
+
+	public static Integer mod(Integer left, Number right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return left % right.intValue();
+	}
+
+	public static Integer mod(String left, Integer right) {
+		if (left == null || right == null || right.intValue() == 0)
+			return 0;
+		return Integer.parseInt(left) % right;
+	}
+
+	public static Integer mod(Integer left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0;
+		int value = Integer.parseInt(right);
+		if (value == 0)
+			return 0;
+		return left % value;
+	}
+
+	public static Integer mod(Object left, Integer right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0;
+	}
+
+	public static Integer mod(Integer left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0;
 	}
 
 	public static long mod(long left, long right) {
+		if (right == 0L)
+			return 0L;
 		return left % right;
+	}
+
+	public static long mod(Number left, long right) {
+		if (left == null || right == 0L)
+			return right;
+		return left.longValue() % right;
+	}
+
+	public static long mod(long left, Number right) {
+		if (right == null || right.longValue() == 0L)
+			return left;
+		return left % right.longValue();
+	}
+
+	public static long mod(String left, long right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0L)
+			return 0L;
+		return Long.parseLong(left) % right;
+	}
+
+	public static long mod(long left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left % Long.parseLong(right);
+	}
+
+	public static long mod(Object left, long right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0L;
+	}
+
+	public static long mod(long left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0L;
+	}
+
+	public static Long mod(Long left, Long right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return left % right;
+	}
+
+	public static Long mod(Number left, Long right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return left.longValue() % right;
+	}
+
+	public static Long mod(Long left, Number right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return left % right.longValue();
+	}
+
+	public static Long mod(String left, Long right) {
+		if (left == null || right == null || right.longValue() == 0L)
+			return 0L;
+		return Long.parseLong(left) % right;
+	}
+
+	public static Long mod(Long left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0L;
+		long value = Long.parseLong(right);
+		if (value == 0L)
+			return 0L;
+		return left % value;
+	}
+
+	public static Long mod(Object left, Long right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0L;
+	}
+
+	public static Long mod(Long left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0L;
 	}
 
 	public static float mod(float left, float right) {
+		if (right == 0F)
+			return 0F;
 		return left % right;
 	}
 
-	public static double mod(double left, double right) {
+	public static float mod(Number left, float right) {
+		if (left == null || right == 0F)
+			return right;
+		return left.floatValue() % right;
+	}
+
+	public static float mod(float left, Number right) {
+		if (right == null || right.floatValue() == 0F)
+			return left;
+		return left % right.floatValue();
+	}
+
+	public static float mod(String left, float right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0F)
+			return 0F;
+		return Float.parseFloat(left) % right;
+	}
+
+	public static float mod(float left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left % Float.parseFloat(right);
+	}
+
+	public static float mod(Object left, float right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0F;
+	}
+
+	public static float mod(float left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0F;
+	}
+
+	public static Float mod(Float left, Float right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
 		return left % right;
+	}
+
+	public static Float mod(Number left, Float right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
+		return left.floatValue() % right;
+	}
+
+	public static Float mod(Float left, Number right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
+		return left % right.floatValue();
+	}
+
+	public static Float mod(String left, Float right) {
+		if (left == null || right == null || right.floatValue() == 0F)
+			return 0F;
+		return Float.parseFloat(left) % right;
+	}
+
+	public static Float mod(Float left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0F;
+		float value = Float.parseFloat(right);
+		if (value == 0F)
+			return 0F;
+		return left % value;
+	}
+
+	public static Float mod(Object left, Float right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0F;
+	}
+
+	public static Float mod(Float left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0F;
+	}
+
+	public static double mod(double left, double right) {
+		if (right == 0D)
+			return 0D;
+		return left % right;
+	}
+
+	public static double mod(Number left, double right) {
+		if (left == null || right == 0D)
+			return right;
+		return left.doubleValue() % right;
+	}
+
+	public static double mod(double left, Number right) {
+		if (right == null || right.doubleValue() == 0D)
+			return left;
+		return left % right.doubleValue();
+	}
+
+	public static double mod(String left, double right) {
+		if (left == null || ! StringUtils.isNumber(left) || right == 0D)
+			return 0D;
+		return Double.parseDouble(left) % right;
+	}
+
+	public static double mod(double left, String right) {
+		if (right == null || ! StringUtils.isNumber(right))
+			return left;
+		return left % Double.parseDouble(right);
+	}
+
+	public static double mod(Object left, double right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0D;
+	}
+
+	public static double mod(double left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0D;
+	}
+
+	public static Double mod(Double left, Double right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return left % right;
+	}
+
+	public static Double mod(Number left, Double right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return left.doubleValue() % right;
+	}
+
+	public static Double mod(Double left, Number right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return left % right.doubleValue();
+	}
+
+	public static Double mod(String left, Double right) {
+		if (left == null || right == null || right.doubleValue() == 0D)
+			return 0D;
+		return Double.parseDouble(left) % right;
+	}
+
+	public static Double mod(Double left, String right) {
+		if (left == null || right == null || ! StringUtils.isNumber(right))
+			return 0D;
+		double value = Double.parseDouble(right);
+		if (value == 0D)
+			return 0D;
+		return left % value;
+	}
+
+	public static Double mod(Object left, Double right) {
+		if (left instanceof Number)
+			return mod((Number) left, right);
+		if (left instanceof String)
+			return mod((String) left, right);
+		return 0D;
+	}
+
+	public static Double mod(Double left, Object right) {
+		if (right instanceof Number)
+			return mod(left, (Number) right);
+		if (right instanceof String)
+			return mod(left, (String) right);
+		return 0D;
 	}
 
 	public static boolean eq(boolean left, boolean right) {
