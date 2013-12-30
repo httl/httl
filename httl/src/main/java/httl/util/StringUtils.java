@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  */
 public class StringUtils {
 
-	private static final Pattern NUMBER_PATTERN = Pattern.compile("^[0-9]+(\\.[.0-9]+)?[BSILFDbsilfd]?$");
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("^[+\\-]?[0-9]+(\\.[.0-9]+)?[BSILFDbsilfd]?$");
 
 	private static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
 
@@ -127,7 +127,13 @@ public class StringUtils {
 	public static boolean isNotBlank(String value) {
 		return ! isBlank(value);
 	}
-	
+
+	public static String valueOf(Object value) {
+		if (value == null)
+			return "";
+		return toString(value);
+	}
+
 	public static String toString(Object value) {
 		if (value == null)
 			return null;
