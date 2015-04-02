@@ -4361,6 +4361,14 @@ public class LangMethod {
 		return right.isInstance(left);
 	}
 
+	public static boolean is(Object left, Object right) {
+		if (right instanceof String)
+			return is(left, right);
+		if (right instanceof Class<?>)
+			return is(left, right);
+		return right == null ? false : right.getClass().isInstance(left);
+	}
+
 	public static <T> T[] array(T[] left, T right) {
 		return add(left, right);
 	}

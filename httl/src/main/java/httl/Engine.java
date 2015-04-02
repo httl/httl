@@ -22,6 +22,7 @@ import httl.util.StringUtils;
 import httl.util.Version;
 import httl.util.VolatileReference;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Locale;
@@ -94,9 +95,10 @@ public abstract class Engine {
 	 * 
 	 * @param configProperties - config properties
 	 * @return template engine
+	 * @throws FileNotFoundException 
 	 */
 	public static Engine getEngine(Properties configProperties) {
-		return getEngine(null, configProperties);
+		return getEngine("", configProperties);
 	}
 
 	/**

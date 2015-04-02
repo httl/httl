@@ -238,25 +238,29 @@ public class ExpressionParser implements Parser {
 		BINARY_OPERATOR_NAMES = Collections.unmodifiableMap(binary);
 	}
 
-	private UnaryOperator createUnaryOperator(String operator, int priority, int offset) {
+	private UnaryOperator createUnaryOperator(String operator, int priority, int offset) throws ParseException {
 		String name = UNARY_OPERATOR_NAMES.get(operator);
 		if (StringUtils.isNotEmpty(name)) {
 			return new UnaryOperator(name, priority, offset);
-		} else if (StringUtils.isFunction(operator)) {
+		} else if (operator.startsWith(".")) {
 			return new UnaryOperator(operator.substring(1), priority, offset);
+		} else if (operator.startsWith("new ")) {
+			return new UnaryOperator(operator, priority, offset);
+		} else if (StringUtils.isClassName(operator)) {
+			return new UnaryOperator("(" + operator + ")", priority, offset);
 		} else {
-			throw new UnsupportedOperationException("Unsupported unary operator " + operator);
+			throw new ParseException("Unsupported unary operator " + operator, offset);
 		}
 	}
 
-	private BinaryOperator createBinaryOperator(String operator, int priority, int offset) {
+	private BinaryOperator createBinaryOperator(String operator, int priority, int offset) throws ParseException {
 		String name = BINARY_OPERATOR_NAMES.get(operator);
 		if (StringUtils.isNotEmpty(name)) {
 			return new BinaryOperator(name, priority, offset);
 		} else if (StringUtils.isFunction(operator)) {
 			return new BinaryOperator(operator.substring(1), priority, offset);
 		} else {
-			throw new UnsupportedOperationException("Unsupported binary operator " + operator);
+			throw new ParseException("Unsupported binary operator " + operator, offset);
 		}
 	}
 

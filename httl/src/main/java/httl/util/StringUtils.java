@@ -34,8 +34,14 @@ public class StringUtils {
 
 	private static final Pattern SYMBOL_PATTERN = Pattern.compile("[^(_a-zA-Z0-9)]");
 
+	private static final Pattern CLASS_NAME_PATTERN = Pattern.compile("[_a-zA-Z][\\._a-zA-Z0-9]+");
+
 	public static String getVaildName(String name) {
 		return SYMBOL_PATTERN.matcher(name).replaceAll("_");
+	}
+
+	public static boolean isClassName(String value) {
+		return isEmpty(value) ? false : CLASS_NAME_PATTERN.matcher(value).matches();
 	}
 
 	public static boolean isNumber(String value) {

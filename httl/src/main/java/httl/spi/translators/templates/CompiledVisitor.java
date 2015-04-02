@@ -1228,44 +1228,54 @@ public class CompiledVisitor extends AstVisitor {
 		} else {
 			parameterTypes = new Class<?>[] { parameterClass };
 		}
-		Type macroType = types.get(name);
-		Class<?> t = (Class<?>) (macroType instanceof ParameterizedType ? ((ParameterizedType) macroType).getRawType() : macroType);
-		if (t != null && Template.class.isAssignableFrom(t)) {
-			variableTypes.put(name, Template.class);
-			type = Object.class;
-			code = "(" + name + " == null ? null : " + name + ".evaluate(new Object" + (parameterCode.length() == 0 ? "[0]" : "[] { " + parameterCode + " }") + "))";
+		if (name.startsWith("new ")) {
+			String clsName = name.substring(4);
+			type = ClassUtils.forName(importPackages, clsName);
+			code = name + "(" + parameterCode + ")";
+		} else if (name.startsWith("(") && name.endsWith(")")) {
+			String clsName = name.substring(1, name.length() - 1);
+			type = ClassUtils.forName(importPackages, clsName);
+			code = "(" + name + "(" + parameterCode + "))";
 		} else {
-			name = ClassUtils.filterJavaKeyword(name);
-			type = null;
-			code = null;
-			if (functions != null && functions.size() > 0) {
-				for (Class<?> function : functions.keySet()) {
-					try {
-						Method method = ClassUtils.searchMethod(function, name, parameterTypes, parameterTypes.length == 1);
-						if (Object.class.equals(method.getDeclaringClass())) {
+			Type macroType = types.get(name);
+			Class<?> t = (Class<?>) (macroType instanceof ParameterizedType ? ((ParameterizedType) macroType).getRawType() : macroType);
+			if (t != null && Template.class.isAssignableFrom(t)) {
+				variableTypes.put(name, Template.class);
+				type = Object.class;
+				code = "(" + name + " == null ? null : " + name + ".evaluate(new Object" + (parameterCode.length() == 0 ? "[0]" : "[] { " + parameterCode + " }") + "))";
+			} else {
+				name = ClassUtils.filterJavaKeyword(name);
+				type = null;
+				code = null;
+				if (functions != null && functions.size() > 0) {
+					for (Class<?> function : functions.keySet()) {
+						try {
+							Method method = ClassUtils.searchMethod(function, name, parameterTypes, parameterTypes.length == 1);
+							if (Object.class.equals(method.getDeclaringClass())) {
+								break;
+							}
+							type = method.getReturnType();
+							if (type == void.class) {
+								throw new ParseException("Can not call void method " + method.getName() + " in class " + function.getName(), node.getOffset());
+							}
+							Class<?>[] pts = method.getParameterTypes();
+							if (parameterTypes.length == 1 && parameterTypes[0].isPrimitive() 
+									&& pts[0].isAssignableFrom(ClassUtils.getBoxedClass(parameterTypes[0]))) {
+								parameterCode = ClassUtils.class.getName() + ".boxed(" + parameterCode + ")";
+							}
+							if (Modifier.isStatic(method.getModifiers())) {
+								code = function.getName() + "." + method.getName() + "(" + parameterCode + ")";
+							} else {
+								code = "$" + function.getName().replace('.', '_') + "." + method.getName() + "(" + parameterCode + ")";
+							}
 							break;
+						} catch (NoSuchMethodException e) {
 						}
-						type = method.getReturnType();
-						if (type == void.class) {
-							throw new ParseException("Can not call void method " + method.getName() + " in class " + function.getName(), node.getOffset());
-						}
-						Class<?>[] pts = method.getParameterTypes();
-						if (parameterTypes.length == 1 && parameterTypes[0].isPrimitive() 
-								&& pts[0].isAssignableFrom(ClassUtils.getBoxedClass(parameterTypes[0]))) {
-							parameterCode = ClassUtils.class.getName() + ".boxed(" + parameterCode + ")";
-						}
-						if (Modifier.isStatic(method.getModifiers())) {
-							code = function.getName() + "." + method.getName() + "(" + parameterCode + ")";
-						} else {
-							code = "$" + function.getName().replace('.', '_') + "." + method.getName() + "(" + parameterCode + ")";
-						}
-						break;
-					} catch (NoSuchMethodException e) {
 					}
 				}
-			}
-			if (code == null) {
-				throw new ParseException("No such macro \"" + name + "\" or import method " + ClassUtils.getMethodFullName(name, parameterTypes) + ".", node.getOffset());
+				if (code == null) {
+					throw new ParseException("No such macro \"" + name + "\" or import method " + ClassUtils.getMethodFullName(name, parameterTypes) + ".", node.getOffset());
+				}
 			}
 		}
 		

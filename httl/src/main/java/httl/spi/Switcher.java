@@ -35,7 +35,7 @@ public interface Switcher<T> {
 	 * Switch's locations.
 	 * 
 	 * <pre>
-	 * locations = ["&lt;script", "&lt;script&gt;"]
+	 * locations = ["&lt;script", "&lt;/script&gt;"]
 	 * </pre>
 	 * 
 	 * @return locations
