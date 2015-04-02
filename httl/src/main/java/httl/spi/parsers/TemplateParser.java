@@ -179,7 +179,7 @@ public class TemplateParser implements Parser {
 
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
-	private String[] setDirective = new String[] { "var" };
+	private String[] setDirective = new String[] { "set" };
 
 	private String[] ifDirective = new String[] { "if" };
 
