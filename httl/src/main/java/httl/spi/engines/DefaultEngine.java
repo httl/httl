@@ -104,6 +104,8 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: instantiated content
 	private Map<String, Object> properties;
+
+	private String defaultEncoding;
 	
 	private Converter<Object, Map<String, Object>> mapConverter;
 
@@ -396,7 +398,7 @@ public class DefaultEngine extends Engine {
 							if (logger != null && logger.isDebugEnabled()) {
 								logger.debug("Preload the template: " + name);
 							}
-							getTemplate(name);
+							getTemplate(name, getDefaultEncoding());
 						} catch (Exception e) {
 							if (logger != null && logger.isErrorEnabled()) {
 								logger.error(e.getMessage(), e);
@@ -413,6 +415,13 @@ public class DefaultEngine extends Engine {
 				}
 			}
 		}
+	}
+
+	public String getDefaultEncoding() {
+		if (defaultEncoding == null) {
+			defaultEncoding = getProperty("input.encoding", String.class);
+		}
+		return defaultEncoding;
 	}
 
 	/**
