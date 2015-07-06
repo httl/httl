@@ -30,15 +30,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
@@ -90,27 +82,7 @@ public class JdkCompiler extends AbstractCompiler {
         } catch (ClassNotFoundException e) { // 如果线程上下文的ClassLoader不能加载当前httl.jar包中的类，则切换回httl.jar所在的ClassLoader
         	contextLoader = JdkCompiler.class.getClassLoader();
         }
-		ClassLoader loader = contextLoader;
-		Set<File> files = new HashSet<File>();
-		while (loader instanceof URLClassLoader 
-				&& (! loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
-			URLClassLoader urlClassLoader = (URLClassLoader) loader;
-			for (URL url : urlClassLoader.getURLs()) {
-				files.add(new File(url.getFile()));
-			}
-			loader = loader.getParent();
-		}
-		if (files.size() > 0) {
-			try {
-				Iterable<? extends File> list = standardJavaFileManager.getLocation(StandardLocation.CLASS_PATH);
-				for (File file : list) {
-					files.add(file);
-				}
-				standardJavaFileManager.setLocation(StandardLocation.CLASS_PATH, files);
-			} catch (IOException e) {
-				throw new IllegalStateException(e.getMessage(), e);
-			}
-		}
+		setDefaultClasspath(standardJavaFileManager, contextLoader);
 		final ClassLoader parentLoader = contextLoader;
 		classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
 			public ClassLoaderImpl run() {
@@ -120,7 +92,29 @@ public class JdkCompiler extends AbstractCompiler {
 		javaFileManager = new JavaFileManagerImpl(standardJavaFileManager, classLoader);
 		lintOptions.add("-Xlint:unchecked");
 	}
-	
+
+	private void setDefaultClasspath(StandardJavaFileManager fileManager, ClassLoader loader) {
+		Collection<URL> classpath = ClassUtils.getClasspathURLs(loader);
+
+		if (classpath.size() > 0) {
+			try {
+				Set<File> files = new LinkedHashSet<File>(classpath.size() + 16);
+				for (URL url : classpath) {
+					File file = new File(url.getFile());
+					if (file.exists()) {
+						files.add(file);
+					}
+				}
+				Iterable<? extends File> list = fileManager.getLocation(StandardLocation.CLASS_PATH);
+				for (File file : list) {
+					files.add(file);
+				}
+				fileManager.setLocation(StandardLocation.CLASS_PATH, files);
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+	}
 	public void init() {
 		if (logger != null && logger.isDebugEnabled()) {
 			StringBuilder buf = new StringBuilder(320);

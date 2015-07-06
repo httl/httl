@@ -19,40 +19,23 @@ import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.spi.Converter;
-import httl.spi.Filter;
-import httl.spi.Loader;
-import httl.spi.Logger;
-import httl.spi.Parser;
-import httl.spi.Resolver;
-import httl.spi.Translator;
+import httl.spi.*;
 import httl.spi.loaders.StringLoader;
 import httl.spi.translators.templates.AbstractTemplate;
-import httl.util.ConfigUtils;
-import httl.util.DelegateMap;
-import httl.util.Digest;
-import httl.util.StringUtils;
-import httl.util.TypeMap;
-import httl.util.UrlUtils;
-import httl.util.VolatileReference;
+import httl.util.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
 /**
  * DefaultEngine. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @see httl.Engine#getEngine()
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DefaultEngine extends Engine {
@@ -69,7 +52,7 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: translator=httl.spi.translators.DefaultTranslator
 	private Translator translator;
-	
+
 	// httl.properties: resolver=httl.spi.resolvers.SystemResolver
 	private Resolver resolver;
 
@@ -89,10 +72,10 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: reloadable=true
 	private boolean reloadable;
-	
+
 	// httl.properties: preload=true
 	private boolean preload;
-	
+
 	// httl.properties: localized=true
 	private boolean localized;
 
@@ -104,8 +87,10 @@ public class DefaultEngine extends Engine {
 
 	// httl.properties: instantiated content
 	private Map<String, Object> properties;
-	
+
 	private Converter<Object, Map<String, Object>> mapConverter;
+
+	private String defaultEncoding;
 
 	public DefaultEngine() {
 		this.stringLoader = new StringLoader(this);
@@ -117,10 +102,10 @@ public class DefaultEngine extends Engine {
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * Get config instantiated value.
-	 * 
+	 *
 	 * @see #getEngine()
 	 * @param key - config key
 	 * @param cls - config value type
@@ -129,7 +114,7 @@ public class DefaultEngine extends Engine {
 	@SuppressWarnings("unchecked")
 	public <T> T getProperty(String key, Class<T> cls) {
 		if (properties != null) {
-			if (cls != null && cls != Object.class && cls != String.class 
+			if (cls != null && cls != Object.class && cls != String.class
 					&& ! cls.isInterface() && ! cls.isArray()) {
 				// engine.getProperty("loaders", ClasspathLoader.class);
 				key = key + "=" + cls.getName();
@@ -147,7 +132,7 @@ public class DefaultEngine extends Engine {
 
 	/**
 	 * Create context map.
-	 * 
+	 *
 	 * @return context map
 	 */
 	public Map<String, Object> createContext(final Map<String, Object> parent, Map<String, Object> current) {
@@ -164,10 +149,10 @@ public class DefaultEngine extends Engine {
 			}
 		};
 	}
-	
+
 	/**
 	 * Get template.
-	 * 
+	 *
 	 * @see #getEngine()
 	 * @param name - template name
 	 * @param locale - template locale
@@ -276,7 +261,7 @@ public class DefaultEngine extends Engine {
 
 	/**
 	 * Parse string template.
-	 * 
+	 *
 	 * @see #getEngine()
 	 * @param source - template source
 	 * @return template instance
@@ -297,7 +282,7 @@ public class DefaultEngine extends Engine {
 
 	/**
 	 * Get resource.
-	 * 
+	 *
 	 * @see #getEngine()
 	 * @param name - resource name
 	 * @param locale - resource locale
@@ -327,7 +312,7 @@ public class DefaultEngine extends Engine {
 
 	/**
 	 * Tests whether the resource denoted by this abstract pathname exists.
-	 * 
+	 *
 	 * @see #getEngine()
 	 * @param name - template name
 	 * @param locale - resource locale
@@ -338,7 +323,7 @@ public class DefaultEngine extends Engine {
 		locale = cleanLocale(locale);
 		return stringLoader.exists(name, locale) || loader.exists(name, locale);
 	}
-	
+
 	private Locale cleanLocale(Locale locale) {
 		if (localized) {
 			return locale;
@@ -354,9 +339,9 @@ public class DefaultEngine extends Engine {
 			if (logger.isWarnEnabled() && ! ConfigUtils.isFilePath(name)) {
 				try {
 					List<String> realPaths = new ArrayList<String>();
-					Enumeration<URL> e = Thread.currentThread().getContextClassLoader().getResources(name);
+					Enumeration<URL> e = ClassUtils.getContextClassLoader().getResources(name);
 					while (e.hasMoreElements()) {
-						URL url = (URL) e.nextElement();
+						URL url = e.nextElement();
 						realPaths.add(url.getFile());
 					}
 					if (realPaths.size() > 1) {
@@ -396,7 +381,7 @@ public class DefaultEngine extends Engine {
 							if (logger != null && logger.isDebugEnabled()) {
 								logger.debug("Preload the template: " + name);
 							}
-							getTemplate(name);
+                            getTemplate(name, getDefaultEncoding());
 						} catch (Exception e) {
 							if (logger != null && logger.isErrorEnabled()) {
 								logger.error(e.getMessage(), e);
@@ -484,7 +469,7 @@ public class DefaultEngine extends Engine {
 	public void setCache(Map<Object, Object> cache) {
 		this.cache = cache;
 	}
-	
+
 	/**
 	 * httl.properties: loaders=httl.spi.loaders.ClasspathLoader
 	 */
@@ -527,4 +512,14 @@ public class DefaultEngine extends Engine {
 		this.mapConverter = mapConverter;
 	}
 
+    public String getDefaultEncoding() {
+        if (defaultEncoding == null) {
+            defaultEncoding = getProperty("input.encoding", String.class);
+        }
+        return defaultEncoding;
+    }
+
+    public void setDefaultEncoding(String defaultEncoding) {
+        this.defaultEncoding = defaultEncoding;
+    }
 }
