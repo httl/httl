@@ -316,6 +316,9 @@ public abstract class AstVisitor implements Visitor {
 	public void visit(Comment node) throws IOException, ParseException {
 	}
 
+	public void visit(ImportDirective node) throws IOException, ParseException {
+	}
+
 	public void visit(SetDirective node) throws IOException, ParseException {
 	}
 

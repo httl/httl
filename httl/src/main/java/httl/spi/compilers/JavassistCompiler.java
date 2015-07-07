@@ -51,22 +51,29 @@ public class JavassistCompiler extends AbstractCompiler {
 	private static final Pattern METHODS_PATTERN = Pattern.compile("\n(private|public|protected)\\s+");
 
 	private static final Pattern FIELD_PATTERN = Pattern.compile("[^\n]+=[^\n]+;");
-	
-	private final ClassPool pool = ClassPool.getDefault();
+
+	private final byte[] locker = new byte[0];
+
+	protected ClassPool pool;
 	
 	public JavassistCompiler() {
+		init();
+	}
+
+	protected void init(){
+		pool = ClassPool.getDefault();
 		ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
 		try {
 			contextLoader.loadClass(JdkCompiler.class.getName());
-        } catch (ClassNotFoundException e) { // 如果线程上下文的ClassLoader不能加载当前httl.jar包中的类，则切换回httl.jar所在的ClassLoader
-        	contextLoader = JdkCompiler.class.getClassLoader();
-        }
+		} catch (ClassNotFoundException e) { // 如果线程上下文的ClassLoader不能加载当前httl.jar包中的类，则切换回httl.jar所在的ClassLoader
+			contextLoader = JdkCompiler.class.getClassLoader();
+		}
 		pool.appendClassPath(new LoaderClassPath(contextLoader));
 	}
 
 	@Override
 	protected Class<?> doCompile(String name, String source) throws Exception {
-		synchronized (pool) {
+		synchronized (locker) {
 			try {
 				return pool.get(name).toClass();
 			} catch (NotFoundException e) {

@@ -140,7 +140,12 @@ public class ClassUtils {
                 && !className.contains(".") && !CLASS_CACHE.containsKey(className)) {
             for (String pkg : packages) {
                 try {
-                    return _forName(pkg + "." + className);
+                    String classN = "." + className;
+                    if (pkg.endsWith(classN)) {
+                        return _forName(pkg);
+                    }else{
+                        return _forName(pkg + classN);
+                    }
                 } catch (ClassNotFoundException e2) {
                 }
             }
@@ -207,7 +212,7 @@ public class ClassUtils {
                     sb.append('L').append(name).append(';');
                 name = sb.toString();
             }
-            clazz = Class.forName(name, true, Thread.currentThread().getContextClassLoader());
+            clazz = Class.forName(name, true, getContextClassLoader());
             Class<?> old = CLASS_CACHE.putIfAbsent(key, clazz);
             if (old != null) {
                 clazz = old;

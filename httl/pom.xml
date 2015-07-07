@@ -22,6 +22,8 @@
 		<artifactId>httl-parent</artifactId>
 		<version>1.0.11</version>
 	</parent>
+	<groupId>org.amebastack.template</groupId>
+	<version>1.0.12</version>
 	<artifactId>httl</artifactId>
 	<packaging>jar</packaging>
 	<name>HTTL</name>
@@ -76,6 +78,14 @@
 		<developer>
 			<name>Li Ding</name>
 			<email>oldratlee A gmail D com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+		<developer>
+			<name>Lixin Zhang</name>
+			<email>intelligentcodemail A gmail D com</email>
 			<roles>
 				<role>Developer</role>
 			</roles>

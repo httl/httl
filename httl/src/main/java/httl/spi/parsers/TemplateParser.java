@@ -18,37 +18,14 @@ package httl.spi.parsers;
 import httl.Engine;
 import httl.Node;
 import httl.Template;
-import httl.ast.BlockDirective;
-import httl.ast.BreakDirective;
-import httl.ast.Comment;
-import httl.ast.Directive;
-import httl.ast.ElseDirective;
-import httl.ast.EndDirective;
-import httl.ast.Expression;
-import httl.ast.ForDirective;
-import httl.ast.IfDirective;
-import httl.ast.MacroDirective;
-import httl.ast.RootDirective;
-import httl.ast.SetDirective;
-import httl.ast.Statement;
-import httl.ast.Text;
-import httl.ast.ValueDirective;
+import httl.ast.*;
 import httl.spi.Parser;
-import httl.util.ClassUtils;
-import httl.util.DfaScanner;
-import httl.util.LinkedStack;
-import httl.util.ParameterizedTypeImpl;
-import httl.util.StringUtils;
-import httl.util.Token;
+import httl.util.*;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -56,9 +33,9 @@ import java.util.regex.Pattern;
 
 /**
  * TemplateParser. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @see httl.spi.engines.DefaultEngine#setTemplateParser(Parser)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class TemplateParser implements Parser {
@@ -131,38 +108,38 @@ public class TemplateParser implements Parser {
 		switch (ch) {
 			case ' ': case '\t': case '\f': case '\b':
 				return 0;
-			case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : 
-			case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' : 
-			case 'o' : case 'p' : case 'q' : case 'r' : case 's' : case 't' : 
+			case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' :
+			case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' : case 'n' :
+			case 'o' : case 'p' : case 'q' : case 'r' : case 's' : case 't' :
 			case 'u' : case 'v' : case 'w' : case 'x' : case 'y' : case 'z' :
 				return 1;
-			case '#' : 
+			case '#' :
 				return 2;
-			case '$' : 
+			case '$' :
 				return 3;
-			case '!' : 
+			case '!' :
 				return 4;
-			case '*' : 
+			case '*' :
 				return 5;
-			case '(' : 
+			case '(' :
 				return 6;
-			case ')' : 
+			case ')' :
 				return 7;
-			case '[' : 
+			case '[' :
 				return 8;
-			case ']' : 
+			case ']' :
 				return 9;
-			case '{' : 
+			case '{' :
 				return 10;
-			case '}' : 
+			case '}' :
 				return 11;
-			case '\"' : 
+			case '\"' :
 				return 12;
-			case '\'' : 
+			case '\'' :
 				return 13;
-			case '`' : 
+			case '`' :
 				return 14;
-			case '\\' : 
+			case '\\' :
 				return 15;
 			case '\r': case '\n':
 				return 16;
@@ -190,11 +167,12 @@ public class TemplateParser implements Parser {
 
 	private boolean isDirectiveName(String name) {
 		return StringUtils.inArray(name, setDirective)
-				|| StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseDirective) 
-				|| StringUtils.inArray(name, forDirective) || StringUtils.inArray(name, breakDirective) 
-				|| StringUtils.inArray(name, macroDirective) || StringUtils.inArray(name, endDirective);
+				|| StringUtils.inArray(name, ifDirective) || StringUtils.inArray(name, elseDirective)
+				|| StringUtils.inArray(name, forDirective) || StringUtils.inArray(name, breakDirective)
+				|| StringUtils.inArray(name, macroDirective) || StringUtils.inArray(name, endDirective)
+                || StringUtils.inArray(name, importDirective);
 	}
-	
+
 	private void defineVariableTypes(String value, int offset, List<Statement> directives) throws IOException, ParseException {
 		int o = offset;
 		for (String v : splitDefine(value)) {
@@ -209,11 +187,11 @@ public class TemplateParser implements Parser {
 				type = v.substring(0, i).trim();
 				var = v.substring(i + 1).trim();
 			}
-			directives.add(new SetDirective(parseGenericType(type, o), var, null, false, false, offset));
+			directives.add(new SetDirective(parseGenericType(type, o, directives), var, null, false, false, offset));
 			o += v.length() + 1;
 		}
 	}
-	
+
 	private boolean isNoLiteralText(Statement node) {
 		return node instanceof Text && ! ((Text) node).isLiteral();
 	}
@@ -246,198 +224,201 @@ public class TemplateParser implements Parser {
 		return nodes;
 	}
 
+    private static final Pattern IMPORT_PATTERN = Pattern.compile("[,;]+");
+
 	private List<Statement> scan(String source, int sourceOffset) throws ParseException, IOException {
 		List<Statement> directives = new ArrayList<Statement>();
 		List<Token> tokens = scanner.scan(source, sourceOffset);
 		AtomicInteger seq = new AtomicInteger();
-		for (int t = 0; t < tokens.size(); t ++) {
-			Token token = tokens.get(t);
-			String message = token.getMessage();
-			int offset = token.getOffset();
-			if (isDirective(message)) {
-				int s = message.indexOf('(');
-				String name;
-				String value;
-				int exprOffset;
-				if (s > 0) {
-					exprOffset = offset + s + 1;
-					name = message.substring(1, s);
-					if (! message.endsWith(")")) {
-						throw new ParseException("The #" + name + " directive mismatch right parentheses.", exprOffset);
-					}
-					value = message.substring(s + 1, message.length() - 1);
-				} else {
-					exprOffset = token.getOffset() + message.length();
-					name = message.substring(1);
-					value = "";
-					if (! StringUtils.inArray(name, elseDirective)
-							&& ! StringUtils.inArray(name, endDirective)
-							&& ! StringUtils.inArray(name, breakDirective)) {
-						throw new ParseException("Not found parameter expression in the #" + name + " directive.", offset);
-					}
-				}
-				if (StringUtils.inArray(name, setDirective)) {
-					if (value.contains("=")) {
-						int o = 0;
-						for (String v : splitAssign(value)) {
-							int i = v.indexOf('=');
-							String var = v.substring(0, i).trim();
-							String expr = v.substring(i + 1);
-							int blank = 0;
-							while (blank < expr.length()) {
-								if (! Character.isWhitespace(expr.charAt(blank))) {
-									break;
-								}
-								blank ++;
-							}
-							if (blank > 0) {
-								expr = expr.substring(blank);
-							}
-							Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + 1 + blank + o);
-							boolean export = false;
-							boolean hide = false;
-							if (var.endsWith(":")) {
-								export = true;
-								var = var.substring(0, var.length() - 1).trim();
-							} else if (var.endsWith(".")) {
-								hide = true;
-								var = var.substring(0, var.length() - 1).trim();
-							}
-							int j = var.lastIndexOf(' ');
-							String type = null;
-							if (j > 0) {
-								type = var.substring(0, j).trim();
-								var = var.substring(j + 1).trim();
-							}
-							directives.add(new SetDirective(parseGenericType(type, exprOffset), var, expression, export, hide, offset));
-							o += v.length() + 1;
-						}
-					} else {
-						defineVariableTypes(value, offset, directives);
-					}
-				} else if (StringUtils.inArray(name, forDirective)) {
-					if (StringUtils.isNumber(value.trim())) {
-						value = "__for" + seq.incrementAndGet() + " : 1 .. " + value.trim();
-					}
-					int i = value.indexOf(" in ");
-					int n = 4;
-					if (i < 0) {
-						i = value.indexOf(':');
-						n = 1;
-					}
-					if (i < 0) {
-						throw new ParseException("Miss colon \":\" in invalid directive #for(" + value + ")", offset);
-					}
-					String var = value.substring(0, i).trim();
-					String expr = value.substring(i + n);
-					int blank = 0;
-					while (blank < expr.length()) {
-						if (! Character.isWhitespace(expr.charAt(blank))) {
-							break;
-						}
-						blank ++;
-					}
-					if (blank > 0) {
-						expr = expr.substring(blank);
-					}
-					Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + n + blank);
-					int j = var.lastIndexOf(' ');
-					String type = null;
-					if (j > 0) {
-						type = var.substring(0, j).trim();
-						var = var.substring(j + 1).trim();
-					}
-					directives.add(new ForDirective(parseGenericType(type, exprOffset), var, expression, offset));
-				} else if (StringUtils.inArray(name, ifDirective)) {
-					directives.add(new IfDirective((Expression) expressionParser.parse(value, exprOffset), offset));
-				} else if (StringUtils.inArray(name, elseDirective)) {
-					directives.add(new ElseDirective(StringUtils.isEmpty(value)
-							? null : (Expression) expressionParser.parse(value, exprOffset), offset));
-				} else if (StringUtils.inArray(name, breakDirective)) {
-					directives.add(new BreakDirective(StringUtils.isBlank(value) ? null : (Expression) expressionParser.parse(value, exprOffset), offset));
-				} else if (StringUtils.inArray(name, macroDirective)) {
-					String macroName = value;
-					String macroParams = null;
-					String filter = null;
-					int idx = macroName.indexOf("=>");
-					if (idx > 0) {
-						filter = macroName.substring(idx + 2).trim();
-						macroName = macroName.substring(0, idx);
-					}
-					int i = value.indexOf('(');
-					if (i > 0) {
-						if (! message.endsWith(")")) {
-							throw new ParseException("The #" + name + " directive mismatch right parentheses.", exprOffset);
-						}
-						macroName = value.substring(0, i);
-						macroParams = value.substring(i + 1, value.length() - 1);
-					}
-					String set = null;
-					boolean parent = false;
-					boolean hide = false;
-					i = macroName.indexOf('=');
-					if (i > 0) {
-						set = macroName.substring(0, i);
-						if (set.endsWith(":")) {
-							parent = true;
-							set = set.substring(0, set.length() - 1);
-						} else if (set.endsWith(".")) {
-							hide = true;
-							set = set.substring(0, set.length() - 1);
-						}
-						set = set.trim();
-						macroName = macroName.substring(i + 1);
-					}
-					boolean out = false;
-					if (macroName.startsWith("$")) {
-						out = true;
-						macroName = macroName.substring(macroName.startsWith("$!") ? 2 : 1);
-					}
-					String expr;
-					if (StringUtils.isNotEmpty(filter)) {
-						if (filter.contains("(")) {
-							expr = filter;
-						} else {
-							expr = filter + "(" + macroName + ")";
-						}
-					} else {
-						expr = macroName;
-					}
-					if (StringUtils.isNotEmpty(set)) {
-						directives.add(new SetDirective(Template.class, set, (Expression) expressionParser.parse(expr, exprOffset), parent, hide, offset));
-					}
-					if (out) {
-						directives.add(new ValueDirective((Expression) expressionParser.parse(expr, exprOffset), true, offset));
-					}
-					macroName = macroName.trim();
-					directives.add(new MacroDirective(macroName, offset));
-					if (StringUtils.isNotEmpty(macroParams)) {
-						defineVariableTypes(macroParams, exprOffset, directives);
-					}
-				} else if (StringUtils.inArray(name, endDirective)) {
-					directives.add(new EndDirective(offset));
-				}
-			} else if (message.endsWith("}") && (message.startsWith("${") || message.startsWith("$!{")
-					|| message.startsWith("#{") || message.startsWith("#!{"))) {
-				int i = message.indexOf('{');
-				directives.add(new ValueDirective((Expression) expressionParser.parse(message.substring(i + 1, message.length() - 1), 
-						offset + i + 1), message.startsWith("$!") || message.startsWith("#!"), offset));
-			} else if (message.startsWith("##")) {
-				directives.add(new Comment(message.substring(2), false, offset));
-			} else if ((message.startsWith("#*") && message.endsWith("*#"))) {
-				directives.add(new Comment(message.substring(2, message.length() - 2), true, offset));
-			} else {
-				boolean literal;
-				if (message.startsWith("#[") && message.endsWith("]#")) {
-					message = message.substring(2, message.length() - 2);
-					literal = true;
-				} else {
-					message = filterEscape(message);
-					literal = false;
-				}
-				directives.add(new Text(message, literal, offset));
-			}
-		}
+        for (Token token : tokens) {
+            String message = token.getMessage();
+            int offset = token.getOffset();
+            if (isDirective(message)) {
+                int s = message.indexOf('(');
+                String name;
+                String value;
+                int exprOffset;
+                if (s > 0) {
+                    exprOffset = offset + s + 1;
+                    name = message.substring(1, s);
+                    if (!message.endsWith(")")) {
+                        throw new ParseException("The #" + name + " directive mismatch right parentheses.", exprOffset);
+                    }
+                    value = message.substring(s + 1, message.length() - 1);
+                } else {
+                    exprOffset = token.getOffset() + message.length();
+                    name = message.substring(1);
+                    value = "";
+                    if (!StringUtils.inArray(name, elseDirective)
+                            && !StringUtils.inArray(name, endDirective)
+                            && !StringUtils.inArray(name, breakDirective)) {
+                        throw new ParseException("Not found parameter expression in the #" + name + " directive.", offset);
+                    }
+                }
+                if (StringUtils.inArray(name, setDirective)) {
+                    if (value.contains("=")) {
+                        int o = 0;
+                        for (String v : splitAssign(value)) {
+                            int i = v.indexOf('=');
+                            String var = v.substring(0, i).trim();
+                            String expr = v.substring(i + 1);
+                            int blank = 0;
+                            while (blank < expr.length()) {
+                                if (!Character.isWhitespace(expr.charAt(blank))) {
+                                    break;
+                                }
+                                blank++;
+                            }
+                            if (blank > 0) {
+                                expr = expr.substring(blank);
+                            }
+                            Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + 1 + blank + o);
+                            boolean export = false;
+                            boolean hide = false;
+                            if (var.endsWith(":")) {
+                                export = true;
+                                var = var.substring(0, var.length() - 1).trim();
+                            } else if (var.endsWith(".")) {
+                                hide = true;
+                                var = var.substring(0, var.length() - 1).trim();
+                            }
+                            int j = var.lastIndexOf(' ');
+                            String type = null;
+                            if (j > 0) {
+                                type = var.substring(0, j).trim();
+                                var = var.substring(j + 1).trim();
+                            }
+                            directives.add(new SetDirective(parseGenericType(type, exprOffset, directives), var, expression, export, hide, offset));
+                            o += v.length() + 1;
+                        }
+                    } else {
+                        defineVariableTypes(value, offset, directives);
+                    }
+                } else if (StringUtils.inArray(name, forDirective)) {
+                    if (StringUtils.isNumber(value.trim())) {
+                        value = "__for" + seq.incrementAndGet() + " : 1 .. " + value.trim();
+                    }
+                    int i = value.indexOf(" in ");
+                    int n = 4;
+                    if (i < 0) {
+                        i = value.indexOf(':');
+                        n = 1;
+                    }
+                    if (i < 0) {
+                        throw new ParseException("Miss colon \":\" in invalid directive #for(" + value + ")", offset);
+                    }
+                    String var = value.substring(0, i).trim();
+                    String expr = value.substring(i + n);
+                    int blank = 0;
+                    while (blank < expr.length()) {
+                        if (!Character.isWhitespace(expr.charAt(blank))) {
+                            break;
+                        }
+                        blank++;
+                    }
+                    if (blank > 0) {
+                        expr = expr.substring(blank);
+                    }
+                    Expression expression = (Expression) expressionParser.parse(expr, exprOffset + i + n + blank);
+                    int j = var.lastIndexOf(' ');
+                    String type = null;
+                    if (j > 0) {
+                        type = var.substring(0, j).trim();
+                        var = var.substring(j + 1).trim();
+                    }
+                    directives.add(new ForDirective(parseGenericType(type, exprOffset, directives), var, expression, offset));
+                } else if (StringUtils.inArray(name, ifDirective)) {
+                    directives.add(new IfDirective((Expression) expressionParser.parse(value, exprOffset), offset));
+                } else if (StringUtils.inArray(name, elseDirective)) {
+                    directives.add(new ElseDirective(StringUtils.isEmpty(value)
+                            ? null : (Expression) expressionParser.parse(value, exprOffset), offset));
+                } else if (StringUtils.inArray(name, breakDirective)) {
+                    directives.add(new BreakDirective(StringUtils.isBlank(value) ? null : (Expression) expressionParser.parse(value, exprOffset), offset));
+                } else if (StringUtils.inArray(name, macroDirective)) {
+                    String macroName = value;
+                    String macroParams = null;
+                    String filter = null;
+                    int idx = macroName.indexOf("=>");
+                    if (idx > 0) {
+                        filter = macroName.substring(idx + 2).trim();
+                        macroName = macroName.substring(0, idx);
+                    }
+                    int i = value.indexOf('(');
+                    if (i > 0) {
+                        if (!message.endsWith(")")) {
+                            throw new ParseException("The #" + name + " directive mismatch right parentheses.", exprOffset);
+                        }
+                        macroName = value.substring(0, i);
+                        macroParams = value.substring(i + 1, value.length() - 1);
+                    }
+                    String set = null;
+                    boolean parent = false;
+                    boolean hide = false;
+                    i = macroName.indexOf('=');
+                    if (i > 0) {
+                        set = macroName.substring(0, i);
+                        if (set.endsWith(":")) {
+                            parent = true;
+                            set = set.substring(0, set.length() - 1);
+                        } else if (set.endsWith(".")) {
+                            hide = true;
+                            set = set.substring(0, set.length() - 1);
+                        }
+                        set = set.trim();
+                        macroName = macroName.substring(i + 1);
+                    }
+                    boolean out = false;
+                    if (macroName.startsWith("$")) {
+                        out = true;
+                        macroName = macroName.substring(macroName.startsWith("$!") ? 2 : 1);
+                    }
+                    String expr;
+                    if (StringUtils.isNotEmpty(filter)) {
+                        if (filter.contains("(")) {
+                            expr = filter;
+                        } else {
+                            expr = filter + "(" + macroName + ")";
+                        }
+                    } else {
+                        expr = macroName;
+                    }
+                    if (StringUtils.isNotEmpty(set)) {
+                        directives.add(new SetDirective(Template.class, set, (Expression) expressionParser.parse(expr, exprOffset), parent, hide, offset));
+                    }
+                    if (out) {
+                        directives.add(new ValueDirective((Expression) expressionParser.parse(expr, exprOffset), true, offset));
+                    }
+                    macroName = macroName.trim();
+                    directives.add(new MacroDirective(macroName, offset));
+                    if (StringUtils.isNotEmpty(macroParams)) {
+                        defineVariableTypes(macroParams, exprOffset, directives);
+                    }
+                } else if (StringUtils.inArray(name, endDirective)) {
+                    directives.add(new EndDirective(offset));
+                } else if (StringUtils.inArray(name, importDirective)) {
+                    directives.add(0, new ImportDirective(IMPORT_PATTERN.split(value), offset));
+                }
+            } else if (message.endsWith("}") && (message.startsWith("${") || message.startsWith("$!{")
+                    || message.startsWith("#{") || message.startsWith("#!{"))) {
+                int i = message.indexOf('{');
+                directives.add(new ValueDirective((Expression) expressionParser.parse(message.substring(i + 1, message.length() - 1),
+                        offset + i + 1), message.startsWith("$!") || message.startsWith("#!"), offset));
+            } else if (message.startsWith("##")) {
+                directives.add(new Comment(message.substring(2), false, offset));
+            } else if ((message.startsWith("#*") && message.endsWith("*#"))) {
+                directives.add(new Comment(message.substring(2, message.length() - 2), true, offset));
+            } else {
+                boolean literal;
+                if (message.startsWith("#[") && message.endsWith("]#")) {
+                    message = message.substring(2, message.length() - 2);
+                    literal = true;
+                } else {
+                    message = filterEscape(message);
+                    literal = false;
+                }
+                directives.add(new Text(message, literal, offset));
+            }
+        }
 		return directives;
 	}
 
@@ -445,37 +426,36 @@ public class TemplateParser implements Parser {
 		LinkedStack<BlockDirectiveEntry> directiveStack = new LinkedStack<BlockDirectiveEntry>();
 		RootDirective rootDirective = new RootDirective();
 		directiveStack.push(new BlockDirectiveEntry(rootDirective));
-		for (int i = 0, n = directives.size(); i < n; i ++) {
-			Statement directive = (Statement)directives.get(i);
-			if (directive == null)
-				continue;
-			Class<?> directiveClass = directive.getClass();
-			// 弹栈
-			if (directiveClass == EndDirective.class
-					|| directiveClass == ElseDirective.class) {
-				if (directiveStack.isEmpty())
-					throw new ParseException("Miss #end directive.", directive.getOffset());
-				BlockDirective blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
-				if (blockDirective == rootDirective)
-					throw new ParseException("Miss #end directive.", directive.getOffset());
-				EndDirective endDirective;
-				if (directiveClass == ElseDirective.class) {
-					endDirective = new EndDirective(directive.getOffset());
-				} else {
-					endDirective = (EndDirective) directive;
-				}
-				blockDirective.setEnd(endDirective);
-			}
-			// 设置树
-			if (directiveClass != EndDirective.class) { // 排除EndDirective
-				if (directiveStack.isEmpty())
-					throw new ParseException("Miss #end directive.", directive.getOffset());
-				((BlockDirectiveEntry) directiveStack.peek()).appendInnerDirective(directive);
-			}
-			// 压栈
-			if (directive instanceof BlockDirective)
-				directiveStack.push(new BlockDirectiveEntry((BlockDirective) directive));
-		}
+        for (Statement directive : directives) {
+            if (directive == null)
+                continue;
+            Class<?> directiveClass = directive.getClass();
+            // 弹栈
+            if (directiveClass == EndDirective.class
+                    || directiveClass == ElseDirective.class) {
+                if (directiveStack.isEmpty())
+                    throw new ParseException("Miss #end directive.", directive.getOffset());
+                BlockDirective blockDirective = ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
+                if (blockDirective == rootDirective)
+                    throw new ParseException("Miss #end directive.", directive.getOffset());
+                EndDirective endDirective;
+                if (directiveClass == ElseDirective.class) {
+                    endDirective = new EndDirective(directive.getOffset());
+                } else {
+                    endDirective = (EndDirective) directive;
+                }
+                blockDirective.setEnd(endDirective);
+            }
+            // 设置树
+            if (directiveClass != EndDirective.class) { // 排除EndDirective
+                if (directiveStack.isEmpty())
+                    throw new ParseException("Miss #end directive.", directive.getOffset());
+                ((BlockDirectiveEntry) directiveStack.peek()).appendInnerDirective(directive);
+            }
+            // 压栈
+            if (directive instanceof BlockDirective)
+                directiveStack.push(new BlockDirectiveEntry((BlockDirective) directive));
+        }
 		BlockDirective root = (BlockDirective) ((BlockDirectiveEntry) directiveStack.pop()).popDirective();
 		if (! directiveStack.isEmpty()) { // 后验条件
 			throw new ParseException("Miss #end directive." + root.getClass().getSimpleName(), root.getOffset());
@@ -504,7 +484,7 @@ public class TemplateParser implements Parser {
 		}
 
 	}
-	
+
 	private static final Pattern ESCAPE_PATTERN = Pattern.compile("\\\\+[#$]");
 
 	private String[] setDirective = new String[] { "var" };
@@ -521,12 +501,14 @@ public class TemplateParser implements Parser {
 
 	private String[] endDirective = new String[] { "end" };
 
+	private String[] importDirective = new String[] { "import" };
+
 	private Engine engine;
-	
+
 	private Parser expressionParser;
-	
+
 	private String[] importMacros;
-   
+
 	private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
 
 	private String[] importPackages;
@@ -651,8 +633,12 @@ public class TemplateParser implements Parser {
 			}
 		}
 	}
-	
-	/**
+
+    public String[] getImportDirective() {
+        return importDirective;
+    }
+
+    /**
 	 * init.
 	 */
 	public void init() {
@@ -690,14 +676,14 @@ public class TemplateParser implements Parser {
 
 	/**
 	 * 如果指令所在的行没有其他内容，那么将两边的空白内容删除。
-	 * 
+	 *
 	 * @author subchen@gmail.com
 	 */
 	private List<Statement> trim(List<Statement> nodes) throws ParseException, IOException {
 		if (! removeDirectiveBlankLine) {
 			return nodes;
 		}
-		
+
 		// 待移除的空的 Text Node (主要是 Text Node 不允许为空的内容，只能在循环外把它delete了)
 		List<Integer> empty_text_index_list = new ArrayList<Integer>();
 
@@ -783,11 +769,8 @@ public class TemplateParser implements Parser {
 	}
 
 	private boolean isTrimableDirective(Statement node) {
-	    if (node instanceof Directive) {
-	        return !(node instanceof ValueDirective);
-	    }
-	    return false;
-	}
+        return node instanceof Directive && !(node instanceof ValueDirective);
+    }
 
 	private String filterEscape(String source) {
 		StringBuffer buf = new StringBuffer();
@@ -804,14 +787,24 @@ public class TemplateParser implements Parser {
 		return buf.toString().substring(0, buf.length() - 1); // 减掉预加的#号
 	}
 
-	private Type parseGenericType(String type, int offset) throws IOException, ParseException {
+	private Type parseGenericType(String type, int offset, List<Statement> directives) throws IOException, ParseException {
 		if (StringUtils.isBlank(type)) {
 			return null;
 		}
 		int i = type.indexOf('<');
 		if (i < 0) {
 			try {
-				return ClassUtils.forName(importPackages, type);
+                String[] pkgs = importPackages;
+                if (directives != null) {
+                    for (Statement s : directives) {
+                        if (s instanceof ImportDirective) {
+                            pkgs = CollectionUtils.merge(pkgs, ((ImportDirective) s).getImports());
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                return ClassUtils.forName(pkgs, type);
 			} catch (Exception e) {
 				throw new ParseException("No such class " + type + ", cause: " + ClassUtils.dumpException(e), offset);
 			}
@@ -830,10 +823,10 @@ public class TemplateParser implements Parser {
 		List<String> genericTypes = new ArrayList<String>();
 		List<Integer> genericOffsets = new ArrayList<Integer>();
 		parseGenericTypeString(parameterType, offset, genericTypes, genericOffsets);
-		if (genericTypes != null && genericTypes.size() > 0) {
+		if (genericTypes.size() > 0) {
 			Type[] types = new Type[genericTypes.size()];
 			for (int k = 0; k < genericTypes.size(); k ++) {
-				types[k] = parseGenericType(genericTypes.get(k), genericOffsets.get(k));
+				types[k] = parseGenericType(genericTypes.get(k), genericOffsets.get(k), directives);
 			}
 			return new ParameterizedTypeImpl(raw, types);
 		}
@@ -869,13 +862,13 @@ public class TemplateParser implements Parser {
 			buf.setLength(0);
 		}
 	}
-	
+
 	private static boolean isEndString(String value) {
 		int sc = 0;
 		int dc = 0;
 		for (int i = 0; i < value.length(); i ++) {
 			char ch = value.charAt(i);
-			if (ch == '\'' && dc % 2 == 0 
+			if (ch == '\'' && dc % 2 == 0
 					|| ch == '\"' && sc % 2 == 0) {
 				int c = 0;
 				for (int j = i - 1; j >= 0; j--) {
@@ -974,5 +967,5 @@ public class TemplateParser implements Parser {
 		}
 		return vs;
 	}
-	
+
 }

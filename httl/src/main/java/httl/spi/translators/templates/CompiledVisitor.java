@@ -15,105 +15,24 @@
  */
 package httl.spi.translators.templates;
 
-import httl.Context;
-import httl.Engine;
-import httl.Node;
-import httl.Resource;
-import httl.Template;
-import httl.ast.AddOperator;
-import httl.ast.AndOperator;
-import httl.ast.ArrayOperator;
-import httl.ast.AstVisitor;
-import httl.ast.BinaryOperator;
-import httl.ast.BitAndOperator;
-import httl.ast.BitNotOperator;
-import httl.ast.BitOrOperator;
-import httl.ast.BitXorOperator;
-import httl.ast.BreakDirective;
-import httl.ast.CastOperator;
-import httl.ast.ConditionOperator;
-import httl.ast.Constant;
-import httl.ast.DivOperator;
-import httl.ast.ElseDirective;
-import httl.ast.EntryOperator;
-import httl.ast.EqualsOperator;
-import httl.ast.Expression;
-import httl.ast.ForDirective;
-import httl.ast.GreaterEqualsOperator;
-import httl.ast.GreaterOperator;
-import httl.ast.IfDirective;
-import httl.ast.IndexOperator;
-import httl.ast.InstanceofOperator;
-import httl.ast.LeftShiftOperator;
-import httl.ast.LessEqualsOperator;
-import httl.ast.LessOperator;
-import httl.ast.ListOperator;
-import httl.ast.MacroDirective;
-import httl.ast.MethodOperator;
-import httl.ast.ModOperator;
-import httl.ast.MulOperator;
-import httl.ast.NegativeOperator;
-import httl.ast.NewOperator;
-import httl.ast.NotEqualsOperator;
-import httl.ast.NotOperator;
-import httl.ast.Operator;
-import httl.ast.OrOperator;
-import httl.ast.PositiveOperator;
-import httl.ast.RightShiftOperator;
-import httl.ast.SequenceOperator;
-import httl.ast.SetDirective;
-import httl.ast.Statement;
-import httl.ast.StaticMethodOperator;
-import httl.ast.SubOperator;
-import httl.ast.Text;
-import httl.ast.UnsignShiftOperator;
-import httl.ast.ValueDirective;
-import httl.ast.Variable;
+import httl.*;
+import httl.ast.*;
 import httl.spi.Compiler;
-import httl.spi.Converter;
-import httl.spi.Filter;
+import httl.spi.*;
 import httl.spi.Formatter;
-import httl.spi.Interceptor;
-import httl.spi.Switcher;
 import httl.spi.formatters.MultiFormatter;
-import httl.util.ByteCache;
-import httl.util.CharCache;
-import httl.util.ClassUtils;
-import httl.util.CollectionUtils;
-import httl.util.IOUtils;
-import httl.util.LinkedStack;
-import httl.util.MapEntry;
-import httl.util.OrderedMap;
-import httl.util.ParameterizedTypeImpl;
-import httl.util.Status;
-import httl.util.StringCache;
-import httl.util.StringSequence;
-import httl.util.StringUtils;
-import httl.util.VolatileReference;
+import httl.util.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 /**
  * CompileVisitor
@@ -355,7 +274,7 @@ public class CompiledVisitor extends AstVisitor {
 			if (formatterLocations != null) {
 				locations.addAll(formatterLocations);
 			}
-			if (locations != null && locations.size() > 0) {
+			if (locations.size() > 0) {
 				Map<Integer, Set<String>> switchesd = new TreeMap<Integer, Set<String>>();
 				for (String location : locations) {
 					int i = -1;
@@ -376,7 +295,7 @@ public class CompiledVisitor extends AstVisitor {
 						int end = entry.getKey();
 						String part = getTextPart(txt.substring(begin, end), filter, false);
 						if (StringUtils.isNotEmpty(part)) {
-							builder.append("	$output.write(" + part + ");\n");
+							builder.append("	$output.write(").append(part).append(");\n");
 						}
 						begin = end;
 						for (String location : entry.getValue()) {
@@ -385,10 +304,10 @@ public class CompiledVisitor extends AstVisitor {
 								filterReference.set(filter);
 							}
 							if (valueLocations != null && valueLocations.contains(location)) {
-								builder.append("	" + filterVariable + " = switchFilter(\"" + StringUtils.escapeString(location) + "\", " + defaultFilterVariable + ");\n");
+								builder.append("	").append(filterVariable).append(" = switchFilter(\"").append(StringUtils.escapeString(location)).append("\", ").append(defaultFilterVariable).append(");\n");
 							}
 							if (formatterLocations != null && formatterLocations.contains(location)) {
-								builder.append("	" + formatterVariable + " = switchFormatter(\"" + StringUtils.escapeString(location) + "\", " + defaultFormatterVariable + ");\n");
+								builder.append("	").append(formatterVariable).append(" = switchFormatter(\"").append(StringUtils.escapeString(location)).append("\", ").append(defaultFormatterVariable).append(");\n");
 							}
 						}
 					}
@@ -400,7 +319,7 @@ public class CompiledVisitor extends AstVisitor {
 		}
 		String part = getTextPart(txt, filter, false);
 		if (StringUtils.isNotEmpty(part)) {
-			builder.append("	$output.write(" + part + ");\n");
+			builder.append("	$output.write(").append(part).append(");\n");
 		}
 	}
 
@@ -491,7 +410,7 @@ public class CompiledVisitor extends AstVisitor {
 					code = "doFilter(" + filterVariable + ", " + key + ", " + code + ")";
 				}
 				builder.append(pre);
-				builder.append("	if (" + var + " instanceof char[]) $output.write(");
+				builder.append("	if (").append(var).append(" instanceof char[]) $output.write(");
 				builder.append(charsCode);
 				builder.append("); else $output.write(");
 				builder.append(code);
@@ -780,6 +699,8 @@ public class CompiledVisitor extends AstVisitor {
 		return compiler.compile(code);
 	}
 
+    private static final Pattern IMPORT_PKG_PATTERN = Pattern.compile("[A-Z]*");
+
 	private String getCode() throws IOException, ParseException {
 		String name = getTemplateClassName(resource, node, stream);
 		String code = builder.toString();
@@ -792,7 +713,12 @@ public class CompiledVisitor extends AstVisitor {
 			for (String pkg : packages) {
 				imports.append("import ");
 				imports.append(pkg);
-				imports.append(".*;\n");
+                if (IMPORT_PKG_PATTERN.matcher(pkg).matches()) {
+                    imports.append(";");
+                } else {
+                    imports.append(".*;");
+                }
+                imports.append("\n");
 			}
 		}
 		Set<String> defined = new HashSet<String>();
@@ -1751,7 +1677,7 @@ public class CompiledVisitor extends AstVisitor {
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") > 0");
+			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(ClassUtils.boxed(" + rightCode + ")) > 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -1785,7 +1711,7 @@ public class CompiledVisitor extends AstVisitor {
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") >= 0");
+            code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(ClassUtils.boxed(" + rightCode + ")) >= 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -1819,7 +1745,8 @@ public class CompiledVisitor extends AstVisitor {
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") < 0");
+            String compareTo;
+			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(ClassUtils.boxed(" + rightCode + ")) < 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -1853,7 +1780,7 @@ public class CompiledVisitor extends AstVisitor {
 		Type type = boolean.class;
 		String code = null;
 		if (leftClass != null && Comparable.class.isAssignableFrom(leftClass)) {
-			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(" + rightCode + ") <= 0");
+			code = getNotNullCode(node.getLeftParameter(), leftClass, leftCode, type, leftCode + ".compareTo(ClassUtils.boxed(" + rightCode + ")) <= 0");
 		}
 		
 		if (node.getRightParameter() instanceof Operator
@@ -2607,6 +2534,11 @@ public class CompiledVisitor extends AstVisitor {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void visit(ImportDirective node) throws IOException, ParseException {
+		importPackages = CollectionUtils.merge(importPackages, node.getImports());
 	}
 
 }

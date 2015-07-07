@@ -1218,6 +1218,7 @@ public class StringUtils {
 
 	public static boolean inArray(String value, String[] values) {
 		if (value != null && values != null) {
+			value = value.trim();
 			for (String v : values) {
 				if (value.equals(v)) {
 					return true;
