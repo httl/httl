@@ -1,7 +1,18 @@
 Hyper-Text Template Language(`HTTL`) and Engine
 ================================================
 
-Homepage: http://httl.github.io
+Documentation
+---------------------
+
+- Homepage: [English](http://httl.github.io/en/) | [中文](http://httl.github.io/zh/)
+    - Example: [English](http://httl.github.io/en/example.html) | [中文](http://httl.github.io/zh/example.html)
+    - User Guide
+        - syntax: [English](http://httl.github.io/en/syntax.html) | [中文](http://httl.github.io/zh/syntax.html)
+        - config: [English](http://httl.github.io/en/config.html) | [中文](http://httl.github.io/zh/config.html)
+    - Develop Guide
+        - integration: [English](http://httl.github.io/en/integration.html) | [中文](http://httl.github.io/zh/integration.html)
+        - design: [English](http://httl.github.io/en/design.html) | [中文](http://httl.github.io/zh/design.html)
+    - Help(FAQ/Team members): [English](http://httl.github.io/en/help.html) | [中文](http://httl.github.io/zh/help.html)
 
 Download
 -------------------
@@ -35,7 +46,7 @@ mvn eclipse:eclipse -DdownloadSources
 Then import project into `eclipse`:
 
 ```
-【File】 -> 【Import】 -> 【Existing Projects into Workspace】 -> 【Browse】(Select Project directory and open)
+【File】 -> 【Import】 -> 【Existing Projects into Workspace】 -> 【Browse】(Select project directory and open)
 ```
 
 Associate `httl` file type with `html` editor:
