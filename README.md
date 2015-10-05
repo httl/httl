@@ -1,17 +1,24 @@
 Hyper-Text Template Language(`HTTL`) and Engine
 ================================================
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.httl/httl/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.httl/httl/)
+[![GitHub release](https://img.shields.io/github/release/httl/httl.svg)](https://github.com/httl/httl/releases)  
+[![GitHub issues](https://img.shields.io/github/issues/httl/httl.svg)](https://github.com/httl/httl/issues)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  
+[![Star](https://img.shields.io/github/stars/httl/httl.svg)](https://github.com/httl/httl/stargazers)
+[![Fork](https://img.shields.io/github/forks/httl/httl.svg)](https://github.com/httl/httl/fork)
+
 Documentation
 ---------------------
 
 - Homepage: [English](http://httl.github.io/en/) | [中文](http://httl.github.io/zh/)
     - Example: [English](http://httl.github.io/en/example.html) | [中文](http://httl.github.io/zh/example.html)
     - User Guide
-        - syntax: [English](http://httl.github.io/en/syntax.html) | [中文](http://httl.github.io/zh/syntax.html)
-        - config: [English](http://httl.github.io/en/config.html) | [中文](http://httl.github.io/zh/config.html)
+        - Syntax: [English](http://httl.github.io/en/syntax.html) | [中文](http://httl.github.io/zh/syntax.html)
+        - Config: [English](http://httl.github.io/en/config.html) | [中文](http://httl.github.io/zh/config.html)
     - Develop Guide
-        - integration: [English](http://httl.github.io/en/integration.html) | [中文](http://httl.github.io/zh/integration.html)
-        - design: [English](http://httl.github.io/en/design.html) | [中文](http://httl.github.io/zh/design.html)
+        - Integration: [English](http://httl.github.io/en/integration.html) | [中文](http://httl.github.io/zh/integration.html)
+        - Design: [English](http://httl.github.io/en/design.html) | [中文](http://httl.github.io/zh/design.html)
     - Help(FAQ/Team members): [English](http://httl.github.io/en/help.html) | [中文](http://httl.github.io/zh/help.html)
 
 Download
