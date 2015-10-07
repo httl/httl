@@ -36,13 +36,6 @@
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
-	<repositories>
-		<repository>
-			<id>httl-repository</id>
-			<name>Httl Repository</name>
-			<url>http://httl.github.io/maven</url>
-		</repository>
-	</repositories>
 	<scm>
 		<url>http://httl.github.io</url>
 		<connection>scm:git:https://github.com/httl/httl.git</connection>

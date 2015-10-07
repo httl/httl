@@ -22,8 +22,6 @@
 		<artifactId>httl-parent</artifactId>
 		<version>1.0.12</version>
 	</parent>
-	<groupId>org.amebastack.template</groupId>
-	<version>1.0.12</version>
 	<artifactId>httl</artifactId>
 	<packaging>jar</packaging>
 	<name>HTTL</name>
@@ -38,13 +36,6 @@
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
-	<repositories>
-		<repository>
-			<id>httl-repository</id>
-			<name>Httl Repository</name>
-			<url>http://httl.github.io/maven</url>
-		</repository>
-	</repositories>
 	<scm>
 		<url>http://httl.github.io</url>
 		<connection>scm:git:https://github.com/httl/httl.git</connection>
