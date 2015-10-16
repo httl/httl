@@ -107,12 +107,12 @@ public abstract class AbstractCompiler implements Compiler {
         }
     }
 
-    private void logJavaCode(Class<?> clazz, String sorceCode) throws IOException {
+    private void logJavaCode(String className, String sorceCode) throws IOException {
         if (logger != null && logger.isDebugEnabled()) {
             logger.debug("\n================================\n" + sorceCode + "\n================================\n");
         }
         if (codeDirectory != null) {
-            File javaFile = new File(codeDirectory, clazz.getPackage().getName().replace('.', '/') + "/" + clazz.getSimpleName() + ".java");
+            File javaFile = new File(codeDirectory, className.replace('.', '/') + ".java");
             File javaDir = javaFile.getParentFile();
             if (javaDir.exists() || javaDir.mkdirs()) {
                 FileWriter writer = new FileWriter(javaFile);
@@ -157,6 +157,7 @@ public abstract class AbstractCompiler implements Compiler {
                 }
             }
             Class<?> cls = ref.get();
+            logJavaCode(className, code);
             if (cls == null) {
                 synchronized (ref) {
                     cls = ref.get();
@@ -166,7 +167,6 @@ public abstract class AbstractCompiler implements Compiler {
                     }
                 }
             }
-            logJavaCode(cls, code);
             return cls;
         } catch (Throwable t) {
             if (logger != null && logger.isErrorEnabled()) {
