@@ -15,70 +15,69 @@
  */
 package httl.spi.codecs;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.xml.Xpp3Driver;
 import httl.util.UnsafeByteArrayInputStream;
 import httl.util.UnsafeByteArrayOutputStream;
 
 import java.text.ParseException;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
-import com.thoughtworks.xstream.io.xml.Xpp3Driver;
-
 /**
  * Xstream Codec. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class XstreamCodec extends AbstractXmlCodec {
 
-	private static XStream XSTREAM = new XStream(new Xpp3Driver());
+    private static XStream XSTREAM = new XStream(new Xpp3Driver());
 
-	public static XStream getXStream() {
-		return XSTREAM;
-	}
+    public static XStream getXStream() {
+        return XSTREAM;
+    }
 
-	public static void setDriver(HierarchicalStreamDriver driver) {
-		XSTREAM = new XStream(driver);
-	}
+    public static void setDriver(HierarchicalStreamDriver driver) {
+        XSTREAM = new XStream(driver);
+    }
 
-	public String toString(String key, Object value) {
-		return XSTREAM.toXML(value);
-	}
+    public String toString(String key, Object value) {
+        return XSTREAM.toXML(value);
+    }
 
-	public byte[] toBytes(String key, Object value) {
-		UnsafeByteArrayOutputStream out = new UnsafeByteArrayOutputStream();
-		XSTREAM.toXML(value, out);
-		return out.toByteArray();
-	}
+    public byte[] toBytes(String key, Object value) {
+        UnsafeByteArrayOutputStream out = new UnsafeByteArrayOutputStream();
+        XSTREAM.toXML(value, out);
+        return out.toByteArray();
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T valueOf(String str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		if (type == null) {
-			return (T) XSTREAM.fromXML(str);
-		}
-		try {
-			return (T) XSTREAM.fromXML(str, type.newInstance());
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T valueOf(String str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        if (type == null) {
+            return (T) XSTREAM.fromXML(str);
+        }
+        try {
+            return (T) XSTREAM.fromXML(str, type.newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		if (type == null) {
-			return (T) XSTREAM.fromXML(new UnsafeByteArrayInputStream(str));
-		}
-		try {
-			return (T) XSTREAM.fromXML(new UnsafeByteArrayInputStream(str), type.newInstance());
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        if (type == null) {
+            return (T) XSTREAM.fromXML(new UnsafeByteArrayInputStream(str));
+        }
+        try {
+            return (T) XSTREAM.fromXML(new UnsafeByteArrayInputStream(str), type.newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
 }

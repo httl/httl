@@ -30,6 +30,7 @@ package httl.spi.converters;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import httl.spi.Converter;
 import httl.util.CollectionUtils;
 
@@ -39,17 +40,16 @@ import java.util.Map;
 
 /**
  * ArrayMapConverter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setMapConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setMapConverter(Converter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ArrayMapConverter implements Converter<Object[], Map<String, Object>> {
 
-	public Map<String, Object> convert(Object[] values, Map<String, Class<?>> types)
-			throws IOException, ParseException {
-		return CollectionUtils.toMap(types.keySet(), values);
-	}
+    public Map<String, Object> convert(Object[] values, Map<String, Class<?>> types)
+            throws IOException, ParseException {
+        return CollectionUtils.toMap(types.keySet(), values);
+    }
 
 }

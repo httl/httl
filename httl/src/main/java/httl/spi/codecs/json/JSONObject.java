@@ -22,216 +22,194 @@ import java.util.Map;
 
 /**
  * JSONObject.
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 
 public class JSONObject implements JSONNode {
-	
-	private Map<String, Object> objectMap = new HashMap<String, Object>();
 
-	/**
-	 * get.
-	 * 
-	 * @param key
-	 *            key.
-	 * @return boolean or long or double or String or JSONArray or JSONObject or
-	 *         null.
-	 */
-	public Object get(String key) {
-		return objectMap.get(key);
-	}
+    private Map<String, Object> objectMap = new HashMap<String, Object>();
 
-	/**
-	 * get boolean value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @param def
-	 *            default value.
-	 * @return value or default value.
-	 */
-	public boolean getBoolean(String key, boolean def) {
-		Object tmp = objectMap.get(key);
-		return tmp != null && tmp instanceof Boolean ? (Boolean) tmp : def;
-	}
+    /**
+     * get.
+     *
+     * @param key key.
+     * @return boolean or long or double or String or JSONArray or JSONObject or
+     * null.
+     */
+    public Object get(String key) {
+        return objectMap.get(key);
+    }
 
-	/**
-	 * get int value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @param def
-	 *            default value.
-	 * @return value or default value.
-	 */
-	public int getInt(String key, int def) {
-		Object tmp = objectMap.get(key);
-		return tmp != null && tmp instanceof Number ? ((Number) tmp).intValue()
-				: def;
-	}
+    /**
+     * get boolean value.
+     *
+     * @param key key.
+     * @param def default value.
+     * @return value or default value.
+     */
+    public boolean getBoolean(String key, boolean def) {
+        Object tmp = objectMap.get(key);
+        return tmp != null && tmp instanceof Boolean ? (Boolean) tmp : def;
+    }
 
-	/**
-	 * get long value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @param def
-	 *            default value.
-	 * @return value or default value.
-	 */
-	public long getLong(String key, long def) {
-		Object tmp = objectMap.get(key);
-		return tmp != null && tmp instanceof Number ? ((Number) tmp)
-				.longValue() : def;
-	}
+    /**
+     * get int value.
+     *
+     * @param key key.
+     * @param def default value.
+     * @return value or default value.
+     */
+    public int getInt(String key, int def) {
+        Object tmp = objectMap.get(key);
+        return tmp != null && tmp instanceof Number ? ((Number) tmp).intValue()
+                : def;
+    }
 
-	/**
-	 * get float value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @param def
-	 *            default value.
-	 * @return value or default value.
-	 */
-	public float getFloat(String key, float def) {
-		Object tmp = objectMap.get(key);
-		return tmp != null && tmp instanceof Number ? ((Number) tmp)
-				.floatValue() : def;
-	}
+    /**
+     * get long value.
+     *
+     * @param key key.
+     * @param def default value.
+     * @return value or default value.
+     */
+    public long getLong(String key, long def) {
+        Object tmp = objectMap.get(key);
+        return tmp != null && tmp instanceof Number ? ((Number) tmp)
+                .longValue() : def;
+    }
 
-	/**
-	 * get double value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @param def
-	 *            default value.
-	 * @return value or default value.
-	 */
-	public double getDouble(String key, double def) {
-		Object tmp = objectMap.get(key);
-		return tmp != null && tmp instanceof Number ? ((Number) tmp)
-				.doubleValue() : def;
-	}
+    /**
+     * get float value.
+     *
+     * @param key key.
+     * @param def default value.
+     * @return value or default value.
+     */
+    public float getFloat(String key, float def) {
+        Object tmp = objectMap.get(key);
+        return tmp != null && tmp instanceof Number ? ((Number) tmp)
+                .floatValue() : def;
+    }
 
-	/**
-	 * get string value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @return value or default value.
-	 */
-	public String getString(String key) {
-		Object tmp = objectMap.get(key);
-		return tmp == null ? null : tmp.toString();
-	}
+    /**
+     * get double value.
+     *
+     * @param key key.
+     * @param def default value.
+     * @return value or default value.
+     */
+    public double getDouble(String key, double def) {
+        Object tmp = objectMap.get(key);
+        return tmp != null && tmp instanceof Number ? ((Number) tmp)
+                .doubleValue() : def;
+    }
 
-	/**
-	 * get JSONArray value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @return value or default value.
-	 */
-	public JSONArray getArray(String key) {
-		Object tmp = objectMap.get(key);
-		return tmp == null ? null : tmp instanceof JSONArray ? (JSONArray) tmp
-				: null;
-	}
+    /**
+     * get string value.
+     *
+     * @param key key.
+     * @return value or default value.
+     */
+    public String getString(String key) {
+        Object tmp = objectMap.get(key);
+        return tmp == null ? null : tmp.toString();
+    }
 
-	/**
-	 * get JSONObject value.
-	 * 
-	 * @param key
-	 *            key.
-	 * @return value or default value.
-	 */
-	public JSONObject getObject(String key) {
-		Object tmp = objectMap.get(key);
-		return tmp == null ? null
-				: tmp instanceof JSONObject ? (JSONObject) tmp : null;
-	}
+    /**
+     * get JSONArray value.
+     *
+     * @param key key.
+     * @return value or default value.
+     */
+    public JSONArray getArray(String key) {
+        Object tmp = objectMap.get(key);
+        return tmp == null ? null : tmp instanceof JSONArray ? (JSONArray) tmp
+                : null;
+    }
 
-	/**
-	 * get key iterator.
-	 * 
-	 * @return key iterator.
-	 */
-	public Iterator<String> keys() {
-		return objectMap.keySet().iterator();
-	}
+    /**
+     * get JSONObject value.
+     *
+     * @param key key.
+     * @return value or default value.
+     */
+    public JSONObject getObject(String key) {
+        Object tmp = objectMap.get(key);
+        return tmp == null ? null
+                : tmp instanceof JSONObject ? (JSONObject) tmp : null;
+    }
 
-	/**
-	 * contains key.
-	 * 
-	 * @param key
-	 *            key.
-	 * @return contains or not.
-	 */
-	public boolean contains(String key) {
-		return objectMap.containsKey(key);
-	}
+    /**
+     * get key iterator.
+     *
+     * @return key iterator.
+     */
+    public Iterator<String> keys() {
+        return objectMap.keySet().iterator();
+    }
 
-	/**
-	 * put value.
-	 * 
-	 * @param name
-	 *            name.
-	 * @param value
-	 *            value.
-	 */
-	public void put(String name, Object value) {
-		objectMap.put(name, value);
-	}
+    /**
+     * contains key.
+     *
+     * @param key key.
+     * @return contains or not.
+     */
+    public boolean contains(String key) {
+        return objectMap.containsKey(key);
+    }
 
-	/**
-	 * put all.
-	 * 
-	 * @param names
-	 *            name array.
-	 * @param values
-	 *            value array.
-	 */
-	public void putAll(String[] names, Object[] values) {
-		for (int i = 0, len = Math.min(names.length, values.length); i < len; i++)
-			objectMap.put(names[i], values[i]);
-	}
+    /**
+     * put value.
+     *
+     * @param name  name.
+     * @param value value.
+     */
+    public void put(String name, Object value) {
+        objectMap.put(name, value);
+    }
 
-	/**
-	 * put all.
-	 * 
-	 * @param map
-	 *            map.
-	 */
-	public void putAll(Map<String, Object> map) {
-		for (Map.Entry<String, Object> entry : map.entrySet())
-			objectMap.put(entry.getKey(), entry.getValue());
-	}
+    /**
+     * put all.
+     *
+     * @param names  name array.
+     * @param values value array.
+     */
+    public void putAll(String[] names, Object[] values) {
+        for (int i = 0, len = Math.min(names.length, values.length); i < len; i++)
+            objectMap.put(names[i], values[i]);
+    }
 
-	/**
-	 * write json.
-	 * 
-	 * @param jc
-	 *            json converter.
-	 * @param jb
-	 *            json builder.
-	 */
-	public void writeJSON(JSONValue jc, JSONWriter jb, boolean writeClass)
-			throws IOException {
-		String key;
-		Object value;
-		jb.objectBegin();
-		for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
-			key = entry.getKey();
-			jb.objectItem(key);
-			value = entry.getValue();
-			if (value == null)
-				jb.valueNull();
-			else
-				jc.writeValue(value, jb, writeClass);
-		}
-		jb.objectEnd();
-	}
+    /**
+     * put all.
+     *
+     * @param map map.
+     */
+    public void putAll(Map<String, Object> map) {
+        for (Map.Entry<String, Object> entry : map.entrySet())
+            objectMap.put(entry.getKey(), entry.getValue());
+    }
+
+    /**
+     * write json.
+     *
+     * @param jc json converter.
+     * @param jb json builder.
+     */
+    public void writeJSON(JSONValue jc, JSONWriter jb, boolean writeClass)
+            throws IOException {
+        String key;
+        Object value;
+        jb.objectBegin();
+        for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
+            key = entry.getKey();
+            jb.objectItem(key);
+            value = entry.getValue();
+            if (value == null)
+                jb.valueNull();
+            else
+                jc.writeValue(value, jb, writeClass);
+        }
+        jb.objectEnd();
+    }
 }

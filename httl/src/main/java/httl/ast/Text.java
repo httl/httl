@@ -21,35 +21,35 @@ import java.text.ParseException;
 
 /**
  * Text. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class Text extends Statement {
 
-	private final String content;
+    private final String content;
 
-	private final boolean literal;
+    private final boolean literal;
 
-	public Text(String content, boolean literal, int offset) throws ParseException {
-		super(offset);
-		if (StringUtils.isEmpty(content)) {
-			throw new ParseException("The text content == null.", offset);
-		}
-		this.content = content;
-		this.literal = literal;
-	}
+    public Text(String content, boolean literal, int offset) throws ParseException {
+        super(offset);
+        if (StringUtils.isEmpty(content)) {
+            throw new ParseException("The text content == null.", offset);
+        }
+        this.content = content;
+        this.literal = literal;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public boolean isLiteral() {
-		return literal;
-	}
+    public boolean isLiteral() {
+        return literal;
+    }
 
-	@Override
-	public String toString() {
-		return literal ? "#[" + content + "]#" : content;
-	}
+    @Override
+    public String toString() {
+        return literal ? "#[" + content + "]#" : content;
+    }
 
 }

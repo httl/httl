@@ -19,19 +19,18 @@ import httl.spi.Converter;
 
 /**
  * MultiOutConverter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setOutConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setOutConverter(Converter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiOutConverter extends MultiConverter {
 
-	/**
-	 * httl.properties: out.converters=httl.spi.converters.ResponseOutConverter
-	 */
-	public void setOutConverters(Converter<Object, Object>[] converters) {
-		super.setConverters(converters);
-	}
+    /**
+     * httl.properties: out.converters=httl.spi.converters.ResponseOutConverter
+     */
+    public void setOutConverters(Converter<Object, Object>[] converters) {
+        super.setConverters(converters);
+    }
 
 }

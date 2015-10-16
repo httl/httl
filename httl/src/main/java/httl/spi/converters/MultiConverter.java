@@ -28,53 +28,52 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * MultiConverter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setMapConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setMapConverter(Converter)
  * @see httl.spi.translators.CompiledTranslator#setOutConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setOutConverter(Converter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiConverter implements Converter<Object, Object> {
 
-	private final Map<Class<?>, Converter<Object, Object>> converters = new ConcurrentHashMap<Class<?>, Converter<Object, Object>>();
+    private final Map<Class<?>, Converter<Object, Object>> converters = new ConcurrentHashMap<Class<?>, Converter<Object, Object>>();
 
-	private Map<Class<?>, Converter<Object, Object>> sortedConverters;
+    private Map<Class<?>, Converter<Object, Object>> sortedConverters;
 
-	public void setConverters(Converter<Object, Object>[] converters) {
-		if (converters != null && converters.length > 0) {
-			for (Converter<Object, Object> converter : converters) {
-				if (converter != null) {
-					Class<?> type = ClassUtils.getGenericClass(converter.getClass());
-					if (type != null && ! this.converters.containsKey(type)) {
-						this.converters.put(type, converter);
-					}
-				}
-			}
-			Map<Class<?>, Converter<Object, Object>> sorted = new TreeMap<Class<?>, Converter<Object, Object>>(ClassComparator.COMPARATOR);
-			sorted.putAll(this.converters);
-			this.sortedConverters = Collections.unmodifiableMap(sorted);
-		}
-	}
+    public void setConverters(Converter<Object, Object>[] converters) {
+        if (converters != null && converters.length > 0) {
+            for (Converter<Object, Object> converter : converters) {
+                if (converter != null) {
+                    Class<?> type = ClassUtils.getGenericClass(converter.getClass());
+                    if (type != null && !this.converters.containsKey(type)) {
+                        this.converters.put(type, converter);
+                    }
+                }
+            }
+            Map<Class<?>, Converter<Object, Object>> sorted = new TreeMap<Class<?>, Converter<Object, Object>>(ClassComparator.COMPARATOR);
+            sorted.putAll(this.converters);
+            this.sortedConverters = Collections.unmodifiableMap(sorted);
+        }
+    }
 
-	public Object convert(Object value, Map<String, Class<?>> types) throws IOException, ParseException {
-		if (value != null && converters != null) {
-			Class<?> cls = value.getClass();
-			Converter<Object, Object> converter = (Converter<Object, Object>) converters.get(cls);
-			if (converter != null) {
-				return converter.convert(value, types);
-			} else if (sortedConverters != null) {
-				for (Map.Entry<Class<?>, Converter<Object, Object>> entry : sortedConverters.entrySet()) {
-					if (entry.getKey().isAssignableFrom(cls)) {
-						converter = entry.getValue();
-						converters.put(cls, converter);
-						return converter.convert(value, types);
-					}
-				}
-			}
-		}
-		return value;
-	}
+    public Object convert(Object value, Map<String, Class<?>> types) throws IOException, ParseException {
+        if (value != null && converters != null) {
+            Class<?> cls = value.getClass();
+            Converter<Object, Object> converter = (Converter<Object, Object>) converters.get(cls);
+            if (converter != null) {
+                return converter.convert(value, types);
+            } else if (sortedConverters != null) {
+                for (Map.Entry<Class<?>, Converter<Object, Object>> entry : sortedConverters.entrySet()) {
+                    if (entry.getKey().isAssignableFrom(cls)) {
+                        converter = entry.getValue();
+                        converters.put(cls, converter);
+                        return converter.convert(value, types);
+                    }
+                }
+            }
+        }
+        return value;
+    }
 
 }

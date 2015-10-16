@@ -24,79 +24,79 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * CodecMethod. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class CodecMethod {
 
-	private final Map<String, Codec> codecs = new ConcurrentHashMap<String, Codec>();
+    private final Map<String, Codec> codecs = new ConcurrentHashMap<String, Codec>();
 
-	private String[] importPackages;
+    private String[] importPackages;
 
-	public void setCodecs(Codec[] codecs) {
-		for (Codec codec : codecs) {
-			this.codecs.put(codec.getFormat(), codec);
-		}
-	}
+    public void setCodecs(Codec[] codecs) {
+        for (Codec codec : codecs) {
+            this.codecs.put(codec.getFormat(), codec);
+        }
+    }
 
-	public void setImportPackages(String[] importPackages) {
-		this.importPackages = importPackages;
-	}
+    public void setImportPackages(String[] importPackages) {
+        this.importPackages = importPackages;
+    }
 
-	private Codec getAndCheckCodec(String format) {
-		Codec codec = codecs.get(format);
-		if (codec == null) {
-			throw new IllegalStateException("Unsupported encode format " + format + ", please add config codecs+=com.your." + format + "Codec" + " in httl.properties.");
-		}
-		return codec;
-	}
+    private Codec getAndCheckCodec(String format) {
+        Codec codec = codecs.get(format);
+        if (codec == null) {
+            throw new IllegalStateException("Unsupported encode format " + format + ", please add config codecs+=com.your." + format + "Codec" + " in httl.properties.");
+        }
+        return codec;
+    }
 
-	public String encode(Object value, String format) {
-		return getAndCheckCodec(format).toString(null, value);
-	}
+    public String encode(Object value, String format) {
+        return getAndCheckCodec(format).toString(null, value);
+    }
 
-	public Object decode(String value, String format) throws ParseException {
-		return decode(value, (Class<?>) null, format);
-	}
+    public Object decode(String value, String format) throws ParseException {
+        return decode(value, (Class<?>) null, format);
+    }
 
-	public Object decode(String value, String type, String format) throws ParseException {
-		return decode(value, ClassUtils.forName(importPackages, type), format);
-	}
+    public Object decode(String value, String type, String format) throws ParseException {
+        return decode(value, ClassUtils.forName(importPackages, type), format);
+    }
 
-	public <T> T decode(String value, Class<T> type, String format) throws ParseException {
-		return getAndCheckCodec(format).valueOf(value, type);
-	}
+    public <T> T decode(String value, Class<T> type, String format) throws ParseException {
+        return getAndCheckCodec(format).valueOf(value, type);
+    }
 
-	public String encodeJson(Object value) {
-		return encode(value, "json");
-	}
+    public String encodeJson(Object value) {
+        return encode(value, "json");
+    }
 
-	public Object decodeJson(String value) throws ParseException {
-		return decode(value, (Class<?>) null, "json");
-	}
+    public Object decodeJson(String value) throws ParseException {
+        return decode(value, (Class<?>) null, "json");
+    }
 
-	public <T> T decodeJson(String value, Class<T> type) throws ParseException {
-		return decode(value, type, "json");
-	}
+    public <T> T decodeJson(String value, Class<T> type) throws ParseException {
+        return decode(value, type, "json");
+    }
 
-	public Object decodeJson(String value, String type) throws ParseException {
-		return decode(value, type, "json");
-	}
+    public Object decodeJson(String value, String type) throws ParseException {
+        return decode(value, type, "json");
+    }
 
-	public String encodeXml(Object value) {
-		return encode(value, "xml");
-	}
+    public String encodeXml(Object value) {
+        return encode(value, "xml");
+    }
 
-	public Object decodeXml(String value) throws ParseException {
-		return decode(value, "xml");
-	}
+    public Object decodeXml(String value) throws ParseException {
+        return decode(value, "xml");
+    }
 
-	public <T> T decodeXml(String value, Class<T> type) throws ParseException {
-		return decode(value, type, "xml");
-	}
+    public <T> T decodeXml(String value, Class<T> type) throws ParseException {
+        return decode(value, type, "xml");
+    }
 
-	public Object decodeXml(String value, String type) throws ParseException {
-		return decode(value, type, "xml");
-	}
+    public Object decodeXml(String value, String type) throws ParseException {
+        return decode(value, type, "xml");
+    }
 
 }

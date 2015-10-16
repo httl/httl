@@ -19,30 +19,30 @@ import java.text.ParseException;
 
 /**
  * EndDirective. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class EndDirective extends Directive {
 
-	private BlockDirective start;
+    private BlockDirective start;
 
-	public EndDirective(int offset) {
-		super(offset);
-	}
+    public EndDirective(int offset) {
+        super(offset);
+    }
 
-	public BlockDirective getStart() {
-		return start;
-	}
+    public BlockDirective getStart() {
+        return start;
+    }
 
-	public void setStart(BlockDirective start) throws ParseException {
-		if (this.start != null)
-			throw new ParseException("Can not modify start.", getOffset());
-		this.start = start;
-	}
+    public void setStart(BlockDirective start) throws ParseException {
+        if (this.start != null)
+            throw new ParseException("Can not modify start.", getOffset());
+        this.start = start;
+    }
 
-	@Override
-	public String toString() {
-		return "#end";
-	}
+    @Override
+    public String toString() {
+        return "#end";
+    }
 
 }

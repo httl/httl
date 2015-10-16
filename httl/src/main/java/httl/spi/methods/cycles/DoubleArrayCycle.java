@@ -22,48 +22,48 @@ package httl.spi.methods.cycles;
  */
 public class DoubleArrayCycle {
 
-	private final double[] values;
-	
-	private final int size;
+    private final double[] values;
 
-	private int index;
+    private final int size;
 
-	public DoubleArrayCycle(double[] values) {
-		if (values == null || values.length == 0) {
-			throw new IllegalArgumentException("cycle values == null");
-		}
-		this.values = values;
-		this.size = values.length;
-		this.index = -1;
-	}
+    private int index;
 
-	public double getNext() {
-		index += 1;
-		if (index >= size)
-			index = 0;
-		return values[index];
-	}
+    public DoubleArrayCycle(double[] values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("cycle values == null");
+        }
+        this.values = values;
+        this.size = values.length;
+        this.index = -1;
+    }
 
-	public double getValue() {
-		if (index == -1)
-			return values[0];
-		return values[index];
-	}
+    public double getNext() {
+        index += 1;
+        if (index >= size)
+            index = 0;
+        return values[index];
+    }
 
-	public double[] getValues() {
-		return values;
-	}
+    public double getValue() {
+        if (index == -1)
+            return values[0];
+        return values[index];
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public double[] getValues() {
+        return values;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public int getSize() {
+        return size;
+    }
 
-	public String toString() {
-		return String.valueOf(getNext());
-	}
+    public int getIndex() {
+        return index;
+    }
+
+    public String toString() {
+        return String.valueOf(getNext());
+    }
 
 }

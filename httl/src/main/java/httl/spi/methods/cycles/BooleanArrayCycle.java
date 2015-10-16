@@ -22,48 +22,48 @@ package httl.spi.methods.cycles;
  */
 public class BooleanArrayCycle {
 
-	private final boolean[] values;
-	
-	private final int size;
+    private final boolean[] values;
 
-	private int index;
+    private final int size;
 
-	public BooleanArrayCycle(boolean[] values) {
-		if (values == null || values.length == 0) {
-			throw new IllegalArgumentException("cycle values == null");
-		}
-		this.values = values;
-		this.size = values.length;
-		this.index = -1;
-	}
+    private int index;
 
-	public boolean getNext() {
-		index += 1;
-		if (index >= size)
-			index = 0;
-		return values[index];
-	}
+    public BooleanArrayCycle(boolean[] values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("cycle values == null");
+        }
+        this.values = values;
+        this.size = values.length;
+        this.index = -1;
+    }
 
-	public boolean getValue() {
-		if (index == -1)
-			return values[0];
-		return values[index];
-	}
+    public boolean getNext() {
+        index += 1;
+        if (index >= size)
+            index = 0;
+        return values[index];
+    }
 
-	public boolean[] getValues() {
-		return values;
-	}
+    public boolean getValue() {
+        if (index == -1)
+            return values[0];
+        return values[index];
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public boolean[] getValues() {
+        return values;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public int getSize() {
+        return size;
+    }
 
-	public String toString() {
-		return String.valueOf(getNext());
-	}
+    public int getIndex() {
+        return index;
+    }
+
+    public String toString() {
+        return String.valueOf(getNext());
+    }
 
 }

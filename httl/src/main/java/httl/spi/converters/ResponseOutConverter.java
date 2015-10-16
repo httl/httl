@@ -17,37 +17,35 @@ package httl.spi.converters;
 
 import httl.spi.Converter;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * ResponseOutConverter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setOutConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setOutConverter(Converter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ResponseOutConverter implements Converter<HttpServletResponse, Object> {
 
-	private boolean outputStream;
+    private boolean outputStream;
 
-	/**
-	 * httl.properties: output.stream=true
-	 */
-	public void setOutputStream(boolean outputStream) {
-		this.outputStream = outputStream;
-	}
+    /**
+     * httl.properties: output.stream=true
+     */
+    public void setOutputStream(boolean outputStream) {
+        this.outputStream = outputStream;
+    }
 
-	public Object convert(HttpServletResponse value, Map<String, Class<?>> types) throws IOException, ParseException {
-		if (outputStream) {
-			return value.getOutputStream();
-		} else {
-			return value.getWriter();
-		}
-	}
+    public Object convert(HttpServletResponse value, Map<String, Class<?>> types) throws IOException, ParseException {
+        if (outputStream) {
+            return value.getOutputStream();
+        } else {
+            return value.getWriter();
+        }
+    }
 
 }

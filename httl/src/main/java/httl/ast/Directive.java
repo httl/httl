@@ -22,25 +22,25 @@ import java.text.ParseException;
 
 /**
  * Directive. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class Directive extends Statement {
 
-	public Directive(int offset) {
-		super(offset);
-	}
+    public Directive(int offset) {
+        super(offset);
+    }
 
-	public void accept(Visitor visitor) throws IOException, ParseException {
-		Expression expression = getExpression();
-		if (expression != null) {
-			expression.accept(visitor);
-		}
-		visitor.visit(this);
-	}
+    public void accept(Visitor visitor) throws IOException, ParseException {
+        Expression expression = getExpression();
+        if (expression != null) {
+            expression.accept(visitor);
+        }
+        visitor.visit(this);
+    }
 
-	protected Expression getExpression() {
-		return null;
-	}
+    protected Expression getExpression() {
+        return null;
+    }
 
 }

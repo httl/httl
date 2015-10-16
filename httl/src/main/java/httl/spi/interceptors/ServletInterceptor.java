@@ -20,40 +20,38 @@ import httl.spi.Interceptor;
 import httl.spi.Listener;
 import httl.spi.resolvers.ServletResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * ServletInterceptor. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setInterceptor(Interceptor)
  * @see httl.spi.translators.InterpretedTranslator#setInterceptor(Interceptor)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ServletInterceptor extends FirstInterceptor {
 
-	@Override
-	protected void doRender(Context context, Listener listener)
-			throws IOException, ParseException {
-		if (ServletResolver.getRequest() == null) {
-			Object request = context.get("request");
-			Object response = context.get("response");
-			if (request instanceof HttpServletRequest
-					&& response instanceof HttpServletResponse) {
-				ServletResolver.setRequestAndResponse((HttpServletRequest) request, (HttpServletResponse) response);
-				try {
-					listener.render(context);
-				} finally {
-					ServletResolver.removeRequestAndResponse();
-				}
-				return;
-			}
-		}
-		listener.render(context);
-	}
+    @Override
+    protected void doRender(Context context, Listener listener)
+            throws IOException, ParseException {
+        if (ServletResolver.getRequest() == null) {
+            Object request = context.get("request");
+            Object response = context.get("response");
+            if (request instanceof HttpServletRequest
+                    && response instanceof HttpServletResponse) {
+                ServletResolver.setRequestAndResponse((HttpServletRequest) request, (HttpServletResponse) response);
+                try {
+                    listener.render(context);
+                } finally {
+                    ServletResolver.removeRequestAndResponse();
+                }
+                return;
+            }
+        }
+        listener.render(context);
+    }
 
 }

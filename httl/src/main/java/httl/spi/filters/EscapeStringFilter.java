@@ -20,24 +20,23 @@ import httl.util.StringUtils;
 
 /**
  * EscapeStringFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setValueFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class EscapeStringFilter implements Filter {
 
-	public String filter(String key, String value) {
-		return StringUtils.escapeString(value);
-	}
+    public String filter(String key, String value) {
+        return StringUtils.escapeString(value);
+    }
 
-	public char[] filter(String key, char[] value) {
-		return StringUtils.escapeString(value);
-	}
+    public char[] filter(String key, char[] value) {
+        return StringUtils.escapeString(value);
+    }
 
-	public byte[] filter(String key, byte[] value) {
-		return StringUtils.escapeString(value);
-	}
+    public byte[] filter(String key, byte[] value) {
+        return StringUtils.escapeString(value);
+    }
 
 }

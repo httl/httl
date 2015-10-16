@@ -24,26 +24,25 @@ import java.util.Locale;
 
 /**
  * ClasspathResource. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.spi.loaders.ClasspathLoader#load(String, Locale, String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.loaders.ClasspathLoader#load(String, Locale, String)
  */
 public class ClasspathResource extends InputStreamResource {
 
-	private static final long serialVersionUID = 2499229996487593996L;
-	
-	public ClasspathResource(Engine engine, String name, Locale locale, String encoding, String path) {
-		super(engine, name, locale, encoding, path);
-	}
+    private static final long serialVersionUID = 2499229996487593996L;
 
-	public InputStream openStream() throws IOException {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(getPath());
-	}
+    public ClasspathResource(Engine engine, String name, Locale locale, String encoding, String path) {
+        super(engine, name, locale, encoding, path);
+    }
 
-	@Override
-	protected URL getUrl() {
-		return Thread.currentThread().getContextClassLoader().getResource(getPath());
-	}
+    public InputStream openStream() throws IOException {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(getPath());
+    }
+
+    @Override
+    protected URL getUrl() {
+        return Thread.currentThread().getContextClassLoader().getResource(getPath());
+    }
 
 }

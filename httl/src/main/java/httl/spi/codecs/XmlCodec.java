@@ -23,43 +23,43 @@ import java.text.ParseException;
 
 /**
  * Xbean Codec. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class XmlCodec extends AbstractXmlCodec {
 
-	public String toString(String key, Object value) {
-		return toString(toBytes(key, value));
-	}
+    public String toString(String key, Object value) {
+        return toString(toBytes(key, value));
+    }
 
-	public byte[] toBytes(String key, Object value) {
-		ByteArrayOutputStream bo = new ByteArrayOutputStream();
-		XMLEncoder xe = new XMLEncoder(bo);
-		try {
-			xe.writeObject(value);
-			xe.flush();
-		} finally {
-			xe.close();
-		}
-		return bo.toByteArray();
-	}
+    public byte[] toBytes(String key, Object value) {
+        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        XMLEncoder xe = new XMLEncoder(bo);
+        try {
+            xe.writeObject(value);
+            xe.flush();
+        } finally {
+            xe.close();
+        }
+        return bo.toByteArray();
+    }
 
-	public <T> T valueOf(String str, Class<T> type) throws ParseException {
-		return valueOf(toBytes(str), type);
-	}
+    public <T> T valueOf(String str, Class<T> type) throws ParseException {
+        return valueOf(toBytes(str), type);
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		ByteArrayInputStream bi = new ByteArrayInputStream(str);
-		XMLDecoder xd = new XMLDecoder(bi);
-		try {
-			return (T) xd.readObject();
-		} finally {
-			xd.close();
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        ByteArrayInputStream bi = new ByteArrayInputStream(str);
+        XMLDecoder xd = new XMLDecoder(bi);
+        try {
+            return (T) xd.readObject();
+        } finally {
+            xd.close();
+        }
+    }
 
 }

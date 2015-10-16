@@ -15,19 +15,14 @@
  */
 package httl.util;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Reqiured. (SPI, Annotation, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.util.BeanFactory
  * @see httl.util.Optional
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

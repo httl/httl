@@ -21,29 +21,29 @@ import java.text.ParseException;
 
 /**
  * BreakDirective. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class BreakDirective extends LineDirective {
 
-	private final Expression expression;
+    private final Expression expression;
 
-	public BreakDirective(Expression expression, int offset) {
-		super(offset);
-		this.expression = expression;
-	}
+    public BreakDirective(Expression expression, int offset) {
+        super(offset);
+        this.expression = expression;
+    }
 
-	public Expression getExpression() {
-		return expression;
-	}
+    public Expression getExpression() {
+        return expression;
+    }
 
-	public void setParent(Node parent) throws ParseException {
-		super.setParent(parent);
-	}
+    public void setParent(Node parent) throws ParseException {
+        super.setParent(parent);
+    }
 
-	@Override
-	public String toString() {
-		return expression == null ? "#break" : "#break(" + expression + ")";
-	}
+    @Override
+    public String toString() {
+        return expression == null ? "#break" : "#break(" + expression + ")";
+    }
 
 }

@@ -15,131 +15,124 @@
  */
 package httl.util;
 
-import java.util.AbstractSet;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * MapSupport (Tool, Prototype, NotThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class MapSupport<K, V> implements Map<K, V> {
 
-	private final Set<K> keySet;
-	
-	public MapSupport() {
-		this(null);
-	}
+    private final Set<K> keySet;
 
-	@SuppressWarnings("unchecked")
-	public MapSupport(K[] keys) {
-		this.keySet = keys == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(new HashSet<K>(Arrays.asList(keys)));
-	}
+    public MapSupport() {
+        this(null);
+    }
 
-	public Set<K> keySet() {
-		return keySet;
-	}
+    @SuppressWarnings("unchecked")
+    public MapSupport(K[] keys) {
+        this.keySet = keys == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(new HashSet<K>(Arrays.asList(keys)));
+    }
 
-	public Collection<V> values() {
-		return new BeanSet<V>() {
-			@Override
-			protected V getVaue(K key) {
-				return get(key);
-			}
-		};
-	}
+    public Set<K> keySet() {
+        return keySet;
+    }
 
-	public Set<Map.Entry<K, V>> entrySet() {
-		return new BeanSet<Map.Entry<K, V>>() {
-			@Override
-			protected Map.Entry<K, V> getVaue(K key) {
-				return new MapEntry<K, V>(key, get(key));
-			}
-		};
-	}
+    public Collection<V> values() {
+        return new BeanSet<V>() {
+            @Override
+            protected V getVaue(K key) {
+                return get(key);
+            }
+        };
+    }
 
-	public boolean containsKey(Object key) {
-		return get(key) != null;
-	}
+    public Set<Map.Entry<K, V>> entrySet() {
+        return new BeanSet<Map.Entry<K, V>>() {
+            @Override
+            protected Map.Entry<K, V> getVaue(K key) {
+                return new MapEntry<K, V>(key, get(key));
+            }
+        };
+    }
 
-	public boolean containsValue(Object value) {
-		return values().contains(value);
-	}
+    public boolean containsKey(Object key) {
+        return get(key) != null;
+    }
 
-	public boolean isEmpty() {
-		return size() > 0;
-	}
+    public boolean containsValue(Object value) {
+        return values().contains(value);
+    }
 
-	public int size() {
-		return keySet().size();
-	}
+    public boolean isEmpty() {
+        return size() > 0;
+    }
 
-	public V put(K key, V value) {
-		throw new UnsupportedOperationException();
-	}
+    public int size() {
+        return keySet().size();
+    }
 
-	public void putAll(Map<? extends K, ? extends V> map) {
-		if (map != null) {
-			for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
-				put(entry.getKey(), entry.getValue());
-			}
-		}
-	}
+    public V put(K key, V value) {
+        throw new UnsupportedOperationException();
+    }
 
-	@SuppressWarnings("unchecked")
-	public V remove(Object key) {
-		return put((K) key, null);
-	}
+    public void putAll(Map<? extends K, ? extends V> map) {
+        if (map != null) {
+            for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
+                put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
 
-	public void clear() {
-		for (K key : keySet()) {
-			remove(key);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public V remove(Object key) {
+        return put((K) key, null);
+    }
 
-	private abstract class BeanSet<T> extends AbstractSet<T> {
+    public void clear() {
+        for (K key : keySet()) {
+            remove(key);
+        }
+    }
 
-		@Override
-		public Iterator<T> iterator() {
-			return new BeanIterator();
-		}
+    private abstract class BeanSet<T> extends AbstractSet<T> {
 
-		@Override
-		public int size() {
-			return MapSupport.this.size();
-		}
-		
-		protected abstract T getVaue(K key);
+        @Override
+        public Iterator<T> iterator() {
+            return new BeanIterator();
+        }
 
-		private class BeanIterator implements Iterator<T> {
-			
-			private final Iterator<K> iterator = MapSupport.this.keySet().iterator();
-			
-			private K key;
-			
-			public boolean hasNext() {
-				return iterator.hasNext();
-			}
+        @Override
+        public int size() {
+            return MapSupport.this.size();
+        }
 
-			public T next() {
-				key = iterator.next();
-				return getVaue(key);
-			}
+        protected abstract T getVaue(K key);
 
-			public void remove() {
-				if (key == null)
-					throw new IllegalStateException("No such remove() key, Please call next() first.");
-				MapSupport.this.remove(key);
-			}
-			
-		}
+        private class BeanIterator implements Iterator<T> {
 
-	}
+            private final Iterator<K> iterator = MapSupport.this.keySet().iterator();
+
+            private K key;
+
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            public T next() {
+                key = iterator.next();
+                return getVaue(key);
+            }
+
+            public void remove() {
+                if (key == null)
+                    throw new IllegalStateException("No such remove() key, Please call next() first.");
+                MapSupport.this.remove(key);
+            }
+
+        }
+
+    }
 
 }

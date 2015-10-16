@@ -20,19 +20,18 @@ import httl.util.Reqiured;
 
 /**
  * MultiListener. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Listener)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Listener)
  */
 public class MultiAfterListener extends MultiListener {
 
-	/**
-	 * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
-	 */
-	@Reqiured
-	public void setAfterListeners(Listener[] listeners) {
-		super.setListeners(listeners);
-	}
+    /**
+     * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
+     */
+    @Reqiured
+    public void setAfterListeners(Listener[] listeners) {
+        super.setListeners(listeners);
+    }
 
 }

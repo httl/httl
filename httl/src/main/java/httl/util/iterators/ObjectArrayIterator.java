@@ -20,38 +20,38 @@ import java.util.NoSuchElementException;
 
 /**
  * ObjectArrayIterator. (Tool, Prototype, ThreadUnsafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ObjectArrayIterator<T> implements Iterator<T> {
 
-	private final T[] array;
+    private final T[] array;
 
-	private final int length;
+    private final int length;
 
-	private int index;
+    private int index;
 
-	public ObjectArrayIterator(T[] array){
-		this.array = array;
-		this.length = array == null ? 0 : array.length;
-	}
+    public ObjectArrayIterator(T[] array) {
+        this.array = array;
+        this.length = array == null ? 0 : array.length;
+    }
 
-	public T[] getArray() {
-		return array;
-	}
+    public T[] getArray() {
+        return array;
+    }
 
-	public boolean hasNext() {
-		return index < length;
-	}
+    public boolean hasNext() {
+        return index < length;
+    }
 
-	public T next() {
-		if (! hasNext()) {
-			throw new NoSuchElementException();
-		}
-		return array[index ++];
-	}
+    public T next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return array[index++];
+    }
 
-	public void remove() {
-		throw new UnsupportedOperationException("remove() method is not supported");
-	}
+    public void remove() {
+        throw new UnsupportedOperationException("remove() method is not supported");
+    }
 }

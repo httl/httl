@@ -22,74 +22,75 @@ import java.nio.ByteBuffer;
 
 /**
  * UnsafeByteArrayOutputStream.
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class UnsafeByteArrayOutputStream extends OutputStream {
 
-	protected byte[] buffer;
+    protected byte[] buffer;
 
-	protected int  count;
+    protected int count;
 
-	public UnsafeByteArrayOutputStream(){
-		this(32);
-	}
+    public UnsafeByteArrayOutputStream() {
+        this(32);
+    }
 
-	public UnsafeByteArrayOutputStream(int size){
-		if (size < 0) throw new IllegalArgumentException("Negative initial size: " + size);
-		buffer = new byte[size];
-	}
+    public UnsafeByteArrayOutputStream(int size) {
+        if (size < 0) throw new IllegalArgumentException("Negative initial size: " + size);
+        buffer = new byte[size];
+    }
 
-	public void write(int b) {
-		int newcount = count + 1;
-		if (newcount > buffer.length) buffer = copyOf(buffer, Math.max(buffer.length << 1, newcount));
-		buffer[count] = (byte) b;
-		count = newcount;
-	}
+    private static byte[] copyOf(byte[] src, int length) {
+        byte[] dest = new byte[length];
+        System.arraycopy(src, 0, dest, 0, Math.min(src.length, length));
+        return dest;
+    }
 
-	public void write(byte b[], int off, int len) {
-		if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) throw new IndexOutOfBoundsException();
-		if (len == 0) return;
-		int newcount = count + len;
-		if (newcount > buffer.length) buffer = copyOf(buffer, Math.max(buffer.length << 1, newcount));
-		System.arraycopy(b, off, buffer, count, len);
-		count = newcount;
-	}
+    public void write(int b) {
+        int newcount = count + 1;
+        if (newcount > buffer.length) buffer = copyOf(buffer, Math.max(buffer.length << 1, newcount));
+        buffer[count] = (byte) b;
+        count = newcount;
+    }
 
-	public int size() {
-		return count;
-	}
+    public void write(byte b[], int off, int len) {
+        if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0))
+            throw new IndexOutOfBoundsException();
+        if (len == 0) return;
+        int newcount = count + len;
+        if (newcount > buffer.length) buffer = copyOf(buffer, Math.max(buffer.length << 1, newcount));
+        System.arraycopy(b, off, buffer, count, len);
+        count = newcount;
+    }
 
-	public void reset() {
-		count = 0;
-	}
+    public int size() {
+        return count;
+    }
 
-	public byte[] toByteArray() {
-		return copyOf(buffer, count);
-	}
+    public void reset() {
+        count = 0;
+    }
 
-	private static byte[] copyOf(byte[] src, int length) {
-		byte[] dest = new byte[length];
-		System.arraycopy(src, 0, dest, 0, Math.min(src.length, length));
-		return dest;
-	}
+    public byte[] toByteArray() {
+        return copyOf(buffer, count);
+    }
 
-	public ByteBuffer toByteBuffer() {
-		return ByteBuffer.wrap(buffer, 0, count);
-	}
+    public ByteBuffer toByteBuffer() {
+        return ByteBuffer.wrap(buffer, 0, count);
+    }
 
-	public void writeTo(OutputStream out) throws IOException {
-		out.write(buffer, 0, count);
-	}
+    public void writeTo(OutputStream out) throws IOException {
+        out.write(buffer, 0, count);
+    }
 
-	public String toString() {
-		return new String(buffer, 0, count);
-	}
+    public String toString() {
+        return new String(buffer, 0, count);
+    }
 
-	public String toString(String charset) throws UnsupportedEncodingException {
-		return new String(buffer, 0, count, charset);
-	}
+    public String toString(String charset) throws UnsupportedEncodingException {
+        return new String(buffer, 0, count, charset);
+    }
 
-	public void close() throws IOException {
-	}
+    public void close() throws IOException {
+    }
 }

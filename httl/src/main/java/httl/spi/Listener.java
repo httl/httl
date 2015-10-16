@@ -22,22 +22,21 @@ import java.text.ParseException;
 
 /**
  * Render Listener. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.Interceptor#render(Context, Listener)
  * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Listener)
  * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Listener)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Listener {
 
-	/**
-	 * On template render.
-	 * 
-	 * @param context - render context
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed on runtime
-	 */
-	void render(Context context) throws IOException, ParseException;
+    /**
+     * On template render.
+     *
+     * @param context - render context
+     * @throws IOException    - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed on runtime
+     */
+    void render(Context context) throws IOException, ParseException;
 
 }

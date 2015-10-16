@@ -26,64 +26,63 @@ import java.util.Locale;
 
 /**
  * MultiLoader. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  */
 public class MultiLoader implements Loader {
 
-	private Loader[] loaders;
-	
-	public void setLoaders(Loader[] loaders) {
-		this.loaders = loaders;
-	}
+    private Loader[] loaders;
 
-	public Resource load(String name, Locale locale, String encoding) throws IOException {
-		if (loaders.length == 1) {
-			return loaders[0].load(name, locale, encoding);
-		}
-		for (Loader loader : loaders) {
-			try {
-				if (loader.exists(name, locale)) {
-					return loader.load(name, locale, encoding);
-				}
-			} catch (Exception e) {
-			}
-		}
-		throw new FileNotFoundException("No such template file: " + name);
-	}
+    public void setLoaders(Loader[] loaders) {
+        this.loaders = loaders;
+    }
 
-	public List<String> list(String suffix) throws IOException {
-		if (loaders.length == 1) {
-			return loaders[0].list(suffix);
-		}
-		List<String> all = new ArrayList<String>();
-		for (Loader loader : loaders) {
-			try {
-				List<String> list = loader.list(suffix);
-				if (list != null && list.size() > 0) {
-					all.addAll(list);
-				}
-			} catch (Exception e) {
-			}
-		}
-		return all;
-	}
+    public Resource load(String name, Locale locale, String encoding) throws IOException {
+        if (loaders.length == 1) {
+            return loaders[0].load(name, locale, encoding);
+        }
+        for (Loader loader : loaders) {
+            try {
+                if (loader.exists(name, locale)) {
+                    return loader.load(name, locale, encoding);
+                }
+            } catch (Exception e) {
+            }
+        }
+        throw new FileNotFoundException("No such template file: " + name);
+    }
 
-	public boolean exists(String name, Locale locale) {
-		if (loaders.length == 1) {
-			return loaders[0].exists(name, locale);
-		}
-		for (Loader loader : loaders) {
-			try {
-				if (loader.exists(name, locale)) {
-					return true;
-				}
-			} catch (Exception e) {
-			}
-		}
-		return false;
-	}
+    public List<String> list(String suffix) throws IOException {
+        if (loaders.length == 1) {
+            return loaders[0].list(suffix);
+        }
+        List<String> all = new ArrayList<String>();
+        for (Loader loader : loaders) {
+            try {
+                List<String> list = loader.list(suffix);
+                if (list != null && list.size() > 0) {
+                    all.addAll(list);
+                }
+            } catch (Exception e) {
+            }
+        }
+        return all;
+    }
+
+    public boolean exists(String name, Locale locale) {
+        if (loaders.length == 1) {
+            return loaders[0].exists(name, locale);
+        }
+        for (Loader loader : loaders) {
+            try {
+                if (loader.exists(name, locale)) {
+                    return true;
+                }
+            } catch (Exception e) {
+            }
+        }
+        return false;
+    }
 
 }

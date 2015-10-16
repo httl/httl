@@ -24,21 +24,20 @@ import java.text.ParseException;
 
 /**
  * FirstInterceptor. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setInterceptor(Interceptor)
  * @see httl.spi.translators.InterpretedTranslator#setInterceptor(Interceptor)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class FirstInterceptor extends TemplateInterceptor {
 
-	public void render(Context context, Listener listener)
-			throws IOException, ParseException {
-		if (context.getLevel() > 1) { 
-			listener.render(context);
-			return;
-		}
-		super.render(context, listener);
-	}
+    public void render(Context context, Listener listener)
+            throws IOException, ParseException {
+        if (context.getLevel() > 1) {
+            listener.render(context);
+            return;
+        }
+        super.render(context, listener);
+    }
 
 }

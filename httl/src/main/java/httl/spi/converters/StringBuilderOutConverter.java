@@ -25,16 +25,15 @@ import java.util.Map;
 
 /**
  * StringBuilderOutConverter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setOutConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setOutConverter(Converter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class StringBuilderOutConverter implements Converter<StringBuilder, Writer> {
 
-	public Writer convert(StringBuilder value, Map<String, Class<?>> types) throws IOException, ParseException {
-		return new UnsafeStringWriter(value);
-	}
+    public Writer convert(StringBuilder value, Map<String, Class<?>> types) throws IOException, ParseException {
+        return new UnsafeStringWriter(value);
+    }
 
 }

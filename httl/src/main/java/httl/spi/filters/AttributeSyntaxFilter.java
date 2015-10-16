@@ -17,24 +17,17 @@ package httl.spi.filters;
 
 import httl.spi.Filter;
 import httl.util.StringUtils;
+import net.htmlparser.jericho.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.htmlparser.jericho.Attribute;
-import net.htmlparser.jericho.Attributes;
-import net.htmlparser.jericho.Element;
-import net.htmlparser.jericho.OutputDocument;
-import net.htmlparser.jericho.Segment;
-import net.htmlparser.jericho.Source;
-
 /**
  * AttributeSyntaxFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTemplateFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTemplateFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class AttributeSyntaxFilter extends AbstractFilter {
 

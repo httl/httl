@@ -17,13 +17,13 @@ package httl.ast;
 
 /**
  * RootDirective. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class RootDirective extends BlockDirective {
 
-	public RootDirective() {
-		super(0);
-	}
+    public RootDirective() {
+        super(0);
+    }
 
 }

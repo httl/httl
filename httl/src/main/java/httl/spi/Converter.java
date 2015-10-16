@@ -21,26 +21,24 @@ import java.util.Map;
 
 /**
  * Object Converter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setMapConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setMapConverter(Converter)
  * @see httl.spi.translators.CompiledTranslator#setOutConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setOutConverter(Converter)
- * 
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Converter<F, T> {
 
-	/**
-	 * Convert the value.
-	 * 
-	 * @param value - origin value
-	 * @param types - convert types
-	 * @return converted value
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed on runtime
-	 */
-	T convert(F value, Map<String, Class<?>> types) throws IOException, ParseException;
+    /**
+     * Convert the value.
+     *
+     * @param value - origin value
+     * @param types - convert types
+     * @return converted value
+     * @throws IOException    - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed on runtime
+     */
+    T convert(F value, Map<String, Class<?>> types) throws IOException, ParseException;
 
 }

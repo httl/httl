@@ -17,31 +17,31 @@ package httl.ast;
 
 /**
  * Comment. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class Comment extends Statement {
 
-	private final String content;
+    private final String content;
 
-	private final boolean block;
+    private final boolean block;
 
-	public Comment(String content, boolean block, int offset) {
-		super(offset);
-		this.content = content;
-		this.block = block;
-	}
+    public Comment(String content, boolean block, int offset) {
+        super(offset);
+        this.content = content;
+        this.block = block;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public boolean isBlock() {
-		return block;
-	}
+    public boolean isBlock() {
+        return block;
+    }
 
-	@Override
-	public String toString() {
-		return block ? "#[" + content + "]#" : "##" + content + "\n";
-	}
+    @Override
+    public String toString() {
+        return block ? "#[" + content + "]#" : "##" + content + "\n";
+    }
 }

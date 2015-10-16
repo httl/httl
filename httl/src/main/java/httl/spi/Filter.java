@@ -17,43 +17,42 @@ package httl.spi;
 
 /**
  * Text Filter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTemplateFilter(Filter)
  * @see httl.spi.translators.CompiledTranslator#setTextFilter(Filter)
  * @see httl.spi.translators.CompiledTranslator#setValueFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTemplateFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTextFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Filter {
 
-	/**
-	 * Filter the string value.
-	 * 
-	 * @param key - source key
-	 * @param value - original string value
-	 * @return filtered string value
-	 */
-	String filter(String key, String value);
+    /**
+     * Filter the string value.
+     *
+     * @param key   - source key
+     * @param value - original string value
+     * @return filtered string value
+     */
+    String filter(String key, String value);
 
-	/**
-	 * Filter the char array value.
-	 * 
-	 * @param key - source key
-	 * @param value - original char array value
-	 * @return filtered char array value
-	 */
-	char[] filter(String key, char[] value);
+    /**
+     * Filter the char array value.
+     *
+     * @param key   - source key
+     * @param value - original char array value
+     * @return filtered char array value
+     */
+    char[] filter(String key, char[] value);
 
-	/**
-	 * Filter the byte array value.
-	 * 
-	 * @param key - source key
-	 * @param value - original byte array value
-	 * @return filtered byte array value
-	 */
-	byte[] filter(String key, byte[] value);
+    /**
+     * Filter the byte array value.
+     *
+     * @param key   - source key
+     * @param value - original byte array value
+     * @return filtered byte array value
+     */
+    byte[] filter(String key, byte[] value);
 
 }

@@ -21,25 +21,26 @@ import java.util.UUID;
 
 /**
  * SystemMethod. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class SystemMethod {
 
-	private SystemMethod() {}
+    private static final Random RANDOM = new Random();
 
-	private static final Random RANDOM = new Random();
+    private SystemMethod() {
+    }
 
-	public static Date now() {
-		return new Date();
-	}
+    public static Date now() {
+        return new Date();
+    }
 
-	public static int random() {
-		return RANDOM.nextInt();
-	}
+    public static int random() {
+        return RANDOM.nextInt();
+    }
 
-	public static UUID uuid() {
-		return UUID.randomUUID();
-	}
+    public static UUID uuid() {
+        return UUID.randomUUID();
+    }
 
 }

@@ -19,19 +19,18 @@ import httl.spi.Filter;
 
 /**
  * MultiTemplateFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTemplateFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTemplateFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiTemplateFilter extends MultiFilter {
 
-	/**
-	 * httl.properties: template.filters=httl.spi.filters.ClearBlankLineFilter
-	 */
-	public void setTemplateFilters(Filter[] filters) {
-		setFilters(filters);
-	}
+    /**
+     * httl.properties: template.filters=httl.spi.filters.ClearBlankLineFilter
+     */
+    public void setTemplateFilters(Filter[] filters) {
+        setFilters(filters);
+    }
 
 }

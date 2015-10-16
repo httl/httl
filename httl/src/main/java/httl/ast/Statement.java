@@ -17,13 +17,13 @@ package httl.ast;
 
 /**
  * Statement. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author liangfei
  */
 public abstract class Statement extends AbstractNode {
 
-	public Statement(int offset) {
-		super(offset);
-	}
+    public Statement(int offset) {
+        super(offset);
+    }
 
 }

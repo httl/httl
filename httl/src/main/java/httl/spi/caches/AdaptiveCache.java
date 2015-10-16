@@ -25,94 +25,93 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * AdaptiveCache. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setCache(java.util.Map)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setCache(java.util.Map)
  */
 public class AdaptiveCache<K, V> implements ConcurrentMap<K, V> {
 
-	private ConcurrentMap<K, V> cache;
+    private ConcurrentMap<K, V> cache;
 
-	/**
-	 * httl.properties: cache.capacity=1000
-	 */
-	public void setCacheCapacity(int capacity) {
-		if (capacity > 0) {
-			cache = new ConcurrentLinkedHashMap<K, V>(capacity);
-		} else {
-			cache = new ConcurrentHashMap<K, V>();
-		}
-	}
-	
-	public void init() {
-		if (cache == null) {
-			setCacheCapacity(0);
-		}
-	}
+    /**
+     * httl.properties: cache.capacity=1000
+     */
+    public void setCacheCapacity(int capacity) {
+        if (capacity > 0) {
+            cache = new ConcurrentLinkedHashMap<K, V>(capacity);
+        } else {
+            cache = new ConcurrentHashMap<K, V>();
+        }
+    }
 
-	public void clear() {
-		cache.clear();
-	}
+    public void init() {
+        if (cache == null) {
+            setCacheCapacity(0);
+        }
+    }
 
-	public boolean containsKey(Object key) {
-		return cache.containsKey(key);
-	}
+    public void clear() {
+        cache.clear();
+    }
 
-	public boolean containsValue(Object value) {
-		return cache.containsValue(value);
-	}
+    public boolean containsKey(Object key) {
+        return cache.containsKey(key);
+    }
 
-	public Set<java.util.Map.Entry<K, V>> entrySet() {
-		return cache.entrySet();
-	}
+    public boolean containsValue(Object value) {
+        return cache.containsValue(value);
+    }
 
-	public V get(Object key) {
-		return cache.get(key);
-	}
+    public Set<java.util.Map.Entry<K, V>> entrySet() {
+        return cache.entrySet();
+    }
 
-	public boolean isEmpty() {
-		return cache.isEmpty();
-	}
+    public V get(Object key) {
+        return cache.get(key);
+    }
 
-	public Set<K> keySet() {
-		return cache.keySet();
-	}
+    public boolean isEmpty() {
+        return cache.isEmpty();
+    }
 
-	public V put(K key, V value) {
-		return cache.put(key, value);
-	}
+    public Set<K> keySet() {
+        return cache.keySet();
+    }
 
-	public void putAll(Map<? extends K, ? extends V> m) {
-		cache.putAll(m);
-	}
+    public V put(K key, V value) {
+        return cache.put(key, value);
+    }
 
-	public V remove(Object key) {
-		return cache.remove(key);
-	}
+    public void putAll(Map<? extends K, ? extends V> m) {
+        cache.putAll(m);
+    }
 
-	public int size() {
-		return cache.size();
-	}
+    public V remove(Object key) {
+        return cache.remove(key);
+    }
 
-	public Collection<V> values() {
-		return cache.values();
-	}
+    public int size() {
+        return cache.size();
+    }
 
-	public V putIfAbsent(K key, V value) {
-		return cache.putIfAbsent(key, value);
-	}
+    public Collection<V> values() {
+        return cache.values();
+    }
 
-	public boolean remove(Object key, Object value) {
-		return cache.remove(key, value);
-	}
+    public V putIfAbsent(K key, V value) {
+        return cache.putIfAbsent(key, value);
+    }
 
-	public boolean replace(K key, V oldValue, V newValue) {
-		return cache.replace(key, oldValue, newValue);
-	}
+    public boolean remove(Object key, Object value) {
+        return cache.remove(key, value);
+    }
 
-	public V replace(K key, V value) {
-		return cache.replace(key, value);
-	}
+    public boolean replace(K key, V oldValue, V newValue) {
+        return cache.replace(key, oldValue, newValue);
+    }
+
+    public V replace(K key, V value) {
+        return cache.replace(key, value);
+    }
 
 }

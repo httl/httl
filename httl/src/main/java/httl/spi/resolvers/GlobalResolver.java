@@ -22,30 +22,30 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * GlobalResolver. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class GlobalResolver implements Resolver {
 
-	private static volatile Map<String, Object> global;
+    private static volatile Map<String, Object> global;
 
-	public static Map<String, Object> getGlobal() {
-		if (global == null) {
-			synchronized (GlobalResolver.class) {
-				if (global == null) {
-					global = new ConcurrentHashMap<String, Object>();
-				}
-			}
-		}
-		return global;
-	}
+    public static Map<String, Object> getGlobal() {
+        if (global == null) {
+            synchronized (GlobalResolver.class) {
+                if (global == null) {
+                    global = new ConcurrentHashMap<String, Object>();
+                }
+            }
+        }
+        return global;
+    }
 
-	public static Object put(String key, Object value) {
-		return getGlobal().put(key, value);
-	}
+    public static Object put(String key, Object value) {
+        return getGlobal().put(key, value);
+    }
 
-	public Object get(String key) {
-		return global == null ? null : global.get(key);
-	}
+    public Object get(String key) {
+        return global == null ? null : global.get(key);
+    }
 
 }

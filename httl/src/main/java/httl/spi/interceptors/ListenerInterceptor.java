@@ -26,66 +26,65 @@ import java.text.ParseException;
 
 /**
  * Listener Interceptor. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setInterceptor(Interceptor)
  * @see httl.spi.translators.InterpretedTranslator#setInterceptor(Interceptor)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ListenerInterceptor implements Interceptor {
 
-	private Listener beforeListener;
+    private Listener beforeListener;
 
-	private Listener afterListener;
+    private Listener afterListener;
 
-	private Logger logger;
+    private Logger logger;
 
-	/**
-	 * httl.properties: before.listeners=httl.spi.listeners.ExtendsListener
-	 */
-	@Optional
-	public void setBeforeListener(Listener listener) {
-		this.beforeListener = listener;
-	}
+    /**
+     * httl.properties: before.listeners=httl.spi.listeners.ExtendsListener
+     */
+    @Optional
+    public void setBeforeListener(Listener listener) {
+        this.beforeListener = listener;
+    }
 
-	/**
-	 * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
-	 */
-	@Optional
-	public void setAfterListener(Listener listener) {
-		this.afterListener = listener;
-	}
+    /**
+     * httl.properties: after.listeners=httl.spi.listeners.ExtendsListener
+     */
+    @Optional
+    public void setAfterListener(Listener listener) {
+        this.afterListener = listener;
+    }
 
-	/**
-	 * httl.properties: loggers=httl.spi.loggers.Log4jListener
-	 */
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}
+    /**
+     * httl.properties: loggers=httl.spi.loggers.Log4jListener
+     */
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
 
-	public void render(Context context, Listener listener) throws IOException, ParseException {
-		if (beforeListener != null) {
-			try {
-				beforeListener.render(context);
-			} catch (Exception e) {
-				if (logger != null && logger.isErrorEnabled()) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-		}
-		try {
-			listener.render(context);
-		} finally {
-			if (afterListener != null) {
-				try {
-					afterListener.render(context);
-				} catch (Exception e) {
-					if (logger != null && logger.isErrorEnabled()) {
-						logger.error(e.getMessage(), e);
-					}
-				}
-			}
-		}
-	}
+    public void render(Context context, Listener listener) throws IOException, ParseException {
+        if (beforeListener != null) {
+            try {
+                beforeListener.render(context);
+            } catch (Exception e) {
+                if (logger != null && logger.isErrorEnabled()) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }
+        try {
+            listener.render(context);
+        } finally {
+            if (afterListener != null) {
+                try {
+                    afterListener.render(context);
+                } catch (Exception e) {
+                    if (logger != null && logger.isErrorEnabled()) {
+                        logger.error(e.getMessage(), e);
+                    }
+                }
+            }
+        }
+    }
 
 }

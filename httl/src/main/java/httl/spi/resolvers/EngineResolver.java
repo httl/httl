@@ -21,19 +21,19 @@ import httl.util.StringUtils;
 
 /**
  * EngineResolver. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class EngineResolver implements Resolver {
-	
-	private Engine engine;
 
-	public void setEngine(Engine engine) {
-		this.engine = engine;
-	}
+    private Engine engine;
 
-	public Object get(String key) {
-		return engine == null ? null : engine.getProperty(StringUtils.splitCamelName(key, "."));
-	}
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+
+    public Object get(String key) {
+        return engine == null ? null : engine.getProperty(StringUtils.splitCamelName(key, "."));
+    }
 
 }

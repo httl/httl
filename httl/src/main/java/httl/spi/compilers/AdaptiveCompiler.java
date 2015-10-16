@@ -23,77 +23,76 @@ import java.text.ParseException;
 
 /**
  * AdaptiveCompiler. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.translators.CompiledTranslator#setCompiler(Compiler)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.translators.CompiledTranslator#setCompiler(Compiler)
  */
 public class AdaptiveCompiler implements Compiler {
 
-	private Compiler compiler;
+    private Compiler compiler;
 
-	private Logger logger;
+    private Logger logger;
 
-	private String codeDirectory;
+    private String codeDirectory;
 
-	/**
-	 * httl.properties: loggers=httl.spi.loggers.Log4jLogger
-	 */
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-		if (compiler instanceof AbstractCompiler) {
-			((AbstractCompiler) compiler).setLogger(logger);
-		}
-	}
+    /**
+     * httl.properties: loggers=httl.spi.loggers.Log4jLogger
+     */
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+        if (compiler instanceof AbstractCompiler) {
+            ((AbstractCompiler) compiler).setLogger(logger);
+        }
+    }
 
-	/**
-	 * httl.properties: code.directory=/tmp
-	 */
-	public void setCodeDirectory(String codeDirectory) {
-		this.codeDirectory = codeDirectory;
-		if (compiler instanceof AbstractCompiler) {
-			((AbstractCompiler) compiler).setCodeDirectory(codeDirectory);
-		}
-	}
+    /**
+     * httl.properties: code.directory=/tmp
+     */
+    public void setCodeDirectory(String codeDirectory) {
+        this.codeDirectory = codeDirectory;
+        if (compiler instanceof AbstractCompiler) {
+            ((AbstractCompiler) compiler).setCodeDirectory(codeDirectory);
+        }
+    }
 
-	/**
-	 * httl.properties: lint.unchecked=true
-	 */
-	public void setLintUnchecked(boolean unchecked) {
-		if (compiler instanceof JdkCompiler) {
-			((JdkCompiler) compiler).setLintUnchecked(unchecked);
-		}
-	}
+    /**
+     * httl.properties: lint.unchecked=true
+     */
+    public void setLintUnchecked(boolean unchecked) {
+        if (compiler instanceof JdkCompiler) {
+            ((JdkCompiler) compiler).setLintUnchecked(unchecked);
+        }
+    }
 
-	/**
-	 * httl.properties: compile.version=1.7
-	 */
-	public void setCompileVersion(String version) {
-		if (version == null || ClassUtils.isBeforeJava6(version)) {
-			JavassistCompiler javassistCompiler = new JavassistCompiler();
-			javassistCompiler.setLogger(logger);
-			javassistCompiler.setCodeDirectory(codeDirectory);
-			compiler = javassistCompiler;
-		} else {
-			JdkCompiler jdkCompiler = new JdkCompiler();
-			jdkCompiler.setCompileVersion(version);
-			jdkCompiler.setLogger(logger);
-			jdkCompiler.setCodeDirectory(codeDirectory);
-			compiler = jdkCompiler;
-		}
-	}
+    /**
+     * httl.properties: compile.version=1.7
+     */
+    public void setCompileVersion(String version) {
+        if (version == null || ClassUtils.isBeforeJava6(version)) {
+            JavassistCompiler javassistCompiler = new JavassistCompiler();
+            javassistCompiler.setLogger(logger);
+            javassistCompiler.setCodeDirectory(codeDirectory);
+            compiler = javassistCompiler;
+        } else {
+            JdkCompiler jdkCompiler = new JdkCompiler();
+            jdkCompiler.setCompileVersion(version);
+            jdkCompiler.setLogger(logger);
+            jdkCompiler.setCodeDirectory(codeDirectory);
+            compiler = jdkCompiler;
+        }
+    }
 
-	public void init() {
-		if (compiler == null) {
-			setCompileVersion(ClassUtils.getJavaVersion());
-		}
-		if (compiler instanceof JdkCompiler) {
-			((JdkCompiler) compiler).init();
-		}
-	}
+    public void init() {
+        if (compiler == null) {
+            setCompileVersion(ClassUtils.getJavaVersion());
+        }
+        if (compiler instanceof JdkCompiler) {
+            ((JdkCompiler) compiler).init();
+        }
+    }
 
-	public Class<?> compile(String code) throws ParseException {
-		return compiler.compile(code);
-	}
+    public Class<?> compile(String code) throws ParseException {
+        return compiler.compile(code);
+    }
 
 }

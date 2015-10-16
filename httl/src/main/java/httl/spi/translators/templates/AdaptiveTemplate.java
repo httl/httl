@@ -15,184 +15,169 @@
  */
 package httl.spi.translators.templates;
 
-import httl.Context;
-import httl.Engine;
-import httl.Node;
-import httl.Template;
-import httl.Visitor;
+import httl.*;
 import httl.spi.Converter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.Writer;
+import java.io.*;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Adaptive Template. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.Engine#getTemplate(String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Engine#getTemplate(String)
  */
 public class AdaptiveTemplate implements Template, Serializable {
 
-	private static final long serialVersionUID = 3094907176375413567L;
+    private static final long serialVersionUID = 3094907176375413567L;
 
-	private final Template writerTemplate;
+    private final Template writerTemplate;
 
-	private final Template streamTemplate;
-	
-	private final Converter<Object, Object> outConverter;
+    private final Template streamTemplate;
 
-	public AdaptiveTemplate(Template writerTemplate, Template streamTemplate, Converter<Object, Object> outConverter) {
-		if (writerTemplate == null)
-			throw new IllegalArgumentException("writer template == null");
-		if (streamTemplate == null)
-			throw new IllegalArgumentException("stream template == null");
-		this.writerTemplate = writerTemplate;
-		this.streamTemplate = streamTemplate;
-		this.outConverter = outConverter;
-	}
+    private final Converter<Object, Object> outConverter;
+    private Map<String, Template> macros;
 
-	public String getName() {
-		return writerTemplate.getName();
-	}
+    public AdaptiveTemplate(Template writerTemplate, Template streamTemplate, Converter<Object, Object> outConverter) {
+        if (writerTemplate == null)
+            throw new IllegalArgumentException("writer template == null");
+        if (streamTemplate == null)
+            throw new IllegalArgumentException("stream template == null");
+        this.writerTemplate = writerTemplate;
+        this.streamTemplate = streamTemplate;
+        this.outConverter = outConverter;
+    }
 
-	public String getEncoding() {
-		return writerTemplate.getEncoding();
-	}
+    public String getName() {
+        return writerTemplate.getName();
+    }
 
-	public Locale getLocale() {
-		return writerTemplate.getLocale();
-	}
+    public String getEncoding() {
+        return writerTemplate.getEncoding();
+    }
 
-	public long getLastModified() {
-		return writerTemplate.getLastModified();
-	}
+    public Locale getLocale() {
+        return writerTemplate.getLocale();
+    }
 
-	public long getLength() {
-		return writerTemplate.getLength();
-	}
+    public long getLastModified() {
+        return writerTemplate.getLastModified();
+    }
 
-	public String getSource() throws IOException {
-		return writerTemplate.getSource();
-	}
+    public long getLength() {
+        return writerTemplate.getLength();
+    }
 
-	public Reader openReader() throws IOException {
-		return writerTemplate.openReader();
-	}
+    public String getSource() throws IOException {
+        return writerTemplate.getSource();
+    }
 
-	public InputStream openStream() throws IOException {
-		return streamTemplate.openStream();
-	}
+    public Reader openReader() throws IOException {
+        return writerTemplate.openReader();
+    }
 
-	public Engine getEngine() {
-		return writerTemplate.getEngine();
-	}
+    public InputStream openStream() throws IOException {
+        return streamTemplate.openStream();
+    }
 
-	public Object evaluate() throws ParseException {
-		// Context.getOut() only OutputStream or Writer
-		if (Context.getContext().getOut() instanceof OutputStream) {
-			return streamTemplate.evaluate();
-		} else {
-			return writerTemplate.evaluate();
-		}
-	}
+    public Engine getEngine() {
+        return writerTemplate.getEngine();
+    }
 
-	public Object evaluate(Object context) throws ParseException {
-		// Context.getOut() only OutputStream or Writer
-		if (Context.getContext().getOut() instanceof OutputStream) {
-			return streamTemplate.evaluate(context);
-		} else {
-			return writerTemplate.evaluate(context);
-		}
-	}
+    public Object evaluate() throws ParseException {
+        // Context.getOut() only OutputStream or Writer
+        if (Context.getContext().getOut() instanceof OutputStream) {
+            return streamTemplate.evaluate();
+        } else {
+            return writerTemplate.evaluate();
+        }
+    }
 
-	public void render() throws IOException, ParseException {
-		render(Context.getContext().getOut());
-	}
+    public Object evaluate(Object context) throws ParseException {
+        // Context.getOut() only OutputStream or Writer
+        if (Context.getContext().getOut() instanceof OutputStream) {
+            return streamTemplate.evaluate(context);
+        } else {
+            return writerTemplate.evaluate(context);
+        }
+    }
 
-	public void render(Object out) throws IOException, ParseException {
-		if (out instanceof OutputStream) {
-			streamTemplate.render(out);
-		} else if (out instanceof Writer) {
-			writerTemplate.render(out);
-		} else {
-			out = outConverter.convert(out, getVariables());
-			if (out instanceof OutputStream) {
-				streamTemplate.render(out);
-			} else {
-				writerTemplate.render(out);
-			}
-		}
-	}
+    public void render() throws IOException, ParseException {
+        render(Context.getContext().getOut());
+    }
 
-	public void render(Object context, Object out)
-			throws IOException, ParseException {
-		if (out instanceof OutputStream) {
-			streamTemplate.render(context, out);
-		} else if (out instanceof Writer) {
-			writerTemplate.render(context, out);
-		} else {
-			out = outConverter.convert(out, getVariables());
-			if (out instanceof OutputStream) {
-				streamTemplate.render(context, out);
-			} else {
-				writerTemplate.render(context, out);
-			}
-		}
-	}
+    public void render(Object out) throws IOException, ParseException {
+        if (out instanceof OutputStream) {
+            streamTemplate.render(out);
+        } else if (out instanceof Writer) {
+            writerTemplate.render(out);
+        } else {
+            out = outConverter.convert(out, getVariables());
+            if (out instanceof OutputStream) {
+                streamTemplate.render(out);
+            } else {
+                writerTemplate.render(out);
+            }
+        }
+    }
 
-	public Map<String, Class<?>> getVariables() {
-		return writerTemplate.getVariables();
-	}
+    public void render(Object context, Object out)
+            throws IOException, ParseException {
+        if (out instanceof OutputStream) {
+            streamTemplate.render(context, out);
+        } else if (out instanceof Writer) {
+            writerTemplate.render(context, out);
+        } else {
+            out = outConverter.convert(out, getVariables());
+            if (out instanceof OutputStream) {
+                streamTemplate.render(context, out);
+            } else {
+                writerTemplate.render(context, out);
+            }
+        }
+    }
 
-	private Map<String, Template> macros;
+    public Map<String, Class<?>> getVariables() {
+        return writerTemplate.getVariables();
+    }
 
-	public Map<String, Template> getMacros() {
-		if (macros == null) { // allow duplicate on concurrent
-			Map<String, Template> map = new HashMap<String, Template>();
-			Map<String, Template> writerMacros = writerTemplate.getMacros();
-			Map<String, Template> streamMacros = streamTemplate.getMacros();
-			for (Map.Entry<String, Template> entry : writerMacros.entrySet()) {
-				map.put(entry.getKey(), new AdaptiveTemplate(entry.getValue(), streamMacros.get(entry.getKey()), outConverter));
-			}
-			macros = Collections.unmodifiableMap(map);
-		}
-		return macros;
-	}
+    public Map<String, Template> getMacros() {
+        if (macros == null) { // allow duplicate on concurrent
+            Map<String, Template> map = new HashMap<String, Template>();
+            Map<String, Template> writerMacros = writerTemplate.getMacros();
+            Map<String, Template> streamMacros = streamTemplate.getMacros();
+            for (Map.Entry<String, Template> entry : writerMacros.entrySet()) {
+                map.put(entry.getKey(), new AdaptiveTemplate(entry.getValue(), streamMacros.get(entry.getKey()), outConverter));
+            }
+            macros = Collections.unmodifiableMap(map);
+        }
+        return macros;
+    }
 
-	public int getOffset() {
-		return writerTemplate.getOffset();
-	}
+    public int getOffset() {
+        return writerTemplate.getOffset();
+    }
 
-	public boolean isMacro() {
-		return writerTemplate.isMacro();
-	}
+    public boolean isMacro() {
+        return writerTemplate.isMacro();
+    }
 
-	public void accept(Visitor visitor) throws IOException, ParseException {
-		writerTemplate.accept(visitor);
-	}
+    public void accept(Visitor visitor) throws IOException, ParseException {
+        writerTemplate.accept(visitor);
+    }
 
-	public Template getParent() {
-		return writerTemplate.getParent();
-	}
+    public Template getParent() {
+        return writerTemplate.getParent();
+    }
 
-	public List<Node> getChildren() {
-		return writerTemplate.getChildren();
-	}
+    public List<Node> getChildren() {
+        return writerTemplate.getChildren();
+    }
 
-	@Override
-	public String toString() {
-		return writerTemplate.toString();
-	}
+    @Override
+    public String toString() {
+        return writerTemplate.toString();
+    }
 
 }

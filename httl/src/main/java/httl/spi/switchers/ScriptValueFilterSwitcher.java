@@ -20,19 +20,18 @@ import httl.spi.Switcher;
 
 /**
  * ScriptTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setValueFilterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilterSwitcher(Switcher)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ScriptValueFilterSwitcher extends ScriptFilterSwitcher {
 
-	/**
-	 * httl.properties: script.value.filter=httl.spi.filters.ScriptValueFilter
-	 */
-	public void setScriptValueFilter(Filter filter) {
-		setScriptFilter(filter);
-	}
+    /**
+     * httl.properties: script.value.filter=httl.spi.filters.ScriptValueFilter
+     */
+    public void setScriptValueFilter(Filter filter) {
+        setScriptFilter(filter);
+    }
 
 }

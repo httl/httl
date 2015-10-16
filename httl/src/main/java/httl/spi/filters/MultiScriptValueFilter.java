@@ -19,19 +19,18 @@ import httl.spi.Filter;
 
 /**
  * MultiScriptValueFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setValueFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiScriptValueFilter extends MultiFilter {
 
-	/**
-	 * httl.properties: script.value.filters=httl.spi.filters.EscapeStringFilter
-	 */
-	public void setScriptValueFilters(Filter[] filters) {
-		setFilters(filters);
-	}
+    /**
+     * httl.properties: script.value.filters=httl.spi.filters.EscapeStringFilter
+     */
+    public void setScriptValueFilters(Filter[] filters) {
+        setFilters(filters);
+    }
 
 }

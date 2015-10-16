@@ -17,13 +17,13 @@ package httl.ast;
 
 /**
  * LineDirective. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class LineDirective extends Directive {
 
-	public LineDirective(int offset) {
-		super(offset);
-	}
+    public LineDirective(int offset) {
+        super(offset);
+    }
 
 }

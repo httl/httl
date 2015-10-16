@@ -19,15 +19,14 @@ import httl.util.StringUtils;
 
 /**
  * UnescapeXmlFilter. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(httl.spi.Filter)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(httl.spi.Filter)
  */
 public class UnescapeXmlFilter extends AbstractFilter {
 
-	public String filter(String key, String value) {
-		return StringUtils.unescapeXml(value);
-	}
+    public String filter(String key, String value) {
+        return StringUtils.unescapeXml(value);
+    }
 
 }

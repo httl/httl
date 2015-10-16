@@ -20,19 +20,19 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ByteCache {
-	
-	private static final AtomicLong IDS = new AtomicLong();
-	
-	private static final ConcurrentMap<String, byte[]> cache = new ConcurrentHashMap<String, byte[]>();
 
-	public static String put(byte[] source) {
-		String id = String.valueOf(IDS.incrementAndGet());
-		cache.putIfAbsent(id, source);
-		return id;
-	}
+    private static final AtomicLong IDS = new AtomicLong();
 
-	public static byte[] getAndRemove(String id) {
-		return cache.remove(id);
-	}
+    private static final ConcurrentMap<String, byte[]> cache = new ConcurrentHashMap<String, byte[]>();
+
+    public static String put(byte[] source) {
+        String id = String.valueOf(IDS.incrementAndGet());
+        cache.putIfAbsent(id, source);
+        return id;
+    }
+
+    public static byte[] getAndRemove(String id) {
+        return cache.remove(id);
+    }
 
 }

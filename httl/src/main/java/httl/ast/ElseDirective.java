@@ -17,25 +17,25 @@ package httl.ast;
 
 /**
  * ElseDirective. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ElseDirective extends BlockDirective {
 
-	private final Expression expression;
+    private final Expression expression;
 
-	public ElseDirective(Expression expression, int offset) {
-		super(offset);
-		this.expression = expression;
-	}
+    public ElseDirective(Expression expression, int offset) {
+        super(offset);
+        this.expression = expression;
+    }
 
-	public Expression getExpression() {
-		return expression;
-	}
+    public Expression getExpression() {
+        return expression;
+    }
 
-	@Override
-	public String toString() {
-		return expression == null ? "#else" : "#else(" + expression + ")";
-	}
+    @Override
+    public String toString() {
+        return expression == null ? "#else" : "#else(" + expression + ")";
+    }
 
 }

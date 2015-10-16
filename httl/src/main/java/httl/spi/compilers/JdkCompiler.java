@@ -21,6 +21,8 @@ import httl.util.StringUtils;
 import httl.util.UnsafeByteArrayInputStream;
 import httl.util.UnsafeByteArrayOutputStream;
 
+import javax.tools.*;
+import javax.tools.JavaFileObject.Kind;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,329 +32,307 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.tools.DiagnosticCollector;
-import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileManager;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
-import javax.tools.ToolProvider;
+import java.util.*;
 
 /**
  * JdkCompiler. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.translators.CompiledTranslator#setCompiler(Compiler)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.translators.CompiledTranslator#setCompiler(Compiler)
  */
 public class JdkCompiler extends AbstractCompiler {
 
-	private final JavaCompiler compiler;
+    private final JavaCompiler compiler;
 
-	private final DiagnosticCollector<JavaFileObject> diagnosticCollector;
-	
-	private final StandardJavaFileManager standardJavaFileManager;
+    private final DiagnosticCollector<JavaFileObject> diagnosticCollector;
 
-	private final ClassLoaderImpl classLoader;
-	
-	private final JavaFileManagerImpl javaFileManager;
+    private final StandardJavaFileManager standardJavaFileManager;
 
-	private final List<String> options = new ArrayList<String>();
+    private final ClassLoaderImpl classLoader;
 
-	private final List<String> lintOptions = new ArrayList<String>();
+    private final JavaFileManagerImpl javaFileManager;
 
-	private boolean lintUnchecked;
-	
-	public JdkCompiler(){
-		compiler = ToolProvider.getSystemJavaCompiler();
-		if (compiler == null) {
-			throw new IllegalStateException("Can not get system java compiler. Please run with JDK (NOT JVM), or configure the httl.properties: compiler=httl.spi.compilers.JavassistCompiler, and add javassist.jar.");
-		}
-		diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
-		standardJavaFileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
-		ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
-		try {
-			contextLoader.loadClass(JdkCompiler.class.getName());
-        } catch (ClassNotFoundException e) { // 如果线程上下文的ClassLoader不能加载当前httl.jar包中的类，则切换回httl.jar所在的ClassLoader
-        	contextLoader = JdkCompiler.class.getClassLoader();
+    private final List<String> options = new ArrayList<String>();
+
+    private final List<String> lintOptions = new ArrayList<String>();
+
+    private boolean lintUnchecked;
+
+    public JdkCompiler() {
+        compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new IllegalStateException("Can not get system java compiler. Please run with JDK (NOT JVM), or configure the httl.properties: compiler=httl.spi.compilers.JavassistCompiler, and add javassist.jar.");
         }
-		ClassLoader loader = contextLoader;
-		Set<File> files = new HashSet<File>();
-		while (loader instanceof URLClassLoader 
-				&& (! loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
-			URLClassLoader urlClassLoader = (URLClassLoader) loader;
-			for (URL url : urlClassLoader.getURLs()) {
-				files.add(new File(url.getFile()));
-			}
-			loader = loader.getParent();
-		}
-		if (files.size() > 0) {
-			try {
-				Iterable<? extends File> list = standardJavaFileManager.getLocation(StandardLocation.CLASS_PATH);
-				for (File file : list) {
-					files.add(file);
-				}
-				standardJavaFileManager.setLocation(StandardLocation.CLASS_PATH, files);
-			} catch (IOException e) {
-				throw new IllegalStateException(e.getMessage(), e);
-			}
-		}
-		final ClassLoader parentLoader = contextLoader;
-		classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
-			public ClassLoaderImpl run() {
-				return new ClassLoaderImpl(parentLoader);
-			}
-		});
-		javaFileManager = new JavaFileManagerImpl(standardJavaFileManager, classLoader);
-		lintOptions.add("-Xlint:unchecked");
-	}
-	
-	public void init() {
-		if (logger != null && logger.isDebugEnabled()) {
-			StringBuilder buf = new StringBuilder(320);
-			buf.append("JDK Compiler classpath locations:\n");
-			buf.append("================\n");
-			for (File file : standardJavaFileManager.getLocation(StandardLocation.CLASS_PATH)) {
-				buf.append(file.getAbsolutePath());
-				buf.append("\n");
-			}
-			buf.append("================\n");
-			logger.debug(buf.toString());
-		}
-	}
+        diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
+        standardJavaFileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
+        ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            contextLoader.loadClass(JdkCompiler.class.getName());
+        } catch (ClassNotFoundException e) { // 如果线程上下文的ClassLoader不能加载当前httl.jar包中的类，则切换回httl.jar所在的ClassLoader
+            contextLoader = JdkCompiler.class.getClassLoader();
+        }
+        ClassLoader loader = contextLoader;
+        Set<File> files = new HashSet<File>();
+        while (loader instanceof URLClassLoader
+                && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
+            URLClassLoader urlClassLoader = (URLClassLoader) loader;
+            for (URL url : urlClassLoader.getURLs()) {
+                files.add(new File(url.getFile()));
+            }
+            loader = loader.getParent();
+        }
+        if (files.size() > 0) {
+            try {
+                Iterable<? extends File> list = standardJavaFileManager.getLocation(StandardLocation.CLASS_PATH);
+                for (File file : list) {
+                    files.add(file);
+                }
+                standardJavaFileManager.setLocation(StandardLocation.CLASS_PATH, files);
+            } catch (IOException e) {
+                throw new IllegalStateException(e.getMessage(), e);
+            }
+        }
+        final ClassLoader parentLoader = contextLoader;
+        classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
+            public ClassLoaderImpl run() {
+                return new ClassLoaderImpl(parentLoader);
+            }
+        });
+        javaFileManager = new JavaFileManagerImpl(standardJavaFileManager, classLoader);
+        lintOptions.add("-Xlint:unchecked");
+    }
 
-	/**
-	 * httl.properties: java.specification.version=1.7
-	 */
-	public void setCompileVersion(String version) {
-		if (StringUtils.isNotEmpty(version)
-				&& ! version.equals(ClassUtils.getJavaVersion())) {
-			options.add("-target");
-			options.add(version);
-			lintOptions.add("-target");
-			lintOptions.add(version);
-		}
-	}
+    public void init() {
+        if (logger != null && logger.isDebugEnabled()) {
+            StringBuilder buf = new StringBuilder(320);
+            buf.append("JDK Compiler classpath locations:\n");
+            buf.append("================\n");
+            for (File file : standardJavaFileManager.getLocation(StandardLocation.CLASS_PATH)) {
+                buf.append(file.getAbsolutePath());
+                buf.append("\n");
+            }
+            buf.append("================\n");
+            logger.debug(buf.toString());
+        }
+    }
 
-	/**
-	 * httl.properties: lint.unchecked=true
-	 */
-	public void setLintUnchecked(boolean lintUnchecked) {
-		this.lintUnchecked = lintUnchecked;
-	}
-	
-	@Override
-	protected Class<?> doCompile(String name, String sourceCode) throws Exception {
-		try {
-			return doCompile(name, sourceCode, options);
-		} catch (Exception e) {
-			if (lintUnchecked && e.getMessage() != null
-					&& e.getMessage().contains("-Xlint:unchecked")) {
-				try {
-					return doCompile(name, sourceCode, lintOptions);
-				} catch (Exception e2) {
-					throw e2;
-				}
-			}
-			throw e;
-		}
-	}
+    /**
+     * httl.properties: java.specification.version=1.7
+     */
+    public void setCompileVersion(String version) {
+        if (StringUtils.isNotEmpty(version)
+                && !version.equals(ClassUtils.getJavaVersion())) {
+            options.add("-target");
+            options.add(version);
+            lintOptions.add("-target");
+            lintOptions.add(version);
+        }
+    }
 
-	private Class<?> doCompile(String name, String sourceCode, List<String> options) throws Exception {
-		try {
-			return classLoader.loadClass(name);
-		} catch (ClassNotFoundException e) {
-			int i = name.lastIndexOf('.');
-			String packageName = i < 0 ? "" : name.substring(0, i);
-			String className = i < 0 ? name : name.substring(i + 1);
-			JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
-			javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, 
-											className + ClassUtils.JAVA_EXTENSION, javaFileObject);
-			Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, 
-											  null, Arrays.asList(new JavaFileObject[]{javaFileObject})).call();
-			if (result == null || ! result.booleanValue()) {
-				throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector.getDiagnostics());
-			}
-			if (compileDirectory != null) {
-				saveBytecode(name, javaFileObject.getByteCode());
-			}
-			return classLoader.loadClass(name);
-		}
-	}
-	
-	private final class ClassLoaderImpl extends ClassLoader {
+    /**
+     * httl.properties: lint.unchecked=true
+     */
+    public void setLintUnchecked(boolean lintUnchecked) {
+        this.lintUnchecked = lintUnchecked;
+    }
 
-		private final Map<String, JavaFileObject> classes = new HashMap<String, JavaFileObject>();
+    @Override
+    protected Class<?> doCompile(String name, String sourceCode) throws Exception {
+        try {
+            return doCompile(name, sourceCode, options);
+        } catch (Exception e) {
+            if (lintUnchecked && e.getMessage() != null
+                    && e.getMessage().contains("-Xlint:unchecked")) {
+                try {
+                    return doCompile(name, sourceCode, lintOptions);
+                } catch (Exception e2) {
+                    throw e2;
+                }
+            }
+            throw e;
+        }
+    }
 
-		ClassLoaderImpl(final ClassLoader parentClassLoader) {
-			super(parentClassLoader);
-		}
+    private Class<?> doCompile(String name, String sourceCode, List<String> options) throws Exception {
+        try {
+            return classLoader.loadClass(name);
+        } catch (ClassNotFoundException e) {
+            int i = name.lastIndexOf('.');
+            String packageName = i < 0 ? "" : name.substring(0, i);
+            String className = i < 0 ? name : name.substring(i + 1);
+            JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
+            javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName,
+                    className + ClassUtils.JAVA_EXTENSION, javaFileObject);
+            Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options,
+                    null, Arrays.asList(javaFileObject)).call();
+            if (result == null || !result) {
+                throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector.getDiagnostics());
+            }
+            if (compileDirectory != null) {
+                saveBytecode(name, javaFileObject.getByteCode());
+            }
+            return classLoader.loadClass(name);
+        }
+    }
 
-		Collection<JavaFileObject> files() {
-			return Collections.unmodifiableCollection(classes.values());
-		}
+    private static final class JavaFileObjectImpl extends SimpleJavaFileObject {
 
-		@Override
-		protected Class<?> findClass(final String qualifiedClassName) throws ClassNotFoundException {
-			try {
-				return super.findClass(qualifiedClassName);
-			} catch (ClassNotFoundException e) {
-				JavaFileObject file = classes.get(qualifiedClassName);
-				if (file != null) {
-					byte[] bytes = ((JavaFileObjectImpl) file).getByteCode();
-					return defineClass(qualifiedClassName, bytes, 0, bytes.length);
-				}
-				throw e;
-			}
-		}
+        private final CharSequence source;
+        private UnsafeByteArrayOutputStream bytecode;
 
-		void add(final String qualifiedClassName, final JavaFileObject javaFile) {
-			classes.put(qualifiedClassName, javaFile);
-		}
+        public JavaFileObjectImpl(final String baseName, final CharSequence source) {
+            super(ClassUtils.toURI(baseName + ClassUtils.JAVA_EXTENSION), Kind.SOURCE);
+            this.source = source;
+        }
 
-		@Override
-		public InputStream getResourceAsStream(final String name) {
-			if (name.endsWith(ClassUtils.CLASS_EXTENSION)) {
-				String qualifiedClassName = name.substring(0, name.length() - ClassUtils.CLASS_EXTENSION.length()).replace('/', '.');
-				JavaFileObjectImpl file = (JavaFileObjectImpl) classes.get(qualifiedClassName);
-				if (file != null) {
-					return new UnsafeByteArrayInputStream(file.getByteCode());
-				}
-			}
-			return super.getResourceAsStream(name);
-		}
-	}
-	
-	private static final class JavaFileObjectImpl extends SimpleJavaFileObject {
+        JavaFileObjectImpl(final String name, final Kind kind) {
+            super(ClassUtils.toURI(name), kind);
+            source = null;
+        }
 
-		private UnsafeByteArrayOutputStream bytecode;
+        public JavaFileObjectImpl(URI uri, Kind kind) {
+            super(uri, kind);
+            source = null;
+        }
 
-		private final CharSequence source;
+        @Override
+        public CharSequence getCharContent(final boolean ignoreEncodingErrors) throws UnsupportedOperationException {
+            if (source == null) {
+                throw new UnsupportedOperationException("source == null");
+            }
+            return source;
+        }
 
-		public JavaFileObjectImpl(final String baseName, final CharSequence source){
-			super(ClassUtils.toURI(baseName + ClassUtils.JAVA_EXTENSION), Kind.SOURCE);
-			this.source = source;
-		}
+        @Override
+        public InputStream openInputStream() {
+            return new UnsafeByteArrayInputStream(getByteCode());
+        }
 
-		JavaFileObjectImpl(final String name, final Kind kind){
-			super(ClassUtils.toURI(name), kind);
-			source = null;
-		}
+        @Override
+        public OutputStream openOutputStream() {
+            return bytecode = new UnsafeByteArrayOutputStream();
+        }
 
-		public JavaFileObjectImpl(URI uri, Kind kind){
-			super(uri, kind);
-			source = null;
-		}
+        public byte[] getByteCode() {
+            return bytecode.toByteArray();
+        }
+    }
 
-		@Override
-		public CharSequence getCharContent(final boolean ignoreEncodingErrors) throws UnsupportedOperationException {
-			if (source == null) {
-				throw new UnsupportedOperationException("source == null");
-			}
-			return source;
-		}
+    private static final class JavaFileManagerImpl extends ForwardingJavaFileManager<JavaFileManager> {
 
-		@Override
-		public InputStream openInputStream() {
-			return new UnsafeByteArrayInputStream(getByteCode());
-		}
+        private final ClassLoaderImpl classLoader;
 
-		@Override
-		public OutputStream openOutputStream() {
-			return bytecode = new UnsafeByteArrayOutputStream();
-		}
+        private final Map<URI, JavaFileObject> fileObjects = new HashMap<URI, JavaFileObject>();
 
-		public byte[] getByteCode() {
-			return bytecode.toByteArray();
-		}
-	}
-	
-	private static final class JavaFileManagerImpl extends ForwardingJavaFileManager<JavaFileManager> {
-		
-		private final ClassLoaderImpl classLoader;
+        public JavaFileManagerImpl(JavaFileManager fileManager, ClassLoaderImpl classLoader) {
+            super(fileManager);
+            this.classLoader = classLoader;
+        }
 
-		private final Map<URI, JavaFileObject> fileObjects = new HashMap<URI, JavaFileObject>();
+        @Override
+        public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
+            FileObject o = fileObjects.get(uri(location, packageName, relativeName));
+            if (o != null)
+                return o;
+            return super.getFileForInput(location, packageName, relativeName);
+        }
 
-		public JavaFileManagerImpl(JavaFileManager fileManager, ClassLoaderImpl classLoader) {
-			super(fileManager);
-			this.classLoader = classLoader;
-		}
+        public void putFileForInput(StandardLocation location, String packageName, String relativeName, JavaFileObject file) {
+            fileObjects.put(uri(location, packageName, relativeName), file);
+        }
 
-		@Override
-		public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
-			FileObject o = fileObjects.get(uri(location, packageName, relativeName));
-			if (o != null)
-				return o;
-			return super.getFileForInput(location, packageName, relativeName);
-		}
+        private URI uri(Location location, String packageName, String relativeName) {
+            return ClassUtils.toURI(location.getName() + '/' + packageName + '/' + relativeName);
+        }
 
-		public void putFileForInput(StandardLocation location, String packageName, String relativeName, JavaFileObject file) {
-			fileObjects.put(uri(location, packageName, relativeName), file);
-		}
+        @Override
+        public JavaFileObject getJavaFileForOutput(Location location, String qualifiedName, Kind kind, FileObject outputFile)
+                throws IOException {
+            JavaFileObject file = new JavaFileObjectImpl(qualifiedName, kind);
+            classLoader.add(qualifiedName, file);
+            return file;
+        }
 
-		private URI uri(Location location, String packageName, String relativeName) {
-			return ClassUtils.toURI(location.getName() + '/' + packageName + '/' + relativeName);
-		}
+        @Override
+        public ClassLoader getClassLoader(JavaFileManager.Location location) {
+            return classLoader;
+        }
 
-		@Override
-		public JavaFileObject getJavaFileForOutput(Location location, String qualifiedName, Kind kind, FileObject outputFile)
-				throws IOException {
-			JavaFileObject file = new JavaFileObjectImpl(qualifiedName, kind);
-			classLoader.add(qualifiedName, file);
-			return file;
-		}
+        @Override
+        public String inferBinaryName(Location loc, JavaFileObject file) {
+            if (file instanceof JavaFileObjectImpl)
+                return file.getName();
+            return super.inferBinaryName(loc, file);
+        }
 
-		@Override
-		public ClassLoader getClassLoader(JavaFileManager.Location location) {
-			return classLoader;
-		}
+        @Override
+        public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse)
+                throws IOException {
+            ArrayList<JavaFileObject> files = new ArrayList<JavaFileObject>();
+            if (location == StandardLocation.CLASS_PATH && kinds.contains(JavaFileObject.Kind.CLASS)) {
+                for (JavaFileObject file : fileObjects.values()) {
+                    if (file.getKind() == Kind.CLASS && file.getName().startsWith(packageName)) {
+                        files.add(file);
+                    }
+                }
+                files.addAll(classLoader.files());
+            } else if (location == StandardLocation.SOURCE_PATH && kinds.contains(JavaFileObject.Kind.SOURCE)) {
+                for (JavaFileObject file : fileObjects.values()) {
+                    if (file.getKind() == Kind.SOURCE && file.getName().startsWith(packageName)) {
+                        files.add(file);
+                    }
+                }
+            }
+            Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
+            for (JavaFileObject file : result) {
+                files.add(file);
+            }
+            return files;
+        }
+    }
 
-		@Override
-		public String inferBinaryName(Location loc, JavaFileObject file) {
-			if (file instanceof JavaFileObjectImpl)
-				return file.getName();
-			return super.inferBinaryName(loc, file);
-		}
+    private final class ClassLoaderImpl extends ClassLoader {
 
-		@Override
-		public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse)
-				throws IOException {
-			ArrayList<JavaFileObject> files = new ArrayList<JavaFileObject>();
-			if (location == StandardLocation.CLASS_PATH && kinds.contains(JavaFileObject.Kind.CLASS)) {
-				for (JavaFileObject file : fileObjects.values()) {
-					if (file.getKind() == Kind.CLASS && file.getName().startsWith(packageName)) {
-						files.add(file);
-					}
-				}
-				files.addAll(classLoader.files());
-			} else if (location == StandardLocation.SOURCE_PATH && kinds.contains(JavaFileObject.Kind.SOURCE)) {
-				for (JavaFileObject file : fileObjects.values()) {
-					if (file.getKind() == Kind.SOURCE && file.getName().startsWith(packageName)) {
-						files.add(file);
-					}
-				}
-			}
-			Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
-			for (JavaFileObject file : result) {
-				files.add(file);
-			}
-			return files;
-		}
-	}
+        private final Map<String, JavaFileObject> classes = new HashMap<String, JavaFileObject>();
+
+        ClassLoaderImpl(final ClassLoader parentClassLoader) {
+            super(parentClassLoader);
+        }
+
+        Collection<JavaFileObject> files() {
+            return Collections.unmodifiableCollection(classes.values());
+        }
+
+        @Override
+        protected Class<?> findClass(final String qualifiedClassName) throws ClassNotFoundException {
+            try {
+                return super.findClass(qualifiedClassName);
+            } catch (ClassNotFoundException e) {
+                JavaFileObject file = classes.get(qualifiedClassName);
+                if (file != null) {
+                    byte[] bytes = ((JavaFileObjectImpl) file).getByteCode();
+                    return defineClass(qualifiedClassName, bytes, 0, bytes.length);
+                }
+                throw e;
+            }
+        }
+
+        void add(final String qualifiedClassName, final JavaFileObject javaFile) {
+            classes.put(qualifiedClassName, javaFile);
+        }
+
+        @Override
+        public InputStream getResourceAsStream(final String name) {
+            if (name.endsWith(ClassUtils.CLASS_EXTENSION)) {
+                String qualifiedClassName = name.substring(0, name.length() - ClassUtils.CLASS_EXTENSION.length()).replace('/', '.');
+                JavaFileObjectImpl file = (JavaFileObjectImpl) classes.get(qualifiedClassName);
+                if (file != null) {
+                    return new UnsafeByteArrayInputStream(file.getByteCode());
+                }
+            }
+            return super.getResourceAsStream(name);
+        }
+    }
 
 
 }

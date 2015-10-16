@@ -20,38 +20,38 @@ import java.util.NoSuchElementException;
 
 /**
  * ArrayIterator. (Tool, Prototype, ThreadUnsafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ByteArrayIterator implements Iterator<Byte> {
 
-	private final byte[] array;
+    private final byte[] array;
 
-	private final int length;
+    private final int length;
 
-	private int index;
+    private int index;
 
-	public ByteArrayIterator(byte[] array){
-		this.array = array;
-		this.length = array == null ? 0 : array.length;
-	}
+    public ByteArrayIterator(byte[] array) {
+        this.array = array;
+        this.length = array == null ? 0 : array.length;
+    }
 
-	public Object getArray() {
-		return array;
-	}
+    public Object getArray() {
+        return array;
+    }
 
-	public boolean hasNext() {
-		return index < length;
-	}
+    public boolean hasNext() {
+        return index < length;
+    }
 
-	public Byte next() {
-		if (! hasNext()) {
-			throw new NoSuchElementException();
-		}
-		return array[index ++];
-	}
+    public Byte next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return array[index++];
+    }
 
-	public void remove() {
-		throw new UnsupportedOperationException("remove() method is not supported");
-	}
+    public void remove() {
+        throw new UnsupportedOperationException("remove() method is not supported");
+    }
 }

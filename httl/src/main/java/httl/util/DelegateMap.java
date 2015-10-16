@@ -16,206 +16,200 @@
 package httl.util;
 
 import java.io.Serializable;
-import java.util.AbstractSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DelegateMap (Tool, Prototype, NotThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DelegateMap<K, V> implements Map<K, V>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final Map<K, V> parent;
-	
-	private final Map<K, V> current;
+    private final Map<K, V> parent;
 
-	private Map<K, V> writable;
+    private final Map<K, V> current;
 
-	public DelegateMap(Map<K, V> current) {
-		this(null, current);
-	}
+    private Map<K, V> writable;
 
-	public DelegateMap(Map<K, V> parent, Map<K, V> current) {
-		this.parent = parent;
-		this.current = current;
-	}
+    public DelegateMap(Map<K, V> current) {
+        this(null, current);
+    }
 
-	public V get(Object key) {
-		if (writable != null) {
-			V value = writable.get(key);
-			if (value != null) {
-				return value;
-			}
-		}
-		if (current != null) {
-			V value = current.get(key);
-			if (value != null) {
-				return value;
-			}
-		}
-		return parent == null ? null : parent.get(key);
-	}
+    public DelegateMap(Map<K, V> parent, Map<K, V> current) {
+        this.parent = parent;
+        this.current = current;
+    }
 
-	public Set<Map.Entry<K, V>> entrySet() {
-		return new DelegateSet<Map.Entry<K, V>>() {
-			@Override
-			protected Collection<java.util.Map.Entry<K, V>> getCollection(Map<K, V> map) {
-				return map.entrySet();
-			}
-		};
-	}
-	
-	public Set<K> keySet() {
-		return new DelegateSet<K>() {
-			@Override
-			protected Collection<K> getCollection(Map<K, V> map) {
-				return map.keySet();
-			}
-		};
-	}
+    public V get(Object key) {
+        if (writable != null) {
+            V value = writable.get(key);
+            if (value != null) {
+                return value;
+            }
+        }
+        if (current != null) {
+            V value = current.get(key);
+            if (value != null) {
+                return value;
+            }
+        }
+        return parent == null ? null : parent.get(key);
+    }
 
-	public Collection<V> values() {
-		return new DelegateSet<V>() {
-			@Override
-			protected Collection<V> getCollection(Map<K, V> map) {
-				return map.values();
-			}
-		};
-	}
+    public Set<Map.Entry<K, V>> entrySet() {
+        return new DelegateSet<Map.Entry<K, V>>() {
+            @Override
+            protected Collection<java.util.Map.Entry<K, V>> getCollection(Map<K, V> map) {
+                return map.entrySet();
+            }
+        };
+    }
 
-	public int size() {
-		int size = 0;
-		if (writable != null) {
-			size += writable.size();
-		}
-		if (current != null) {
-			size += current.size();
-		}
-		if (parent != null) {
-			size += parent.size();
-		}
-		return size;
-	}
+    public Set<K> keySet() {
+        return new DelegateSet<K>() {
+            @Override
+            protected Collection<K> getCollection(Map<K, V> map) {
+                return map.keySet();
+            }
+        };
+    }
 
-	public boolean containsKey(Object key) {
-		if (writable != null && writable.containsKey(key)) {
-			return true;
-		}
-		if (current != null && current.containsKey(key)) {
-			return true;
-		}
-		return parent != null && parent.containsKey(key);
-	}
+    public Collection<V> values() {
+        return new DelegateSet<V>() {
+            @Override
+            protected Collection<V> getCollection(Map<K, V> map) {
+                return map.values();
+            }
+        };
+    }
 
-	public boolean containsValue(Object value) {
-		if (writable != null && writable.containsValue(value)) {
-			return true;
-		}
-		if (current != null && current.containsValue(value)) {
-			return true;
-		}
-		return parent != null && parent.containsValue(value);
-	}
+    public int size() {
+        int size = 0;
+        if (writable != null) {
+            size += writable.size();
+        }
+        if (current != null) {
+            size += current.size();
+        }
+        if (parent != null) {
+            size += parent.size();
+        }
+        return size;
+    }
 
-	public boolean isEmpty() {
-		if (writable != null && ! writable.isEmpty()) {
-			return false;
-		}
-		if (current != null && ! current.isEmpty()) {
-			return false;
-		}
-		return parent == null || parent.isEmpty();
-	}
+    public boolean containsKey(Object key) {
+        if (writable != null && writable.containsKey(key)) {
+            return true;
+        }
+        if (current != null && current.containsKey(key)) {
+            return true;
+        }
+        return parent != null && parent.containsKey(key);
+    }
 
-	public V put(K key, V value) {
-		if (writable == null) {
-			writable = new HashMap<K, V>();
-		}
-		return writable.put(key, value);
-	}
+    public boolean containsValue(Object value) {
+        if (writable != null && writable.containsValue(value)) {
+            return true;
+        }
+        if (current != null && current.containsValue(value)) {
+            return true;
+        }
+        return parent != null && parent.containsValue(value);
+    }
 
-	public void putAll(Map<? extends K, ? extends V> map) {
-		if (writable == null) {
-			writable = new HashMap<K, V>();
-		}
-		writable.putAll(map);
-	}
+    public boolean isEmpty() {
+        if (writable != null && !writable.isEmpty()) {
+            return false;
+        }
+        if (current != null && !current.isEmpty()) {
+            return false;
+        }
+        return parent == null || parent.isEmpty();
+    }
 
-	public V remove(Object key) {
-		if (writable != null) {
-			return writable.remove(key);
-		}
-		return null;
-	}
+    public V put(K key, V value) {
+        if (writable == null) {
+            writable = new HashMap<K, V>();
+        }
+        return writable.put(key, value);
+    }
 
-	public void clear() {
-		if (writable != null) {
-			writable.clear();
-		}
-	}
+    public void putAll(Map<? extends K, ? extends V> map) {
+        if (writable == null) {
+            writable = new HashMap<K, V>();
+        }
+        writable.putAll(map);
+    }
 
-	private abstract class DelegateSet<T> extends AbstractSet<T> {
+    public V remove(Object key) {
+        if (writable != null) {
+            return writable.remove(key);
+        }
+        return null;
+    }
 
-		@Override
-		public Iterator<T> iterator() {
-			return new DelegateIterator();
-		}
+    public void clear() {
+        if (writable != null) {
+            writable.clear();
+        }
+    }
 
-		@Override
-		public int size() {
-			return DelegateMap.this.size();
-		}
-		
-		protected abstract Collection<T> getCollection(Map<K, V> map);
+    private abstract class DelegateSet<T> extends AbstractSet<T> {
 
-		private class DelegateIterator implements Iterator<T> {
-			
-			private int level = 0;
-			
-			private Iterator<T> iterator;
-			
-			private Iterator<T> getIterator() {
-				if (iterator == null || ! iterator.hasNext()) {
-					if (level < 1 && parent != null) {
-						level = 1;
-						iterator = DelegateSet.this.getCollection(parent).iterator();
-					} else if (level < 2 && current != null) {
-						level = 2;
-						iterator = DelegateSet.this.getCollection(current).iterator();
-					} else if (level < 3 && writable != null) {
-						level = 3;
-						iterator = DelegateSet.this.getCollection(writable).iterator();
-					}
-				}
-				return iterator;
-			}
+        @Override
+        public Iterator<T> iterator() {
+            return new DelegateIterator();
+        }
 
-			public boolean hasNext() {
-				Iterator<T> iterator = getIterator();
-				return iterator == null ? false : iterator.hasNext();
-			}
+        @Override
+        public int size() {
+            return DelegateMap.this.size();
+        }
 
-			public T next() {
-				Iterator<T> iterator = getIterator();
-				if (iterator == null)
-					throw new NoSuchElementException();
-				return iterator.next();
-			}
+        protected abstract Collection<T> getCollection(Map<K, V> map);
 
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-			
-		}
+        private class DelegateIterator implements Iterator<T> {
 
-	}
-	
+            private int level = 0;
+
+            private Iterator<T> iterator;
+
+            private Iterator<T> getIterator() {
+                if (iterator == null || !iterator.hasNext()) {
+                    if (level < 1 && parent != null) {
+                        level = 1;
+                        iterator = DelegateSet.this.getCollection(parent).iterator();
+                    } else if (level < 2 && current != null) {
+                        level = 2;
+                        iterator = DelegateSet.this.getCollection(current).iterator();
+                    } else if (level < 3 && writable != null) {
+                        level = 3;
+                        iterator = DelegateSet.this.getCollection(writable).iterator();
+                    }
+                }
+                return iterator;
+            }
+
+            public boolean hasNext() {
+                Iterator<T> iterator = getIterator();
+                return iterator == null ? false : iterator.hasNext();
+            }
+
+            public T next() {
+                Iterator<T> iterator = getIterator();
+                if (iterator == null)
+                    throw new NoSuchElementException();
+                return iterator.next();
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+        }
+
+    }
+
 }

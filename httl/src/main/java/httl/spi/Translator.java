@@ -25,21 +25,20 @@ import java.util.Map;
 
 /**
  * Template Translator. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
  */
 public interface Translator {
 
-	/**
-	 * Translate the resource to template.
-	 * 
-	 * @param resource - template resource
-	 * @param root - template root node
-	 * @param types - template parameter types
-	 * @return template instance
-	 */
-	Template translate(Resource resource, Node root, Map<String, Class<?>> types) throws ParseException, IOException;
+    /**
+     * Translate the resource to template.
+     *
+     * @param resource - template resource
+     * @param root     - template root node
+     * @param types    - template parameter types
+     * @return template instance
+     */
+    Template translate(Resource resource, Node root, Map<String, Class<?>> types) throws ParseException, IOException;
 
 }

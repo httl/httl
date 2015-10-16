@@ -17,21 +17,21 @@ package httl.util;
 
 public class Condition {
 
-	private final boolean status;
+    private final boolean status;
 
-	private final Object value;
+    private final Object value;
 
-	public Condition(boolean status, Object value) {
-		this.status = status;
-		this.value = value;
-	}
+    public Condition(boolean status, Object value) {
+        this.status = status;
+        this.value = value;
+    }
 
-	public boolean isStatus() {
-		return status;
-	}
+    public boolean isStatus() {
+        return status;
+    }
 
-	public Object getValue() {
-		return value;
-	}
+    public Object getValue() {
+        return value;
+    }
 
 }

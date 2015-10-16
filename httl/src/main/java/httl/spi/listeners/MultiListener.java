@@ -24,56 +24,55 @@ import java.text.ParseException;
 
 /**
  * MultiListener. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.interceptors.ListenerInterceptor#setBeforeListener(Listener)
  * @see httl.spi.interceptors.ListenerInterceptor#setAfterListener(Listener)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiListener implements Listener {
 
-	private Listener[] listeners;
+    private Listener[] listeners;
 
-	private Logger logger;
+    private Logger logger;
 
-	/**
-	 * httl.properties: listeners=httl.spi.listeners.ExtendsListener
-	 */
-	public void setListeners(Listener[] listeners) {
-		if (listeners != null && listeners.length > 0 
-				&& this.listeners != null && this.listeners.length > 0) {
-			Listener[] oldListeners = this.listeners;
-			this.listeners = new Listener[oldListeners.length + listeners.length];
-			System.arraycopy(oldListeners, 0, this.listeners, 0, oldListeners.length);
-			System.arraycopy(listeners, 0, this.listeners, oldListeners.length, listeners.length);
-		} else {
-			this.listeners = listeners;
-		}
-	}
+    /**
+     * httl.properties: listeners=httl.spi.listeners.ExtendsListener
+     */
+    public void setListeners(Listener[] listeners) {
+        if (listeners != null && listeners.length > 0
+                && this.listeners != null && this.listeners.length > 0) {
+            Listener[] oldListeners = this.listeners;
+            this.listeners = new Listener[oldListeners.length + listeners.length];
+            System.arraycopy(oldListeners, 0, this.listeners, 0, oldListeners.length);
+            System.arraycopy(listeners, 0, this.listeners, oldListeners.length, listeners.length);
+        } else {
+            this.listeners = listeners;
+        }
+    }
 
-	/**
-	 * httl.properties: loggers=httl.spi.loggers.Log4jListener
-	 */
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}
+    /**
+     * httl.properties: loggers=httl.spi.loggers.Log4jListener
+     */
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
 
-	public void render(Context context) throws IOException, ParseException {
-		if (listeners == null || listeners.length == 0)
-			return;
-		if (listeners.length == 1) {
-			listeners[0].render(context);
-			return;
-		}
-		for (Listener listener : listeners) {
-			try {
-				listener.render(context);
-			} catch (Exception e) { // 确保第一个出错，不影响第二个执行
-				if (logger != null && logger.isErrorEnabled()) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-		}
-	}
+    public void render(Context context) throws IOException, ParseException {
+        if (listeners == null || listeners.length == 0)
+            return;
+        if (listeners.length == 1) {
+            listeners[0].render(context);
+            return;
+        }
+        for (Listener listener : listeners) {
+            try {
+                listener.render(context);
+            } catch (Exception e) { // 确保第一个出错，不影响第二个执行
+                if (logger != null && logger.isErrorEnabled()) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
 
 }

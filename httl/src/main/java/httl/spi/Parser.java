@@ -21,21 +21,20 @@ import java.text.ParseException;
 
 /**
  * Template Parser. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setTemplateParser(Parser)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setTemplateParser(Parser)
  */
 public interface Parser {
 
-	/**
-	 * Parse the template/expression.
-	 * 
-	 * @param source - template/expression source
-	 * @param offset - template/expression offset
-	 * @return template/expression root node
-	 * @throws ParseException - If the template cannot be parsed
-	 */
-	Node parse(String source, int offset) throws ParseException;
+    /**
+     * Parse the template/expression.
+     *
+     * @param source - template/expression source
+     * @param offset - template/expression offset
+     * @return template/expression root node
+     * @throws ParseException - If the template cannot be parsed
+     */
+    Node parse(String source, int offset) throws ParseException;
 
 }

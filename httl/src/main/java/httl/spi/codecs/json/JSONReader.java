@@ -15,56 +15,52 @@
  */
 package httl.spi.codecs.json;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.text.ParseException;
 
 /**
  * JSON reader.
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 
 public class JSONReader {
 
-	private static ThreadLocal<Yylex> LOCAL_LEXER = new ThreadLocal<Yylex>();
+    private static ThreadLocal<Yylex> LOCAL_LEXER = new ThreadLocal<Yylex>();
 
-	private Yylex yylex;
+    private Yylex yylex;
 
-	public JSONReader(InputStream is, String charset)
-			throws UnsupportedEncodingException {
-		this(new InputStreamReader(is, charset));
-	}
+    public JSONReader(InputStream is, String charset)
+            throws UnsupportedEncodingException {
+        this(new InputStreamReader(is, charset));
+    }
 
-	public JSONReader(Reader reader) {
-		yylex = getLexer(reader);
-	}
+    public JSONReader(Reader reader) {
+        yylex = getLexer(reader);
+    }
 
-	public JSONToken nextToken() throws IOException, ParseException {
-		return yylex.yylex();
-	}
+    private static Yylex getLexer(Reader reader) {
+        Yylex ret = LOCAL_LEXER.get();
+        if (ret == null) {
+            ret = new Yylex(reader);
+            LOCAL_LEXER.set(ret);
+        } else {
+            ret.yyreset(reader);
+        }
+        return ret;
+    }
 
-	public JSONToken nextToken(int expect) throws IOException, ParseException {
-		JSONToken ret = yylex.yylex();
-		if (ret == null)
-			throw new ParseException("EOF error.", 0);
-		if (expect != JSONToken.ANY && expect != ret.type)
-			throw new ParseException("Unexcepted token.", 0);
-		return ret;
-	}
+    public JSONToken nextToken() throws IOException, ParseException {
+        return yylex.yylex();
+    }
 
-	private static Yylex getLexer(Reader reader) {
-		Yylex ret = LOCAL_LEXER.get();
-		if (ret == null) {
-			ret = new Yylex(reader);
-			LOCAL_LEXER.set(ret);
-		} else {
-			ret.yyreset(reader);
-		}
-		return ret;
-	}
+    public JSONToken nextToken(int expect) throws IOException, ParseException {
+        JSONToken ret = yylex.yylex();
+        if (ret == null)
+            throw new ParseException("EOF error.", 0);
+        if (expect != JSONToken.ANY && expect != ret.type)
+            throw new ParseException("Unexcepted token.", 0);
+        return ret;
+    }
 
 }

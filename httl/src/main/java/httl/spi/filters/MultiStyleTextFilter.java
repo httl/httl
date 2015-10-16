@@ -19,19 +19,18 @@ import httl.spi.Filter;
 
 /**
  * MultiStyleTextFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setValueFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiStyleTextFilter extends MultiFilter {
 
-	/**
-	 * httl.properties: style.text.filters=httl.spi.filters.ClearBlankLineFilter
-	 */
-	public void setStyleTextFilters(Filter[] filters) {
-		setFilters(filters);
-	}
+    /**
+     * httl.properties: style.text.filters=httl.spi.filters.ClearBlankLineFilter
+     */
+    public void setStyleTextFilters(Filter[] filters) {
+        setFilters(filters);
+    }
 
 }

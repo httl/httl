@@ -15,12 +15,7 @@
  */
 package httl.spi.translators.templates;
 
-import httl.Context;
-import httl.Engine;
-import httl.Node;
-import httl.Resource;
-import httl.Template;
-import httl.Visitor;
+import httl.*;
 import httl.ast.BlockDirective;
 import httl.ast.MacroDirective;
 import httl.spi.Converter;
@@ -30,11 +25,7 @@ import httl.util.ClassUtils;
 import httl.util.StringUtils;
 import httl.util.UnsafeStringWriter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Locale;
@@ -42,293 +33,289 @@ import java.util.Map;
 
 /**
  * AbstractTemplate. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.Engine#getTemplate(String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Engine#getTemplate(String)
  */
 public abstract class AbstractTemplate implements Template {
 
-	private final Resource resource;
+    private final Resource resource;
 
-	private final Node root;
+    private final Node root;
 
-	private final Template parent;
+    private final Template parent;
 
-	private final String name;
+    private final String name;
 
-	private final String encoding;
+    private final String encoding;
 
-	private final Locale locale;
-	
-	private final long lastModified;
+    private final Locale locale;
 
-	private final long length;
+    private final long lastModified;
 
-	public AbstractTemplate(Resource resource, Node root, Template parent) {
-		this.resource = resource;
-		this.root = root;
-		this.parent = parent;
-		this.name = buildName(resource, root);
-		this.encoding = resource.getEncoding();
-		this.locale = resource.getLocale();
-		// 注意：lastModified被用作缓存的更新条件，resource.getLastModified()很慢，必须缓存
-		this.lastModified = resource.getLastModified();
-		this.length = resource.getLength();
-	}
+    private final long length;
+    private Converter<Object, Object> mapConverter;
+    private Converter<Object, Object> outConverter;
+    private Interceptor interceptor;
 
-	private static String buildName(Resource resource, Node root) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(resource.getName());
-		while (root instanceof MacroDirective) {
-			builder.append("#");
-			builder.append(((MacroDirective) root).getName());
-			root = root.getParent();
-		}
-		return builder.toString();
-	}
+    public AbstractTemplate(Resource resource, Node root, Template parent) {
+        this.resource = resource;
+        this.root = root;
+        this.parent = parent;
+        this.name = buildName(resource, root);
+        this.encoding = resource.getEncoding();
+        this.locale = resource.getLocale();
+        // 注意：lastModified被用作缓存的更新条件，resource.getLastModified()很慢，必须缓存
+        this.lastModified = resource.getLastModified();
+        this.length = resource.getLength();
+    }
 
-	private Converter<Object, Object> mapConverter;
+    private static String buildName(Resource resource, Node root) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(resource.getName());
+        while (root instanceof MacroDirective) {
+            builder.append("#");
+            builder.append(((MacroDirective) root).getName());
+            root = root.getParent();
+        }
+        return builder.toString();
+    }
 
-	private Converter<Object, Object> outConverter;
-	
-	private Interceptor interceptor;
+    public static ParseException toLocatedParseException(ParseException e, Resource resource) {
+        if (e.getMessage() != null
+                && e.getMessage().contains("Occur to offset:")) {
+            return e;
+        }
+        int offset = e.getErrorOffset();
+        if (offset <= 0) {
+            return e;
+        }
+        String location = null;
+        try {
+            Reader reader = resource.openReader();
+            try {
+                location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
+            } finally {
+                reader.close();
+            }
+        } catch (Throwable t) {
+        }
+        return new ParseException(e.getMessage() + "\nOccur to offset: " + offset +
+                (StringUtils.isEmpty(location) ? "" : ", " + location)
+                + ", stack: " + ClassUtils.toString(e), offset);
+    }
 
-	private Object convertOut(Object out) throws IOException, ParseException {
-		if (outConverter != null && out != null
-				&& ! (out instanceof OutputStream) 
-				&& ! (out instanceof Writer)) {
-			return outConverter.convert(out, getVariables());
-		}
-		return out;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertMap(Object context) throws ParseException {
-		if (mapConverter != null && context != null && ! (context instanceof Map)) {
-			try {
-				context = mapConverter.convert(context, getVariables());
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-		}
-		if (context == null || context instanceof Map) {
-			return (Map<String, Object>) context;
-		} else {
-			throw new IllegalArgumentException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
-		}
-	}
+    private Object convertOut(Object out) throws IOException, ParseException {
+        if (outConverter != null && out != null
+                && !(out instanceof OutputStream)
+                && !(out instanceof Writer)) {
+            return outConverter.convert(out, getVariables());
+        }
+        return out;
+    }
 
-	public void render(Object parameters, Object out) throws IOException, ParseException {
-		Map<String, Object> map = convertMap(parameters);
-		out = convertOut(out);
-		Context context = Context.pushContext(map);
-		try {
-			context.setTemplate(this);
-			if (out instanceof OutputStream) {
-				context.setOut((OutputStream) out);
-			} else if (out instanceof Writer) {
-				context.setOut((Writer) out);
-			} else {
-				throw new IllegalArgumentException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
-			}
-			if (interceptor != null) {
-				interceptor.render(context, new Listener() {
-					public void render(Context context) throws IOException, ParseException {
-						_render(context);
-					}
-				});
-			} else {
-				_render(context);
-			}
-		} catch (ParseException e) {
-			throw toLocatedParseException(e, this);
-		} finally {
-			Context.popContext();
-		}
-	}
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> convertMap(Object context) throws ParseException {
+        if (mapConverter != null && context != null && !(context instanceof Map)) {
+            try {
+                context = mapConverter.convert(context, getVariables());
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+        if (context == null || context instanceof Map) {
+            return (Map<String, Object>) context;
+        } else {
+            throw new IllegalArgumentException("No such Converter to convert the " + context.getClass().getName() + " to Map.");
+        }
+    }
 
-	private void _render(Context context) throws IOException, ParseException {
-		try {
-			doRender(context);
-		} catch (RuntimeException e) {
-			throw (RuntimeException) e;
-		} catch (IOException e) {
-			throw (IOException) e;
-		} catch (ParseException e) {
-			throw (ParseException) e;
-		} catch (Exception e) {
-			throw new RuntimeException(ClassUtils.toString(e), e);
-		}
-	}
+    public void render(Object parameters, Object out) throws IOException, ParseException {
+        Map<String, Object> map = convertMap(parameters);
+        out = convertOut(out);
+        Context context = Context.pushContext(map);
+        try {
+            context.setTemplate(this);
+            if (out instanceof OutputStream) {
+                context.setOut((OutputStream) out);
+            } else if (out instanceof Writer) {
+                context.setOut((Writer) out);
+            } else {
+                throw new IllegalArgumentException("No such Converter to convert the " + out.getClass().getName() + " to OutputStream or Writer.");
+            }
+            if (interceptor != null) {
+                interceptor.render(context, new Listener() {
+                    public void render(Context context) throws IOException, ParseException {
+                        _render(context);
+                    }
+                });
+            } else {
+                _render(context);
+            }
+        } catch (ParseException e) {
+            throw toLocatedParseException(e, this);
+        } finally {
+            Context.popContext();
+        }
+    }
 
-	protected abstract void doRender(Context context) throws Exception;
+    private void _render(Context context) throws IOException, ParseException {
+        try {
+            doRender(context);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (ParseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(ClassUtils.toString(e), e);
+        }
+    }
 
-	protected Resource getResource() {
-		return resource;
-	}
+    protected abstract void doRender(Context context) throws Exception;
 
-	protected Node getRoot() {
-		return root;
-	}
+    protected Resource getResource() {
+        return resource;
+    }
 
-	protected Converter<Object, Object> getMapConverter() {
-		return mapConverter;
-	}
+    protected Node getRoot() {
+        return root;
+    }
 
-	protected Converter<Object, Object> getOutConverter() {
-		return outConverter;
-	}
+    protected Converter<Object, Object> getMapConverter() {
+        return mapConverter;
+    }
 
-	protected Interceptor getInterceptor() {
-		return interceptor;
-	}
+    public void setMapConverter(Converter<Object, Object> mapConverter) {
+        this.mapConverter = mapConverter;
+    }
 
-	public void setInterceptor(Interceptor interceptor) {
-		this.interceptor = interceptor;
-	}
+    protected Converter<Object, Object> getOutConverter() {
+        return outConverter;
+    }
 
-	public void setMapConverter(Converter<Object, Object> mapConverter) {
-		this.mapConverter = mapConverter;
-	}
+    public void setOutConverter(Converter<Object, Object> outConverter) {
+        this.outConverter = outConverter;
+    }
 
-	public void setOutConverter(Converter<Object, Object> outConverter) {
-		this.outConverter = outConverter;
-	}
+    protected Interceptor getInterceptor() {
+        return interceptor;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setInterceptor(Interceptor interceptor) {
+        this.interceptor = interceptor;
+    }
 
-	public String getEncoding() {
-		return encoding;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Locale getLocale() {
-		return locale;
-	}
+    public String getEncoding() {
+        return encoding;
+    }
 
-	public long getLastModified() {
-		return lastModified;
-	}
+    public Locale getLocale() {
+        return locale;
+    }
 
-	public long getLength() {
-		return length;
-	}
+    public long getLastModified() {
+        return lastModified;
+    }
 
-	public String getSource() throws IOException {
-		return resource.getSource();
-	}
+    public long getLength() {
+        return length;
+    }
 
-	public Reader openReader() throws IOException {
-		return resource.openReader();
-	}
+    public String getSource() throws IOException {
+        return resource.getSource();
+    }
 
-	public InputStream openStream() throws IOException {
-		return resource.openStream();
-	}
+    public Reader openReader() throws IOException {
+        return resource.openReader();
+    }
 
-	public Engine getEngine() {
-		return resource.getEngine();
-	}
+    public InputStream openStream() throws IOException {
+        return resource.openStream();
+    }
 
-	public int getOffset() {
-		return root.getOffset();
-	}
+    public Engine getEngine() {
+        return resource.getEngine();
+    }
 
-	public Template getParent() {
-		return parent;
-	}
+    public int getOffset() {
+        return root.getOffset();
+    }
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Node> getChildren() {
-		return (List) ((BlockDirective) root).getChildren();
-	}
+    public Template getParent() {
+        return parent;
+    }
 
-	public boolean isMacro() {
-		return root instanceof MacroDirective;
-	}
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Node> getChildren() {
+        return (List) ((BlockDirective) root).getChildren();
+    }
 
-	public void accept(Visitor visitor) throws IOException, ParseException {
-		if (visitor.visit(this)) {
-			for (Node node : getChildren()) {
-				node.accept(visitor);
-			}
-		}
-	}
+    public boolean isMacro() {
+        return root instanceof MacroDirective;
+    }
 
-	public Object evaluate() throws ParseException {
-		return evaluate(null);
-	}
+    public void accept(Visitor visitor) throws IOException, ParseException {
+        if (visitor.visit(this)) {
+            for (Node node : getChildren()) {
+                node.accept(visitor);
+            }
+        }
+    }
 
-	public void render(Object out) throws IOException, ParseException {
-		render(null, out);
-	}
+    public Object evaluate() throws ParseException {
+        return evaluate(null);
+    }
 
-	public void render() throws IOException, ParseException {
-		render(null, Context.getContext().getOut());
-	}
+    public void render(Object out) throws IOException, ParseException {
+        render(null, out);
+    }
 
-	public Object evaluate(Object context) throws ParseException {
-		UnsafeStringWriter writer = new UnsafeStringWriter();
-		try {
-			render(context, writer);
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		return writer.toString();
-	}
-	
-	public static ParseException toLocatedParseException(ParseException e, Resource resource) {
-		if (e.getMessage() != null 
-				&& e.getMessage().contains("Occur to offset:")) {
-			return e;
-		}
-		int offset = e.getErrorOffset();
-		if (offset <= 0) {
-			return e;
-		}
-		String location = null;
-		try {
-			Reader reader = resource.openReader();
-			try {
-				location = StringUtils.getLocationMessage(resource.getName(), reader, offset);
-			} finally {
-				reader.close();
-			}
-		} catch (Throwable t) {
-		}
-		return new ParseException(e.getMessage()  + "\nOccur to offset: " + offset + 
-								 (StringUtils.isEmpty(location) ? "" : ", " + location) 
-								 + ", stack: " + ClassUtils.toString(e), offset);
-	}
+    public void render() throws IOException, ParseException {
+        render(null, Context.getContext().getOut());
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		String name = getName();
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
-		AbstractTemplate other = (AbstractTemplate) obj;
-		String name = getName();
-		String otherName = other.getName();
-		if (name == null) {
-			if (otherName != null) return false;
-		} else if (!name.equals(otherName)) return false;
-		return true;
-	}
+    public Object evaluate(Object context) throws ParseException {
+        UnsafeStringWriter writer = new UnsafeStringWriter();
+        try {
+            render(context, writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return writer.toString();
+    }
 
-	@Override
-	public String toString() {
-		return getName();
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        String name = getName();
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        AbstractTemplate other = (AbstractTemplate) obj;
+        String name = getName();
+        String otherName = other.getName();
+        if (name == null) {
+            if (otherName != null) return false;
+        } else if (!name.equals(otherName)) return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 
 }

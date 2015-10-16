@@ -20,16 +20,15 @@ import httl.util.StringUtils;
 
 /**
  * CompressBlankFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTextFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTextFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class CompressBlankFilter extends AbstractFilter {
-	
-	public String filter(String key, String text) {
-		return StringUtils.compressBlank(text);
-	}
+
+    public String filter(String key, String text) {
+        return StringUtils.compressBlank(text);
+    }
 
 }

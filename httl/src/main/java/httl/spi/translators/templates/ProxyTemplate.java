@@ -15,11 +15,7 @@
  */
 package httl.spi.translators.templates;
 
-import httl.Context;
-import httl.Engine;
-import httl.Node;
-import httl.Template;
-import httl.Visitor;
+import httl.*;
 import httl.util.UnsafeByteArrayOutputStream;
 import httl.util.UnsafeStringWriter;
 
@@ -34,119 +30,118 @@ import java.util.Map;
 
 /**
  * ProxyTemplate. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.Engine#getTemplate(String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Engine#getTemplate(String)
  */
 public class ProxyTemplate implements Template {
 
-	private final Template template;
+    private final Template template;
 
-	public ProxyTemplate(Template template) {
-		this.template = template;
-	}
-	
-	public Object evaluate() throws ParseException {
-		return evaluate(null);
-	}
+    public ProxyTemplate(Template template) {
+        this.template = template;
+    }
 
-	public Object evaluate(Object parameters)
-			throws ParseException {
-		if (Context.getContext().getOut() instanceof OutputStream) {
-			UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
-			try {
-				render(parameters, output);
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-			return output.toByteArray();
-		} else {
-			UnsafeStringWriter writer = new UnsafeStringWriter();
-			try {
-				render(parameters, writer);
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-			return writer.toString();
-		}
-	}
+    public Object evaluate() throws ParseException {
+        return evaluate(null);
+    }
 
-	public void render() throws IOException, ParseException {
-		render(null, Context.getContext().getOut());
-	}
+    public Object evaluate(Object parameters)
+            throws ParseException {
+        if (Context.getContext().getOut() instanceof OutputStream) {
+            UnsafeByteArrayOutputStream output = new UnsafeByteArrayOutputStream();
+            try {
+                render(parameters, output);
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            return output.toByteArray();
+        } else {
+            UnsafeStringWriter writer = new UnsafeStringWriter();
+            try {
+                render(parameters, writer);
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            return writer.toString();
+        }
+    }
 
-	public void render(Object stream) throws IOException, ParseException {
-		render(null, stream);
-	}
+    public void render() throws IOException, ParseException {
+        render(null, Context.getContext().getOut());
+    }
 
-	public void render(Object parameters, Object stream)
-			throws IOException, ParseException {
-		template.render(parameters, stream);
-	}
+    public void render(Object stream) throws IOException, ParseException {
+        render(null, stream);
+    }
 
-	public String getName() {
-		return template.getName();
-	}
+    public void render(Object parameters, Object stream)
+            throws IOException, ParseException {
+        template.render(parameters, stream);
+    }
 
-	public String getEncoding() {
-		return template.getEncoding();
-	}
+    public String getName() {
+        return template.getName();
+    }
 
-	public Locale getLocale() {
-		return template.getLocale();
-	}
+    public String getEncoding() {
+        return template.getEncoding();
+    }
 
-	public long getLastModified() {
-		return template.getLastModified();
-	}
+    public Locale getLocale() {
+        return template.getLocale();
+    }
 
-	public long getLength() {
-		return template.getLength();
-	}
+    public long getLastModified() {
+        return template.getLastModified();
+    }
 
-	public String getSource() throws IOException {
-		return template.getSource();
-	}
+    public long getLength() {
+        return template.getLength();
+    }
 
-	public Reader openReader() throws IOException {
-		return template.openReader();
-	}
+    public String getSource() throws IOException {
+        return template.getSource();
+    }
 
-	public Map<String, Class<?>> getVariables() {
-		return template.getVariables();
-	}
+    public Reader openReader() throws IOException {
+        return template.openReader();
+    }
 
-	public InputStream openStream() throws IOException {
-		return template.openStream();
-	}
+    public Map<String, Class<?>> getVariables() {
+        return template.getVariables();
+    }
 
-	public int getOffset() {
-		return template.getOffset();
-	}
+    public InputStream openStream() throws IOException {
+        return template.openStream();
+    }
 
-	public Engine getEngine() {
-		return template.getEngine();
-	}
+    public int getOffset() {
+        return template.getOffset();
+    }
 
-	public Map<String, Template> getMacros() {
-		return template.getMacros();
-	}
+    public Engine getEngine() {
+        return template.getEngine();
+    }
 
-	public boolean isMacro() {
-		return template.isMacro();
-	}
+    public Map<String, Template> getMacros() {
+        return template.getMacros();
+    }
 
-	public void accept(Visitor visitor) throws IOException, ParseException {
-		template.accept(visitor);
-	}
+    public boolean isMacro() {
+        return template.isMacro();
+    }
 
-	public Template getParent() {
-		return template.getParent();
-	}
+    public void accept(Visitor visitor) throws IOException, ParseException {
+        template.accept(visitor);
+    }
 
-	public List<Node> getChildren() {
-		return template.getChildren();
-	}
+    public Template getParent() {
+        return template.getParent();
+    }
+
+    public List<Node> getChildren() {
+        return template.getChildren();
+    }
 
 }

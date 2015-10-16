@@ -20,64 +20,62 @@ import httl.spi.Loader;
 import httl.spi.loaders.resources.ServletResource;
 import httl.util.UrlUtils;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 /**
  * ServletLoader. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  */
 public class ServletLoader extends AbstractLoader implements ServletContextListener {
 
-	private static ServletContext SERVLET_CONTEXT;
+    private static ServletContext SERVLET_CONTEXT;
 
-	public static ServletContext getAndCheckServletContext() {
-		if (SERVLET_CONTEXT == null) {
-			throw new IllegalStateException("servletContext == null. Please add config in your /WEB-INF/web.xml: " +
-					"\n<listener>\n\t<listener-class>" + ServletLoader.class.getName() + "</listener-class>\n</listener>\n");
-		}
-		return SERVLET_CONTEXT;
-	}
+    public static ServletContext getAndCheckServletContext() {
+        if (SERVLET_CONTEXT == null) {
+            throw new IllegalStateException("servletContext == null. Please add config in your /WEB-INF/web.xml: " +
+                    "\n<listener>\n\t<listener-class>" + ServletLoader.class.getName() + "</listener-class>\n</listener>\n");
+        }
+        return SERVLET_CONTEXT;
+    }
 
-	public static ServletContext getServletContext() {
-		return SERVLET_CONTEXT;
-	}
+    public static ServletContext getServletContext() {
+        return SERVLET_CONTEXT;
+    }
 
-	public static void setServletContext(ServletContext servletContext) {
-		SERVLET_CONTEXT = servletContext;
-	}
+    public static void setServletContext(ServletContext servletContext) {
+        SERVLET_CONTEXT = servletContext;
+    }
 
-	public void contextInitialized(ServletContextEvent sce) {
-		setServletContext(sce.getServletContext());
-	}
+    public void contextInitialized(ServletContextEvent sce) {
+        setServletContext(sce.getServletContext());
+    }
 
-	public void contextDestroyed(ServletContextEvent sce) {
-		setServletContext(null);
-	}
+    public void contextDestroyed(ServletContextEvent sce) {
+        setServletContext(null);
+    }
 
-	public List<String> doList(String directory, String suffix) throws IOException {
-		String path = getAndCheckServletContext().getRealPath(directory);
-		if (path == null || path.length() == 0) {
-			return null;
-		}
-		return UrlUtils.listFile(new File(path), suffix);
-	}
+    public List<String> doList(String directory, String suffix) throws IOException {
+        String path = getAndCheckServletContext().getRealPath(directory);
+        if (path == null || path.length() == 0) {
+            return null;
+        }
+        return UrlUtils.listFile(new File(path), suffix);
+    }
 
-	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
-		return new ServletResource(getEngine(), name, locale, encoding, path, getAndCheckServletContext());
-	}
+    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+        return new ServletResource(getEngine(), name, locale, encoding, path, getAndCheckServletContext());
+    }
 
-	public boolean doExists(String name, Locale locale, String path) throws IOException {
-		return SERVLET_CONTEXT != null && SERVLET_CONTEXT.getResource(path) != null;
-	}
+    public boolean doExists(String name, Locale locale, String path) throws IOException {
+        return SERVLET_CONTEXT != null && SERVLET_CONTEXT.getResource(path) != null;
+    }
 
 }

@@ -19,70 +19,70 @@ import java.text.ParseException;
 
 /**
  * Object Codec. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Codec extends Formatter<Object> {
 
-	/**
-	 * Get the codec format.
-	 * 
-	 * @return format
-	 */
-	String getFormat();
+    /**
+     * Get the codec format.
+     *
+     * @return format
+     */
+    String getFormat();
 
-	/**
-	 * The string is decodable by this codec.
-	 * 
-	 * @param string - encoded string
-	 * @return decodable
-	 */
-	boolean isValueOf(String string);
+    /**
+     * The string is decodable by this codec.
+     *
+     * @param string - encoded string
+     * @return decodable
+     */
+    boolean isValueOf(String string);
 
-	/**
-	 * The string is decodable by this codec.
-	 * 
-	 * @param chars - encoded string
-	 * @return decodable
-	 */
-	boolean isValueOf(char[] chars);
+    /**
+     * The string is decodable by this codec.
+     *
+     * @param chars - encoded string
+     * @return decodable
+     */
+    boolean isValueOf(char[] chars);
 
-	/**
-	 * The string is decodable by this codec.
-	 * 
-	 * @param bytes - encoded string
-	 * @return decodable
-	 */
-	boolean isValueOf(byte[] bytes);
+    /**
+     * The string is decodable by this codec.
+     *
+     * @param bytes - encoded string
+     * @return decodable
+     */
+    boolean isValueOf(byte[] bytes);
 
-	/**
-	 * Decode the string as a bean object.
-	 * 
-	 * @param string - encoded string
-	 * @param type - bean type
-	 * @return bean object
-	 * @throws ParseException If the string cannot be parsed
-	 */
-	<T> T valueOf(String string, Class<T> type) throws ParseException;
+    /**
+     * Decode the string as a bean object.
+     *
+     * @param string - encoded string
+     * @param type   - bean type
+     * @return bean object
+     * @throws ParseException If the string cannot be parsed
+     */
+    <T> T valueOf(String string, Class<T> type) throws ParseException;
 
-	/**
-	 * Decode the string as a bean object.
-	 * 
-	 * @param chars - encoded string
-	 * @param type - bean type
-	 * @return bean object
-	 * @throws ParseException If the string cannot be parsed
-	 */
-	<T> T valueOf(char[] chars, Class<T> type) throws ParseException;
+    /**
+     * Decode the string as a bean object.
+     *
+     * @param chars - encoded string
+     * @param type  - bean type
+     * @return bean object
+     * @throws ParseException If the string cannot be parsed
+     */
+    <T> T valueOf(char[] chars, Class<T> type) throws ParseException;
 
-	/**
-	 * Decode the string as a bean object.
-	 * 
-	 * @param bytes - encoded string
-	 * @param type - bean type
-	 * @return bean object
-	 * @throws ParseException If the string cannot be parsed
-	 */
-	<T> T valueOf(byte[] bytes, Class<T> type) throws ParseException;
+    /**
+     * Decode the string as a bean object.
+     *
+     * @param bytes - encoded string
+     * @param type  - bean type
+     * @return bean object
+     * @throws ParseException If the string cannot be parsed
+     */
+    <T> T valueOf(byte[] bytes, Class<T> type) throws ParseException;
 
 }

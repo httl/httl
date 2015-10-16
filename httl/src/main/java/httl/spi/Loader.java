@@ -23,38 +23,37 @@ import java.util.Locale;
 
 /**
  * Resource Loader. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  */
 public interface Loader {
 
-	/**
-	 * list resource names.
-	 * 
-	 * @param suffix resource suffix
-	 * @return resource names.
-	 */
-	List<String> list(String suffix) throws IOException;
+    /**
+     * list resource names.
+     *
+     * @param suffix resource suffix
+     * @return resource names.
+     */
+    List<String> list(String suffix) throws IOException;
 
-	/**
-	 * is exists resource.
-	 * 
-	 * @param name - resource name
-	 * @param locale - resource locale
-	 * @return exists
-	 */
-	boolean exists(String name, Locale locale);
+    /**
+     * is exists resource.
+     *
+     * @param name   - resource name
+     * @param locale - resource locale
+     * @return exists
+     */
+    boolean exists(String name, Locale locale);
 
-	/**
-	 * load resource.
-	 * 
-	 * @param name - resource name
-	 * @param locale - resource locale
-	 * @param encoding - resource encoding
-	 * @return resource
-	 */
-	Resource load(String name, Locale locale, String encoding) throws IOException;
+    /**
+     * load resource.
+     *
+     * @param name     - resource name
+     * @param locale   - resource locale
+     * @param encoding - resource encoding
+     * @return resource
+     */
+    Resource load(String name, Locale locale, String encoding) throws IOException;
 
 }

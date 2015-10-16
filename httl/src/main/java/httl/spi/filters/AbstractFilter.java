@@ -15,60 +15,59 @@
  */
 package httl.spi.filters;
 
-import java.io.UnsupportedEncodingException;
-
 import httl.spi.Filter;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * AbstractFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTemplateFilter(Filter)
  * @see httl.spi.translators.CompiledTranslator#setTextFilter(Filter)
  * @see httl.spi.translators.CompiledTranslator#setValueFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTemplateFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTextFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class AbstractFilter implements Filter {
 
-	private String outputEncoding;
+    private String outputEncoding;
 
-	/**
-	 * httl.properties: output.encoding=UTF-8
-	 */
-	public void setOutputEncoding(String outputEncoding) {
-		this.outputEncoding = outputEncoding;
-	}
+    /**
+     * httl.properties: output.encoding=UTF-8
+     */
+    public void setOutputEncoding(String outputEncoding) {
+        this.outputEncoding = outputEncoding;
+    }
 
-	public char[] filter(String key, char[] value) { // slowly
-		if (value == null) {
-			return new char[0];
-		}
-		String str = filter(key, String.valueOf(value));
-		if (str == null) {
-			return new char[0];
-		}
-		return str.toCharArray();
-	}
+    public char[] filter(String key, char[] value) { // slowly
+        if (value == null) {
+            return new char[0];
+        }
+        String str = filter(key, String.valueOf(value));
+        if (str == null) {
+            return new char[0];
+        }
+        return str.toCharArray();
+    }
 
-	public byte[] filter(String key, byte[] value) { // slowly
-		if (value == null) {
-			return new byte[0];
-		}
-		String str = filter(key, new String(value));
-		if (str == null) {
-			return new byte[0];
-		}
-		if (outputEncoding == null) {
-			return str.getBytes();
-		}
-		try {
-			return str.getBytes(outputEncoding);
-		} catch (UnsupportedEncodingException e) {
-			return str.getBytes();
-		}
-	}
+    public byte[] filter(String key, byte[] value) { // slowly
+        if (value == null) {
+            return new byte[0];
+        }
+        String str = filter(key, new String(value));
+        if (str == null) {
+            return new byte[0];
+        }
+        if (outputEncoding == null) {
+            return str.getBytes();
+        }
+        try {
+            return str.getBytes(outputEncoding);
+        } catch (UnsupportedEncodingException e) {
+            return str.getBytes();
+        }
+    }
 
 }

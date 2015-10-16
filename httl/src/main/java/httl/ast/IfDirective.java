@@ -19,28 +19,28 @@ import java.text.ParseException;
 
 /**
  * IfDirective. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class IfDirective extends BlockDirective {
-	
-	private final Expression expression;
 
-	public IfDirective(Expression expression, int offset) throws ParseException {
-		super(offset);
-		if (expression == null) {
-			throw new ParseException("The if expression is required.", offset);
-		}
-		this.expression = expression;
-	}
+    private final Expression expression;
 
-	public Expression getExpression() {
-		return expression;
-	}
+    public IfDirective(Expression expression, int offset) throws ParseException {
+        super(offset);
+        if (expression == null) {
+            throw new ParseException("The if expression is required.", offset);
+        }
+        this.expression = expression;
+    }
 
-	@Override
-	public String toString() {
-		return "#if(" + expression + ")";
-	}
+    public Expression getExpression() {
+        return expression;
+    }
+
+    @Override
+    public String toString() {
+        return "#if(" + expression + ")";
+    }
 
 }

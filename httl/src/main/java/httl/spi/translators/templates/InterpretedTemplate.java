@@ -34,180 +34,179 @@ import java.util.Map;
 
 /**
  * InterpretedTemplate. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.Engine#getTemplate(String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Engine#getTemplate(String)
  */
 public class InterpretedTemplate extends AbstractTemplate {
 
-	private Map<String, Class<?>> variables;
+    private Map<String, Class<?>> variables;
 
-	private Map<String, Template> macros;
+    private Map<String, Template> macros;
 
-	private Formatter<Object> formatter;
+    private Formatter<Object> formatter;
 
-	private Filter textFilter;
+    private Filter textFilter;
 
-	private Filter valueFilter;
+    private Filter valueFilter;
 
-	private Switcher<Filter> textFilterSwitcher;
+    private Switcher<Filter> textFilterSwitcher;
 
-	private Switcher<Filter> valueFilterSwitcher;
+    private Switcher<Filter> valueFilterSwitcher;
 
-	private Switcher<Formatter<Object>> formatterSwitcher;
+    private Switcher<Formatter<Object>> formatterSwitcher;
 
-	private String filterVariable;
+    private String filterVariable;
 
-	private String formatterVariable;
+    private String formatterVariable;
 
-	private String[] forVariable;
+    private String[] forVariable;
 
-	private String ifVariable;
+    private String ifVariable;
 
-	private String outputEncoding;
+    private String outputEncoding;
 
-	private List<StringSequence> importSequences;
-	
-	private Map<Class<?>, Object> importMethods;
+    private List<StringSequence> importSequences;
 
-	private Map<String, Template> importMacros;
+    private Map<Class<?>, Object> importMethods;
 
-	private String[] importPackages;
-	
-	private Class<?> defaultVariableType;
+    private Map<String, Template> importMacros;
 
-	public InterpretedTemplate(Resource resource, Node root, Template parent) throws IOException, ParseException {
-		super(resource, root, parent);
-	}
-	
-	public void init() throws IOException, ParseException {
-		VariableVisitor visitor = new VariableVisitor(defaultVariableType, true);
-		accept(visitor);
-		this.variables = Collections.unmodifiableMap(visitor.getVariables());
-		Map<String, Template> macros = new HashMap<String, Template>();
-		for (Node node : getChildren()) {
-			if (node instanceof MacroDirective) {
-				InterpretedTemplate macro = new InterpretedTemplate(this, node, this);
-				macros.put(((MacroDirective) node).getName(), macro);
-			}
-		}
-		this.macros = Collections.unmodifiableMap(macros);
-		for (Template m : macros.values()) {
-			InterpretedTemplate macro = (InterpretedTemplate) m;
-			macro.setInterceptor(getInterceptor());
-			macro.setMapConverter(getMapConverter());
-			macro.setOutConverter(getOutConverter());
-			macro.setFormatter(formatter);
-			macro.setValueFilter(valueFilter);
-			macro.setTextFilter(textFilter);
-			macro.setForVariable(forVariable);
-			macro.setIfVariable(ifVariable);
-			macro.setOutputEncoding(outputEncoding);
-			macro.setImportSequences(importSequences);
-			macro.setImportMethods(importMethods);
-			macro.setImportMacros(importMacros);
-			macro.setImportPackages(importPackages);
-			macro.setTextFilterSwitcher(textFilterSwitcher);
-			macro.setValueFilterSwitcher(valueFilterSwitcher);
-			macro.setFormatterSwitcher(formatterSwitcher);
-			macro.setFilterVariable(filterVariable);
-			macro.setFormatterVariable(formatterVariable);
-			macro.init();
-		}
-	}
+    private String[] importPackages;
 
-	@Override
-	protected void doRender(Context context) throws Exception {
-		InterpretedVisitor visitor = new InterpretedVisitor();
-		visitor.setTemplate(this);
-		visitor.setOut(Context.getContext().getOut());
-		visitor.setFormatter(formatter);
-		visitor.setValueFilter(valueFilter);
-		visitor.setTextFilter(textFilter);
-		visitor.setForVariable(forVariable);
-		visitor.setIfVariable(ifVariable);
-		visitor.setOutputEncoding(outputEncoding);
-		visitor.setImportMethods(importMethods);
-		visitor.setImportMacros(importMacros);
-		visitor.setTextFilterSwitcher(textFilterSwitcher);
-		visitor.setValueFilterSwitcher(valueFilterSwitcher);
-		visitor.setFormatterSwitcher(formatterSwitcher);
-		visitor.setFilterVariable(filterVariable);
-		visitor.setFormatterVariable(formatterVariable);
-		accept(visitor);
-	}
+    private Class<?> defaultVariableType;
 
-	public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
-		this.textFilterSwitcher = textFilterSwitcher;
-	}
+    public InterpretedTemplate(Resource resource, Node root, Template parent) throws IOException, ParseException {
+        super(resource, root, parent);
+    }
 
-	public void setValueFilterSwitcher(Switcher<Filter> valueFilterSwitcher) {
-		this.valueFilterSwitcher = valueFilterSwitcher;
-	}
+    public void init() throws IOException, ParseException {
+        VariableVisitor visitor = new VariableVisitor(defaultVariableType, true);
+        accept(visitor);
+        this.variables = Collections.unmodifiableMap(visitor.getVariables());
+        Map<String, Template> macros = new HashMap<String, Template>();
+        for (Node node : getChildren()) {
+            if (node instanceof MacroDirective) {
+                InterpretedTemplate macro = new InterpretedTemplate(this, node, this);
+                macros.put(((MacroDirective) node).getName(), macro);
+            }
+        }
+        this.macros = Collections.unmodifiableMap(macros);
+        for (Template m : macros.values()) {
+            InterpretedTemplate macro = (InterpretedTemplate) m;
+            macro.setInterceptor(getInterceptor());
+            macro.setMapConverter(getMapConverter());
+            macro.setOutConverter(getOutConverter());
+            macro.setFormatter(formatter);
+            macro.setValueFilter(valueFilter);
+            macro.setTextFilter(textFilter);
+            macro.setForVariable(forVariable);
+            macro.setIfVariable(ifVariable);
+            macro.setOutputEncoding(outputEncoding);
+            macro.setImportSequences(importSequences);
+            macro.setImportMethods(importMethods);
+            macro.setImportMacros(importMacros);
+            macro.setImportPackages(importPackages);
+            macro.setTextFilterSwitcher(textFilterSwitcher);
+            macro.setValueFilterSwitcher(valueFilterSwitcher);
+            macro.setFormatterSwitcher(formatterSwitcher);
+            macro.setFilterVariable(filterVariable);
+            macro.setFormatterVariable(formatterVariable);
+            macro.init();
+        }
+    }
 
-	public void setFormatterSwitcher(Switcher<Formatter<Object>> formatterSwitcher) {
-		this.formatterSwitcher = formatterSwitcher;
-	}
+    @Override
+    protected void doRender(Context context) throws Exception {
+        InterpretedVisitor visitor = new InterpretedVisitor();
+        visitor.setTemplate(this);
+        visitor.setOut(Context.getContext().getOut());
+        visitor.setFormatter(formatter);
+        visitor.setValueFilter(valueFilter);
+        visitor.setTextFilter(textFilter);
+        visitor.setForVariable(forVariable);
+        visitor.setIfVariable(ifVariable);
+        visitor.setOutputEncoding(outputEncoding);
+        visitor.setImportMethods(importMethods);
+        visitor.setImportMacros(importMacros);
+        visitor.setTextFilterSwitcher(textFilterSwitcher);
+        visitor.setValueFilterSwitcher(valueFilterSwitcher);
+        visitor.setFormatterSwitcher(formatterSwitcher);
+        visitor.setFilterVariable(filterVariable);
+        visitor.setFormatterVariable(formatterVariable);
+        accept(visitor);
+    }
 
-	public void setFilterVariable(String filterVariable) {
-		this.filterVariable = filterVariable;
-	}
+    public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
+        this.textFilterSwitcher = textFilterSwitcher;
+    }
 
-	public void setFormatterVariable(String formatterVariable) {
-		this.formatterVariable = formatterVariable;
-	}
+    public void setValueFilterSwitcher(Switcher<Filter> valueFilterSwitcher) {
+        this.valueFilterSwitcher = valueFilterSwitcher;
+    }
 
-	public void setImportMethods(Map<Class<?>, Object> importMethods) {
-		this.importMethods = importMethods;
-	}
+    public void setFormatterSwitcher(Switcher<Formatter<Object>> formatterSwitcher) {
+        this.formatterSwitcher = formatterSwitcher;
+    }
 
-	public void setImportSequences(List<StringSequence> importSequences) {
-		this.importSequences = importSequences;
-	}
+    public void setFilterVariable(String filterVariable) {
+        this.filterVariable = filterVariable;
+    }
 
-	public void setImportMacros(Map<String, Template> importMacros) {
-		this.importMacros = importMacros;
-	}
+    public void setFormatterVariable(String formatterVariable) {
+        this.formatterVariable = formatterVariable;
+    }
 
-	public void setImportPackages(String[] importPackages) {
-		this.importPackages = importPackages;
-	}
+    public void setImportMethods(Map<Class<?>, Object> importMethods) {
+        this.importMethods = importMethods;
+    }
 
-	public void setFormatter(Formatter<Object> formatter) {
-		this.formatter = formatter;
-	}
+    public void setImportSequences(List<StringSequence> importSequences) {
+        this.importSequences = importSequences;
+    }
 
-	public void setTextFilter(Filter textFilter) {
-		this.textFilter = textFilter;
-	}
+    public void setImportMacros(Map<String, Template> importMacros) {
+        this.importMacros = importMacros;
+    }
 
-	public void setValueFilter(Filter valueFilter) {
-		this.valueFilter = valueFilter;
-	}
+    public void setImportPackages(String[] importPackages) {
+        this.importPackages = importPackages;
+    }
 
-	public void setForVariable(String[] forVariable) {
-		this.forVariable = forVariable;
-	}
+    public void setFormatter(Formatter<Object> formatter) {
+        this.formatter = formatter;
+    }
 
-	public void setIfVariable(String ifVariable) {
-		this.ifVariable = ifVariable;
-	}
+    public void setTextFilter(Filter textFilter) {
+        this.textFilter = textFilter;
+    }
 
-	public void setOutputEncoding(String outputEncoding) {
-		this.outputEncoding = outputEncoding;
-	}
+    public void setValueFilter(Filter valueFilter) {
+        this.valueFilter = valueFilter;
+    }
 
-	public Map<String, Class<?>> getVariables() {
-		return variables;
-	}
+    public void setForVariable(String[] forVariable) {
+        this.forVariable = forVariable;
+    }
 
-	public Map<String, Template> getMacros() {
-		return macros;
-	}
+    public void setIfVariable(String ifVariable) {
+        this.ifVariable = ifVariable;
+    }
 
-	public void setDefaultVariableType(Class<?> defaultVariableType) {
-		this.defaultVariableType = defaultVariableType;
-	}
+    public void setOutputEncoding(String outputEncoding) {
+        this.outputEncoding = outputEncoding;
+    }
+
+    public Map<String, Class<?>> getVariables() {
+        return variables;
+    }
+
+    public Map<String, Template> getMacros() {
+        return macros;
+    }
+
+    public void setDefaultVariableType(Class<?> defaultVariableType) {
+        this.defaultVariableType = defaultVariableType;
+    }
 
 }

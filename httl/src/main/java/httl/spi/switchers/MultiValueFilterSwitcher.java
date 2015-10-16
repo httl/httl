@@ -21,20 +21,19 @@ import httl.util.Reqiured;
 
 /**
  * MultiValueFilterSwitcher. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setValueFilterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilterSwitcher(Switcher)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiValueFilterSwitcher extends MultiSwitcher<Filter> {
 
-	/**
-	 * httl.properties: value.filter.switchers=httl.spi.switchers.JavascriptFilterSwitcher
-	 */
-	@Reqiured
-	public void setValueFilterSwitchers(Switcher<Filter>[] switchers) {
-		setSwitchers(switchers);
-	}
+    /**
+     * httl.properties: value.filter.switchers=httl.spi.switchers.JavascriptFilterSwitcher
+     */
+    @Reqiured
+    public void setValueFilterSwitchers(Switcher<Filter>[] switchers) {
+        setSwitchers(switchers);
+    }
 
 }

@@ -17,36 +17,36 @@ package httl.ast;
 
 /**
  * Constant. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public final class Constant extends Expression {
 
-	private final Object value;
-	
-	private final boolean boxed;
+    private final Object value;
 
-	public Constant(Object value, boolean boxed, int offset) {
-		super(offset);
-		this.value = value;
-		this.boxed = boxed;
-	}
+    private final boolean boxed;
 
-	public String getToken() {
-		return toString();
-	}
+    public Constant(Object value, boolean boxed, int offset) {
+        super(offset);
+        this.value = value;
+        this.boxed = boxed;
+    }
 
-	public Object getValue() {
-		return value;
-	}
+    public String getToken() {
+        return toString();
+    }
 
-	public boolean isBoxed() {
-		return boxed;
-	}
+    public Object getValue() {
+        return value;
+    }
 
-	@Override
-	public String toString() {
-		return value == null && boxed ? "" : String.valueOf(value);
-	}
+    public boolean isBoxed() {
+        return boxed;
+    }
+
+    @Override
+    public String toString() {
+        return value == null && boxed ? "" : String.valueOf(value);
+    }
 
 }

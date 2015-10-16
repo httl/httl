@@ -25,72 +25,71 @@ import java.util.Locale;
 
 /**
  * AbstractResource. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.spi.loaders.AbstractLoader#load(String, Locale, String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.loaders.AbstractLoader#load(String, Locale, String)
  */
 public abstract class AbstractResource implements Resource, Serializable {
 
-	private static final long serialVersionUID = 6834431114838915042L;
+    private static final long serialVersionUID = 6834431114838915042L;
 
-	private final transient Engine engine;
-	
-	private final String name;
-	
-	private final String encoding;
+    private final transient Engine engine;
 
-	private final Locale locale;
+    private final String name;
 
-	private final long lastModified;
+    private final String encoding;
 
-	public AbstractResource(Engine engine, String name, Locale locale, String encoding) {
-		this(engine, name, locale, encoding, -1);
-	}
+    private final Locale locale;
 
-	public AbstractResource(Engine engine, String name, Locale locale, String encoding, long lastModified) {
-		this.engine = engine;
-		this.name = name;
-		this.encoding = encoding;
-		this.locale = locale;
-		this.lastModified = lastModified;
-	}
+    private final long lastModified;
 
-	public Engine getEngine() {
-		return engine;
-	}
+    public AbstractResource(Engine engine, String name, Locale locale, String encoding) {
+        this(engine, name, locale, encoding, -1);
+    }
 
-	public String getName() {
-		return name;
-	}
+    public AbstractResource(Engine engine, String name, Locale locale, String encoding, long lastModified) {
+        this.engine = engine;
+        this.name = name;
+        this.encoding = encoding;
+        this.locale = locale;
+        this.lastModified = lastModified;
+    }
 
-	public String getEncoding() {
-		return encoding;
-	}
+    public Engine getEngine() {
+        return engine;
+    }
 
-	public Locale getLocale() {
-		return locale;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public long getLastModified() {
-		return lastModified;
-	}
+    public String getEncoding() {
+        return encoding;
+    }
 
-	public long getLength() {
-		return -1;
-	}
+    public Locale getLocale() {
+        return locale;
+    }
 
-	public String getSource() throws IOException {
-		try {
-			return IOUtils.readToString(openReader());
-		} catch (IOException e) {
-			throw new IllegalStateException(e.getMessage(), e);
-		}
-	}
-	
-	@Override
-	public String toString() {
-		return getName();
-	}
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public long getLength() {
+        return -1;
+    }
+
+    public String getSource() throws IOException {
+        try {
+            return IOUtils.readToString(openReader());
+        } catch (IOException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 
 }

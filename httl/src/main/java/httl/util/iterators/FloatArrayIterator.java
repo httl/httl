@@ -20,38 +20,38 @@ import java.util.NoSuchElementException;
 
 /**
  * FloatArrayIterator. (Tool, Prototype, ThreadUnsafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class FloatArrayIterator implements Iterator<Float> {
 
-	private final float[] array;
+    private final float[] array;
 
-	private final int length;
+    private final int length;
 
-	private int index;
+    private int index;
 
-	public FloatArrayIterator(float[] array){
-		this.array = array;
-		this.length = array == null ? 0 : array.length;
-	}
+    public FloatArrayIterator(float[] array) {
+        this.array = array;
+        this.length = array == null ? 0 : array.length;
+    }
 
-	public Object getArray() {
-		return array;
-	}
+    public Object getArray() {
+        return array;
+    }
 
-	public boolean hasNext() {
-		return index < length;
-	}
+    public boolean hasNext() {
+        return index < length;
+    }
 
-	public Float next() {
-		if (! hasNext()) {
-			throw new NoSuchElementException();
-		}
-		return array[index ++];
-	}
+    public Float next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return array[index++];
+    }
 
-	public void remove() {
-		throw new UnsupportedOperationException("remove() method is not supported");
-	}
+    public void remove() {
+        throw new UnsupportedOperationException("remove() method is not supported");
+    }
 }

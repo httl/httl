@@ -17,15 +17,14 @@ package httl.ast;
 
 /**
  * Expression. (API, Prototype, Immutable, ThreadSafe)
- * 
- * @see httl.spi.parsers.ExpressionParser#parse(String, int)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.parsers.ExpressionParser#parse(String, int)
  */
 public abstract class Expression extends AbstractNode {
 
-	public Expression(int offset) {
-		super(offset);
-	}
+    public Expression(int offset) {
+        super(offset);
+    }
 
 }

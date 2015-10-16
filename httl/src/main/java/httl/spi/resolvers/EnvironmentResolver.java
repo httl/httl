@@ -19,13 +19,13 @@ import httl.spi.Resolver;
 
 /**
  * EnvironmentResolver. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class EnvironmentResolver implements Resolver {
 
-	public Object get(String key) {
-		return System.getenv(key);
-	}
+    public Object get(String key) {
+        return System.getenv(key);
+    }
 
 }

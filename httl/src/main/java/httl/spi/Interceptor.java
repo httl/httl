@@ -22,22 +22,21 @@ import java.text.ParseException;
 
 /**
  * Render Interceptor. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setInterceptor(Interceptor)
  * @see httl.spi.translators.InterpretedTranslator#setInterceptor(Interceptor)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Interceptor {
 
-	/**
-	 * Intercept the template rendition.
-	 * 
-	 * @param context - render context
-	 * @param listener - render listener.
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the template cannot be parsed on runtime
-	 */
-	void render(Context context, Listener listener) throws IOException, ParseException;
+    /**
+     * Intercept the template rendition.
+     *
+     * @param context  - render context
+     * @param listener - render listener.
+     * @throws IOException    - If an I/O error occurs
+     * @throws ParseException - If the template cannot be parsed on runtime
+     */
+    void render(Context context, Listener listener) throws IOException, ParseException;
 
 }

@@ -20,29 +20,29 @@ import java.util.Map;
 
 /**
  * JsonMethod. (SPI, Singleton, ThreadSafe)
- * 
- * @deprecated Replace to <code>CodecMethod</code>
- * @see httl.spi.methods.CodecMethod
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.methods.CodecMethod
+ * @deprecated Replace to <code>CodecMethod</code>
  */
 @Deprecated
 public class JsonMethod extends CodecMethod {
 
-	public String toJson(Object object) {
-		return super.encodeJson(object);
-	}
+    public String toJson(Object object) {
+        return super.encodeJson(object);
+    }
 
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> parseJson(String json) throws ParseException {
-		return super.decodeJson(json, Map.class);
-	}
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> parseJson(String json) throws ParseException {
+        return super.decodeJson(json, Map.class);
+    }
 
-	public Object parseJson(String json, String cls) throws ParseException {
-		return super.decodeJson(json, cls);
-	}
+    public Object parseJson(String json, String cls) throws ParseException {
+        return super.decodeJson(json, cls);
+    }
 
-	public <T> T parseJson(String json, Class<T> cls) throws ParseException {
-		return super.decodeJson(json, cls);
-	}
+    public <T> T parseJson(String json, Class<T> cls) throws ParseException {
+        return super.decodeJson(json, cls);
+    }
 
 }

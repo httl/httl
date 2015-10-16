@@ -25,41 +25,41 @@ import java.util.List;
 
 /**
  * UnaryOperator. (SPI, Prototype, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class UnaryOperator extends Operator {
 
-	private Expression parameter;
-	
-	public UnaryOperator(String name, int priority, int offset) {
-		super(name, priority, offset);
-	}
+    private Expression parameter;
 
-	public void accept(Visitor visitor) throws IOException, ParseException {
-		parameter.accept(visitor);
-		visitor.visit(this);
-	}
+    public UnaryOperator(String name, int priority, int offset) {
+        super(name, priority, offset);
+    }
 
-	public Expression getParameter() {
-		return parameter;
-	}
+    public void accept(Visitor visitor) throws IOException, ParseException {
+        parameter.accept(visitor);
+        visitor.visit(this);
+    }
 
-	public void setParameter(Expression parameter) throws ParseException {
-		if (this.parameter != null)
-			throw new ParseException("Can not modify parameter.", getOffset());
-		this.parameter = parameter;
-		parameter.setParent(this);
-	}
+    public Expression getParameter() {
+        return parameter;
+    }
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Node> getChildren() {
-		return (List) Arrays.asList(parameter);
-	}
+    public void setParameter(Expression parameter) throws ParseException {
+        if (this.parameter != null)
+            throw new ParseException("Can not modify parameter.", getOffset());
+        this.parameter = parameter;
+        parameter.setParent(this);
+    }
 
-	@Override
-	public String toString() {
-		return getName() + " " + parameter;
-	}
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Node> getChildren() {
+        return (List) Arrays.asList(parameter);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " " + parameter;
+    }
 
 }

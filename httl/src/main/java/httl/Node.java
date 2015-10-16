@@ -21,41 +21,40 @@ import java.util.List;
 
 /**
  * Node. (API, Prototype, Immutable, ThreadSafe)
- * 
- * @see httl.Template
- * 
+ *
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Template
  */
 public interface Node {
 
-	/**
-	 * Accept a visitor.
-	 * 
-	 * @param visitor
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the expression cannot be parsed on runtime
-	 */
-	void accept(Visitor visitor) throws IOException, ParseException;
+    /**
+     * Accept a visitor.
+     *
+     * @param visitor
+     * @throws IOException    - If an I/O error occurs
+     * @throws ParseException - If the expression cannot be parsed on runtime
+     */
+    void accept(Visitor visitor) throws IOException, ParseException;
 
-	/**
-	 * Get the node offset.
-	 * 
-	 * @return offset
-	 */
-	int getOffset();
+    /**
+     * Get the node offset.
+     *
+     * @return offset
+     */
+    int getOffset();
 
-	/**
-	 * Get the parent node.
-	 * 
-	 * @return parent
-	 */
-	Node getParent();
+    /**
+     * Get the parent node.
+     *
+     * @return parent
+     */
+    Node getParent();
 
-	/**
-	 * Get the template children nodes.
-	 * 
-	 * @return children nodes
-	 */
-	List<Node> getChildren();
+    /**
+     * Get the template children nodes.
+     *
+     * @return children nodes
+     */
+    List<Node> getChildren();
 
 }

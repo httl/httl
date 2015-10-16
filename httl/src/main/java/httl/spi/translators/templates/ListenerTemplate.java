@@ -24,24 +24,23 @@ import java.text.ParseException;
 
 /**
  * ListenerTemplate. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.Engine#getTemplate(String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Engine#getTemplate(String)
  */
 public class ListenerTemplate extends ProxyTemplate {
 
-	private final Listener listener;
+    private final Listener listener;
 
-	public ListenerTemplate(Template template, Listener listener) {
-		super(template);
-		this.listener = listener;
-	}
+    public ListenerTemplate(Template template, Listener listener) {
+        super(template);
+        this.listener = listener;
+    }
 
-	@Override
-	public void render(Object parameters, Object out)
-			throws IOException, ParseException {
-		listener.render(Context.getContext());
-	}
+    @Override
+    public void render(Object parameters, Object out)
+            throws IOException, ParseException {
+        listener.render(Context.getContext());
+    }
 
 }

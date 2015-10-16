@@ -31,69 +31,68 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * StringLoader. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  * @see httl.spi.engines.DefaultEngine#parseTemplate(String)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class StringLoader implements Loader {
-	
-	private static final String STRING_ENCODING = "UTF-8";
-	
-	private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
-	
-	private Engine engine;
-	
-	public StringLoader() {
-	}
 
-	public StringLoader(Engine engine) {
-		this.engine = engine;
-	}
-	
-	public void setEngine(Engine engine) {
-		this.engine = engine;
-	}
+    private static final String STRING_ENCODING = "UTF-8";
 
-	public void add(String name, String source) {
-		add(name, null, source);
-	}
-	
-	public void add(String name, Locale locale, String source) {
-		templates.put(getTemplateKey(name, locale), new StringResource(engine, name, locale, STRING_ENCODING, System.currentTimeMillis(), source));
-	}
-	
-	public void remove(String name) {
-		remove(name, null);
-	}
+    private final Map<String, StringResource> templates = new ConcurrentHashMap<String, StringResource>();
 
-	public void remove(String name, Locale locale) {
-		templates.remove(getTemplateKey(name, locale));
-	}
+    private Engine engine;
 
-	public void clear() {
-		templates.clear();
-	}
+    public StringLoader() {
+    }
 
-	public List<String> list(String suffix) throws IOException {
-		return new ArrayList<String>(templates.keySet());
-	}
+    public StringLoader(Engine engine) {
+        this.engine = engine;
+    }
 
-	public Resource load(String name, Locale locale, String encoding) throws IOException {
-		StringResource resource = templates.get(getTemplateKey(name, locale));
-		if (resource == null) {
-			throw new FileNotFoundException("Not found template " + name);
-		}
-		return resource;
-	}
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
 
-	public boolean exists(String name, Locale locale) {
-		return templates.containsKey(getTemplateKey(name, locale));
-	}
+    public void add(String name, String source) {
+        add(name, null, source);
+    }
 
-	private String getTemplateKey(String name, Locale locale) {
-		return LocaleUtils.appendLocale(name, locale);
-	}
+    public void add(String name, Locale locale, String source) {
+        templates.put(getTemplateKey(name, locale), new StringResource(engine, name, locale, STRING_ENCODING, System.currentTimeMillis(), source));
+    }
+
+    public void remove(String name) {
+        remove(name, null);
+    }
+
+    public void remove(String name, Locale locale) {
+        templates.remove(getTemplateKey(name, locale));
+    }
+
+    public void clear() {
+        templates.clear();
+    }
+
+    public List<String> list(String suffix) throws IOException {
+        return new ArrayList<String>(templates.keySet());
+    }
+
+    public Resource load(String name, Locale locale, String encoding) throws IOException {
+        StringResource resource = templates.get(getTemplateKey(name, locale));
+        if (resource == null) {
+            throw new FileNotFoundException("Not found template " + name);
+        }
+        return resource;
+    }
+
+    public boolean exists(String name, Locale locale) {
+        return templates.containsKey(getTemplateKey(name, locale));
+    }
+
+    private String getTemplateKey(String name, Locale locale) {
+        return LocaleUtils.appendLocale(name, locale);
+    }
 
 }

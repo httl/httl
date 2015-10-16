@@ -15,17 +15,9 @@
  */
 package httl.spi.translators.templates;
 
-import httl.Context;
-import httl.Engine;
-import httl.Node;
-import httl.Resource;
-import httl.Template;
+import httl.*;
 import httl.spi.Compiler;
-import httl.spi.Converter;
-import httl.spi.Filter;
-import httl.spi.Formatter;
-import httl.spi.Interceptor;
-import httl.spi.Switcher;
+import httl.spi.*;
 
 import java.io.OutputStream;
 import java.io.Writer;
@@ -33,27 +25,26 @@ import java.util.Map;
 
 /**
  * Writer Template. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.Engine#getTemplate(String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Engine#getTemplate(String)
  */
 public abstract class WriterTemplate extends CompiledTemplate {
 
-	public WriterTemplate(Engine engine, Interceptor interceptor, Compiler compiler, 
-			Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher, 
-			Filter filter, Formatter<Object> formatter, 
-			Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
-			Map<Class<?>, Object> functions, Map<String, Template> importMacros,
-			Resource resource, Template template, Node root){
-		super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter, 
-				mapConverter, outConverter, functions, importMacros, resource, template, root);
-	}
+    public WriterTemplate(Engine engine, Interceptor interceptor, Compiler compiler,
+                          Switcher<Filter> filterSwitcher, Switcher<Formatter<Object>> formatterSwitcher,
+                          Filter filter, Formatter<Object> formatter,
+                          Converter<Object, Object> mapConverter, Converter<Object, Object> outConverter,
+                          Map<Class<?>, Object> functions, Map<String, Template> importMacros,
+                          Resource resource, Template template, Node root) {
+        super(engine, interceptor, compiler, filterSwitcher, formatterSwitcher, filter, formatter,
+                mapConverter, outConverter, functions, importMacros, resource, template, root);
+    }
 
-	@Override
-	protected void doRenderStream(Context context, OutputStream stream) throws Exception {
-		throw new UnsupportedOperationException("Unsupported out type " + Writer.class.getName() 
-				+ " in compiled " + OutputStream.class.getName() + " template. Please config output.stream=true");
-	}
+    @Override
+    protected void doRenderStream(Context context, OutputStream stream) throws Exception {
+        throw new UnsupportedOperationException("Unsupported out type " + Writer.class.getName()
+                + " in compiled " + OutputStream.class.getName() + " template. Please config output.stream=true");
+    }
 
 }

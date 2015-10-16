@@ -15,62 +15,62 @@
  */
 package httl.spi.codecs;
 
-import java.text.ParseException;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
+import java.text.ParseException;
+
 /**
  * FastJson Codec. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class FastjsonCodec extends AbstractJsonCodec {
 
-	private static final SerializerFeature[] FEATURES = new SerializerFeature[] {SerializerFeature.SortField};
+    private static final SerializerFeature[] FEATURES = new SerializerFeature[]{SerializerFeature.SortField};
 
-	private static final SerializerFeature[] FEATURES_WITH_CLASS = new SerializerFeature[] {SerializerFeature.SortField, SerializerFeature.WriteClassName};
+    private static final SerializerFeature[] FEATURES_WITH_CLASS = new SerializerFeature[]{SerializerFeature.SortField, SerializerFeature.WriteClassName};
 
-	public String toString(String key, Object value) {
-		if (value == null) {
-			return null;
-		}
-		if (isJsonWithClass()) {
-			return JSON.toJSONString(value, FEATURES_WITH_CLASS);
-		}
-		return JSON.toJSONString(value, FEATURES);
-	}
+    public String toString(String key, Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (isJsonWithClass()) {
+            return JSON.toJSONString(value, FEATURES_WITH_CLASS);
+        }
+        return JSON.toJSONString(value, FEATURES);
+    }
 
-	public byte[] toBytes(String key, Object value) {
-		if (value == null) {
-			return null;
-		}
-		if (isJsonWithClass()) {
-			return JSON.toJSONBytes(value, FEATURES_WITH_CLASS);
-		}
-		return JSON.toJSONBytes(value, FEATURES);
-	}
+    public byte[] toBytes(String key, Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (isJsonWithClass()) {
+            return JSON.toJSONBytes(value, FEATURES_WITH_CLASS);
+        }
+        return JSON.toJSONBytes(value, FEATURES);
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T valueOf(String str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		if (type == null) {
-			return (T) JSON.parseObject(str);
-		}
-		return JSON.parseObject(str, type);
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T valueOf(String str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        if (type == null) {
+            return (T) JSON.parseObject(str);
+        }
+        return JSON.parseObject(str, type);
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		if (type == null) {
-			return (T) JSON.parse(str);
-		}
-		return (T) JSON.parseObject(str, type);
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        if (type == null) {
+            return (T) JSON.parse(str);
+        }
+        return (T) JSON.parseObject(str, type);
+    }
 
 }

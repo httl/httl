@@ -24,24 +24,23 @@ import java.text.ParseException;
 
 /**
  * TemplateInterceptor. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setInterceptor(Interceptor)
  * @see httl.spi.translators.InterpretedTranslator#setInterceptor(Interceptor)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class TemplateInterceptor implements Interceptor {
 
-	public void render(Context context, Listener listener)
-			throws IOException, ParseException {
-		if (context.getTemplate().isMacro()) { 
-			listener.render(context);
-			return;
-		}
-		doRender(context, listener);
-	}
+    public void render(Context context, Listener listener)
+            throws IOException, ParseException {
+        if (context.getTemplate().isMacro()) {
+            listener.render(context);
+            return;
+        }
+        doRender(context, listener);
+    }
 
-	protected abstract void doRender(Context context, Listener listener)
-			throws IOException, ParseException;
+    protected abstract void doRender(Context context, Listener listener)
+            throws IOException, ParseException;
 
 }

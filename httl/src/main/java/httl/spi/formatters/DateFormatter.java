@@ -24,32 +24,31 @@ import java.util.TimeZone;
 
 /**
  * DateFormatter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setFormatter(Formatter)
  * @see httl.spi.translators.InterpretedTranslator#setFormatter(Formatter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DateFormatter extends AbstractFormatter<Date> {
 
-	private String dateFormat;
+    private String dateFormat;
 
-	private TimeZone timeZone;
+    private TimeZone timeZone;
 
-	/**
-	 * httl.properties: date.format=yyyy-MM-dd HH:mm:ss
-	 */
-	public void setDateFormat(String dateFormat) {
-		new SimpleDateFormat(dateFormat).format(new Date());
-		this.dateFormat = dateFormat;
-	}
+    /**
+     * httl.properties: date.format=yyyy-MM-dd HH:mm:ss
+     */
+    public void setDateFormat(String dateFormat) {
+        new SimpleDateFormat(dateFormat).format(new Date());
+        this.dateFormat = dateFormat;
+    }
 
-	public void setTimeZone(String timeZone) {
-		this.timeZone = TimeZone.getTimeZone(timeZone);
-	}
+    public void setTimeZone(String timeZone) {
+        this.timeZone = TimeZone.getTimeZone(timeZone);
+    }
 
-	public String toString(String key, Date value) {
-		return DateUtils.format(value, dateFormat, timeZone);
-	}
+    public String toString(String key, Date value) {
+        return DateUtils.format(value, dateFormat, timeZone);
+    }
 
 }

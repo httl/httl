@@ -19,13 +19,7 @@ import httl.Engine;
 import httl.Node;
 import httl.Resource;
 import httl.Template;
-import httl.spi.Converter;
-import httl.spi.Filter;
-import httl.spi.Formatter;
-import httl.spi.Interceptor;
-import httl.spi.Logger;
-import httl.spi.Switcher;
-import httl.spi.Translator;
+import httl.spi.*;
 import httl.spi.translators.templates.InterpretedTemplate;
 import httl.util.StringSequence;
 
@@ -39,216 +33,197 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * InterpretedTranslator. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
- * 
+ *
  * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setTranslator(Translator)
  */
 public class InterpretedTranslator implements Translator {
 
-	private Formatter<Object> formatter;
+    private final List<StringSequence> importSequences = new CopyOnWriteArrayList<StringSequence>();
+    private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
+    private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
+    private Formatter<Object> formatter;
+    private Filter textFilter;
+    private Filter valueFilter;
+    private Switcher<Filter> textFilterSwitcher;
+    private Switcher<Filter> valueFilterSwitcher;
+    private Switcher<Formatter<Object>> formatterSwitcher;
+    private String filterVariable;
+    private String formatterVariable;
+    private String[] forVariable;
+    private String ifVariable;
+    private String outputEncoding;
+    private Engine engine;
+    private Class<?> defaultVariableType;
+    private String[] importPackages;
+    private String[] importMacros;
+    private Interceptor interceptor;
 
-	private Filter textFilter;
+    private Converter<Object, Object> mapConverter;
 
-	private Filter valueFilter;
+    private Converter<Object, Object> outConverter;
 
-	private Switcher<Filter> textFilterSwitcher;
+    private Logger logger;
 
-	private Switcher<Filter> valueFilterSwitcher;
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
 
-	private Switcher<Formatter<Object>> formatterSwitcher;
+    public void setMapConverter(Converter<Object, Object> mapConverter) {
+        this.mapConverter = mapConverter;
+    }
 
-	private String filterVariable;
+    public void setOutConverter(Converter<Object, Object> outConverter) {
+        this.outConverter = outConverter;
+    }
 
-	private String formatterVariable;
+    public void setInterceptor(Interceptor interceptor) {
+        this.interceptor = interceptor;
+    }
 
-	private String[] forVariable;
+    /**
+     * inited.
+     */
+    public void inited() {
+        if (importMacros != null && importMacros.length > 0) {
+            for (String importMacro : importMacros) {
+                try {
+                    Template importMacroTemplate = engine.getTemplate(importMacro);
+                    importMacroTemplates.putAll(importMacroTemplate.getMacros());
+                } catch (Exception e) {
+                    throw new IllegalStateException(e.getMessage(), e);
+                }
+            }
+        }
+    }
 
-	private String ifVariable;
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
 
-	private String outputEncoding;
+    public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
+        this.textFilterSwitcher = textFilterSwitcher;
+    }
 
-	private Engine engine;
+    public void setValueFilterSwitcher(Switcher<Filter> valueFilterSwitcher) {
+        this.valueFilterSwitcher = valueFilterSwitcher;
+    }
 
-	private Class<?> defaultVariableType;
+    public void setFormatterSwitcher(Switcher<Formatter<Object>> formatterSwitcher) {
+        this.formatterSwitcher = formatterSwitcher;
+    }
 
-	private final List<StringSequence> importSequences = new CopyOnWriteArrayList<StringSequence>();
+    public void setFilterVariable(String filterVariable) {
+        this.filterVariable = filterVariable;
+    }
 
-	private final Map<Class<?>, Object> functions = new ConcurrentHashMap<Class<?>, Object>();
+    public void setFormatterVariable(String formatterVariable) {
+        this.formatterVariable = formatterVariable;
+    }
 
-	private String[] importPackages;
+    /**
+     * httl.properties: import.macros=common.httl
+     */
+    public void setImportMacros(String[] importMacros) {
+        this.importMacros = importMacros;
+    }
 
-	private String[] importMacros;
-   
-	private final Map<String, Template> importMacroTemplates = new ConcurrentHashMap<String, Template>();
+    /**
+     * httl.properties: import.packages=java.util
+     */
+    public void setImportPackages(String[] importPackages) {
+        this.importPackages = importPackages;
+    }
 
-	private Interceptor interceptor;
+    /**
+     * httl.properties: import.methods=java.lang.Math
+     */
+    public void setImportMethods(Object[] importMethods) {
+        for (Object function : importMethods) {
+            if (function instanceof Class) {
+                this.functions.put((Class<?>) function, function);
+            } else {
+                this.functions.put(function.getClass(), function);
+            }
+        }
+    }
 
-	private Converter<Object, Object> mapConverter;
+    /**
+     * httl.properties: import.sequences=Mon Tue Wed Thu Fri Sat Sun Mon
+     */
+    public void setImportSequences(String[] sequences) {
+        for (String s : sequences) {
+            s = s.trim();
+            if (s.length() > 0) {
+                String[] ts = s.split("\\s+");
+                List<String> sequence = new ArrayList<String>();
+                for (String t : ts) {
+                    t = t.trim();
+                    if (t.length() > 0) {
+                        sequence.add(t);
+                    }
+                }
+                this.importSequences.add(new StringSequence(sequence));
+            }
+        }
+    }
 
-	private Converter<Object, Object> outConverter;
+    public void setFormatter(Formatter<Object> formatter) {
+        this.formatter = formatter;
+    }
 
-	private Logger logger;
+    public void setTextFilter(Filter textFilter) {
+        this.textFilter = textFilter;
+    }
 
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}
+    public void setValueFilter(Filter valueFilter) {
+        this.valueFilter = valueFilter;
+    }
 
-	public void setMapConverter(Converter<Object, Object> mapConverter) {
-		this.mapConverter = mapConverter;
-	}
+    public void setForVariable(String[] forVariable) {
+        this.forVariable = forVariable;
+    }
 
-	public void setOutConverter(Converter<Object, Object> outConverter) {
-		this.outConverter = outConverter;
-	}
+    public void setIfVariable(String ifVariable) {
+        this.ifVariable = ifVariable;
+    }
 
-	public void setInterceptor(Interceptor interceptor) {
-		this.interceptor = interceptor;
-	}
+    public void setOutputEncoding(String outputEncoding) {
+        this.outputEncoding = outputEncoding;
+    }
 
-	/**
-	 * inited.
-	 */
-	public void inited() {
-		if (importMacros != null && importMacros.length > 0) {
-			for (String importMacro : importMacros) {
-				try {
-					Template importMacroTemplate = engine.getTemplate(importMacro);
-					importMacroTemplates.putAll(importMacroTemplate.getMacros());
-				} catch (Exception e) {
-					throw new IllegalStateException(e.getMessage(), e);
-				}
-			}
-		}
-	}
+    public void setDefaultVariableType(Class<?> defaultVariableType) {
+        this.defaultVariableType = defaultVariableType;
+    }
 
-	public void setEngine(Engine engine) {
-		this.engine = engine;
-	}
-
-	public void setTextFilterSwitcher(Switcher<Filter> textFilterSwitcher) {
-		this.textFilterSwitcher = textFilterSwitcher;
-	}
-
-	public void setValueFilterSwitcher(Switcher<Filter> valueFilterSwitcher) {
-		this.valueFilterSwitcher = valueFilterSwitcher;
-	}
-
-	public void setFormatterSwitcher(Switcher<Formatter<Object>> formatterSwitcher) {
-		this.formatterSwitcher = formatterSwitcher;
-	}
-
-	public void setFilterVariable(String filterVariable) {
-		this.filterVariable = filterVariable;
-	}
-
-	public void setFormatterVariable(String formatterVariable) {
-		this.formatterVariable = formatterVariable;
-	}
-
-	/**
-	 * httl.properties: import.macros=common.httl
-	 */
-	public void setImportMacros(String[] importMacros) {
-		this.importMacros = importMacros;
-	}
-
-	/**
-	 * httl.properties: import.packages=java.util
-	 */
-	public void setImportPackages(String[] importPackages) {
-		this.importPackages = importPackages;
-	}
-
-	/**
-	 * httl.properties: import.methods=java.lang.Math
-	 */
-	public void setImportMethods(Object[] importMethods) {
-		for (Object function : importMethods) {
-			if (function instanceof Class) {
-				this.functions.put((Class<?>) function, function);
-			} else {
-				this.functions.put(function.getClass(), function);
-			}
-		}
-	}
-
-	/**
-	 * httl.properties: import.sequences=Mon Tue Wed Thu Fri Sat Sun Mon
-	 */
-	public void setImportSequences(String[] sequences) {
-		for (String s : sequences) {
-			s = s.trim();
-			if (s.length() > 0) {
-				String[] ts = s.split("\\s+");
-				List<String> sequence = new ArrayList<String>();
-				for (String t : ts) {
-					t = t.trim();
-					if (t.length() > 0) {
-						sequence.add(t);
-					}
-				}
-				this.importSequences.add(new StringSequence(sequence));
-			}
-		}
-	}
-
-	public void setFormatter(Formatter<Object> formatter) {
-		this.formatter = formatter;
-	}
-
-	public void setTextFilter(Filter textFilter) {
-		this.textFilter = textFilter;
-	}
-
-	public void setValueFilter(Filter valueFilter) {
-		this.valueFilter = valueFilter;
-	}
-
-	public void setForVariable(String[] forVariable) {
-		this.forVariable = forVariable;
-	}
-
-	public void setIfVariable(String ifVariable) {
-		this.ifVariable = ifVariable;
-	}
-
-	public void setOutputEncoding(String outputEncoding) {
-		this.outputEncoding = outputEncoding;
-	}
-
-	public void setDefaultVariableType(Class<?> defaultVariableType) {
-		this.defaultVariableType = defaultVariableType;
-	}
-
-	public Template translate(Resource resource,
-			Node root, Map<String, Class<?>> parameterTypes) throws ParseException,
-			IOException {
-		if (logger != null && logger.isDebugEnabled()) {
-			logger.debug("Interprete template " + resource.getName());
-		}
-		InterpretedTemplate template = new InterpretedTemplate(resource, root, null);
-		template.setInterceptor(interceptor);
-		template.setMapConverter(mapConverter);
-		template.setOutConverter(outConverter);
-		template.setFormatter(formatter);
-		template.setValueFilter(valueFilter);
-		template.setTextFilter(textFilter);
-		template.setForVariable(forVariable);
-		template.setIfVariable(ifVariable);
-		template.setOutputEncoding(outputEncoding);
-		template.setImportSequences(importSequences);
-		template.setImportMethods(functions);
-		template.setImportMacros(importMacroTemplates);
-		template.setImportPackages(importPackages);
-		template.setTextFilterSwitcher(textFilterSwitcher);
-		template.setValueFilterSwitcher(valueFilterSwitcher);
-		template.setFormatterSwitcher(formatterSwitcher);
-		template.setFilterVariable(filterVariable);
-		template.setFormatterVariable(formatterVariable);
-		template.setDefaultVariableType(defaultVariableType);
-		template.init();
-		return template;
-	}
+    public Template translate(Resource resource,
+                              Node root, Map<String, Class<?>> parameterTypes) throws ParseException,
+            IOException {
+        if (logger != null && logger.isDebugEnabled()) {
+            logger.debug("Interprete template " + resource.getName());
+        }
+        InterpretedTemplate template = new InterpretedTemplate(resource, root, null);
+        template.setInterceptor(interceptor);
+        template.setMapConverter(mapConverter);
+        template.setOutConverter(outConverter);
+        template.setFormatter(formatter);
+        template.setValueFilter(valueFilter);
+        template.setTextFilter(textFilter);
+        template.setForVariable(forVariable);
+        template.setIfVariable(ifVariable);
+        template.setOutputEncoding(outputEncoding);
+        template.setImportSequences(importSequences);
+        template.setImportMethods(functions);
+        template.setImportMacros(importMacroTemplates);
+        template.setImportPackages(importPackages);
+        template.setTextFilterSwitcher(textFilterSwitcher);
+        template.setValueFilterSwitcher(valueFilterSwitcher);
+        template.setFormatterSwitcher(formatterSwitcher);
+        template.setFilterVariable(filterVariable);
+        template.setFormatterVariable(formatterVariable);
+        template.setDefaultVariableType(defaultVariableType);
+        template.init();
+        return template;
+    }
 
 }

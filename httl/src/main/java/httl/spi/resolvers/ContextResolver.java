@@ -21,32 +21,32 @@ import httl.spi.Resolver;
 
 /**
  * ContextResolver. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ContextResolver implements Resolver {
 
-	public Object get(String key) {
-		if ("parent".equals(key)) {
-			return Context.getContext().getParent();
-		} else if ("super".equals(key)) {
-			Context parent = Context.getContext().getParent();
-			return parent == null ? null : parent.getTemplate();
-		} else if ("this".equals(key)) {
-			return Context.getContext().getTemplate();
-		} else if ("engine".equals(key)) {
-			return Context.getContext().getEngine();
-		} else if ("out".equals(key)) {
-			return Context.getContext().getOut();
-		} else if ("level".equals(key)) {
-			return Context.getContext().getLevel();
-		} else {
-			Template template = Context.getContext().getTemplate();
-			if (template != null) {
-				return template.getMacros().get(key);
-			}
-			return null;
-		}
-	}
+    public Object get(String key) {
+        if ("parent".equals(key)) {
+            return Context.getContext().getParent();
+        } else if ("super".equals(key)) {
+            Context parent = Context.getContext().getParent();
+            return parent == null ? null : parent.getTemplate();
+        } else if ("this".equals(key)) {
+            return Context.getContext().getTemplate();
+        } else if ("engine".equals(key)) {
+            return Context.getContext().getEngine();
+        } else if ("out".equals(key)) {
+            return Context.getContext().getOut();
+        } else if ("level".equals(key)) {
+            return Context.getContext().getLevel();
+        } else {
+            Template template = Context.getContext().getTemplate();
+            if (template != null) {
+                return template.getMacros().get(key);
+            }
+            return null;
+        }
+    }
 
 }

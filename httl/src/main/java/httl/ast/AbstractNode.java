@@ -9,34 +9,34 @@ import java.util.List;
 
 public abstract class AbstractNode implements Node {
 
-	private final int offset;
+    private final int offset;
 
-	private Node parent;
+    private Node parent;
 
-	public AbstractNode(int offset) {
-		this.offset = offset;
-	}
+    public AbstractNode(int offset) {
+        this.offset = offset;
+    }
 
-	public void accept(Visitor visitor) throws IOException, ParseException {
-		visitor.visit(this);
-	}
+    public void accept(Visitor visitor) throws IOException, ParseException {
+        visitor.visit(this);
+    }
 
-	public int getOffset() {
-		return offset;
-	}
+    public int getOffset() {
+        return offset;
+    }
 
-	public Node getParent() {
-		return parent;
-	}
+    public Node getParent() {
+        return parent;
+    }
 
-	public void setParent(Node parent) throws ParseException {
-		if (this.parent != null)
-			throw new ParseException("Can not modify parent.", getOffset());
-		this.parent = parent;
-	}
+    public void setParent(Node parent) throws ParseException {
+        if (this.parent != null)
+            throw new ParseException("Can not modify parent.", getOffset());
+        this.parent = parent;
+    }
 
-	public List<Node> getChildren() {
-		return null;
-	}
+    public List<Node> getChildren() {
+        return null;
+    }
 
 }

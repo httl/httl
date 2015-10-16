@@ -19,19 +19,18 @@ import httl.spi.Converter;
 
 /**
  * MultiMapConverter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setMapConverter(Converter)
  * @see httl.spi.translators.InterpretedTranslator#setMapConverter(Converter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiMapConverter extends MultiConverter {
 
-	/**
-	 * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
-	 */
-	public void setMapConverters(Converter<Object, Object>[] converters) {
-		super.setConverters(converters);
-	}
+    /**
+     * httl.properties: map.converters=httl.spi.converters.BeanMapConverter
+     */
+    public void setMapConverters(Converter<Object, Object>[] converters) {
+        super.setConverters(converters);
+    }
 
 }

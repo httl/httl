@@ -15,78 +15,78 @@
  */
 package httl.spi.codecs;
 
-import java.text.ParseException;
-
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import java.text.ParseException;
+
 /**
  * Jackson Codec. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class JacksonCodec extends AbstractJsonCodec {
 
-	private static ObjectMapper mapper = new ObjectMapper();
+    private static ObjectMapper mapper = new ObjectMapper();
 
-	public static ObjectMapper getMapper() {
-		return mapper;
-	}
+    public static ObjectMapper getMapper() {
+        return mapper;
+    }
 
-	public static void setMapper(ObjectMapper mapper) {
-		JacksonCodec.mapper = mapper;
-	}
+    public static void setMapper(ObjectMapper mapper) {
+        JacksonCodec.mapper = mapper;
+    }
 
-	public String toString(String key, Object value) {
-		if (value == null) {
-			return null;
-		}
-		try {
-			return mapper.writeValueAsString(value);
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to serialize " + value + " using jackson, cause: " + e.getMessage(), e);
-		}
-	}
+    public String toString(String key, Object value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return mapper.writeValueAsString(value);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize " + value + " using jackson, cause: " + e.getMessage(), e);
+        }
+    }
 
-	public byte[] toBytes(String key, Object value) {
-		if (value == null) {
-			return null;
-		}
-		try {
-			return mapper.writeValueAsBytes(value);
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to serialize " + value + " using jackson, cause: " + e.getMessage(), e);
-		}
-	}
+    public byte[] toBytes(String key, Object value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return mapper.writeValueAsBytes(value);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize " + value + " using jackson, cause: " + e.getMessage(), e);
+        }
+    }
 
-	public <T> T valueOf(String str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		try {
-			return mapper.readValue(str, type);
-		} catch (Exception e) {
-			int offset = 0;
-			if (e instanceof JsonProcessingException) {
-				offset = (int) ((JsonProcessingException) e).getLocation().getCharOffset();
-			}
-			throw new ParseException("Failed to parse " + str + " using jackson, cause: " + e.getMessage(), offset);
-		}
-	}
+    public <T> T valueOf(String str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return mapper.readValue(str, type);
+        } catch (Exception e) {
+            int offset = 0;
+            if (e instanceof JsonProcessingException) {
+                offset = (int) ((JsonProcessingException) e).getLocation().getCharOffset();
+            }
+            throw new ParseException("Failed to parse " + str + " using jackson, cause: " + e.getMessage(), offset);
+        }
+    }
 
-	public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		try {
-			return mapper.readValue(str, type);
-		} catch (Exception e) {
-			int offset = 0;
-			if (e instanceof JsonProcessingException) {
-				offset = (int) ((JsonProcessingException) e).getLocation().getCharOffset();
-			}
-			throw new ParseException("Failed to parse " + toString(str) + " using jackson, cause: " + e.getMessage(), offset);
-		}
-	}
+    public <T> T valueOf(byte[] str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return mapper.readValue(str, type);
+        } catch (Exception e) {
+            int offset = 0;
+            if (e instanceof JsonProcessingException) {
+                offset = (int) ((JsonProcessingException) e).getLocation().getCharOffset();
+            }
+            throw new ParseException("Failed to parse " + toString(str) + " using jackson, cause: " + e.getMessage(), offset);
+        }
+    }
 
 }

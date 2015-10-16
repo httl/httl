@@ -21,20 +21,19 @@ import httl.util.Reqiured;
 
 /**
  * MultiFormatterSwitcher. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setFormatterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setFormatterSwitcher(Switcher)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiFormatterSwitcher extends MultiSwitcher<Formatter<Object>> {
 
-	/**
-	 * httl.properties: formatter.switchers=httl.spi.switchers.StyleFormatterSwitcher
-	 */
-	@Reqiured
-	public void setFormatterSwitchers(Switcher<Formatter<Object>>[] switchers) {
-		setSwitchers(switchers);
-	}
+    /**
+     * httl.properties: formatter.switchers=httl.spi.switchers.StyleFormatterSwitcher
+     */
+    @Reqiured
+    public void setFormatterSwitchers(Switcher<Formatter<Object>>[] switchers) {
+        setSwitchers(switchers);
+    }
 
 }

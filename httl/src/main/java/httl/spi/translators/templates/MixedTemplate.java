@@ -30,106 +30,105 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * MixedTemplate. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.Engine#getTemplate(String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.Engine#getTemplate(String)
  */
 public class MixedTemplate extends ProxyTemplate {
 
-	private final Map<String, Class<?>> types = new ConcurrentHashMap<String, Class<?>>();
+    private final Map<String, Class<?>> types = new ConcurrentHashMap<String, Class<?>>();
 
-	private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
-	private final Resource resource;
+    private final Resource resource;
 
-	private final Node root;
+    private final Node root;
 
-	private final Translator compiledTranslator;
+    private final Translator compiledTranslator;
 
-	private final Converter<Object, Object> mapConverter;
+    private final Converter<Object, Object> mapConverter;
 
-	private final Logger logger;
+    private final Logger logger;
 
-	private volatile Template compiledTemplate;
-	
-	private volatile boolean firstWarn = true;
+    private volatile Template compiledTemplate;
 
-	public MixedTemplate(Template template, Resource resource, Node root, Map<String, Class<?>> types, 
-			Translator translator, Converter<Object, Object> mapConverter, Logger logger) {
-		super(template);
-		this.compiledTranslator = translator;
-		this.mapConverter = mapConverter;
-		this.logger = logger;
-		this.resource = resource;
-		this.root = root;
-		if (types != null) {
-			this.types.putAll(types);
-		}
-		VariableVisitor visitor = new VariableVisitor(null, false);
-		try {
-			template.accept(visitor);
-		} catch (Exception e) {
-		}
-		this.types.putAll(visitor.getVariables());
-	}
+    private volatile boolean firstWarn = true;
 
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> convertMap(Object parameters) throws IOException, ParseException {
-		if (mapConverter != null && parameters != null && ! (parameters instanceof Map)) {
-			parameters = mapConverter.convert(parameters, null);
-		}
-		if (parameters == null || parameters instanceof Map) {
-			return (Map<String, Object>) parameters;
-		} else {
-			throw new IllegalArgumentException("No such Converter to convert the " + parameters.getClass().getName() + " to Map.");
-		}
-	}
+    public MixedTemplate(Template template, Resource resource, Node root, Map<String, Class<?>> types,
+                         Translator translator, Converter<Object, Object> mapConverter, Logger logger) {
+        super(template);
+        this.compiledTranslator = translator;
+        this.mapConverter = mapConverter;
+        this.logger = logger;
+        this.resource = resource;
+        this.root = root;
+        if (types != null) {
+            this.types.putAll(types);
+        }
+        VariableVisitor visitor = new VariableVisitor(null, false);
+        try {
+            template.accept(visitor);
+        } catch (Exception e) {
+        }
+        this.types.putAll(visitor.getVariables());
+    }
 
-	public void render(Object parameters, Object stream)
-			throws IOException, ParseException {
-		if (compiledTemplate != null) {
-			compiledTemplate.render(parameters, stream);
-			return;
-		}
-		Map<String, Object> map = convertMap(parameters);
-		if (map != null) {
-			boolean compilable = true;
-			for (String key : getVariables().keySet()) {
-				if (! types.containsKey(key)) {
-					Object value = map.get(key);
-					if (value != null) {
-						types.put(key, value.getClass());
-					} else {
-						compilable = false;
-					}
-				}
-			}
-			if (compilable) {
-				if (lock.tryLock()) {
-					lock.lock();
-					try {
-						if (compiledTemplate == null) {
-							try {
-								compiledTemplate = compiledTranslator.translate(resource, root, types);
-							} catch (ParseException e) {
-								if (firstWarn && logger != null && logger.isWarnEnabled()) {
-									firstWarn = false;
-									logger.warn(e.getMessage(), e);
-								}
-							}
-						}
-					} finally {
-						lock.unlock();
-					}
-					if (compiledTemplate != null) {
-						compiledTemplate.render(parameters, stream);
-					}
-					return;
-				}
-			}
-		}
-		super.render(parameters, stream);
-	}
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> convertMap(Object parameters) throws IOException, ParseException {
+        if (mapConverter != null && parameters != null && !(parameters instanceof Map)) {
+            parameters = mapConverter.convert(parameters, null);
+        }
+        if (parameters == null || parameters instanceof Map) {
+            return (Map<String, Object>) parameters;
+        } else {
+            throw new IllegalArgumentException("No such Converter to convert the " + parameters.getClass().getName() + " to Map.");
+        }
+    }
+
+    public void render(Object parameters, Object stream)
+            throws IOException, ParseException {
+        if (compiledTemplate != null) {
+            compiledTemplate.render(parameters, stream);
+            return;
+        }
+        Map<String, Object> map = convertMap(parameters);
+        if (map != null) {
+            boolean compilable = true;
+            for (String key : getVariables().keySet()) {
+                if (!types.containsKey(key)) {
+                    Object value = map.get(key);
+                    if (value != null) {
+                        types.put(key, value.getClass());
+                    } else {
+                        compilable = false;
+                    }
+                }
+            }
+            if (compilable) {
+                if (lock.tryLock()) {
+                    lock.lock();
+                    try {
+                        if (compiledTemplate == null) {
+                            try {
+                                compiledTemplate = compiledTranslator.translate(resource, root, types);
+                            } catch (ParseException e) {
+                                if (firstWarn && logger != null && logger.isWarnEnabled()) {
+                                    firstWarn = false;
+                                    logger.warn(e.getMessage(), e);
+                                }
+                            }
+                        }
+                    } finally {
+                        lock.unlock();
+                    }
+                    if (compiledTemplate != null) {
+                        compiledTemplate.render(parameters, stream);
+                    }
+                    return;
+                }
+            }
+        }
+        super.render(parameters, stream);
+    }
 
 }

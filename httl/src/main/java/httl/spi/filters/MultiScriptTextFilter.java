@@ -19,19 +19,18 @@ import httl.spi.Filter;
 
 /**
  * MultiScriptTextFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setValueFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiScriptTextFilter extends MultiFilter {
 
-	/**
-	 * httl.properties: script.text.filters=httl.spi.filters.ClearBlankLineFilter
-	 */
-	public void setScriptTextFilters(Filter[] filters) {
-		setFilters(filters);
-	}
+    /**
+     * httl.properties: script.text.filters=httl.spi.filters.ClearBlankLineFilter
+     */
+    public void setScriptTextFilters(Filter[] filters) {
+        setFilters(filters);
+    }
 
 }

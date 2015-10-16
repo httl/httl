@@ -22,48 +22,48 @@ package httl.spi.methods.cycles;
  */
 public class ShortArrayCycle {
 
-	private final short[] values;
-	
-	private final int size;
+    private final short[] values;
 
-	private int index;
+    private final int size;
 
-	public ShortArrayCycle(short[] values) {
-		if (values == null || values.length == 0) {
-			throw new IllegalArgumentException("cycle values == null");
-		}
-		this.values = values;
-		this.size = values.length;
-		this.index = -1;
-	}
+    private int index;
 
-	public short getNext() {
-		index += 1;
-		if (index >= size)
-			index = 0;
-		return values[index];
-	}
+    public ShortArrayCycle(short[] values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("cycle values == null");
+        }
+        this.values = values;
+        this.size = values.length;
+        this.index = -1;
+    }
 
-	public short getValue() {
-		if (index == -1)
-			return values[0];
-		return values[index];
-	}
+    public short getNext() {
+        index += 1;
+        if (index >= size)
+            index = 0;
+        return values[index];
+    }
 
-	public short[] getValues() {
-		return values;
-	}
+    public short getValue() {
+        if (index == -1)
+            return values[0];
+        return values[index];
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public short[] getValues() {
+        return values;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public int getSize() {
+        return size;
+    }
 
-	public String toString() {
-		return String.valueOf(getNext());
-	}
+    public int getIndex() {
+        return index;
+    }
+
+    public String toString() {
+        return String.valueOf(getNext());
+    }
 
 }

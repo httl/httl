@@ -26,52 +26,52 @@ import java.util.List;
  */
 public class ListCycle<T> {
 
-	private final List<T> values;
-	
-	private final int size;
+    private final List<T> values;
 
-	private int index;
-	
-	public ListCycle(Collection<T> values) {
-		this(values instanceof List ? (List<T>) values : new ArrayList<T>(values));
-	}
+    private final int size;
 
-	public ListCycle(List<T> values) {
-		if (values == null || values.size() == 0) {
-			throw new IllegalArgumentException("cycle values == null");
-		}
-		this.values = values;
-		this.size = values.size();
-		this.index = -1;
-	}
+    private int index;
 
-	public Object getNext() {
-		index += 1;
-		if (index >= size)
-			index = 0;
-		return values.get(index);
-	}
+    public ListCycle(Collection<T> values) {
+        this(values instanceof List ? (List<T>) values : new ArrayList<T>(values));
+    }
 
-	public T getValue() {
-		if (index == -1)
-			return values.get(0);
-		return values.get(index);
-	}
+    public ListCycle(List<T> values) {
+        if (values == null || values.size() == 0) {
+            throw new IllegalArgumentException("cycle values == null");
+        }
+        this.values = values;
+        this.size = values.size();
+        this.index = -1;
+    }
 
-	public List<T> getValues() {
-		return values;
-	}
+    public Object getNext() {
+        index += 1;
+        if (index >= size)
+            index = 0;
+        return values.get(index);
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public T getValue() {
+        if (index == -1)
+            return values.get(0);
+        return values.get(index);
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public List<T> getValues() {
+        return values;
+    }
 
-	public String toString() {
-		return String.valueOf(getNext());
-	}
+    public int getSize() {
+        return size;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public String toString() {
+        return String.valueOf(getNext());
+    }
 
 }

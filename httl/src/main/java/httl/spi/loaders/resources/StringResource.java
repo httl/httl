@@ -17,47 +17,42 @@ package httl.spi.loaders.resources;
 
 import httl.Engine;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.Locale;
 
 /**
  * StringResource. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.spi.loaders.StringLoader#load(String, Locale, String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.loaders.StringLoader#load(String, Locale, String)
  */
 public class StringResource extends AbstractResource {
-	
-	private static final long serialVersionUID = 1L;
-	
-	private final String source;
-	
-	public StringResource(Engine engine, String name, Locale locale, String encoding, String source) {
-		super(engine, name, locale, encoding);
-		this.source = source;
-	}
-	
-	public StringResource(Engine engine, String name, Locale locale, String encoding, long lastModified, String source) {
-		super(engine, name, locale, encoding, lastModified);
-		this.source = source;
-	}
 
-	@Override
-	public long getLength() {
-		return source.length();
-	}
-	
-	public Reader openReader() throws IOException {
-		return new StringReader(source);
-	}
+    private static final long serialVersionUID = 1L;
 
-	public InputStream openStream() throws IOException {
-		return new ByteArrayInputStream(source.getBytes(getEncoding()));
-	}
+    private final String source;
+
+    public StringResource(Engine engine, String name, Locale locale, String encoding, String source) {
+        super(engine, name, locale, encoding);
+        this.source = source;
+    }
+
+    public StringResource(Engine engine, String name, Locale locale, String encoding, long lastModified, String source) {
+        super(engine, name, locale, encoding, lastModified);
+        this.source = source;
+    }
+
+    @Override
+    public long getLength() {
+        return source.length();
+    }
+
+    public Reader openReader() throws IOException {
+        return new StringReader(source);
+    }
+
+    public InputStream openStream() throws IOException {
+        return new ByteArrayInputStream(source.getBytes(getEncoding()));
+    }
 
 }

@@ -25,29 +25,28 @@ import java.util.Locale;
 
 /**
  * FileResource. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.spi.loaders.FileLoader#load(String, Locale, String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.loaders.FileLoader#load(String, Locale, String)
  */
 public class FileResource extends InputStreamResource {
-	
-	private static final long serialVersionUID = 1L;
-	
-	private final File file;
-	
-	public FileResource(Engine engine, String name, Locale locale, String encoding, String path) {
-		super(engine, name, locale, encoding, path);
-		this.file = new File(path);
-	}
 
-	public InputStream openStream() throws IOException {
-		return new FileInputStream(this.file);
-	}
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public File getFile() {
-		return file;
-	}
+    private final File file;
+
+    public FileResource(Engine engine, String name, Locale locale, String encoding, String path) {
+        super(engine, name, locale, encoding, path);
+        this.file = new File(path);
+    }
+
+    public InputStream openStream() throws IOException {
+        return new FileInputStream(this.file);
+    }
+
+    @Override
+    public File getFile() {
+        return file;
+    }
 
 }

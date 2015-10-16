@@ -19,25 +19,25 @@ import httl.util.StringUtils;
 
 /**
  * Xml Codec. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public abstract class AbstractXmlCodec extends AbstractCodec {
 
-	public String getFormat() {
-		return "xml";
-	}
+    public String getFormat() {
+        return "xml";
+    }
 
-	public boolean isValueOf(String str) {
-		return StringUtils.isNotEmpty(str) && str.startsWith("<");
-	}
+    public boolean isValueOf(String str) {
+        return StringUtils.isNotEmpty(str) && str.startsWith("<");
+    }
 
-	public boolean isValueOf(char[] str) {
-		return StringUtils.isNotEmpty(str) && str[0] == '<';
-	}
+    public boolean isValueOf(char[] str) {
+        return StringUtils.isNotEmpty(str) && str[0] == '<';
+    }
 
-	public boolean isValueOf(byte[] str) {
-		return StringUtils.isNotEmpty(str) && str[0] == '<';
-	}
+    public boolean isValueOf(byte[] str) {
+        return StringUtils.isNotEmpty(str) && str[0] == '<';
+    }
 
 }

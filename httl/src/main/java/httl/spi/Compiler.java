@@ -19,19 +19,18 @@ import java.text.ParseException;
 
 /**
  * Java Compiler. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.translators.CompiledTranslator#setCompiler(Compiler)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.translators.CompiledTranslator#setCompiler(Compiler)
  */
 public interface Compiler {
 
-	/**
-	 * Compile java source code.
-	 * 
-	 * @param code - java source code
-	 * @return compiled java class
-	 */
-	Class<?> compile(String code) throws ParseException;
+    /**
+     * Compile java source code.
+     *
+     * @param code - java source code
+     * @return compiled java class
+     */
+    Class<?> compile(String code) throws ParseException;
 
 }

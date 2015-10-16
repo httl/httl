@@ -20,38 +20,38 @@ import java.util.NoSuchElementException;
 
 /**
  * BooleanArrayIterator. (Tool, Prototype, ThreadUnsafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class BooleanArrayIterator implements Iterator<Boolean> {
 
-	private final boolean[] array;
+    private final boolean[] array;
 
-	private final int length;
+    private final int length;
 
-	private int index;
+    private int index;
 
-	public BooleanArrayIterator(boolean[] array){
-		this.array = array;
-		this.length = array == null ? 0 : array.length;
-	}
+    public BooleanArrayIterator(boolean[] array) {
+        this.array = array;
+        this.length = array == null ? 0 : array.length;
+    }
 
-	public Object getArray() {
-		return array;
-	}
+    public Object getArray() {
+        return array;
+    }
 
-	public boolean hasNext() {
-		return index < length;
-	}
+    public boolean hasNext() {
+        return index < length;
+    }
 
-	public Boolean next() {
-		if (! hasNext()) {
-			throw new NoSuchElementException();
-		}
-		return array[index ++];
-	}
+    public Boolean next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return array[index++];
+    }
 
-	public void remove() {
-		throw new UnsupportedOperationException("remove() method is not supported");
-	}
+    public void remove() {
+        throw new UnsupportedOperationException("remove() method is not supported");
+    }
 }

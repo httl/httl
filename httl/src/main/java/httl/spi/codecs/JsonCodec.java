@@ -25,37 +25,37 @@ import java.util.Map;
 
 /**
  * Json Codec. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class JsonCodec extends AbstractJsonCodec {
 
-	private final BeanMapConverter converter = new BeanMapConverter();
+    private final BeanMapConverter converter = new BeanMapConverter();
 
-	public void setCompiler(Compiler compiler) {
-		this.converter.setCompiler(compiler);
-	}
+    public void setCompiler(Compiler compiler) {
+        this.converter.setCompiler(compiler);
+    }
 
-	public String toString(String key, Object value) {
-		if (value == null) {
-			return null;
-		}
-		try {
-			return JSON.json(value, isJsonWithClass(), converter);
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
+    public String toString(String key, Object value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return JSON.json(value, isJsonWithClass(), converter);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T valueOf(String str, Class<T> type) throws ParseException {
-		if (str == null) {
-			return null;
-		}
-		if (type == null) {
-			return (T) JSON.parse(str, Map.class, converter);
-		}
-		return JSON.parse(str, type, converter);
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T valueOf(String str, Class<T> type) throws ParseException {
+        if (str == null) {
+            return null;
+        }
+        if (type == null) {
+            return (T) JSON.parse(str, Map.class, converter);
+        }
+        return JSON.parse(str, type, converter);
+    }
 
 }

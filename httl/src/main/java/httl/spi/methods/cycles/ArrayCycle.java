@@ -22,48 +22,48 @@ package httl.spi.methods.cycles;
  */
 public class ArrayCycle<T> {
 
-	private final T[] values;
-	
-	private final int size;
+    private final T[] values;
 
-	private int index;
+    private final int size;
 
-	public ArrayCycle(T[] values) {
-		if (values == null || values.length == 0) {
-			throw new IllegalArgumentException("cycle values == null");
-		}
-		this.values = values;
-		this.size = values.length;
-		this.index = -1;
-	}
+    private int index;
 
-	public Object getNext() {
-		index += 1;
-		if (index >= size)
-			index = 0;
-		return values[index];
-	}
+    public ArrayCycle(T[] values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("cycle values == null");
+        }
+        this.values = values;
+        this.size = values.length;
+        this.index = -1;
+    }
 
-	public Object getValue() {
-		if (index == -1)
-			return values[0];
-		return values[index];
-	}
+    public Object getNext() {
+        index += 1;
+        if (index >= size)
+            index = 0;
+        return values[index];
+    }
 
-	public T[] getValues() {
-		return values;
-	}
+    public Object getValue() {
+        if (index == -1)
+            return values[0];
+        return values[index];
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public T[] getValues() {
+        return values;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public int getSize() {
+        return size;
+    }
 
-	public String toString() {
-		return String.valueOf(getNext());
-	}
+    public int getIndex() {
+        return index;
+    }
+
+    public String toString() {
+        return String.valueOf(getNext());
+    }
 
 }

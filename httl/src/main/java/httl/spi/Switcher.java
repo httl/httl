@@ -19,44 +19,43 @@ import java.util.List;
 
 /**
  * Location Switcher. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTextFilterSwitcher(Switcher)
  * @see httl.spi.translators.CompiledTranslator#setValueFilterSwitcher(Switcher)
  * @see httl.spi.translators.CompiledTranslator#setFormatterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setTextFilterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setFormatterSwitcher(Switcher)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Switcher<T> {
 
-	/**
-	 * Switch's locations.
-	 * 
-	 * <pre>
-	 * locations = ["&lt;script", "&lt;/script&gt;"]
-	 * </pre>
-	 * 
-	 * @return locations
-	 */
-	List<String> locations();
+    /**
+     * Switch's locations.
+     * <p/>
+     * <pre>
+     * locations = ["&lt;script", "&lt;/script&gt;"]
+     * </pre>
+     *
+     * @return locations
+     */
+    List<String> locations();
 
-	/**
-	 * Enter the location.
-	 * 
-	 * <pre>
-	 * filter = switcher.switchover("&lt;script", defaultFilter); // return EscapeStringFilter
-	 * &lt;script type="text/javascript"&gt;
-	 * ...
-	 * filter = switcher.switchover("&lt;/script&gt;", defaultFilter); // return defaultFilter
-	 * &lt;/script&gt;
-	 * </pre>
-	 * 
-	 * @param location - the entered location
-	 * @param origin - the origin value
-	 * @return the location value
-	 */
-	T switchover(String location, T origin);
+    /**
+     * Enter the location.
+     * <p/>
+     * <pre>
+     * filter = switcher.switchover("&lt;script", defaultFilter); // return EscapeStringFilter
+     * &lt;script type="text/javascript"&gt;
+     * ...
+     * filter = switcher.switchover("&lt;/script&gt;", defaultFilter); // return defaultFilter
+     * &lt;/script&gt;
+     * </pre>
+     *
+     * @param location - the entered location
+     * @param origin   - the origin value
+     * @return the location value
+     */
+    T switchover(String location, T origin);
 
 }

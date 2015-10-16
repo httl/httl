@@ -25,63 +25,64 @@ import java.net.URLEncoder;
 
 /**
  * EscapeMethod. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class EscapeMethod {
-	
-	private EscapeMethod() {}
 
-	public static String escapeString(String value) {
-		return StringUtils.escapeString(value);
-	}
+    private EscapeMethod() {
+    }
 
-	public static String unescapeString(String value) {
-		return StringUtils.unescapeString(value);
-	}
+    public static String escapeString(String value) {
+        return StringUtils.escapeString(value);
+    }
 
-	public static String escapeXml(String value) {
-		return StringUtils.escapeXml(value);
-	}
+    public static String unescapeString(String value) {
+        return StringUtils.unescapeString(value);
+    }
 
-	public static String unescapeXml(String value) {
-		return StringUtils.unescapeXml(value);
-	}
+    public static String escapeXml(String value) {
+        return StringUtils.escapeXml(value);
+    }
 
-	public static String escapeUrl(String value) {
-		return escapeUrl(value, "UTF-8");
-	}
+    public static String unescapeXml(String value) {
+        return StringUtils.unescapeXml(value);
+    }
 
-	public static String escapeUrl(String value, String encoding) {
-		try {
-			return value == null ? null : URLEncoder.encode(value, encoding);
-		} catch (UnsupportedEncodingException e) {
-			return value;
-		}
-	}
+    public static String escapeUrl(String value) {
+        return escapeUrl(value, "UTF-8");
+    }
 
-	public static String unescapeUrl(String value) {
-		return unescapeUrl(value, "UTF-8");
-	}
+    public static String escapeUrl(String value, String encoding) {
+        try {
+            return value == null ? null : URLEncoder.encode(value, encoding);
+        } catch (UnsupportedEncodingException e) {
+            return value;
+        }
+    }
 
-	public static String unescapeUrl(String value, String encoding) {
-		try {
-			return value == null ? null : URLDecoder.decode(value, encoding);
-		} catch (UnsupportedEncodingException e) {
-			return value;
-		}
-	}
+    public static String unescapeUrl(String value) {
+        return unescapeUrl(value, "UTF-8");
+    }
 
-	public static String escapeBase64(String value) {
-		return value == null ? null : Base64.encodeBytes(value.getBytes());
-	}
+    public static String unescapeUrl(String value, String encoding) {
+        try {
+            return value == null ? null : URLDecoder.decode(value, encoding);
+        } catch (UnsupportedEncodingException e) {
+            return value;
+        }
+    }
 
-	public static String unescapeBase64(String value) {
-		try {
-			return value == null ? null : new String(Base64.decode(value));
-		} catch (IOException e) {
-			return value;
-		}
-	}
+    public static String escapeBase64(String value) {
+        return value == null ? null : Base64.encodeBytes(value.getBytes());
+    }
+
+    public static String unescapeBase64(String value) {
+        try {
+            return value == null ? null : new String(Base64.decode(value));
+        } catch (IOException e) {
+            return value;
+        }
+    }
 
 }

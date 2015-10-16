@@ -27,24 +27,23 @@ import java.util.Locale;
 
 /**
  * FileLoader. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  */
 public class FileLoader extends AbstractLoader {
 
-	public List<String> doList(String directory, String suffix) throws IOException {
-		File file = new File(directory);
-		return UrlUtils.listFile(file, suffix);
-	}
-	
-	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
-		return new FileResource(getEngine(), name, locale, encoding, path);
-	}
+    public List<String> doList(String directory, String suffix) throws IOException {
+        File file = new File(directory);
+        return UrlUtils.listFile(file, suffix);
+    }
 
-	public boolean doExists(String name, Locale locale, String path) throws IOException {
-		return new File(path).exists();
-	}
+    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+        return new FileResource(getEngine(), name, locale, encoding, path);
+    }
+
+    public boolean doExists(String name, Locale locale, String path) throws IOException {
+        return new File(path).exists();
+    }
 
 }

@@ -22,26 +22,25 @@ import java.text.DecimalFormat;
 
 /**
  * NumberFormatter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setFormatter(Formatter)
  * @see httl.spi.translators.InterpretedTranslator#setFormatter(Formatter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class NumberFormatter extends AbstractFormatter<Number> {
-	
-	private String numberFormat;
-	
-	/**
-	 * httl.properties: number.format=###,##0.###
-	 */
-	public void setNumberFormat(String numberFormat) {
-		new DecimalFormat(numberFormat).format(0);
-		this.numberFormat = numberFormat;
-	}
 
-	public String toString(String key, Number value) {
-		return NumberUtils.format(value, numberFormat);
-	}
+    private String numberFormat;
+
+    /**
+     * httl.properties: number.format=###,##0.###
+     */
+    public void setNumberFormat(String numberFormat) {
+        new DecimalFormat(numberFormat).format(0);
+        this.numberFormat = numberFormat;
+    }
+
+    public String toString(String key, Number value) {
+        return NumberUtils.format(value, numberFormat);
+    }
 
 }

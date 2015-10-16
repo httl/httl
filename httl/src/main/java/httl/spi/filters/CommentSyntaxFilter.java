@@ -21,59 +21,58 @@ import httl.util.StringUtils;
 
 /**
  * CommentSyntaxFilter. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTextFilter(Filter)
  * @see httl.spi.translators.InterpretedTranslator#setTextFilter(Filter)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class CommentSyntaxFilter extends AbstractFilter {
 
-	private String commentLeft;
+    private String commentLeft;
 
-	private String commentRight;
+    private String commentRight;
 
-	private boolean removeDirectiveBlankLine;
+    private boolean removeDirectiveBlankLine;
 
-	/**
-	 * httl.properties: comment.left=&lt;!--
-	 */
-	@Reqiured
-	public void setCommentLeft(String commentLeft) {
-		this.commentLeft = commentLeft;
-	}
+    /**
+     * httl.properties: comment.left=&lt;!--
+     */
+    @Reqiured
+    public void setCommentLeft(String commentLeft) {
+        this.commentLeft = commentLeft;
+    }
 
-	/**
-	 * httl.properties: comment.right=--&gt;
-	 */
-	@Reqiured
-	public void setCommentRight(String commentRight) {
-		this.commentRight = commentRight;
-	}
+    /**
+     * httl.properties: comment.right=--&gt;
+     */
+    @Reqiured
+    public void setCommentRight(String commentRight) {
+        this.commentRight = commentRight;
+    }
 
-	/**
-	 * httl.properties: remove.directive.blank.line=true
-	 */
-	public void setRemoveDirectiveBlankLine(boolean removeDirectiveBlankLine) {
-		this.removeDirectiveBlankLine = removeDirectiveBlankLine;
-	}
+    /**
+     * httl.properties: remove.directive.blank.line=true
+     */
+    public void setRemoveDirectiveBlankLine(boolean removeDirectiveBlankLine) {
+        this.removeDirectiveBlankLine = removeDirectiveBlankLine;
+    }
 
-	public String filter(String key, String value) {
-		boolean left = false;
-		boolean right = false;
-		String trim = value.trim();
-		if (trim.startsWith(commentRight)) {
-			value = value.substring(value.indexOf(commentRight) + commentRight.length());
-			left = true;
-		}
-		if (trim.endsWith(commentLeft)) {
-			value = value.substring(0, value.lastIndexOf(commentLeft));
-			right = true;
-		}
-		if (removeDirectiveBlankLine && (left || right)) {
-			value = StringUtils.trimBlankLine(value, left, right);
-		}
-		return value;
-	}
+    public String filter(String key, String value) {
+        boolean left = false;
+        boolean right = false;
+        String trim = value.trim();
+        if (trim.startsWith(commentRight)) {
+            value = value.substring(value.indexOf(commentRight) + commentRight.length());
+            left = true;
+        }
+        if (trim.endsWith(commentLeft)) {
+            value = value.substring(0, value.lastIndexOf(commentLeft));
+            right = true;
+        }
+        if (removeDirectiveBlankLine && (left || right)) {
+            value = StringUtils.trimBlankLine(value, left, right);
+        }
+        return value;
+    }
 
 }

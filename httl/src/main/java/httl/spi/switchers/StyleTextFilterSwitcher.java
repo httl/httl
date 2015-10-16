@@ -20,19 +20,18 @@ import httl.spi.Switcher;
 
 /**
  * StyleTextFilterSwitcher. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTextFilterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setTextFilterSwitcher(Switcher)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class StyleTextFilterSwitcher extends StyleFilterSwitcher {
 
-	/**
-	 * httl.properties: style.text.filter=httl.spi.filters.StyleTextFilter
-	 */
-	public void setStyleTextFilter(Filter filter) {
-		setStyleFilter(filter);
-	}
+    /**
+     * httl.properties: style.text.filter=httl.spi.filters.StyleTextFilter
+     */
+    public void setStyleTextFilter(Filter filter) {
+        setStyleFilter(filter);
+    }
 
 }

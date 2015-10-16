@@ -19,18 +19,17 @@ import httl.spi.Filter;
 
 /**
  * MultiExpressionFilter. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(Filter)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.parsers.ExpressionParser#setExpressionFilter(Filter)
  */
 public class MultiExpressionFilter extends MultiFilter {
 
-	/**
-	 * httl.properties: expression.filters=httl.spi.filters.UnescapeXmlFilter
-	 */
-	public void setExpressionFilters(Filter[] filters) {
-		setFilters(filters);
-	}
+    /**
+     * httl.properties: expression.filters=httl.spi.filters.UnescapeXmlFilter
+     */
+    public void setExpressionFilters(Filter[] filters) {
+        setFilters(filters);
+    }
 
 }

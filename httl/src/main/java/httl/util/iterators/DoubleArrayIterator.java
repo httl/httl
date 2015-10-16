@@ -20,38 +20,38 @@ import java.util.NoSuchElementException;
 
 /**
  * DoubleArrayIterator. (Tool, Prototype, ThreadUnsafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class DoubleArrayIterator implements Iterator<Double> {
 
-	private final double[] array;
+    private final double[] array;
 
-	private final int length;
+    private final int length;
 
-	private int index;
+    private int index;
 
-	public DoubleArrayIterator(double[] array){
-		this.array = array;
-		this.length = array == null ? 0 : array.length;
-	}
+    public DoubleArrayIterator(double[] array) {
+        this.array = array;
+        this.length = array == null ? 0 : array.length;
+    }
 
-	public Object getArray() {
-		return array;
-	}
+    public Object getArray() {
+        return array;
+    }
 
-	public boolean hasNext() {
-		return index < length;
-	}
+    public boolean hasNext() {
+        return index < length;
+    }
 
-	public Double next() {
-		if (! hasNext()) {
-			throw new NoSuchElementException();
-		}
-		return array[index ++];
-	}
+    public Double next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return array[index++];
+    }
 
-	public void remove() {
-		throw new UnsupportedOperationException("remove() method is not supported");
-	}
+    public void remove() {
+        throw new UnsupportedOperationException("remove() method is not supported");
+    }
 }

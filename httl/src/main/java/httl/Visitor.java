@@ -20,22 +20,21 @@ import java.text.ParseException;
 
 /**
  * Visitor. (API, Prototype, Callback, NonThreadSafe)
- * 
+ *
+ * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.Node#accept(Visitor)
  * @see httl.Template#accept(Visitor)
- * 
- * @author @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public interface Visitor {
 
-	/**
-	 * Visit a node.
-	 * 
-	 * @param node - visited node
-	 * @throws IOException - If an I/O error occurs
-	 * @throws ParseException - If the expression cannot be parsed on runtime
-	 * @return true - Need visit the children nodes.
-	 */
-	boolean visit(Node node) throws IOException, ParseException;
+    /**
+     * Visit a node.
+     *
+     * @param node - visited node
+     * @return true - Need visit the children nodes.
+     * @throws IOException    - If an I/O error occurs
+     * @throws ParseException - If the expression cannot be parsed on runtime
+     */
+    boolean visit(Node node) throws IOException, ParseException;
 
 }

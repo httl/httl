@@ -15,55 +15,54 @@
  */
 package httl.spi.switchers;
 
+import httl.spi.Filter;
+import httl.spi.Switcher;
+
 import java.util.Arrays;
 import java.util.List;
 
-import httl.spi.Switcher;
-import httl.spi.Filter;
-
 /**
  * ScriptFilterSwitcher. (SPI, Singleton, ThreadSafe)
- * 
+ *
+ * @author Liang Fei (liangfei0201 AT gmail DOT com)
  * @see httl.spi.translators.CompiledTranslator#setTextFilterSwitcher(Switcher)
  * @see httl.spi.translators.CompiledTranslator#setValueFilterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setTextFilterSwitcher(Switcher)
  * @see httl.spi.translators.InterpretedTranslator#setValueFilterSwitcher(Switcher)
- * 
- * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class ScriptFilterSwitcher implements Switcher<Filter> {
 
-	private static final String START_TAG = "<script";
+    private static final String START_TAG = "<script";
 
-	private static final String END_TAG = "</script>";
+    private static final String END_TAG = "</script>";
 
-	private List<String> scriptLocations = Arrays.asList(new String[] {START_TAG, END_TAG});
+    private List<String> scriptLocations = Arrays.asList(new String[]{START_TAG, END_TAG});
 
-	private Filter scriptFilter;
+    private Filter scriptFilter;
 
-	/**
-	 * httl.properties: script.locations=&lt;script,&lt;/script&gt;
-	 */
-	public void setScriptLocations(String[] locations) {
-		this.scriptLocations = Arrays.asList(locations);
-	}
+    /**
+     * httl.properties: script.locations=&lt;script,&lt;/script&gt;
+     */
+    public void setScriptLocations(String[] locations) {
+        this.scriptLocations = Arrays.asList(locations);
+    }
 
-	/**
-	 * httl.properties: script.filter=httl.spi.filters.ScriptFilter
-	 */
-	public void setScriptFilter(Filter filter) {
-		this.scriptFilter = filter;
-	}
+    /**
+     * httl.properties: script.filter=httl.spi.filters.ScriptFilter
+     */
+    public void setScriptFilter(Filter filter) {
+        this.scriptFilter = filter;
+    }
 
-	public List<String> locations() {
-		return scriptLocations;
-	}
+    public List<String> locations() {
+        return scriptLocations;
+    }
 
-	public Filter switchover(String location, Filter defaultFilter) {
-		if (START_TAG.equals(location)) {
-			return scriptFilter;
-		}
-		return defaultFilter;
-	}
+    public Filter switchover(String location, Filter defaultFilter) {
+        if (START_TAG.equals(location)) {
+            return scriptFilter;
+        }
+        return defaultFilter;
+    }
 
 }

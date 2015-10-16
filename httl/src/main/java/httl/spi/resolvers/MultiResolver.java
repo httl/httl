@@ -22,43 +22,43 @@ import java.util.Map;
 
 /**
  * MultiResolver. (SPI, Singleton, ThreadSafe)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
  */
 public class MultiResolver implements Resolver {
-	
-	private Resolver[] resolvers;
 
-	private Map<String, Resolver> resolverMap;
+    private Resolver[] resolvers;
 
-	public void setResolvers(Resolver[] resolvers) {
-		this.resolvers = resolvers;
-		this.resolverMap = new HashMap<String, Resolver>();
-		String suffix = Resolver.class.getSimpleName();
-		for (Resolver resolver : resolvers) {
-			String name = resolver.getClass().getSimpleName();
-			if (name.endsWith(suffix)) {
-				name = name.substring(0, name.length() - suffix.length());
-			}
-			name = name.substring(0, 1).toLowerCase() + name.substring(1);
-			resolverMap.put(name, resolver);
-		}
-	}
+    private Map<String, Resolver> resolverMap;
 
-	public Object get(String key) {
-		if (resolvers == null || resolvers.length == 0) {
-			return null;
-		}
-		for (Resolver resolver : resolvers) {
-			Object value = resolver.get(key);
-			if (value != null) {
-				return value;
-			}
-		}
-		if (resolverMap != null) {
-			return resolverMap.get(key);
-		}
-		return null;
-	}
+    public void setResolvers(Resolver[] resolvers) {
+        this.resolvers = resolvers;
+        this.resolverMap = new HashMap<String, Resolver>();
+        String suffix = Resolver.class.getSimpleName();
+        for (Resolver resolver : resolvers) {
+            String name = resolver.getClass().getSimpleName();
+            if (name.endsWith(suffix)) {
+                name = name.substring(0, name.length() - suffix.length());
+            }
+            name = name.substring(0, 1).toLowerCase() + name.substring(1);
+            resolverMap.put(name, resolver);
+        }
+    }
+
+    public Object get(String key) {
+        if (resolvers == null || resolvers.length == 0) {
+            return null;
+        }
+        for (Resolver resolver : resolvers) {
+            Object value = resolver.get(key);
+            if (value != null) {
+                return value;
+            }
+        }
+        if (resolverMap != null) {
+            return resolverMap.get(key);
+        }
+        return null;
+    }
 
 }

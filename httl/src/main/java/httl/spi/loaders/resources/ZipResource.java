@@ -25,44 +25,43 @@ import java.util.zip.ZipFile;
 
 /**
  * ZipResource. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.spi.loaders.ZipLoader#load(String, Locale, String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.loaders.ZipLoader#load(String, Locale, String)
  */
 public class ZipResource extends InputStreamResource {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final File file;
+    private final File file;
 
-	public ZipResource(Engine engine, String name, Locale locale, String encoding, File file) {
-		super(engine, name, locale, encoding, file.getPath() + JAR_FILE_SEPARATOR + name);
-		this.file = file;
-	}
+    public ZipResource(Engine engine, String name, Locale locale, String encoding, File file) {
+        super(engine, name, locale, encoding, file.getPath() + JAR_FILE_SEPARATOR + name);
+        this.file = file;
+    }
 
-	public InputStream openStream() throws IOException {
-		// 注：ZipFile与File的设计是不一样的，File相当于C#的FileInfo，只持有信息，
-		// 而ZipFile构造时即打开流，所以每次读取数据时，重新new新的实例，而不作为属性字段持有。
-		ZipFile zipFile = new ZipFile(file);
-		return zipFile.getInputStream(zipFile.getEntry(getName()));
-	}
+    public InputStream openStream() throws IOException {
+        // 注：ZipFile与File的设计是不一样的，File相当于C#的FileInfo，只持有信息，
+        // 而ZipFile构造时即打开流，所以每次读取数据时，重新new新的实例，而不作为属性字段持有。
+        ZipFile zipFile = new ZipFile(file);
+        return zipFile.getInputStream(zipFile.getEntry(getName()));
+    }
 
-	public long getLastModified() {
-		return file.lastModified();
-	}
+    public long getLastModified() {
+        return file.lastModified();
+    }
 
-	public long getLength() {
-		try {
-			ZipFile zipFile = new ZipFile(file);
-			try {
-				return zipFile.getEntry(getName()).getSize();
-			} finally {
-				zipFile.close();
-			}
-		} catch (IOException e) {
-			return super.getLength();
-		}
-	}
+    public long getLength() {
+        try {
+            ZipFile zipFile = new ZipFile(file);
+            try {
+                return zipFile.getEntry(getName()).getSize();
+            } finally {
+                zipFile.close();
+            }
+        } catch (IOException e) {
+            return super.getLength();
+        }
+    }
 
 }

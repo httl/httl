@@ -22,48 +22,48 @@ package httl.spi.methods.cycles;
  */
 public class ByteArrayCycle {
 
-	private final byte[] values;
-	
-	private final int size;
+    private final byte[] values;
 
-	private int index;
+    private final int size;
 
-	public ByteArrayCycle(byte[] values) {
-		if (values == null || values.length == 0) {
-			throw new IllegalArgumentException("cycle values == null");
-		}
-		this.values = values;
-		this.size = values.length;
-		this.index = -1;
-	}
+    private int index;
 
-	public byte getNext() {
-		index += 1;
-		if (index >= size)
-			index = 0;
-		return values[index];
-	}
+    public ByteArrayCycle(byte[] values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("cycle values == null");
+        }
+        this.values = values;
+        this.size = values.length;
+        this.index = -1;
+    }
 
-	public byte getValue() {
-		if (index == -1)
-			return values[0];
-		return values[index];
-	}
+    public byte getNext() {
+        index += 1;
+        if (index >= size)
+            index = 0;
+        return values[index];
+    }
 
-	public byte[] getValues() {
-		return values;
-	}
+    public byte getValue() {
+        if (index == -1)
+            return values[0];
+        return values[index];
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public byte[] getValues() {
+        return values;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public int getSize() {
+        return size;
+    }
 
-	public String toString() {
-		return String.valueOf(getNext());
-	}
+    public int getIndex() {
+        return index;
+    }
+
+    public String toString() {
+        return String.valueOf(getNext());
+    }
 
 }

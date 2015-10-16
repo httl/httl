@@ -28,33 +28,32 @@ import java.util.Locale;
 
 /**
  * UrlLoader. (SPI, Singleton, ThreadSafe)
- * 
- * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.engines.DefaultEngine#setLoader(Loader)
  */
 public class UrlLoader extends AbstractLoader {
-	
-	public List<String> doList(String directory, String suffix) throws IOException {
-		return UrlUtils.listUrl(new URL(cleanPath(directory)), suffix);
-	}
-	
-	protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
-		return new UrlResource(getEngine(), name, locale, encoding, cleanPath(path));
-	}
 
-	public boolean doExists(String name, Locale locale, String path) throws IOException {
-		InputStream in = new URL(cleanPath(path)).openStream();
-		try {
-			return in != null;
-		} finally {
-			if (in != null)
-				in.close();
-		}
-	}
+    public List<String> doList(String directory, String suffix) throws IOException {
+        return UrlUtils.listUrl(new URL(cleanPath(directory)), suffix);
+    }
 
-	private String cleanPath(String path) {
-		return path.startsWith("/") ? path.substring(1) : path;
-	}
+    protected Resource doLoad(String name, Locale locale, String encoding, String path) throws IOException {
+        return new UrlResource(getEngine(), name, locale, encoding, cleanPath(path));
+    }
+
+    public boolean doExists(String name, Locale locale, String path) throws IOException {
+        InputStream in = new URL(cleanPath(path)).openStream();
+        try {
+            return in != null;
+        } finally {
+            if (in != null)
+                in.close();
+        }
+    }
+
+    private String cleanPath(String path) {
+        return path.startsWith("/") ? path.substring(1) : path;
+    }
 
 }

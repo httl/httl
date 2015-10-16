@@ -17,38 +17,36 @@ package httl.spi.loaders.resources;
 
 import httl.Engine;
 
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-import javax.servlet.ServletContext;
-
 /**
  * ServletResource. (SPI, Prototype, ThreadSafe)
- * 
- * @see httl.spi.loaders.ServletLoader#load(String, Locale, String)
- * 
+ *
  * @author Liang Fei (liangfei0201 AT gmail DOT com)
+ * @see httl.spi.loaders.ServletLoader#load(String, Locale, String)
  */
 public class ServletResource extends InputStreamResource {
 
-	private static final long serialVersionUID = 2499229996487593996L;
-	
-	private final transient ServletContext servletContext;
+    private static final long serialVersionUID = 2499229996487593996L;
 
-	public ServletResource(Engine engine, String name, Locale locale, String encoding, String path, ServletContext servletContext) {
-		super(engine, name, locale, encoding, path);
-		this.servletContext = servletContext;
-	}
+    private final transient ServletContext servletContext;
 
-	public InputStream openStream() throws IOException {
-		return servletContext.getResourceAsStream(getPath());
-	}
+    public ServletResource(Engine engine, String name, Locale locale, String encoding, String path, ServletContext servletContext) {
+        super(engine, name, locale, encoding, path);
+        this.servletContext = servletContext;
+    }
 
-	@Override
-	public File getFile() {
-		return new File(servletContext.getRealPath(getPath()));
-	}
+    public InputStream openStream() throws IOException {
+        return servletContext.getResourceAsStream(getPath());
+    }
+
+    @Override
+    public File getFile() {
+        return new File(servletContext.getRealPath(getPath()));
+    }
 
 }
