@@ -217,10 +217,10 @@ public class DefaultEngine extends Engine {
             }
         }
         assert (reference != null);
-        Template template = (Template) reference.get();
+        Template template = reference.get();
         if (template == null || template.getLastModified() < lastModified) {
             synchronized (reference) { // reference lock
-                template = (Template) reference.get();
+                template = reference.get();
                 if (template == null || template.getLastModified() < lastModified) { // double check
                     template = parseTemplate(resource, name, locale, encoding, args); // slowly
                     reference.set(template);
