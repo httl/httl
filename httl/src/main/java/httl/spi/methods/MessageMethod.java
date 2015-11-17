@@ -1,12 +1,12 @@
 /*
  * Copyright 2011-2013 HTTL Team.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,12 +24,11 @@ import httl.spi.Resolver;
 import httl.util.EncodingProperties;
 import httl.util.LocaleUtils;
 import httl.util.StringUtils;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * MessageMethod. (SPI, Singleton, ThreadSafe)
@@ -38,15 +37,21 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class MessageMethod {
 
-    private final ConcurrentMap<String, EncodingProperties> messageCache = new ConcurrentHashMap<String, EncodingProperties>();
+    private final Map<String, EncodingProperties> messageCache;
+    private final Map<String, String> basenameCache;
     private Engine engine;
     private Resolver resolver;
     private Logger logger;
-    private String messageBasename;
+    private String[] messageBasenames;
     private String messageFormat;
     private String messageEncoding;
     private String messageSuffix;
     private boolean reloadable;
+
+    public MessageMethod() {
+        messageCache = new ConcurrentHashMap<String, EncodingProperties>();
+        basenameCache = new ConcurrentHashMap<String, String>();
+    }
 
     /**
      * httl.properties: engine=httl.spi.engines.DefaultEngine
@@ -79,8 +84,8 @@ public class MessageMethod {
     /**
      * httl.properties: message.basename=messages
      */
-    public void setMessageBasename(String messageBasename) {
-        this.messageBasename = messageBasename;
+    public void setMessageBasenames(String[] messageBasenames) {
+        this.messageBasenames = messageBasenames;
     }
 
     /**
@@ -168,7 +173,7 @@ public class MessageMethod {
     }
 
     public String message(String key, Locale locale, Object[] args) {
-        if (StringUtils.isEmpty(key) || messageBasename == null) {
+        if (StringUtils.isEmpty(key) || messageBasenames == null) {
             return key;
         }
         if (locale == null) {
@@ -186,10 +191,29 @@ public class MessageMethod {
                 return value;
             }
         }
+
         return key;
     }
 
     private String findMessageByLocale(String key, Locale locale) {
+        String messageBasename = basenameCache.get(key);
+
+        String value = "";
+        if (StringUtils.isBlank(messageBasename)) {
+            for (String basename : messageBasenames) {
+                value = findMessageByLocale(key, basename, locale);
+                if (!StringUtils.isBlank(value)) {
+                    break;
+                }
+            }
+        } else {
+            value = findMessageByLocale(messageBasename, key, locale);
+        }
+
+        return value;
+    }
+
+    private String findMessageByLocale(String key, String messageBasename, Locale locale) {
         String file = messageBasename + (locale == null ? "" : "_" + locale) + messageSuffix;
         EncodingProperties properties = messageCache.get(file);
         if ((properties == null || reloadable) && engine.hasResource(file)) {
@@ -215,13 +239,14 @@ public class MessageMethod {
         if (properties != null) {
             String value = properties.getProperty(key);
             if (StringUtils.isNotEmpty(value)) {
+                basenameCache.put(key, messageBasename);
                 return value;
             }
         }
         if (locale != null) {
             return findMessageByLocale(key, LocaleUtils.getParentLocale(locale));
         }
-        return null;
-    }
 
+        return "";
+    }
 }
