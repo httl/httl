@@ -82,10 +82,10 @@ public class MessageMethod {
     }
 
     /**
-     * httl.properties: message.basenames=messages
+     * httl.properties: message.basename=messages
      */
-    public void setMessageBasenames(String messageBasenames) {
-        this.messageBasenames = messageBasenames.split(",");
+    public void setMessageBasename(String messageBasename) {
+        this.messageBasenames = messageBasename.trim().split(",");
     }
 
     /**
@@ -175,6 +175,7 @@ public class MessageMethod {
         if (StringUtils.isEmpty(key) || messageBasenames == null) {
             return key;
         }
+
         if (locale == null) {
             locale = getLocale();
         }
