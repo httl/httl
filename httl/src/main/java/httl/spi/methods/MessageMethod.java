@@ -82,18 +82,17 @@ public class MessageMethod {
     }
 
     /**
-     * httl.properties: message.basename=messages
+     * httl.properties: message.basenames=messages
      */
-    public void setMessageBasenames(String[] messageBasenames) {
-        this.messageBasenames = messageBasenames;
+    public void setMessageBasenames(String messageBasenames) {
+        this.messageBasenames = messageBasenames.split(",");
     }
 
     /**
      * httl.properties: message.format=string
      */
     public void setMessageFormat(String messageFormat) {
-        if (!"string".equals(messageFormat)
-                && !"message".equals(messageFormat)) {
+        if (!"string".equals(messageFormat) && !"message".equals(messageFormat)) {
             throw new IllegalArgumentException("Unsupported message.format=" + messageFormat + ", only supported \"string\" or \"message\" format.");
         }
         this.messageFormat = messageFormat;
