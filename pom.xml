@@ -47,7 +47,7 @@
 		<repository>
 			<id>httl-repository</id>
 			<name>Httl Repository</name>
-			<url>http://httl.github.io/maven</url>
+			<url>https://httl.github.io/maven</url>
 		</repository>
 	</repositories>
 	<scm>
