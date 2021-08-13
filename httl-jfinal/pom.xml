@@ -88,7 +88,7 @@
 		<dependency>
 			<groupId>com.jfinal</groupId>
 			<artifactId>jfinal</artifactId>
-			<version>1.4</version>
+			<version>4.9.11</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
